@@ -1,4 +1,20 @@
-# React + TypeScript + Vite
+# Hangulling 한글링
+
+# 폴더구조
+src/
+├── api/
+├── assets/
+├── components/
+├── constants/
+├── hooks/
+├── layouts/
+├── mocks/
+├── pages/
+├── router/
+├── store/
+├── styles/
+├── types/
+└── utils/
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
