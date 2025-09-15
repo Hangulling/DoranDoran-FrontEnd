@@ -16,8 +16,20 @@ Remove: 파일을 삭제하는 작업만 수행한 경우
 !HOTFIX: 급하게 치명적인 버그를 고쳐야 하는 경우  
 
 # 폴더구조
-
-
+src/  
+├── api/  
+├── assets/  
+├── components/  
+├── constants/  
+├── hooks/  
+├── layouts/  
+├── mocks/  
+├── pages/  
+├── router/  
+├── store/  
+├── styles/  
+├── types/  
+└── utils/  
 
 ## Expanding the ESLint configuration
 
