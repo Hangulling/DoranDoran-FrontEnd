@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import { Routes } from './router/routes'
-import LoadingSpinner from './components/LoadingSpinner'
+import LoadingSpinner from './components/common/LoadingSpinner'
 
 function App() {
   return (
