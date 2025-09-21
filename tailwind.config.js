@@ -9,6 +9,10 @@ module.exports = {
       xl: '1280px',
       xl2: '1360px',
     },
-    extend: {},
+    extend: {
+      lineHeight: {
+        150: '1.5', // 150% 행간 추가
+      },
+    },
   },
 }
