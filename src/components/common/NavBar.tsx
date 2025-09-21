@@ -1,7 +1,7 @@
 import type React from 'react'
 import { useNavigate } from 'react-router-dom'
-import LeftArrowIcon from '../../assets/leftArrowIcon.svg'
-import BookMarkIcon from '../../assets/bookMarkIcon.svg'
+import LeftArrowIcon from '../../assets/icon/leftArrow.svg'
+import BookMarkIcon from '../../assets/icon/bookMark.svg'
 
 interface NavBarProps {
   title?: string
@@ -17,12 +17,12 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain }) => {
   }
 
   return (
-    <div className="navbar bg-base-100 shadow-sm">
+    <div className="navbar bg-base-100 shadow-sm h-15">
       {/* 뒤로가기 */}
       <div className="navbar-start">
         {!isMain && (
           <button onClick={goBack} className="btn btn-ghost btn-circle">
-            <img src={LeftArrowIcon} alt="Left Arrow" />
+            <img src={LeftArrowIcon} alt="뒤로가기" />
           </button>
         )}
       </div>
@@ -35,7 +35,7 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain }) => {
       {/* 북마크 */}
       <div className="navbar-end">
         <button className="btn btn-ghost btn-circle">
-          <img src={BookMarkIcon} alt="Book Mark" />
+          <img src={BookMarkIcon} alt="북마크" />
         </button>
       </div>
     </div>
