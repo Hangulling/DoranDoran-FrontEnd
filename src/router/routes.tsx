@@ -1,7 +1,7 @@
 import { lazy } from 'react'
 import { Route, Routes as RouterRoutes } from 'react-router-dom'
 
-const ListPage = lazy(() => import('../pages/ListPage'))
+const ListPage = lazy(() => import('../pages/MainPage'))
 
 export function Routes() {
   return (
