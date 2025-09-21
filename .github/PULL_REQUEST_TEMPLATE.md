@@ -10,9 +10,8 @@
 
 ## Checklist
 <!-- PR 제출 전 확인사항 -->
-- [ ] `npm run lint`를 실행하여 린트 오류가 없습니다
-- [ ] `npm run typecheck`를 실행하여 타입 오류가 없습니다
-- [ ] `npm run build`를 실행하여 빌드가 성공합니다
+- [ ] Commit Convention을 준수했습니다
+- [ ] CI 통과를 확인했습니다
 
 ## Additional Context
 <!-- 추가로 설명할 사항이 있으면 적어주세요 -->
