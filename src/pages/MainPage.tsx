@@ -1,8 +1,8 @@
 import Character from '../assets/mainCharacter.svg'
-import SchoolAvatar from '../assets/profile/school.svg'
-import LoverAvatar from '../assets/profile/lover.svg'
-import CompanyAvatar from '../assets/profile/company.svg'
-import ClientAvatar from '../assets/profile/client.svg'
+import SchoolAvatar from '/chat/school.svg'
+import LoverAvatar from '/chat/lover.svg'
+import CompanyAvatar from '/chat/company.svg'
+import ClientAvatar from '/chat/client.svg'
 
 const chatRooms = [
   { id: 'school', label: '학교 선배', avatar: SchoolAvatar, message: '밥 먹었어?' },
