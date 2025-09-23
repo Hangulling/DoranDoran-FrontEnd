@@ -3,6 +3,7 @@ import SchoolAvatar from '/chat/school.svg'
 import LoverAvatar from '/chat/lover.svg'
 import CompanyAvatar from '/chat/company.svg'
 import ClientAvatar from '/chat/client.svg'
+import { useNavigate } from 'react-router-dom'
 
 const chatRooms = [
   { id: 'school', label: '학교 선배', avatar: SchoolAvatar, message: '밥 먹었어?' },
@@ -12,7 +13,10 @@ const chatRooms = [
 ]
 
 const MainPage = () => {
+  const navigate = useNavigate()
+
   const handleRoomClick = (id: string) => {
+    navigate('/chat')
     console.log(id + ' 채팅방 이동')
   }
   return (
