@@ -4,6 +4,8 @@ import LoverAvatar from '/chat/lover.svg'
 import CompanyAvatar from '/chat/company.svg'
 import ClientAvatar from '/chat/client.svg'
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import CommonModal from '../components/common/CommonModal'
 
 const chatRooms = [
   { id: 'school', label: '학교 선배', avatar: SchoolAvatar, message: '밥 먹었어?' },
@@ -12,17 +14,47 @@ const chatRooms = [
   { id: 'client', label: '거래처', avatar: ClientAvatar, message: '밥 먹었어?' },
 ]
 
+const LOGOUT_DESC = ['로그아웃 하시겠어요?', '다음에 또 만나요!']
+const SIGNOUT_DESC = ['회원 탈퇴 시 복구가 어려워요.', '그래도 진행하시겠어요?']
+
 const MainPage = () => {
   const navigate = useNavigate()
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalType, setModalType] = useState<'logout' | 'signout' | null>(null)
 
   const handleRoomClick = (id: string) => {
-    navigate('/chat')
+    navigate('/chat', { state: { showCoachMark: true, roomId: id } })
     console.log(id + ' 채팅방 이동')
   }
+
+  // 로그아웃 버튼 클릭 시
+  const openLogoutModal = () => {
+    setModalType('logout')
+    setModalOpen(true)
+  }
+  // 회원탈퇴 버튼 클릭 시
+  const openSignoutModal = () => {
+    setModalType('signout')
+    setModalOpen(true)
+  }
+
+  const handleConfirm = () => {
+    if (modalType === 'logout') {
+      console.log('로그아웃')
+    } else if (modalType === 'signout') {
+      console.log('회원탈퇴')
+    }
+    setModalOpen(false)
+  }
+
+  const handleCancel = () => {
+    setModalOpen(false)
+  }
+
   return (
     <>
       {/* 상단 환영 메시지 */}
-      <div className="w-full bg-[#9ADAD5] h-[94px] relative max-w-md mx-auto">
+      <div className="w-full bg-[#5ac0b7] h-[94px] relative max-w-md mx-auto">
         <div className="absolute top-[22px] left-6">
           <div className="text-[16px] mb-0.5">반가워요,</div>
           <div className="text-[16px]">
@@ -60,11 +92,23 @@ const MainPage = () => {
               </button>
             ))}
           </div>
+
+          {/* 로그아웃 탈퇴 */}
           <div className="flex justify-center gap-2 mt-[60px] text-gray-600 text-[14px]">
-            <button>로그아웃</button>
+            <button onClick={openLogoutModal}>로그아웃</button>
             <span className="text-gray-200">|</span>
-            <button>회원탈퇴</button>
+            <button onClick={openSignoutModal}>회원탈퇴</button>
           </div>
+
+          <CommonModal
+            open={modalOpen}
+            title={modalType === 'logout' ? '로그아웃' : '회원탈퇴'}
+            description={modalType === 'logout' ? LOGOUT_DESC : SIGNOUT_DESC}
+            confirmText="확인"
+            cancelText="닫기"
+            onConfirm={handleConfirm}
+            onCancel={handleCancel}
+          />
         </div>
       </div>
     </>

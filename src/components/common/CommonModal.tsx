@@ -3,7 +3,7 @@ import React from 'react'
 interface CommonModalProps {
   open: boolean
   title: string
-  description?: string
+  description?: string | string[] // 상수 지정시 배열
   confirmText?: string
   cancelText?: string
   onConfirm: () => void
@@ -27,7 +27,15 @@ const CommonModal: React.FC<CommonModalProps> = ({
         <div className="modal-box rounded-lg max-w-[303px] py-5 px-4 flex flex-col items-center">
           <h3 className="text-title text-[18px] mb-2">{title}</h3>
 
-          {description && <p className="text-[14px] text-center">{description}</p>}
+          {Array.isArray(description) ? (
+            <div className="text-[14px] text-center">
+              {description.map((line, idx) => (
+                <p key={idx}>{line}</p>
+              ))}
+            </div>
+          ) : (
+            <p className="text-[14px] text-center">{description}</p>
+          )}
 
           <div className="modal-action w-full flex gap-x-[14px] mt-4">
             <button
