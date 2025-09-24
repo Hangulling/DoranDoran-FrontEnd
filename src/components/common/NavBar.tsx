@@ -17,7 +17,7 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain }) => {
   }
 
   return (
-    <div className="navbar bg-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] h-15 p-0">
+    <div className="navbar bg-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] h-15 min-h-15 p-0">
       {/* 뒤로가기 */}
       <div className="navbar-start ml-[20px]">
         {!isMain && (
