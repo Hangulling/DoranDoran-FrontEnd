@@ -28,7 +28,7 @@ const CoachMark: React.FC<CoachMarkProps> = ({ show, onClose }) => {
 
       {/* 안내 UI */}
       <div className="relative w-full h-full text-white text-center pointer-events-none">
-        <img src={BookMark} alt="북마크" className="absolute top-[2px] right-[2px]" />
+        <img src={BookMark} alt="북마크" className="absolute top-[2px] right-[7px]" />
         <img
           src={ArrowUp}
           alt="위쪽을 가리키는 화살표"
