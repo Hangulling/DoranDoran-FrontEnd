@@ -19,8 +19,8 @@ const CoachMark: React.FC<CoachMarkProps> = ({ show, onClose }) => {
       <div
         style={{
           width: '100%',
-          height: '116px',
-          bottom: '91px',
+          height: '121px',
+          bottom: '58px',
           left: '0',
         }}
         className="absolute shadow-[0_0_0_9999px_rgba(0,0,0,0.65)]"
@@ -32,7 +32,7 @@ const CoachMark: React.FC<CoachMarkProps> = ({ show, onClose }) => {
         <img
           src={ArrowUp}
           alt="위쪽을 가리키는 화살표"
-          className="absolute top-[71px] right-[24px]"
+          className="absolute top-[71px] right-[30px]"
         />
 
         <div className="absolute top-[127px] right-[57px] text-[16px]">
@@ -42,17 +42,18 @@ const CoachMark: React.FC<CoachMarkProps> = ({ show, onClose }) => {
           </p>
         </div>
 
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-[264px] text-[16px]">
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-[230px] text-[16px]">
           <p>거리감 레벨을 설정하고</p>
           <p>
-            <span className="text-green-300">친밀도에 따른 다른 표현</span>을 알아보아요!
+            <span className="text-green-300">친밀도에 따른 다른 표현</span>을
           </p>
+          <p>알아보아요!</p>
         </div>
 
         <img
           src={ArrowDown}
           alt="아래쪽을 가리키는 화살표"
-          className="absolute left-1/2 -translate-x-1/2 bottom-[219px]"
+          className="absolute left-1/2 -translate-x-1/2 bottom-[185px]"
         />
       </div>
     </div>

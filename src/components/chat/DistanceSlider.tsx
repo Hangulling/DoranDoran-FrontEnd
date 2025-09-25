@@ -27,12 +27,12 @@ const DistanceSlider = () => {
   return (
     <div
       style={{
-        width: '100%',
-        maxWidth: 375,
-        padding: '12px 24px 10px',
-        boxSizing: 'border-box',
         display: 'flex',
         justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: '58px',
+        boxSizing: 'border-box',
       }}
     >
       <Slider
@@ -112,11 +112,11 @@ const DistanceSlider = () => {
 
           // 레이블
           '& .MuiSlider-markLabel': {
-            marginTop: '13px',
+            marginTop: '12px',
             color: '#A6ABAA',
             fontSize: '12px',
             fontWeight: 'normal',
-            transform: 'translateX(-50%)',
+            transform: 'translateX(-55%)',
 
             // 활성화된 마크 레이블에만 bold
             [`&[data-index="${activeMarkIndex}"]`]: {

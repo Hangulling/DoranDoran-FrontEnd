@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import ChatBubble from '../components/chat/ChatBubble'
 import ChatDate from '../components/chat/ChatDate'
-import DistanceSlider from '../components/chat/DistanceSlider'
 import CoachMark from '../components/chat/CoachMark'
+import ChatFooter from '../components/chat/ChatFooter'
 
 const ChatPage = () => {
   const [showCoachMark, setShowCoachMark] = useState(true)
@@ -36,10 +36,10 @@ const ChatPage = () => {
         message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
         isSender={true}
       />
-      <DistanceSlider />
-
       {/* showCoachMark */}
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
+
+      <ChatFooter />
     </div>
   )
 }
