@@ -5,11 +5,13 @@ import AppLayout from './layouts/AppLayout'
 
 function App() {
   return (
-    <AppLayout>
-      <Suspense fallback={<LoadingSpinner />}>
-        <Routes />
-      </Suspense>
-    </AppLayout>
+    <div className="relative mx-auto w-[375px] min-h-screen bg-white">
+      <AppLayout>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes />
+        </Suspense>
+      </AppLayout>
+    </div>
   )
 }
 
