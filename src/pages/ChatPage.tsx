@@ -25,17 +25,43 @@ const ChatPage = () => {
   }
 
   return (
-    <div className=" mx-5">
-      <ChatDate dateText="2025년 9월 25일" />
+    <div className="flex flex-col max-w-md mx-auto bg-white h-screen">
+      <main className="flex-grow overflow-y-auto px-5 pb-[24px]">
+        <ChatDate dateText="2025년 9월 25일" />
 
-      <ChatBubble
-        message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-        isSender={false}
-      />
-      <ChatBubble
-        message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-        isSender={true}
-      />
+        <ChatBubble
+          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
+          isSender={false}
+        />
+        <ChatBubble
+          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
+          isSender={true}
+        />
+        <ChatBubble
+          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
+          isSender={true}
+        />
+        <ChatBubble
+          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
+          isSender={true}
+        />
+        <ChatBubble
+          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
+          isSender={true}
+        />
+        <ChatBubble
+          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
+          isSender={true}
+        />
+        <ChatBubble
+          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
+          isSender={true}
+        />
+        <ChatBubble
+          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
+          isSender={true}
+        />
+      </main>
       {/* showCoachMark */}
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
