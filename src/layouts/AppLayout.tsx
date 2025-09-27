@@ -17,7 +17,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   // 메인페이지에서 로고 표시, 뒤로가기 미표시
   return (
-    <div>
+    <div className="mx-auto w-full max-w-md">
       {!hideNavBar && (
         <NavBar isMain={isMain} title={isMain ? 'Logo' : pathname.replace('/', '')} />
       )}
