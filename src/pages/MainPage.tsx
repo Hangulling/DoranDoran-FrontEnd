@@ -8,23 +8,22 @@ import { useState } from 'react'
 import CommonModal from '../components/common/CommonModal'
 
 const chatRooms = [
-  { id: 'school', label: '학교 선배', avatar: SchoolAvatar, message: '밥 먹었어?' },
-  { id: 'lover', label: '애인', avatar: LoverAvatar, message: '밥 먹었어?' },
-  { id: 'company', label: '회사', avatar: CompanyAvatar, message: '밥 먹었어?' },
-  { id: 'client', label: '거래처', avatar: ClientAvatar, message: '밥 먹었어?' },
+  { id: 1, label: 'Senior', avatar: SchoolAvatar, message: '족보 필요하면 연락해~!' },
+  { id: 2, label: 'Honey', avatar: LoverAvatar, message: '자기 어디야?' },
+  { id: 3, label: 'Coworker', avatar: CompanyAvatar, message: '수정 사항 완료 되었나요?' },
+  { id: 4, label: 'Client', avatar: ClientAvatar, message: '내일 미팅 10시 괜찮으세요?' },
 ]
 
-const LOGOUT_DESC = ['로그아웃 하시겠어요?', '다음에 또 만나요!']
-const SIGNOUT_DESC = ['회원 탈퇴 시 복구가 어려워요.', '그래도 진행하시겠어요?']
+const LOGOUT_DESC = ['You can log in again anytime.']
+const SIGNOUT_DESC = ['This action cannot be undone.', 'Are you sure you want to continue?']
 
 const MainPage = () => {
   const navigate = useNavigate()
   const [modalOpen, setModalOpen] = useState(false)
   const [modalType, setModalType] = useState<'logout' | 'signout' | null>(null)
 
-  const handleRoomClick = (id: string) => {
+  const handleRoomClick = (id: number) => {
     navigate('/chat', { state: { showCoachMark: true, roomId: id } })
-    console.log(id + ' 채팅방 이동')
   }
 
   // 로그아웃 버튼 클릭 시
@@ -54,24 +53,20 @@ const MainPage = () => {
   return (
     <>
       {/* 상단 환영 메시지 */}
-      <div className="w-full bg-[#5ac0b7] h-[94px] relative max-w-md mx-auto">
-        <div className="absolute top-[22px] left-6">
-          <div className="text-[16px] mb-0.5">반가워요,</div>
+      <div className="w-full bg-[#9ADAD5] h-[99px] relative max-w-md mx-auto overflow-hidden">
+        <div className="absolute top-[14px] left-[20px]">
+          <div className="text-[14px]">Welcome,</div>
           <div className="text-[16px]">
+            {/* 이름 변경할 것 */}
             <span className="text-title">John Smith</span>
-            <span> 님 :)</span>
+            <span>:)</span>
           </div>
+          <p className="mt-[8px] text-[12px] text-gray-600">Learn Korean expressions by chat!</p>
         </div>
-        <img src={Character} alt="캐릭터 이미지" className="absolute top-[10px] left-[210px]" />
+        <img src={Character} alt="캐릭터 이미지" className="absolute top-[23px] right-[20.16px]" />
       </div>
 
-      <div className="max-w-md mx-auto px-5 pb-16">
-        {/* 안내문구 */}
-        <div className="bg-gray-80 rounded-lg text-center px-1 py-2 text-gray-600 text-[14px] mb-[25px] mt-[30px]">
-          대화를 나누며 상황과 관계에
-          <br />
-          알맞은 한국어 표현을 익혀보세요
-        </div>
+      <div className="max-w-md mx-auto px-5 pb-16 mt-[30px]">
         {/* 채팅방 목록 */}
         <div>
           <div className="text-title mb-4 text-[20px] border-b border-gray-80 pb-2">채팅방</div>
@@ -94,18 +89,22 @@ const MainPage = () => {
           </div>
 
           {/* 로그아웃 탈퇴 */}
-          <div className="flex justify-center gap-2 mt-[60px] text-gray-600 text-[14px]">
-            <button onClick={openLogoutModal}>로그아웃</button>
+          <div className="flex justify-center gap-2 mt-[180px] text-gray-400 text-[14px]">
+            <button onClick={openLogoutModal}>Log Out</button>
             <span className="text-gray-200">|</span>
-            <button onClick={openSignoutModal}>회원탈퇴</button>
+            <button onClick={openSignoutModal}>Delete account</button>
           </div>
+
+          <p className="text-center text-gray-300 text-[12px] mt-[20px]">
+            Copyright 2025.dorandoran all rights reserved.
+          </p>
 
           <CommonModal
             open={modalOpen}
-            title={modalType === 'logout' ? '로그아웃' : '회원탈퇴'}
+            title={modalType === 'logout' ? 'Logout' : 'Delete Account'}
             description={modalType === 'logout' ? LOGOUT_DESC : SIGNOUT_DESC}
-            confirmText="확인"
-            cancelText="닫기"
+            confirmText={modalType === 'logout' ? 'Log out' : 'Delete'}
+            cancelText="keep"
             onConfirm={handleConfirm}
             onCancel={handleCancel}
           />
