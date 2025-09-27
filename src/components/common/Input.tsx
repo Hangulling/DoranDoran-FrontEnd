@@ -32,7 +32,7 @@ export default function Input({
   const isPassword = type === 'password'
   const VARIANTS = {
     primary: 'flex border rounded-lg border-gray-100 px-3 my-2',
-    error: 'flex border border-orange-300',
+    error: 'flex border rounded-lg border-orange-300 px-3 my-2',
   } as const
 
   const SIZES = {
