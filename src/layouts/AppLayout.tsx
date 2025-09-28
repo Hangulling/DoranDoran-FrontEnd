@@ -6,20 +6,49 @@ interface AppLayoutProps {
   children: React.ReactNode
 }
 
+const pageTitles: Record<string, string> = {
+  '/': '',
+  '/chat': 'Chat', // 추후 삭제
+  '/signup': 'Sign Up',
+  '/archive': 'Archive',
+}
+
+const chatRoomNames: Record<string, string> = {
+  '1': 'Senior',
+  '2': 'Honey',
+  '3': 'Coworker',
+  '4': 'Client',
+}
+
+const showBookmarkPaths = ['/', '/chat']
+const showDeletePaths = ['/archive']
+
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation()
-  const skipNavPaths = ['/login', '/signup'] // 로그인 회원가입 경로 추후 수정
+  const skipNavPaths = ['/login'] // 로그인 경로 추후 수정
+  const pathname = location.pathname
 
-  const hideNavBar = skipNavPaths.includes(location.pathname)
-
-  const { pathname } = location
   const isMain = pathname === '/'
+  const hideNavBar = skipNavPaths.includes(pathname)
+  const showBookmark = showBookmarkPaths.includes(pathname)
+  const showDelete = showDeletePaths.includes(pathname)
 
-  // 메인페이지에서 로고 표시, 뒤로가기 미표시
+  // 채팅방 id
+  const chatRoomMatch = pathname.match(/^\/chat\/(\d+)$/)
+  const chatRoomId = chatRoomMatch ? chatRoomMatch[1] : null
+
+  // 타이틀
+  let title = ''
+  if (chatRoomId) {
+    title = chatRoomNames[chatRoomId] || `채팅방 ${chatRoomId}`
+  } else {
+    title = pageTitles[pathname] || '페이지'
+  }
+
   return (
     <div className="mx-auto w-full max-w-md">
       {!hideNavBar && (
-        <NavBar isMain={isMain} title={isMain ? 'Logo' : pathname.replace('/', '')} />
+        <NavBar isMain={isMain} title={title} showBookmark={showBookmark} showDelete={showDelete} />
       )}
       <main>{children}</main>
     </div>
