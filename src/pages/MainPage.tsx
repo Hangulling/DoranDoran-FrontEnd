@@ -1,4 +1,4 @@
-import Character from '../assets/mainCharacter.svg'
+import Character from '../assets/main/mainCharacter.svg'
 import SchoolAvatar from '/chat/school.svg'
 import LoverAvatar from '/chat/lover.svg'
 import CompanyAvatar from '/chat/company.svg'
