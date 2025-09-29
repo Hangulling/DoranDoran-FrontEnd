@@ -25,14 +25,16 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export default function Button({
   variant = 'primary',
-  size = 'md',
+  size,
   children,
-  className,
+  className = '',
   ...props
 }: ButtonProps) {
   return (
     <button
-      className={`flex justify-center items-center ${VARIANTS[variant]} ${SIZES[size]} ${className} `}
+      className={`flex justify-center items-center ${VARIANTS[variant]} ${
+        size ? SIZES[size] : ''
+      } ${className}`}
       {...props}
     >
       {children}
