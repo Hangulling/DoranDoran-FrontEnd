@@ -11,6 +11,7 @@ interface Message {
   isSender: boolean
   avatarUrl?: string
   variant?: 'basic' | 'second' | 'sender'
+  showIcon?: boolean
 }
 
 interface ChatListProps {
@@ -31,12 +32,14 @@ const ChatPage: React.FC<ChatListProps> = () => {
       isSender: false,
       avatarUrl: '/public/chat/lover.svg',
       variant: 'basic' as const,
+      showIcon: true,
     },
     {
       id: 2,
       text: '족보',
       isSender: false,
       variant: 'second' as const,
+      showIcon: false,
     },
   ]
 
@@ -98,6 +101,7 @@ const ChatPage: React.FC<ChatListProps> = () => {
                 isSender={msg.isSender}
                 avatarUrl={msg.avatarUrl}
                 variant={msg.variant ?? 'basic'}
+                showIcon={msg.showIcon}
               />
             </div>
           )

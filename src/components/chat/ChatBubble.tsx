@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
+import TTSIcon from './VolumeIcon'
+import BookmarkIcon from './BookmarkIcon'
 
 interface ChatBubbleProps {
   message: string
   isSender: boolean
   avatarUrl?: string
   variant?: 'basic' | 'second' | 'sender'
+  showIcon?: boolean
 }
 
 const bubbleVariants = {
@@ -18,12 +21,22 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
   isSender,
   avatarUrl,
   variant = 'basic',
+  showIcon = false,
 }) => {
   const baseBubbleClass = 'py-[6px] px-2 text-[14px] max-w-[265px] rounded-lg'
 
   const bubbleClass = `${baseBubbleClass} ${isSender ? bubbleVariants.sender : bubbleVariants[variant]}`
 
   const marginClass = !isSender && (avatarUrl || variant === 'second') ? 'ml-10' : ''
+
+  const [isBookmarked, setIsBookmarked] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+
+  const toggleBookmark = () => setIsBookmarked(!isBookmarked)
+  const playTTS = () => {
+    // TTS 동작
+    setIsPlaying(!isPlaying)
+  }
 
   return (
     <div className={isSender ? 'chat chat-end gap-x-[0]' : 'chat chat-start gap-x-[8px] relative'}>
@@ -34,7 +47,20 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
           </div>
         </div>
       )}
-      <div className={`${bubbleClass} ${marginClass}`}>{message}</div>
+
+      <div className={`${bubbleClass} ${marginClass} flex flex-col max-w-[265px]`}>
+        <span>{message}</span>
+
+        {!isSender && showIcon && (
+          <>
+            <div className="h-[1px] bg-gray-80 w-full my-1" />
+            <div className="flex flex-row justify-between">
+              <TTSIcon playing={isPlaying} onPlay={playTTS} />
+              <BookmarkIcon isBookmarked={isBookmarked} onToggle={toggleBookmark} />
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }
