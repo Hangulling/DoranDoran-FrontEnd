@@ -1,12 +1,13 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
-type Variant = 'primary' | 'cancel' | 'text'
+type Variant = 'primary' | 'cancel' | 'text' | 'confirm'
 type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 const VARIANTS: Record<Variant, string> = {
   primary: 'text-white rounded-lg disabled:bg-gray-100 disabled:text-gray-300',
   cancel: 'bg-gray-80 text-gray-600 rounded-lg',
   text: 'bg-transparent',
+  confirm: 'bg-green-400 text-white rounded-lg',
 }
 
 const SIZES: Record<Size, string> = {
