@@ -1,7 +1,7 @@
 import type React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import LeftArrowIcon from '../../assets/icon/leftArrow.svg'
-import BookmarkIcon from '../../assets/icon/bookmark.svg?react'
+import BookmarkIcon from '../../assets/icon/bookmark.svg'
 import MainLogo from '../../assets/main/mainLogo.svg'
 
 interface NavBarProps {
