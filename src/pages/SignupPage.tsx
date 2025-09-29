@@ -3,6 +3,8 @@ import Button from '../components/common/Button'
 import Input from '../components/common/Input'
 import Agreement, { type AgreementValue } from '../components/common/Agreement'
 import { validateEmail, validateName } from '../utils/validations'
+import CommonModal from '../components/common/CommonModal'
+import { useNavigate } from 'react-router-dom'
 
 export default function SignupPage() {
   const [firstName, setFirstName] = useState('')
@@ -18,11 +20,15 @@ export default function SignupPage() {
   const [pwdTouched, setPwdTouched] = useState(false)
   const [pwdCheckTouched, setPwdCheckTouched] = useState(false)
 
+  const [openModal, setOpenModal] = useState(false)
+
   const [agreements, setAgreements] = useState<AgreementValue>({
     service: false,
     privacy: false,
     marketing: false,
   })
+
+  const navigate = useNavigate()
 
   const handleFirstNameChange = (v: string) => {
     setFirstName(v)
@@ -90,10 +96,19 @@ export default function SignupPage() {
     validateEmail(email) === null &&
     isPasswordValidForSubmit &&
     requiredAgreed
+  const handleOpenModal = () => {
+    if (!isFormValid) return
+    setOpenModal(true)
+  }
+
+  const handleConfirmModal = () => {
+    setOpenModal(false)
+    handleSubmit()
+  }
 
   const handleSubmit = () => {
     if (!isFormValid) return
-    alert('회원가입')
+    navigate('/login')
     console.log('submit', {
       firstName,
       lastName,
@@ -194,15 +209,27 @@ export default function SignupPage() {
 
         <div className="m-2 ">
           <Button
+            type="submit"
             className="bg-gray-800"
             variant="primary"
             disabled={!isFormValid}
             size="xl"
-            onClick={handleSubmit}
+            onClick={handleOpenModal}
           >
             Sign Up
           </Button>
         </div>
+        {openModal && (
+          <CommonModal
+            variant="signup"
+            open
+            title="Sign Up Complete"
+            confirmText="Start"
+            description="Welcome! Ready to start Chatting?"
+            onCancel={() => setOpenModal(false)}
+            onConfirm={handleConfirmModal}
+          />
+        )}
       </div>
     </div>
   )
