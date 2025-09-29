@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import TTSIcon from './ttsIcon'
+import TTSIcon from './VolumeIcon'
 import BookmarkIcon from './BookMarkIcon'
 
 interface ChatBubbleProps {
