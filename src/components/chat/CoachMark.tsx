@@ -149,7 +149,7 @@ const CoachMark: React.FC<CoachMarkProps> = ({ show, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 cursor-pointer" onClick={handleNext}>
-      <div className="relative mx-auto w-full max-w-md h-screen overflow-hidden pointer-events-none">
+      <div className="relative mx-auto w-full max-w-md min-h-dvh overflow-hidden pointer-events-none">
         {/* 투명 영역 */}
         <div
           style={currentStep.holeStyle}
