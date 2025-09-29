@@ -1,7 +1,7 @@
 import type React from 'react'
 import { useNavigate } from 'react-router-dom'
 import LeftArrowIcon from '../../assets/icon/leftArrow.svg'
-import BookMarkIcon from '../../assets/icon/bookMark.svg'
+import BookmarkIcon from '../../assets/icon/bookmark.svg'
 
 interface NavBarProps {
   title?: string
@@ -35,7 +35,7 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain }) => {
       {/* 북마크 */}
       <div className="navbar-end mr-[20px]">
         <button>
-          <img src={BookMarkIcon} alt="북마크" />
+          <img src={BookmarkIcon} alt="북마크" />
         </button>
       </div>
     </div>

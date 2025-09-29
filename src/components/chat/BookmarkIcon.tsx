@@ -1,6 +1,6 @@
 import React from 'react'
-import FilledMark from '../../assets/icon/filledBookMark.svg?react'
-import OutlineMark from '../../assets/icon/outlineBookMark.svg?react'
+import FilledMark from '../../assets/icon/filledBookmark.svg?react'
+import OutlineMark from '../../assets/icon/outlineBookmark.svg?react'
 
 interface BookmarkIconProps {
   isBookmarked: boolean
