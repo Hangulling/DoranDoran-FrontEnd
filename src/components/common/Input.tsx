@@ -43,7 +43,7 @@ export default function Input({
   return (
     <div className="flex flex-col">
       {label && (
-        <label htmlFor={id} className="text-gray-800 text-base font-mediumm my-2">
+        <label htmlFor={id} className="text-gray-800 text-base text-subtitle my-2">
           {label}
         </label>
       )}
@@ -53,7 +53,7 @@ export default function Input({
           id={id}
           name={name}
           placeholder={placeholder}
-          className="outline-none w-full text-sm"
+          className="outline-none w-full text-sm text-body "
           value={value}
           onChange={onChange}
           onBlur={onBlur}

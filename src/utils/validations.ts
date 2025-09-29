@@ -12,7 +12,7 @@ export const validateEmail = (email: string): string | null => {
   const v = email.trim()
   if (v.length === 0) return null
   if (!(EMAIL_REGEX_ASCII.test(v) || EMAIL_REGEX_UNICODE.test(v))) {
-    return 'Please enter a valid email address.'
+    return 'Email error'
   }
   return null
 }
