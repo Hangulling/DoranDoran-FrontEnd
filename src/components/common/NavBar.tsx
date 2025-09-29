@@ -1,7 +1,7 @@
 import type React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import LeftArrowIcon from '../../assets/icon/leftArrow.svg'
-import BookMarkIcon from '../../assets/icon/bookMark.svg'
+import BookmarkIcon from '../../assets/icon/bookmark.svg'
 import MainLogo from '../../assets/main/mainLogo.svg'
 
 interface NavBarProps {
@@ -29,7 +29,7 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
           </button>
         )}
       </div>
-      
+
       {/* 로고 및 페이지이름 */}
       <div className="navbar-center">
         {/* 임시 Link */}
@@ -46,7 +46,7 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
         {/* 북마크 */}
         {showBookmark && (
           <button>
-            <img src={BookMarkIcon} alt="북마크" />
+            <BookmarkIcon />
           </button>
         )}
         {/* 보관함 삭제 버튼 */}
