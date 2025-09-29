@@ -8,6 +8,7 @@
   --font-family-sans: 'Noto Sans', 'Noto Sans KR', sans-serif;
 
   --color-white: #ffffff;
+  --color-green-50: #e9f6f5;
   --color-green-300: #7bccc5;
   --color-green-400: #54bdb4;
   --color-orange-300: #ff6149;
@@ -28,6 +29,11 @@
 @layer base {
   body {
     font-family: var(--font-family-sans);
+  }
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
 }
 
