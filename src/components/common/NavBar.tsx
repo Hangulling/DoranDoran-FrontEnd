@@ -29,11 +29,14 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
           </button>
         )}
       </div>
-
+      
       {/* 로고 및 페이지이름 */}
       <div className="navbar-center">
+        {/* 임시 Link */}
         {isMain ? (
-          <img src={MainLogo} alt="메인로고" />
+          <Link to="/login">
+            <img src={MainLogo} alt="메인로고" />
+          </Link>
         ) : (
           <a className="text-title text-[16px] normal-case">{title}</a>
         )}
