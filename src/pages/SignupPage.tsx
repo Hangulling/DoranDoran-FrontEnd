@@ -14,7 +14,7 @@ export default function SignupPage() {
   const [firstNameError, setFirstNameError] = useState<string | null>(null)
   const [lastNameError, setLastNameError] = useState<string | null>(null)
   const [emailError, setEmailError] = useState<string | null>(null)
-
+  const [emailSuccess, setEmailSuccess] = useState<string | null>(null)
   const [pwdTouched, setPwdTouched] = useState(false)
   const [pwdCheckTouched, setPwdCheckTouched] = useState(false)
 
@@ -35,9 +35,23 @@ export default function SignupPage() {
   const handleEmailChange = (v: string) => {
     setEmail(v)
     if (emailError && validateEmail(v) === null) setEmailError(null)
+    setEmailSuccess(null)
   }
-  const handleEmailBlur = () => setEmailError(validateEmail(email))
-
+  const handleEmailBlur = () => {
+    const err = validateEmail(email)
+    setEmailError(err)
+    if (err) setEmailSuccess(null)
+  }
+  const handleVerify = () => {
+    const err = validateEmail(email) || (email.trim() === '' ? 'Please enter your email.' : null)
+    if (err) {
+      setEmailError(err)
+      setEmailSuccess(null)
+      return
+    }
+    setEmailError(null)
+    setEmailSuccess('Verified successfully.')
+  }
   const isEmailFormatValid = email.trim() !== '' && validateEmail(email) === null
 
   const pwdLenError =
@@ -89,8 +103,8 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex justify-center items-center">
-      <div className="bg-gray flex flex-col justify-center items-center ">
+    <div className="mt-4">
+      <div className="flex flex-col justify-center items-center">
         <div>
           <Input
             type="text"
@@ -118,7 +132,7 @@ export default function SignupPage() {
         </div>
 
         <div className="w-[335px]">
-          <div className="flex items-end gap-2">
+          <div className="flex items-end justify-between">
             <Input
               type="email"
               label="E-mail"
@@ -134,11 +148,16 @@ export default function SignupPage() {
               disabled={!isEmailFormatValid}
               className="bg-gray-800 my-2"
               size="sm"
+              onClick={handleVerify}
             >
               Verify
             </Button>
           </div>
-          {emailError && <span className="text-xs text-orange-300">{emailError}</span>}
+          {emailError ? (
+            <span className="text-xs text-orange-300">{emailError}</span>
+          ) : emailSuccess ? (
+            <span className="text-xs text-blue-500">{emailSuccess}</span>
+          ) : null}
         </div>
 
         <div className="w-[335px]">
