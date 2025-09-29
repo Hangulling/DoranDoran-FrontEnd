@@ -58,7 +58,6 @@ export default function Input({
           onChange={onChange}
           onBlur={onBlur}
         />
-        {<div>{}</div>}
         {isPassword && value && value.length > 0 && (
           <Button type="button" variant="text" size="xs" onClick={() => setShow(s => !s)}>
             <img src={show ? eye : eyeOff} alt="eye" className="w-5 h-5" />
