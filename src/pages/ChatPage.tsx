@@ -3,12 +3,42 @@ import ChatBubble from '../components/chat/ChatBubble'
 import ChatDate from '../components/chat/ChatDate'
 import CoachMark from '../components/chat/CoachMark'
 import ChatFooter from '../components/chat/ChatFooter'
+import InitChat from '../components/chat/InitChat'
 
-const ChatPage = () => {
+interface Message {
+  id: number
+  text: string
+  isSender: boolean
+  avatarUrl?: string
+  variant?: 'basic' | 'second' | 'sender'
+}
+
+interface ChatListProps {
+  messages: Message[]
+}
+
+const ChatPage: React.FC<ChatListProps> = () => {
   const [showCoachMark, setShowCoachMark] = useState(true)
   const [footerHeight, setFooterHeight] = useState(173)
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
+
+  // 메시지 배열
+  const messages = [
+    {
+      id: 1,
+      text: '족보 필요하면 연락해~!',
+      isSender: false,
+      avatarUrl: '/public/chat/lover.svg',
+      variant: 'basic' as const,
+    },
+    {
+      id: 2,
+      text: '족보',
+      isSender: false,
+      variant: 'second' as const,
+    },
+  ]
 
   useEffect(() => {
     const inputEl = inputRef.current
@@ -55,40 +85,25 @@ const ChatPage = () => {
         className="flex-grow min-h-0 overflow-y-auto px-5"
         style={{ paddingBottom: footerHeight + 24 }}
       >
-        <ChatDate dateText="2025년 9월 25일" />
+        <ChatDate />
 
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={false}
-        />
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={true}
-        />
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={true}
-        />
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={true}
-        />
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={true}
-        />
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={true}
-        />
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={true}
-        />
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={true}
-        />
+        {messages.map((msg, idx) => {
+          const prevMsg = idx > 0 ? messages[idx - 1] : null
+          const isSenderChanged = prevMsg ? prevMsg.isSender !== msg.isSender : false
+          const marginClass = isSenderChanged ? 'mt-[12px]' : 'mt-0'
+          return (
+            <div key={msg.id} className={marginClass}>
+              <ChatBubble
+                message={msg.text}
+                isSender={msg.isSender}
+                avatarUrl={msg.avatarUrl}
+                variant={msg.variant ?? 'basic'}
+              />
+            </div>
+          )
+        })}
+
+        <InitChat />
       </main>
       {/* showCoachMark */}
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />

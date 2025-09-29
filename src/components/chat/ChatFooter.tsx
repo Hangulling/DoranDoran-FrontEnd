@@ -48,7 +48,7 @@ const ChatFooter = ({ onHeightChange, inputRef }: ChatFooterProps) => {
 
   return (
     <div
-      className="bottom-0 left-0 w-full bg-white border-t-[1px] border-gray-80 shadow-[0_-1px_2px_rgba(0,0,0,0.08)]"
+      className="bottom-0 mx-auto w-full max-w-md left-1/2 bg-white border-t-[1px] border-gray-80 shadow-[0_-1px_2px_rgba(0,0,0,0.08)]"
       style={{ height: isExpanded ? 173 : 105 }}
     >
       <div className="relative px-[20px] bg-white">
