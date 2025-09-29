@@ -48,14 +48,14 @@ export default function Agreement({ value, onChange }: AgreementProps) {
       <button
         type="button"
         onClick={toggleAll}
-        className="flex items-center gap-2 font-semibold"
+        className="flex items-center gap-2"
         role="checkbox"
         aria-checked={allChecked ? 'true' : someChecked ? 'mixed' : 'false'}
       >
         <span className="relative w-6 h-6">
           <img src={getIconSrc('all', allChecked)} alt="all-check" className="w-6 h-6" />
         </span>
-        <span className="text-base">Agree to all</span>
+        <span className="text-base text-subtitle">Agree to all</span>
       </button>
 
       {terms.slice(1).map(t => {
@@ -72,7 +72,7 @@ export default function Agreement({ value, onChange }: AgreementProps) {
               aria-checked={isChecked}
             >
               <img src={getIconSrc(id, isChecked)} alt="check" className="w-5 h-5" />
-              <span className="text-gray-500 text-xs">{t.label}</span>
+              <span className="text-gray-500 text-xs text-body">{t.label}</span>
             </button>
 
             {t.required && (

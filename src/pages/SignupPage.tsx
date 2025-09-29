@@ -161,7 +161,7 @@ export default function SignupPage() {
             <Button
               variant="primary"
               disabled={!isEmailFormatValid}
-              className="bg-gray-800 my-2"
+              className="bg-gray-800 my-2 text-subtitle"
               size="sm"
               onClick={handleVerify}
             >

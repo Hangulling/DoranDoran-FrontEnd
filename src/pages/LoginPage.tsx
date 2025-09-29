@@ -38,7 +38,9 @@ export default function LoginPage() {
       <div className="w-full max-w-sm p-6 bg-white rounded-lg">
         <div className="flex flex-col justify-center items-center mb-12">
           <img src={doran} alt="DoranDoran" className="mb-4" />
-          <span className="text-gray-700 text-sm">Chat your way to real-life Korean</span>
+          <span className="text-gray-700 text-sm text-subtitle">
+            Chat your way to real-life Korean
+          </span>
         </div>
         <img src={loginCharacter} />
         <div className="mt-4">
@@ -60,7 +62,7 @@ export default function LoginPage() {
               onChange={e => setPassword(e.target.value)}
             />
             {error && (
-              <span className="mt-1 block text-xs text-orange-500">
+              <span className="mt-1 block text-xs text-orange-500 text-body">
                 {error === 'email' && 'Email error'}
                 {error === 'password' && 'Password error'}
                 {error === 'both' && 'Email error + Password error'}
@@ -71,7 +73,7 @@ export default function LoginPage() {
           <Button
             variant="primary"
             size="xl"
-            className="bg-gray-800 my-4 w-full"
+            className="bg-gray-800 my-4 w-full text-subtitle"
             onClick={handleLogin}
           >
             Login
@@ -79,8 +81,8 @@ export default function LoginPage() {
         </div>
 
         <div className="flex justify-center items-center gap-2 mt-6 text-sm">
-          <span className="text-gray-700">Don't have an account yet?</span>
-          <Link to="/signup" className="underline underline-offset-4  text-gray-800">
+          <span className="text-gray-700 text-body">Don't have an account yet?</span>
+          <Link to="/signup" className="underline underline-offset-4 text-title text-gray-800">
             Sign up
           </Link>
         </div>

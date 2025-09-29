@@ -53,7 +53,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
                 variant="confirm"
                 onClick={onConfirm}
                 size="lg"
-                className="text-[14px] text-white py-[14px]"
+                className="text-[14px] text-white py-[14px] text-subtitle"
               >
                 {confirmText}
               </Button>
