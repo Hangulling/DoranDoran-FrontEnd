@@ -1,5 +1,5 @@
 import type React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import LeftArrowIcon from '../../assets/icon/leftArrow.svg'
 import BookMarkIcon from '../../assets/icon/bookMark.svg'
 import MainLogo from '../../assets/main/mainLogo.svg'
