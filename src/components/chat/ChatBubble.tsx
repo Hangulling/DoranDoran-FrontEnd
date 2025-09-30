@@ -39,7 +39,13 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
   }
 
   return (
-    <div className={isSender ? 'chat chat-end gap-x-[0]' : 'chat chat-start gap-x-[8px] relative'}>
+    <div
+      className={
+        isSender
+          ? 'chat chat-end gap-x-[0] pt-0 pb-2'
+          : 'chat chat-start gap-x-[8px] relative pt-0 pb-2'
+      }
+    >
       {!isSender && avatarUrl && variant === 'basic' && (
         <div className="chat-image avatar absolute top-1 left-0 w-8 h-8">
           <div className="w-8 h-8 rounded-full overflow-hidden">

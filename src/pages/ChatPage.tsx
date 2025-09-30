@@ -4,6 +4,8 @@ import ChatDate from '../components/chat/ChatDate'
 import CoachMark from '../components/chat/CoachMark'
 import ChatFooter from '../components/chat/ChatFooter'
 import InitChat from '../components/chat/InitChat'
+import DescriptionBubble from '../components/chat/DescriptionBubble'
+import { messages } from '../mocks/db/chat'
 
 interface Message {
   id: number
@@ -23,25 +25,6 @@ const ChatPage: React.FC<ChatListProps> = () => {
   const [footerHeight, setFooterHeight] = useState(173)
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
-
-  // 메시지 배열
-  const messages = [
-    {
-      id: 1,
-      text: '족보 필요하면 연락해~!',
-      isSender: false,
-      avatarUrl: '/public/chat/lover.svg',
-      variant: 'basic' as const,
-      showIcon: true,
-    },
-    {
-      id: 2,
-      text: '족보',
-      isSender: false,
-      variant: 'second' as const,
-      showIcon: false,
-    },
-  ]
 
   useEffect(() => {
     const inputEl = inputRef.current
@@ -93,7 +76,7 @@ const ChatPage: React.FC<ChatListProps> = () => {
         {messages.map((msg, idx) => {
           const prevMsg = idx > 0 ? messages[idx - 1] : null
           const isSenderChanged = prevMsg ? prevMsg.isSender !== msg.isSender : false
-          const marginClass = isSenderChanged ? 'mt-[12px]' : 'mt-0'
+          const marginClass = isSenderChanged ? 'mt-5' : 'mt-0'
           return (
             <div key={msg.id} className={marginClass}>
               <ChatBubble
@@ -103,13 +86,22 @@ const ChatPage: React.FC<ChatListProps> = () => {
                 variant={msg.variant ?? 'basic'}
                 showIcon={msg.showIcon}
               />
+
+              {msg.explanation && (
+                <DescriptionBubble
+                  word={msg.explanation.word}
+                  pronunciation={msg.explanation.pronunciation}
+                  descriptionByTab={msg.explanation.descriptionByTab}
+                  initialTab={msg.explanation.selectedTab}
+                />
+              )}
             </div>
           )
         })}
 
         <InitChat />
       </main>
-      {/* showCoachMark */}
+
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
       <footer
