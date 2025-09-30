@@ -1,8 +1,8 @@
 import type React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import LeftArrowIcon from '../../assets/icon/leftArrow.svg'
 import CloseIcon from '../../assets/icon/close.svg'
-import BookMarkIcon from '../../assets/icon/bookMark.svg'
+import BookmarkIcon from '../../assets/icon/bookmark.svg?react'
 import MainLogo from '../../assets/main/mainLogo.svg'
 import useArchiveStore from '../../stores/useArchiveStore'
 import Button from './Button'
@@ -41,8 +41,11 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
 
       {/* 로고 및 페이지이름 */}
       <div className="navbar-center">
+        {/* 임시 Link */}
         {isMain ? (
-          <img src={MainLogo} alt="메인로고" />
+          <Link to="/login">
+            <img src={MainLogo} alt="메인로고" />
+          </Link>
         ) : (
           <a className="text-title text-[16px] normal-case">{title}</a>
         )}
@@ -52,7 +55,7 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
         {/* 북마크 */}
         {showBookmark && (
           <button>
-            <img src={BookMarkIcon} alt="북마크" onClick={() => navigate('/archive')} />
+            <BookmarkIcon />
           </button>
         )}
 

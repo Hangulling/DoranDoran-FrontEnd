@@ -3,8 +3,24 @@ import ChatBubble from '../components/chat/ChatBubble'
 import ChatDate from '../components/chat/ChatDate'
 import CoachMark from '../components/chat/CoachMark'
 import ChatFooter from '../components/chat/ChatFooter'
+import InitChat from '../components/chat/InitChat'
+import DescriptionBubble from '../components/chat/DescriptionBubble'
+import { messages } from '../mocks/db/chat'
 
-const ChatPage = () => {
+interface Message {
+  id: number
+  text: string
+  isSender: boolean
+  avatarUrl?: string
+  variant?: 'basic' | 'second' | 'sender'
+  showIcon?: boolean
+}
+
+interface ChatListProps {
+  messages: Message[]
+}
+
+const ChatPage: React.FC<ChatListProps> = () => {
   const [showCoachMark, setShowCoachMark] = useState(true)
   const [footerHeight, setFooterHeight] = useState(173)
   const chatMainRef = useRef<HTMLDivElement>(null)
@@ -55,42 +71,37 @@ const ChatPage = () => {
         className="flex-grow min-h-0 overflow-y-auto px-5"
         style={{ paddingBottom: footerHeight + 24 }}
       >
-        <ChatDate dateText="2025년 9월 25일" />
+        <ChatDate />
 
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={false}
-        />
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={true}
-        />
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={true}
-        />
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={true}
-        />
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={true}
-        />
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={true}
-        />
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={true}
-        />
-        <ChatBubble
-          message="테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트"
-          isSender={true}
-        />
+        {messages.map((msg, idx) => {
+          const prevMsg = idx > 0 ? messages[idx - 1] : null
+          const isSenderChanged = prevMsg ? prevMsg.isSender !== msg.isSender : false
+          const marginClass = isSenderChanged ? 'mt-5' : 'mt-0'
+          return (
+            <div key={msg.id} className={marginClass}>
+              <ChatBubble
+                message={msg.text}
+                isSender={msg.isSender}
+                avatarUrl={msg.avatarUrl}
+                variant={msg.variant ?? 'basic'}
+                showIcon={msg.showIcon}
+              />
+
+              {msg.explanation && (
+                <DescriptionBubble
+                  word={msg.explanation.word}
+                  pronunciation={msg.explanation.pronunciation}
+                  descriptionByTab={msg.explanation.descriptionByTab}
+                  initialTab={msg.explanation.selectedTab}
+                />
+              )}
+            </div>
+          )
+        })}
+
+        <InitChat />
       </main>
-      {/* showCoachMark */}
+
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
       <footer
