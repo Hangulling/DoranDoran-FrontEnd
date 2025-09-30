@@ -14,7 +14,7 @@ interface ExpressionCardProps {
 export default function ExpressionCard({ item }: ExpressionCardProps) {
   const { selectionMode, selectedIds, toggleSelect } = useArchiveStore()
   const isSelected = selectedIds.has(item.id)
-  console.log(isSelected)
+
   const handleClick = () => {
     if (selectionMode) {
       toggleSelect(item.id)
