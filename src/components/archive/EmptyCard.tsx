@@ -1,7 +1,10 @@
 import Button from '../common/Button'
 import arrowActive from '../../assets/icon/arrowRight.svg'
+import { useNavigate } from 'react-router-dom'
 
 export default function EmptyCard() {
+  const navigate = useNavigate()
+
   return (
     <div className="flex flex-col items-center justify-center py-10 mt-50">
       <p className="text-body text-sm text-gray-600">You haven't saved any phrase yet.</p>
@@ -10,6 +13,7 @@ export default function EmptyCard() {
         <Button
           variant="text"
           className="border border-green-400 rounded-full px-4 py-2 text-green-400"
+          onClick={() => navigate('/chat')}
         >
           <span className="flex items-center gap-1 text-sm">
             Start chatting
