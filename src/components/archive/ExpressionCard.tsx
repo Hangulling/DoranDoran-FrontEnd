@@ -18,8 +18,6 @@ export default function ExpressionCard({ item }: ExpressionCardProps) {
   const handleClick = () => {
     if (selectionMode) {
       toggleSelect(item.id)
-    } else {
-      console.log(isSelected)
     }
   }
 
