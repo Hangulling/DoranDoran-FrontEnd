@@ -8,7 +8,7 @@ interface ResponseOptionsProps {
 
 const Selection: React.FC<ResponseOptionsProps> = ({ options, onSelect, selectedOption }) => {
   return (
-    <div className="flex gap-[10px] mt-2 flex-wrap w-[265px] ml-10">
+    <div className="flex gap-[10px] flex-wrap w-[265px] ml-10">
       {options.map((option, idx) => {
         const isSelected = option === selectedOption
         const isAnySelected = selectedOption !== null && selectedOption !== undefined

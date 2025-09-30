@@ -23,7 +23,7 @@ const InitChat: React.FC = () => {
           selectedOption={selected}
         />
       }
-      <div className="mt-3">{selected && <ChatBubble message={selected} isSender={true} />}</div>
+      <div className="mt-5">{selected && <ChatBubble message={selected} isSender={true} />}</div>
     </div>
   )
 }
