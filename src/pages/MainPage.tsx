@@ -1,18 +1,8 @@
 import Character from '../assets/main/mainCharacter.svg'
-import SchoolAvatar from '/chat/school.svg'
-import LoverAvatar from '/chat/lover.svg'
-import CompanyAvatar from '/chat/company.svg'
-import ClientAvatar from '/chat/client.svg'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import CommonModal from '../components/common/CommonModal'
-
-const chatRooms = [
-  { id: 1, label: 'Senior', avatar: SchoolAvatar, message: '족보 필요하면 연락해~!' },
-  { id: 2, label: 'Honey', avatar: LoverAvatar, message: '자기 어디야?' },
-  { id: 3, label: 'Coworker', avatar: CompanyAvatar, message: '수정 사항 완료 되었나요?' },
-  { id: 4, label: 'Client', avatar: ClientAvatar, message: '내일 미팅 10시 괜찮으세요?' },
-]
+import { chatRooms } from '../mockData/chat'
 
 const LOGOUT_DESC = ['You can log in again anytime.']
 const SIGNOUT_DESC = ['This action cannot be undone.', 'Are you sure you want to continue?']
@@ -23,7 +13,7 @@ const MainPage = () => {
   const [modalType, setModalType] = useState<'logout' | 'signout' | null>(null)
 
   const handleRoomClick = (id: number) => {
-    navigate('/chat', { state: { showCoachMark: true, roomId: id } })
+    navigate(`/chat/${id}`, { state: { showCoachMark: true, roomId: id } })
   }
 
   // 로그아웃 버튼 클릭 시
