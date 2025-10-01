@@ -5,7 +5,7 @@ import CoachMark from '../components/chat/CoachMark'
 import ChatFooter from '../components/chat/ChatFooter'
 import InitChat from '../components/chat/InitChat'
 import DescriptionBubble from '../components/chat/DescriptionBubble'
-import { messages } from '../mocks/db/chat'
+import { messages } from '../mockData/chat'
 
 interface Message {
   id: number
@@ -24,7 +24,7 @@ const ChatPage: React.FC<ChatListProps> = () => {
   const [showCoachMark, setShowCoachMark] = useState(true)
   const [footerHeight, setFooterHeight] = useState(173)
   const chatMainRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement | null>(null)
+  const inputRef = useRef<HTMLTextAreaElement | null>(null)
 
   useEffect(() => {
     const inputEl = inputRef.current

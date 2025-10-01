@@ -16,8 +16,14 @@ type ToastProps = {
   iconType?: IconType
 }
 
+let toastActive = false
+
 const showToast = ({ message, iconType }: ToastProps) => {
-  toast.custom(
+  if (toastActive) return
+
+  toastActive = true
+
+  const toastId = toast.custom(
     <div className="flex items-start w-full mx-[20px] mb-[20px] bg-[rgba(15,16,16,0.8)] px-[14px] py-[16px] rounded-[12px] gap-[8px]">
       {iconType && iconMap[iconType]}
       <span className="text-subtitle text-[14px] text-white">{message}</span>
@@ -27,6 +33,10 @@ const showToast = ({ message, iconType }: ToastProps) => {
       position: 'bottom-center',
     }
   )
+  setTimeout(() => {
+    toastActive = false
+    toast.dismiss(toastId)
+  }, 4000)
 }
 
 export default showToast
