@@ -18,9 +18,15 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
   const navigate = useNavigate()
   const { selectionMode, deleteMode, enterSelectionMode, exitSelectionMode, selectAll, delectAll } =
     useArchiveStore()
+
   // 뒤로가기
   const goBack = () => {
     navigate(-1)
+  }
+
+  // 북마크 이동
+  const handleBookmarkClick = () => {
+    navigate('/archive')
   }
 
   return (
@@ -54,7 +60,7 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
       <div className="navbar-end mr-5">
         {/* 북마크 */}
         {showBookmark && (
-          <button>
+          <button onClick={handleBookmarkClick}>
             <BookmarkIcon />
           </button>
         )}
