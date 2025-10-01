@@ -1,6 +1,7 @@
 import type React from 'react'
 import { useLocation } from 'react-router-dom'
 import NavBar from '../components/common/NavBar'
+import useArchiveStore from '../stores/useArchiveStore'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -37,12 +38,18 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const chatRoomMatch = pathname.match(/^\/chat\/(\d+)$/)
   const chatRoomId = chatRoomMatch ? chatRoomMatch[1] : null
 
+  const { selectionMode } = useArchiveStore()
+
   // 타이틀
   let title = ''
   if (chatRoomId) {
     title = chatRoomNames[chatRoomId] || `채팅방 ${chatRoomId}`
   } else {
     title = pageTitles[pathname] || '페이지'
+  }
+
+  if (selectionMode) {
+    title = 'Delete'
   }
 
   return (
