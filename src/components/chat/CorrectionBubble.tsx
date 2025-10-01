@@ -10,11 +10,11 @@ const bubbleClass = 'bg-green-50 rounded-lg px-[10px] py-[10px] max-w-[265px] mb
 
 const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   level = 'Lv. 1',
-  initialTab = '한국어',
+  initialTab = 'Kor',
   descriptionByTab,
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
-  const tabs = ['한국어', '영어']
+  const tabs = ['Kor', 'Eng']
 
   const wrapperClass = 'chat chat-end'
 

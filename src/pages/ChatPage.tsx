@@ -3,9 +3,8 @@ import ChatBubble from '../components/chat/ChatBubble'
 import ChatDate from '../components/chat/ChatDate'
 import CoachMark from '../components/chat/CoachMark'
 import ChatFooter from '../components/chat/ChatFooter'
-import InitChat from '../components/chat/InitChat'
 import DescriptionBubble from '../components/chat/DescriptionBubble'
-import { messages } from '../mockData/chat'
+import { initialMessages } from '../mockData/chat'
 
 interface Message {
   id: number
@@ -14,15 +13,21 @@ interface Message {
   avatarUrl?: string
   variant?: 'basic' | 'second' | 'sender'
   showIcon?: boolean
+  explanation?: {
+    word: string
+    pronunciation: string
+    selectedTab: 'Kor' | 'Eng'
+    descriptionByTab: {
+      Kor: string
+      Eng: string
+    }
+  }
 }
 
-interface ChatListProps {
-  messages: Message[]
-}
-
-const ChatPage: React.FC<ChatListProps> = () => {
+const ChatPage: React.FC = () => {
   const [showCoachMark, setShowCoachMark] = useState(true)
   const [footerHeight, setFooterHeight] = useState(173)
+  const [messages, setMessages] = useState<Message[]>([...initialMessages])
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
 
@@ -43,6 +48,13 @@ const ChatPage: React.FC<ChatListProps> = () => {
     return () => inputEl.removeEventListener('focus', handleFocus)
   }, [])
 
+  // 메시지 추가될때마다 자동 스크롤
+  useEffect(() => {
+    if (chatMainRef.current) {
+      chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
+    }
+  }, [messages])
+
   // API 연동 위해 작성
   useEffect(() => {
     // const checkCoachMarkSeen = async () => {
@@ -62,6 +74,18 @@ const ChatPage: React.FC<ChatListProps> = () => {
 
   const handleFooterHeightChange = (height: number) => {
     setFooterHeight(height)
+  }
+
+  // 메시지 전송
+  const handleSendMessage = (text: string) => {
+    const newMessage: Message = {
+      id: messages.length + 1, // 간단한 ID 생성
+      text,
+      isSender: true,
+      variant: 'sender',
+    }
+    // 기존 메시지에 새 메시지를 추가
+    setMessages(prevMessages => [...prevMessages, newMessage])
   }
 
   return (
@@ -98,8 +122,6 @@ const ChatPage: React.FC<ChatListProps> = () => {
             </div>
           )
         })}
-
-        <InitChat />
       </main>
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
@@ -108,7 +130,11 @@ const ChatPage: React.FC<ChatListProps> = () => {
         className="fixed bottom-0 left-0 right-0 bg-white"
         style={{ height: footerHeight, zIndex: 10 }}
       >
-        <ChatFooter onHeightChange={handleFooterHeightChange} inputRef={inputRef} />
+        <ChatFooter
+          onHeightChange={handleFooterHeightChange}
+          inputRef={inputRef}
+          onSendMessage={handleSendMessage}
+        />
       </footer>
     </div>
   )
