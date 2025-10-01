@@ -2,7 +2,7 @@ import Character from '../assets/main/mainCharacter.svg'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import CommonModal from '../components/common/CommonModal'
-import { chatRooms } from '../mockData/chat'
+import { chatRooms } from '../mocks/db/chat'
 
 const LOGOUT_DESC = ['You can log in again anytime.']
 const SIGNOUT_DESC = ['This action cannot be undone.', 'Are you sure you want to continue?']

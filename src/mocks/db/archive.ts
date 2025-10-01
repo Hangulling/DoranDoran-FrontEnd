@@ -1,4 +1,4 @@
-import type { ExpressionItem } from '../stores/useArchiveStore'
+import type { ExpressionItem } from '../../stores/useArchiveStore'
 
 export const fakeArchiveItems: ExpressionItem[] = [
   // Senior 채팅방

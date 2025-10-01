@@ -6,7 +6,7 @@ import Button from '../components/common/Button'
 import checkCircle from '../assets/icon/checkRound.svg'
 import { useEffect, useState } from 'react'
 import useArchiveStore from '../stores/useArchiveStore'
-import { fakeArchiveItems } from '../mockData/archive'
+import { fakeArchiveItems } from '../mocks/db/archive'
 
 export default function ArchivePage() {
   const {
