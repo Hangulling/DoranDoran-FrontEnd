@@ -1,7 +1,9 @@
 import check from '../../assets/icon/checkAll.svg'
 import checkOff from '../../assets/icon/disabledCheckAll.svg'
-import speaker from '../../assets/icon/tts.svg'
+import speakerOn from '../../assets/icon/activeVolume.svg'
+import speakerOff from '../../assets/icon/defaultVolume.svg'
 import useArchiveStore from '../../stores/useArchiveStore'
+import { useState } from 'react'
 
 interface ExpressionCardProps {
   item: {
@@ -13,6 +15,7 @@ interface ExpressionCardProps {
 
 export default function ExpressionCard({ item }: ExpressionCardProps) {
   const { selectionMode, selectedIds, toggleSelect } = useArchiveStore()
+  const [isVolumeOn, setIsVolumeOn] = useState(false)
   const isSelected = selectedIds.has(item.id)
 
   const handleClick = () => {
@@ -37,7 +40,12 @@ export default function ExpressionCard({ item }: ExpressionCardProps) {
           )}
         </div>
         <div className="flex w-full px-4 mt-1">
-          <img src={speaker} className="w-5 h-5 mr-1" alt="tts" />
+          <img
+            src={isVolumeOn ? speakerOn : speakerOff}
+            className="w-5 h-5 mr-1"
+            alt="tts"
+            onClick={() => setIsVolumeOn(prev => !prev)}
+          />
           <span className="text-body text-sm text-gray-800">{item.text}</span>
         </div>
       </div>
