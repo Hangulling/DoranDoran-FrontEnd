@@ -4,7 +4,7 @@ import ChatDate from '../components/chat/ChatDate'
 import CoachMark from '../components/chat/CoachMark'
 import ChatFooter from '../components/chat/ChatFooter'
 import DescriptionBubble from '../components/chat/DescriptionBubble'
-import { initialMessages } from '../mocks/chat'
+import { initialMessages } from '../mocks/db/chat'
 
 interface Message {
   id: number

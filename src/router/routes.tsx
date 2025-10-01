@@ -13,7 +13,7 @@ export function Routes() {
       <Route path="/" element={<MainPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/chat/:id" element={<ChatPage messages={[]} />} />
+      <Route path="/chat/:id" element={<ChatPage />} />
       <Route path="/archive" element={<ArchivePage />} />
     </RouterRoutes>
   )
