@@ -14,21 +14,13 @@ const prepare = async () => {
 }
 
 prepare().then(() => {
-  ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+  const container = document.getElementById('root')!
+  const root = ReactDOM.createRoot(container)
+  root.render(
     <React.StrictMode>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </React.StrictMode>
   )
 })
-if (process.env.NODE_ENV === 'development') {
-  const { worker } = await import('./mocks/browser')
-  worker.start()
-}
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
-)
