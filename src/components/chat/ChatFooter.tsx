@@ -8,6 +8,7 @@ import showToast from '../common/CommonToast'
 interface ChatFooterProps {
   onHeightChange: (height: number) => void
   inputRef: RefObject<HTMLTextAreaElement | null>
+  onSendMessage: (message: string) => void
 }
 
 const MAX_ROWS = 3
@@ -16,7 +17,7 @@ const SINGLE_LINE_HEIGHT = 37
 const EXPANDED_SLIDER_HEIGHT = 173
 const COLLAPSED_BASE_HEIGHT = 105
 
-const ChatFooter = ({ onHeightChange, inputRef }: ChatFooterProps) => {
+const ChatFooter = ({ onHeightChange, inputRef, onSendMessage }: ChatFooterProps) => {
   const [isExpanded, setIsExpanded] = useState(true)
   const [inputActive, setInputActive] = useState(false)
   const [inputValue, setInputValue] = useState('')
@@ -113,6 +114,19 @@ const ChatFooter = ({ onHeightChange, inputRef }: ChatFooterProps) => {
     onHeightChange(calculatedFooterHeight)
   }, [calculatedFooterHeight, onHeightChange])
 
+  // 메시지 전송 처리 함수
+  const handleSendClick = () => {
+    if (inputValue.trim()) {
+      onSendMessage(inputValue.trim())
+      setInputValue('') // 입력창 비우기
+      // 메시지 전송 후 textarea 높이 초기화
+      if (inputRef.current) {
+        inputRef.current.style.height = `${SINGLE_LINE_HEIGHT}px`
+        setTextareaHeight(SINGLE_LINE_HEIGHT)
+      }
+    }
+  }
+
   return (
     <div
       className="bottom-0 mx-auto w-full max-w-md left-1/2 pb-[env(safe-area-inset-bottom)] bg-white border-t-[1px] border-gray-80 shadow-[0_-1px_2px_rgba(0,0,0,0.08)]"
@@ -164,7 +178,7 @@ const ChatFooter = ({ onHeightChange, inputRef }: ChatFooterProps) => {
             }}
             className="flex-grow px-3 py-2 mr-2 border border-gray-100 bg-gray-50 rounded-full focus:border-gray-100 focus:outline-none"
           />
-          <button>
+          <button onClick={handleSendClick}>
             {inputActive && inputValue.trim() ? (
               <img src={ActiveSend} alt="활성화된 보내기" />
             ) : (

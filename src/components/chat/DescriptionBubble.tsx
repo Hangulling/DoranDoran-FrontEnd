@@ -13,11 +13,11 @@ const bubbleSecondClass =
 const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
   word,
   pronunciation,
-  initialTab = '한국어',
+  initialTab = 'Kor',
   descriptionByTab,
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
-  const tabs = ['한국어', '영어']
+  const tabs = ['Kor', 'Eng']
 
   return (
     <div className={bubbleSecondClass}>
