@@ -71,10 +71,10 @@ const ChatFooter = ({ onHeightChange, inputRef }: ChatFooterProps) => {
     }
 
     if (!koreanRegex.test(value) && !isEmptyOrWhitespace) {
-      showToast({ message: '한글만 입력할 수 있습니다.', iconType: 'error' })
+      showToast({ message: 'Please enter your message in Korean only', iconType: 'error' })
     }
     if (value.length > 50) {
-      showToast({ message: 'Maximum of 50 characters allowed', iconType: 'error' })
+      showToast({ message: 'You can only write up to 50 characters', iconType: 'error' })
       value = value.substring(0, 50)
     }
 

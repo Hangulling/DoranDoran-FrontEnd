@@ -1,14 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import ChatBubble from './ChatBubble'
-import Selection from './Selection'
 
 const InitChat: React.FC = () => {
-  const [selected, setSelected] = useState<string | null>(null)
-
-  const handleSelect = (option: string) => {
-    setSelected(option)
-  }
-
   return (
     <div>
       <ChatBubble
@@ -16,14 +9,6 @@ const InitChat: React.FC = () => {
         isSender={false}
         variant="second"
       />
-      {
-        <Selection
-          options={['우왕!! 너무 좋지!', '진짜? 고마워ㅠ!', '감사합니다']}
-          onSelect={handleSelect}
-          selectedOption={selected}
-        />
-      }
-      <div className="mt-5">{selected && <ChatBubble message={selected} isSender={true} />}</div>
     </div>
   )
 }
