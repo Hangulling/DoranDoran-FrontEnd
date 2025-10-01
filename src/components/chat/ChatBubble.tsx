@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import TTSIcon from './VolumeIcon'
 import BookmarkIcon from './BookmarkIcon'
+import useTTS from '../../hooks/useTTS'
 
 interface ChatBubbleProps {
   message: string
@@ -24,19 +25,13 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
   showIcon = false,
 }) => {
   const baseBubbleClass = 'py-[6px] px-2 text-[14px] max-w-[265px] rounded-lg'
-
   const bubbleClass = `${baseBubbleClass} ${isSender ? bubbleVariants.sender : bubbleVariants[variant]}`
-
   const marginClass = !isSender && (avatarUrl || variant === 'second') ? 'ml-10' : ''
 
   const [isBookmarked, setIsBookmarked] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(false)
+  const { onPlay: playTTS, playing: isPlaying } = useTTS(message)
 
   const toggleBookmark = () => setIsBookmarked(!isBookmarked)
-  const playTTS = () => {
-    // TTS 동작
-    setIsPlaying(!isPlaying)
-  }
 
   return (
     <div
