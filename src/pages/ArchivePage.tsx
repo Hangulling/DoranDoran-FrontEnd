@@ -1,12 +1,13 @@
-import ArchiveTabs from '../components/archive/ArchiveTabs'
+import ArchiveTabs, { type Room } from '../components/archive/ArchiveTabs'
 import ExpressionCard from '../components/archive/ExpressionCard'
 import CommonModal from '../components/common/CommonModal'
 import EmptyCard from '../components/archive/EmptyCard'
 import Button from '../components/common/Button'
 import checkCircle from '../assets/icon/checkRound.svg'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import useArchiveStore from '../stores/useArchiveStore'
 import { fakeArchiveItems } from '../mockData/archive'
+import { useParams } from 'react-router-dom'
 
 export default function ArchivePage() {
   const {
@@ -20,11 +21,20 @@ export default function ArchivePage() {
   } = useArchiveStore()
   const [openModal, setOpenModal] = useState(false)
   const [showToast, setShowToast] = useState(false)
+  const list = items.filter(i => i.chatRoom === activeRoom)
+  const { id } = useParams<{ id?: string }>()
+  const idToRoom: Record<string, Room> = useMemo(
+    () => ({ '1': 'Senior', '2': 'Honey', '3': 'Coworker', '4': 'Client' }),
+    []
+  )
 
   useEffect(() => {
     if (items.length === 0) seedItems(fakeArchiveItems)
   }, [items.length, seedItems])
-  const list = items.filter(i => i.chatRoom === activeRoom)
+
+  useEffect(() => {
+    if (id && idToRoom[id]) setActiveRoom(idToRoom[id])
+  }, [id, idToRoom, setActiveRoom])
 
   return (
     <div className="min-h-screen bg-gray-50 h-full pb-20">
@@ -47,6 +57,7 @@ export default function ArchivePage() {
             className={`min-w-md h-11 bg-white fixed bottom-0 ${selectedIds.size > 0 ? 'text-orange-300' : 'text-orange-100'}`}
             size="xl"
             onClick={() => setOpenModal(true)}
+            disabled={selectedIds.size < 1}
           >
             Delete {selectedIds.size > 0 ? `${selectedIds.size}` : ''}
           </Button>
