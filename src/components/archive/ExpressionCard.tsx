@@ -3,7 +3,7 @@ import checkOff from '../../assets/icon/disabledCheckAll.svg'
 import speakerOn from '../../assets/icon/activeVolume.svg'
 import speakerOff from '../../assets/icon/defaultVolume.svg'
 import useArchiveStore from '../../stores/useArchiveStore'
-import { useState } from 'react'
+import useTTS from '../../hooks/useTTS'
 
 interface ExpressionCardProps {
   item: {
@@ -15,13 +15,18 @@ interface ExpressionCardProps {
 
 export default function ExpressionCard({ item }: ExpressionCardProps) {
   const { selectionMode, selectedIds, toggleSelect } = useArchiveStore()
-  const [isVolumeOn, setIsVolumeOn] = useState(false)
   const isSelected = selectedIds.has(item.id)
+  const { onPlay, playing } = useTTS(item.text)
 
   const handleClick = () => {
     if (selectionMode) {
       toggleSelect(item.id)
     }
+  }
+
+  const handleSpeakerClick = (e: React.MouseEvent<HTMLImageElement>) => {
+    e.stopPropagation()
+    onPlay()
   }
 
   return (
@@ -41,10 +46,10 @@ export default function ExpressionCard({ item }: ExpressionCardProps) {
         </div>
         <div className="flex w-full px-4 mt-1">
           <img
-            src={isVolumeOn ? speakerOn : speakerOff}
+            src={playing ? speakerOn : speakerOff}
             className="w-5 h-5 mr-1"
-            alt="tts"
-            onClick={() => setIsVolumeOn(prev => !prev)}
+            alt={playing ? '읽는 중' : '읽기'}
+            onClick={handleSpeakerClick}
           />
           <span className="text-body text-sm text-gray-800">{item.text}</span>
         </div>
