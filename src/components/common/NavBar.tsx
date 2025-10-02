@@ -1,5 +1,5 @@
 import type React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useMatch, useNavigate } from 'react-router-dom'
 import LeftArrowIcon from '../../assets/icon/leftArrow.svg'
 import CloseIcon from '../../assets/icon/close.svg'
 import BookmarkIcon from '../../assets/icon/bookmark.svg?react'
@@ -19,16 +19,26 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
   const { selectionMode, deleteMode, enterSelectionMode, exitSelectionMode, selectAll, delectAll } =
     useArchiveStore()
 
+  const chatMatch = useMatch('/chat/:id')
+  const archiveMatch = useMatch('/archive/:id')
+  const currentId = chatMatch?.params.id ?? archiveMatch?.params.id
+
   // 뒤로가기
   const goBack = () => {
     navigate(-1)
   }
 
-  // 북마크 이동
   const handleBookmarkClick = () => {
-    navigate('/archive')
+    if (!currentId) {
+      navigate('/archive/2')
+      return
+    }
+    if (chatMatch) {
+      navigate(`/archive/${currentId}`)
+    } else {
+      navigate(`/chat/${currentId}`)
+    }
   }
-
   return (
     <div className="fixed top-0 mx-auto w-full max-w-md left-1/2 translate-x-[-50%] navbar bg-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] h-15 min-h-15 p-0 z-50">
       {/* 뒤로가기 */}

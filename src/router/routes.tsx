@@ -14,7 +14,7 @@ export function Routes() {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/chat/:id" element={<ChatPage />} />
-      <Route path="/archive" element={<ArchivePage />} />
+      <Route path="/archive/:id" element={<ArchivePage />} />
     </RouterRoutes>
   )
 }
