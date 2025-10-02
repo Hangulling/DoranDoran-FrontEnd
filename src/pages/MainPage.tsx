@@ -2,7 +2,7 @@ import Character from '../assets/main/mainCharacter.svg'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import CommonModal from '../components/common/CommonModal'
-import { chatRooms } from '../mockData/chat'
+import { chatRooms } from '../mocks/db/chat'
 
 const LOGOUT_DESC = ['You can log in again anytime.']
 const SIGNOUT_DESC = ['This action cannot be undone.', 'Are you sure you want to continue?']
@@ -68,10 +68,10 @@ const MainPage = () => {
                 className="flex items-center gap-4 w-full h-21 bg-white rounded-lg shadow-[1px_1px_10px_rgba(0,0,0,0.1)] py-3 px-4 active:bg-gray-100"
               >
                 <div className="w-13 h-13 rounded-full flex items-center justify-center overflow-hidden bg-gray-100">
-                  <img src={room.avatar} alt={room.label} className="w-full h-full object-cover" />
+                  <img src={room.avatar} alt={room.title} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex flex-col items-start">
-                  <span className="text-title text-[16px]">{room.label}</span>
+                  <span className="text-title text-[16px]">{room.title}</span>
                   <span className="text-gray-600 text-[14px]">{room.message}</span>
                 </div>
               </button>
@@ -86,7 +86,7 @@ const MainPage = () => {
           </div>
 
           <p className="text-center text-gray-300 text-[12px] mt-[20px]">
-            Copyright 2025.dorandoran all rights reserved.
+            Copyright 2025. dorandoran all rights reserved.
           </p>
 
           <CommonModal

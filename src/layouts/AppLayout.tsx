@@ -9,7 +9,6 @@ interface AppLayoutProps {
 
 const pageTitles: Record<string, string> = {
   '/': '',
-  '/chat': 'Chat', // 추후 삭제
   '/signup': 'Sign Up',
   '/archive': 'Archive',
 }
@@ -55,7 +54,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md">
+    <div className="mx-auto w-full max-w-md pt-15">
       {!hideNavBar && (
         <NavBar isMain={isMain} title={title} showBookmark={showBookmark} showDelete={showDelete} />
       )}

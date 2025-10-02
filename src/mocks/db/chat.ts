@@ -5,10 +5,22 @@ import ClientAvatar from '/chat/client.svg'
 
 // 채팅방
 export const chatRooms = [
-  { id: 1, label: 'Senior', avatar: SchoolAvatar, message: '족보 필요하면 연락해~!' },
-  { id: 2, label: 'Honey', avatar: LoverAvatar, message: '자기 어디야?' },
-  { id: 3, label: 'Coworker', avatar: CompanyAvatar, message: '수정 사항 완료 되었나요?' },
-  { id: 4, label: 'Client', avatar: ClientAvatar, message: '내일 미팅 10시 괜찮으세요?' },
+  { id: 1, title: 'Senior', avatar: SchoolAvatar, message: '족보 필요하면 연락해~!', intimacy: 1 },
+  { id: 2, title: 'Honey', avatar: LoverAvatar, message: '자기 어디야?', intimacy: 1 },
+  {
+    id: 3,
+    title: 'Coworker',
+    avatar: CompanyAvatar,
+    message: '수정 사항 완료 되었나요?',
+    intimacy: 1,
+  },
+  {
+    id: 4,
+    title: 'Client',
+    avatar: ClientAvatar,
+    message: '내일 미팅 10시 괜찮으세요?',
+    intimacy: 1,
+  },
 ]
 
 // 메시지

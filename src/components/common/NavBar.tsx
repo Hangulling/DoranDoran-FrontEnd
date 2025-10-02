@@ -40,7 +40,7 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
     }
   }
   return (
-    <div className="mx-auto w-full max-w-md left-1/2 navbar bg-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] h-15 min-h-15 p-0">
+    <div className="fixed top-0 mx-auto w-full max-w-md left-1/2 translate-x-[-50%] navbar bg-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] h-15 min-h-15 p-0 z-50">
       {/* 뒤로가기 */}
       <div className="navbar-start ml-5">
         {!isMain && !selectionMode && (
