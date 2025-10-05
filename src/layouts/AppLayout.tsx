@@ -1,5 +1,5 @@
 import type React from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useMatch } from 'react-router-dom'
 import NavBar from '../components/common/NavBar'
 import useArchiveStore from '../stores/useArchiveStore'
 
@@ -21,7 +21,6 @@ const chatRoomNames: Record<string, string> = {
 }
 
 const showBookmarkPaths = ['/']
-const showDeletePaths = ['/archive']
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation()
@@ -29,8 +28,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const pathname = location.pathname
 
   const isMain = pathname === '/'
+  const onArchive = !!useMatch('/archive/:id')
+  const showDelete = onArchive
   const hideNavBar = skipNavPaths.includes(pathname)
-  const showDelete = showDeletePaths.includes(pathname)
 
   // 채팅방 id
   const chatRoomMatch = pathname.match(/^\/(chat|closeness)\/(\d+)$/)
@@ -46,6 +46,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     title = chatRoomNames[chatRoomId] || `채팅방 ${chatRoomId}`
   } else {
     title = pageTitles[pathname] || '페이지'
+  }
+
+  if (onArchive) {
+    title = 'Archive'
   }
 
   if (selectionMode) {
