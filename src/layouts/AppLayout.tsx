@@ -57,11 +57,19 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md pt-15">
+    <div className="mx-auto flex h-screen w-full max-w-md flex-col">
       {!hideNavBar && (
-        <NavBar isMain={isMain} title={title} showBookmark={showBookmark} showDelete={showDelete} />
+        <header className="flex-shrink-0">
+          <NavBar
+            isMain={isMain}
+            title={title}
+            showBookmark={showBookmark}
+            showDelete={showDelete}
+          />
+          <div className="h-14" />
+        </header>
       )}
-      <main>{children}</main>
+      <main className="flex-grow overflow-y-auto min-h-0">{children}</main>
     </div>
   )
 }
