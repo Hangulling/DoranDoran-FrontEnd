@@ -13,7 +13,7 @@ const MainPage = () => {
   const [modalType, setModalType] = useState<'logout' | 'signout' | null>(null)
 
   const handleRoomClick = (id: number) => {
-    navigate(`/chat/${id}`, { state: { showCoachMark: true, roomId: id } })
+    navigate(`/closeness/${id}`, { state: { showCoachMark: true, roomId: id } })
   }
 
   // 로그아웃 버튼 클릭 시

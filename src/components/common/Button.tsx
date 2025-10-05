@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 type Variant = 'primary' | 'cancel' | 'text' | 'confirm' | 'tab' | 'archive'
-type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'archive'
+type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'archive' | 'confirm'
 
 const VARIANTS: Record<Variant, string> = {
   primary: 'text-white rounded-lg disabled:bg-gray-100 disabled:text-gray-300',
@@ -19,6 +19,7 @@ const SIZES: Record<Size, string> = {
   lg: 'w-[271px] h-12',
   xl: 'w-[335px] h-14',
   archive: 'px-4 py-2',
+  confirm: 'w-58 py-2',
 }
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
