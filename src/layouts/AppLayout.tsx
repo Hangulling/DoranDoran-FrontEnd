@@ -20,22 +20,23 @@ const chatRoomNames: Record<string, string> = {
   '4': 'Client',
 }
 
-const showBookmarkPaths = ['/', '/chat']
+const showBookmarkPaths = ['/']
 const showDeletePaths = ['/archive']
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation()
-  const skipNavPaths = ['/login'] // 로그인 경로 추후 수정
+  const skipNavPaths = ['/login']
   const pathname = location.pathname
 
   const isMain = pathname === '/'
   const hideNavBar = skipNavPaths.includes(pathname)
-  const showBookmark = showBookmarkPaths.includes(pathname)
   const showDelete = showDeletePaths.includes(pathname)
 
   // 채팅방 id
-  const chatRoomMatch = pathname.match(/^\/chat\/(\d+)$/)
-  const chatRoomId = chatRoomMatch ? chatRoomMatch[1] : null
+  const chatRoomMatch = pathname.match(/^\/(chat|closeness)\/(\d+)$/)
+  const chatRoomId = chatRoomMatch ? chatRoomMatch[2] : null
+
+  const showBookmark = showBookmarkPaths.includes(pathname) || chatRoomId !== null
 
   const { selectionMode } = useArchiveStore()
 

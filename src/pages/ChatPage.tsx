@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import ChatBubble from '../components/chat/ChatBubble'
-import ChatDate from '../components/chat/ChatDate'
 import CoachMark from '../components/chat/CoachMark'
 import ChatFooter from '../components/chat/ChatFooter'
 import DescriptionBubble from '../components/chat/DescriptionBubble'
@@ -95,8 +94,6 @@ const ChatPage: React.FC = () => {
         className="flex-grow min-h-0 overflow-y-auto px-5"
         style={{ paddingBottom: footerHeight + 24 }}
       >
-        <ChatDate />
-
         {messages.map((msg, idx) => {
           const prevMsg = idx > 0 ? messages[idx - 1] : null
           const isSenderChanged = prevMsg ? prevMsg.isSender !== msg.isSender : false

@@ -1,5 +1,4 @@
 import { useEffect, useState, type RefObject } from 'react'
-import DistanceSlider from './DistanceSlider'
 import Arrow from '../../assets/icon/expandArrow.svg'
 import Send from '../../assets/icon/send.svg'
 import ActiveSend from '../../assets/icon/activeSend.svg'
@@ -150,12 +149,6 @@ const ChatFooter = ({ onHeightChange, inputRef, onSendMessage }: ChatFooterProps
             )}
           </button>
         </div>
-
-        {isExpanded && (
-          <div className="mx-[20px] mb-[9px]">
-            <DistanceSlider />
-          </div>
-        )}
 
         <div className="relative mx-auto w-screen max-w-md left-1/2 -translate-x-1/2 h-[1px] bg-gray-80" />
 

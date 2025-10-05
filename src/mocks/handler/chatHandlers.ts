@@ -28,7 +28,7 @@ const coachMarks: { [key: number]: boolean } = {
 
 export const chatHandlers = [
   // 채팅방 목록 조회
-  http.get('{Body}/chat/list', ({ request }) => {
+  http.get('/api/chat/list', ({ request }) => {
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') || '1', 10)
     const limit = parseInt(url.searchParams.get('limit') || '10', 10)
