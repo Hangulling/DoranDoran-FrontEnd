@@ -4,24 +4,23 @@ import LeftArrowIcon from '../../assets/icon/leftArrow.svg'
 import CloseIcon from '../../assets/icon/close.svg'
 import BookmarkIcon from '../../assets/icon/bookmark.svg?react'
 import MainLogo from '../../assets/main/mainLogo.svg'
+import Hamburger from '../../assets/icon/hamburger.svg?react'
 import useArchiveStore from '../../stores/useArchiveStore'
 import Button from './Button'
-
-interface NavBarProps {
-  title?: string
-  isMain?: boolean
-  showBookmark?: boolean
-  showDelete?: boolean
-}
+import { useState } from 'react'
+import Sidebar from './SideBar'
+import type { NavBarProps } from '../../types/common'
 
 const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete }) => {
   const navigate = useNavigate()
   const { selectionMode, deleteMode, enterSelectionMode, exitSelectionMode, selectAll, delectAll } =
     useArchiveStore()
 
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const chatMatch = useMatch('/chat/:id')
+  const closenessMatch = useMatch('/closeness/:id')
   const archiveMatch = useMatch('/archive/:id')
-  const currentId = chatMatch?.params.id ?? archiveMatch?.params.id
+  const currentId = chatMatch?.params.id ?? closenessMatch?.params.id ?? archiveMatch?.params.id
 
   // 뒤로가기
   const goBack = () => {
@@ -35,14 +34,21 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
     }
     if (chatMatch) {
       navigate(`/archive/${currentId}`)
+    } else if (closenessMatch) {
+      navigate(`/archive/${currentId}`)
     } else {
       navigate(`/chat/${currentId}`)
     }
   }
+
+  const toggleSidebar = () => {
+    setSidebarOpen(open => !open)
+  }
+
   return (
     <div className="fixed top-0 mx-auto w-full max-w-md left-1/2 translate-x-[-50%] navbar bg-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] h-15 min-h-15 p-0 z-50">
-      {/* 뒤로가기 */}
       <div className="navbar-start ml-5">
+        {/* 뒤로가기 */}
         {!isMain && !selectionMode && (
           <button onClick={goBack}>
             <img src={LeftArrowIcon} alt="뒤로가기" />
@@ -52,6 +58,12 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
           <Button onClick={exitSelectionMode}>
             <img src={CloseIcon} />
           </Button>
+        )}
+        {/* 햄버거 */}
+        {isMain && !selectionMode && (
+          <button onClick={toggleSidebar}>
+            <Hamburger />
+          </button>
         )}
       </div>
 
@@ -92,6 +104,9 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
           </Button>
         )}
       </div>
+
+      {/* 사이드바 표시 */}
+      <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
     </div>
   )
 }

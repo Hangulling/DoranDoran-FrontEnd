@@ -2,18 +2,14 @@ import { type JSX } from 'react'
 import { toast } from 'react-hot-toast'
 import ErrorIcon from '../../assets/icon/error.svg'
 import CheckIcon from '../../assets/icon/checkRound.svg'
+import type { ToastProps } from '../../types/common'
 
-type IconType = 'error' | 'checkRound'
+export type IconType = 'error' | 'checkRound'
 
 // 에러 / 체크 아이콘 선택
 const iconMap: Record<IconType, JSX.Element> = {
   error: <img src={ErrorIcon} alt="error" />,
   checkRound: <img src={CheckIcon} alt="check" />,
-}
-
-type ToastProps = {
-  message: string
-  iconType?: IconType
 }
 
 let toastActive = false
