@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import CloseIcon from '../../assets/icon/blackClose.svg?react'
 import RightArrowIcon from '../../assets/icon/blackArrowRight.svg'
 import LogoutIcon from '../../assets/icon/logout.svg?react'
-import SignupIcon from '../../assets/icon/Signup.svg?react'
+import SignupIcon from '../../assets/icon/signup.svg?react'
 import type { SidebarProps } from '../../types/common'
 import CommonModal from './CommonModal'
 
