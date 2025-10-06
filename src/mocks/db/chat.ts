@@ -24,23 +24,23 @@ export const chatRooms = [
 ]
 
 // 메시지
-export const initialMessages = [
-  {
-    id: 1,
-    text: '종강은 언제야?',
-    isSender: false,
-    avatarUrl: '/public/chat/lover.svg',
-    variant: 'basic',
-    showIcon: true,
-    //설명
-    explanation: {
-      word: '종강',
-      pronunciation: 'Pronunciation',
-      selectedTab: 'Kor',
-      descriptionByTab: {
-        Kor: '종강은 학기가 끝나는 단어를 뜻해요',
-        Eng: 'The semester is over',
-      },
-    },
-  },
-] as const
+// export const initialMessages = [
+//   {
+//     id: 1,
+//     text: '배고파~ 치맥 먹으러 갈래?',
+//     isSender: false,
+//     avatarUrl: '/public/chat/lover.svg',
+//     variant: 'basic',
+//     showIcon: true,
+//     //설명
+//     explanation: {
+//       word: '치맥',
+//       pronunciation: 'chi-maek',
+//       selectedTab: 'Kor',
+//       descriptionByTab: {
+//         Kor: '맥주와 치킨을 같이 즐기는 어쩌구',
+//         Eng: 'A Korean slang term for the popular pairing of fried chicken and beer (maekju).',
+//       },
+//     },
+//   },
+// ] as const

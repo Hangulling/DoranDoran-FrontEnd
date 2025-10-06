@@ -3,43 +3,46 @@ import ChatBubble from '../components/chat/ChatBubble'
 import CoachMark from '../components/chat/CoachMark'
 import ChatFooter from '../components/chat/ChatFooter'
 import DescriptionBubble from '../components/chat/DescriptionBubble'
-import { initialMessages } from '../mocks/db/chat'
-
-interface Message {
-  id: number
-  text: string
-  isSender: boolean
-  avatarUrl?: string
-  variant?: 'basic' | 'second' | 'sender'
-  showIcon?: boolean
-  explanation?: {
-    word: string
-    pronunciation: string
-    selectedTab: 'Kor' | 'Eng'
-    descriptionByTab: {
-      Kor: string
-      Eng: string
-    }
-  }
-}
+//import { initialMessages } from '../mocks/db/chat'
+import type { Message } from '../types/chat'
+import InitChat from '../components/chat/InitChat'
+import { useCoachStore } from '../stores/useUiStateStore'
 
 const ChatPage: React.FC = () => {
-  const [showCoachMark, setShowCoachMark] = useState(true)
-  const [footerHeight, setFooterHeight] = useState(173)
-  const [messages, setMessages] = useState<Message[]>([...initialMessages])
+  const coachMarkSeen = useCoachStore(s => s.coachMarkSeen)
+  const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
+  const [showCoachMark, setShowCoachMark] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([])
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
+  const coachTimerRef = useRef<number | null>(null)
+
+  // InitChat 렌더 후 콜백
+  const handleInitReady = () => {
+    if (coachMarkSeen) return
+    if (coachTimerRef.current) {
+      window.clearTimeout(coachTimerRef.current)
+      coachTimerRef.current = null
+    }
+    coachTimerRef.current = window.setTimeout(() => {
+      setShowCoachMark(true)
+    }, 2000) // 2초 뒤 표시
+  }
+
+  useEffect(() => {
+    return () => {
+      if (coachTimerRef.current) {
+        window.clearTimeout(coachTimerRef.current)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     const inputEl = inputRef.current
     if (!inputEl) return
-
     const handleFocus = () => {
       setTimeout(() => {
-        chatMainRef.current?.scrollTo({
-          top: chatMainRef.current.scrollHeight,
-          behavior: 'smooth',
-        })
+        chatMainRef.current?.scrollTo({ top: chatMainRef.current.scrollHeight, behavior: 'smooth' })
       }, 100) // 키보드 올라올 대기시간 고려
     }
 
@@ -67,71 +70,58 @@ const ChatPage: React.FC = () => {
 
   const handleCloseCoachMark = () => {
     setShowCoachMark(false)
-
+    setCoachMarkSeen(true)
     // await api.post('/user/coachMark'); // 확인 시 API 전달
   }
 
-  const handleFooterHeightChange = (height: number) => {
-    setFooterHeight(height)
-  }
-
-  // 메시지 전송
   const handleSendMessage = (text: string) => {
     const newMessage: Message = {
-      id: messages.length + 1, // 간단한 ID 생성
+      id: messages.length + 1,
       text,
       isSender: true,
       variant: 'sender',
     }
-    // 기존 메시지에 새 메시지를 추가
     setMessages(prevMessages => [...prevMessages, newMessage])
   }
 
   return (
-    <div className="flex flex-col max-w-md mx-auto bg-white h-screen overflow-hidden">
-      <main
-        ref={chatMainRef}
-        className="flex-grow min-h-0 overflow-y-auto px-5"
-        style={{ paddingBottom: footerHeight + 24 }}
-      >
-        {messages.map((msg, idx) => {
-          const prevMsg = idx > 0 ? messages[idx - 1] : null
-          const isSenderChanged = prevMsg ? prevMsg.isSender !== msg.isSender : false
-          const marginClass = isSenderChanged ? 'mt-5' : 'mt-0'
-          return (
-            <div key={msg.id} className={marginClass}>
-              <ChatBubble
-                message={msg.text}
-                isSender={msg.isSender}
-                avatarUrl={msg.avatarUrl}
-                variant={msg.variant ?? 'basic'}
-                showIcon={msg.showIcon}
-              />
-
-              {msg.explanation && (
-                <DescriptionBubble
-                  word={msg.explanation.word}
-                  pronunciation={msg.explanation.pronunciation}
-                  descriptionByTab={msg.explanation.descriptionByTab}
-                  initialTab={msg.explanation.selectedTab}
+    <div className="flex flex-col h-full bg-white">
+      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-4">
+        <InitChat onReady={handleInitReady} />
+        <div className="space-y-4">
+          {messages.map((msg, idx) => {
+            const prevMsg = idx > 0 ? messages[idx - 1] : null
+            const isSenderChanged = prevMsg ? prevMsg.isSender !== msg.isSender : false
+            const marginClass = isSenderChanged ? 'mt-5' : 'mt-0'
+            return (
+              <div key={msg.id} className={marginClass}>
+                <ChatBubble
+                  message={msg.text}
+                  isSender={msg.isSender}
+                  avatarUrl={msg.avatarUrl}
+                  variant={msg.variant ?? 'basic'}
+                  showIcon={msg.showIcon}
                 />
-              )}
-            </div>
-          )
-        })}
+                {msg.explanation && (
+                  <DescriptionBubble
+                    word={msg.explanation.word}
+                    pronunciation={msg.explanation.pronunciation}
+                    descriptionByTab={msg.explanation.descriptionByTab}
+                    initialTab={msg.explanation.selectedTab}
+                  />
+                )}
+              </div>
+            )
+          })}
+        </div>
+        {/* 입력창 사이의 여백 */}
+        <div className="h-6" />
       </main>
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer
-        className="fixed bottom-0 left-0 right-0 bg-white"
-        style={{ height: footerHeight, zIndex: 10 }}
-      >
-        <ChatFooter
-          onHeightChange={handleFooterHeightChange}
-          inputRef={inputRef}
-          onSendMessage={handleSendMessage}
-        />
+      <footer className="flex-shrink-0">
+        <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>
   )
