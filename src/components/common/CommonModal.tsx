@@ -26,7 +26,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
             <img src={checkIcon} className="w-10 h-10" />
           </div>
         )}
-        <h3 className="text-title text-[18px] mb-2">{title}</h3>
+        <h3 className="text-title text-[18px] mb-1">{title}</h3>
         {Array.isArray(description) ? (
           <div className="text-[14px] text-center">
             {description.map((line, idx) => (

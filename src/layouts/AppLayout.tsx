@@ -2,6 +2,7 @@ import type React from 'react'
 import { useLocation, useMatch } from 'react-router-dom'
 import NavBar from '../components/common/NavBar'
 import useArchiveStore from '../stores/useArchiveStore'
+import ClosenessBar from '../components/chat/ClosenessBar'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -32,10 +33,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const showDelete = onArchive
   const hideNavBar = skipNavPaths.includes(pathname)
 
-  // 채팅방 id
+  // 친밀도 바(채팅에서만)
+  const closenessMatch = pathname.match(/^\/chat\/(\d+)$/)
+  const closenessId = closenessMatch ? closenessMatch[1] : null
+
+  // 북마크(채팅/친밀)
   const chatRoomMatch = pathname.match(/^\/(chat|closeness)\/(\d+)$/)
   const chatRoomId = chatRoomMatch ? chatRoomMatch[2] : null
-
   const showBookmark = showBookmarkPaths.includes(pathname) || chatRoomId !== null
 
   const { selectionMode } = useArchiveStore()
@@ -59,15 +63,19 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   return (
     <div className="mx-auto flex h-screen w-full max-w-md flex-col">
       {!hideNavBar && (
-        <header className="flex-shrink-0">
-          <NavBar
-            isMain={isMain}
-            title={title}
-            showBookmark={showBookmark}
-            showDelete={showDelete}
-          />
-          <div className="h-14" />
-        </header>
+        <>
+          <header className="flex-shrink-0">
+            <NavBar
+              isMain={isMain}
+              title={title}
+              showBookmark={showBookmark}
+              showDelete={showDelete}
+            />
+            <div className="h-15" />
+          </header>
+          {/* 친밀도 바 */}
+          {closenessId && <ClosenessBar chatRoomId={closenessId} />}
+        </>
       )}
       <main className="flex-grow overflow-y-auto min-h-0">{children}</main>
     </div>
