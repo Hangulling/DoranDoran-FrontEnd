@@ -86,7 +86,7 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-4">
+      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
         <InitChat onReady={handleInitReady} />
         <div className="space-y-4">
           {messages.map((msg, idx) => {
