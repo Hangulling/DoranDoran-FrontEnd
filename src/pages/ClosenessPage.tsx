@@ -4,9 +4,10 @@ import Button from '../components/common/Button'
 import { useNavigate, useParams } from 'react-router-dom'
 import useClosenessStore from '../stores/useClosenessStore'
 
-const bubbleBase = 'py-[6px] px-2 text-[14px] text-gray-700 max-w-[265px] rounded-lg flex flex-col'
-const bubbleBasic = bubbleBase + ' bg-white border border-gray-100 rounded-tl-none relative'
-const bubbleSecond = bubbleBase + ' bg-white border border-gray-100 relative ml-10'
+const bubbleBase = 'py-[6px] px-2 text-[14px] text-gray-700 rounded-lg flex flex-col'
+const bubbleBasic =
+  bubbleBase + ' bg-white border border-gray-100 max-w-[265px] rounded-tl-none relative'
+const bubbleSecond = bubbleBase + ' bg-white border border-gray-100 relative ml-10 w-[186px]'
 
 const ClosenessPage = () => {
   const { id } = useParams()
@@ -36,7 +37,7 @@ const ClosenessPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-white pt-10 px-5">
+    <div className="h-full flex flex-col items-center bg-white pt-10 px-5">
       <div className="max-w-md w-full flex flex-col">
         <div className="chat chat-start gap-x-[8px] pt-0 pb-2 relative flex items-start">
           <div className="chat-image avatar absolute top-1 left-0 w-8 h-8">
