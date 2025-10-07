@@ -7,8 +7,11 @@ import DescriptionBubble from '../components/chat/DescriptionBubble'
 import type { Message } from '../types/chat'
 import InitChat from '../components/chat/InitChat'
 import { useCoachStore } from '../stores/useUiStateStore'
+import { useParams } from 'react-router-dom'
+import { chatRooms } from '../mocks/db/chat'
 
 const ChatPage: React.FC = () => {
+  const { id } = useParams()
   const coachMarkSeen = useCoachStore(s => s.coachMarkSeen)
   const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
   const [showCoachMark, setShowCoachMark] = useState(false)
@@ -16,6 +19,7 @@ const ChatPage: React.FC = () => {
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
+  const room = chatRooms.find(r => String(r.roomId) === String(id))
 
   // InitChat 렌더 후 콜백
   const handleInitReady = () => {
@@ -87,7 +91,8 @@ const ChatPage: React.FC = () => {
   return (
     <div className="flex flex-col h-full bg-white">
       <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
-        <InitChat onReady={handleInitReady} />
+        <InitChat avatar={room?.avatar} onReady={handleInitReady} />
+
         <div className="space-y-4">
           {messages.map((msg, idx) => {
             const prevMsg = idx > 0 ? messages[idx - 1] : null

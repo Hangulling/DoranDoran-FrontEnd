@@ -3,6 +3,7 @@ import DistanceSlider from '../components/chat/DistanceSlider'
 import Button from '../components/common/Button'
 import { useNavigate, useParams } from 'react-router-dom'
 import useClosenessStore from '../stores/useClosenessStore'
+import { chatRooms } from '../mocks/db/chat'
 
 const bubbleBase = 'py-[6px] px-2 text-[14px] text-gray-700 rounded-lg flex flex-col'
 const bubbleBasic =
@@ -16,6 +17,7 @@ const ClosenessPage = () => {
   const setCloseness = useClosenessStore(state => state.setCloseness)
   const [sliderValue, setSliderValue] = useState(closeness)
   const [touched, setTouched] = useState(false)
+  const room = chatRooms.find(r => String(r.roomId) === String(id))
 
   // 슬라이더값 initial
   useEffect(() => {
@@ -42,7 +44,7 @@ const ClosenessPage = () => {
         <div className="chat chat-start gap-x-[8px] pt-0 pb-2 relative flex items-start">
           <div className="chat-image avatar absolute top-1 left-0 w-8 h-8">
             <div className="w-8 h-8 rounded-full overflow-hidden">
-              <img alt="프로필 사진" src="/chat/lover.svg" />
+              <img alt="프로필 사진" src={room?.avatar} />
             </div>
           </div>
           {/* 안내1 */}

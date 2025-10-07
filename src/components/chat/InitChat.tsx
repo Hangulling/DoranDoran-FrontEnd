@@ -3,10 +3,11 @@ import ChatBubble from './ChatBubble'
 import DescriptionBubble from './DescriptionBubble'
 
 interface InitChatProps {
+  avatar?: string
   onReady?: () => void
 }
 
-const InitChat: React.FC<InitChatProps> = ({ onReady }) => {
+const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
   useEffect(() => {
     // 마운트 완료 시점에 알림
     onReady?.()
@@ -17,7 +18,7 @@ const InitChat: React.FC<InitChatProps> = ({ onReady }) => {
       <ChatBubble
         message="배고파~ 치맥 먹으러 갈래?"
         isSender={false}
-        avatarUrl="/public/chat/lover.svg"
+        avatarUrl={avatar}
         variant="basic"
         showIcon={true}
       />
