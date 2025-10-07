@@ -1,9 +1,23 @@
 import Character from '../assets/main/mainCharacter.svg'
 import { useNavigate } from 'react-router-dom'
 import { chatRooms } from '../mocks/db/chat'
+import { useEffect, useState } from 'react'
+import { useUserStore } from '../stores/useUserStore'
 
 const MainPage = () => {
   const navigate = useNavigate()
+  const [userName, setUserName] = useState<string>('')
+  const setStoreName = useUserStore(state => state.setName)
+
+  // 사용자 정보 GET, store 저장
+  useEffect(() => {
+    fetch('/api/users/me')
+      .then(res => res.json())
+      .then(profile => {
+        setUserName(profile.name)
+        setStoreName(profile.name)
+      })
+  }, [setStoreName])
 
   const handleRoomClick = (id: number) => {
     navigate(`/closeness/${id}`, { state: { showCoachMark: true, roomId: id } })
@@ -16,9 +30,8 @@ const MainPage = () => {
         <div className="absolute top-[14px] left-[20px]">
           <div className="text-[14px]">Welcome,</div>
           <div className="text-[16px]">
-            {/* 이름 변경할 것 */}
-            <span className="text-title">John Smith</span>
-            <span>:)</span>
+            <span className="text-title">{userName}</span>
+            <span> :)</span>
           </div>
           <p className="mt-[8px] text-[12px] text-gray-600">Learn Korean expressions by chat!</p>
         </div>
@@ -31,15 +44,15 @@ const MainPage = () => {
         <div className="flex flex-col gap-[10px]">
           {chatRooms.map(room => (
             <button
-              key={room.id}
-              onClick={() => handleRoomClick(room.id)}
+              key={room.roomId}
+              onClick={() => handleRoomClick(room.roomId)}
               className="flex items-center gap-4 w-full h-21 bg-white rounded-lg shadow-[1px_1px_10px_rgba(0,0,0,0.1)] py-3 px-4 active:bg-green-80"
             >
               <div className="w-13 h-13 rounded-full flex items-center justify-center overflow-hidden bg-gray-100">
-                <img src={room.avatar} alt={room.title} className="w-full h-full object-cover" />
+                <img src={room.avatar} alt={room.roomName} className="w-full h-full object-cover" />
               </div>
               <div className="flex flex-col items-start">
-                <span className="text-title text-[16px]">{room.title}</span>
+                <span className="text-title text-[16px]">{room.roomName}</span>
                 <span className="text-gray-600 text-[14px]">{room.message}</span>
               </div>
             </button>

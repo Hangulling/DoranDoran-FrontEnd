@@ -8,8 +8,8 @@ interface ClosenessBarProps {
 const ClosenessBar: React.FC<ClosenessBarProps> = ({ chatRoomId }) => {
   const closeness = useClosenessStore(state => state.closenessMap[chatRoomId] ?? 1)
 
-  const room = chatRooms.find(room => room.id === Number(chatRoomId))
-  const chatRoomLabel = room ? room.title : `ChatRoom ${chatRoomId}`
+  const room = chatRooms.find(room => room.roomId === Number(chatRoomId))
+  const chatRoomLabel = room ? room.roomName : `ChatRoom ${chatRoomId}`
 
   const closenessText = closeness == 1 ? 'casual' : closeness == 2 ? 'friendly' : 'close'
 
