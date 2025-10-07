@@ -6,23 +6,25 @@ export const userHandlers = [
   http.get('/api/users/me', () => {
     return HttpResponse.json({
       email: userProfile.email,
-      nickname: userProfile.nickname,
+      name: userProfile.name,
+      password: userProfile.password,
+      firstName: userProfile.firstName,
+      lastName: userProfile.lastName,
       preferences: userProfile.preferences,
-      status: userProfile.status,
       createdAt: userProfile.createdAt.toISOString(),
       updatedAt: userProfile.updatedAt.toISOString(),
     })
   }),
 
-  // 닉네임 및 설정 수정 (추가 기능)
+  // 이름 및 설정 수정 (추가 기능)
   http.put('/api/users/me', async ({ request }) => {
-    const { nickname, preferences } = (await request.json()) as {
-      nickname: string
+    const { name, preferences } = (await request.json()) as {
+      name: string
       preferences: string
     }
 
     // 사용자 프로필 데이터 업데이트
-    userProfile.nickname = nickname
+    userProfile.name = name
     userProfile.preferences = preferences
     userProfile.updatedAt = new Date()
 
@@ -46,7 +48,7 @@ export const userHandlers = [
     }
 
     // 현재 비밀번호 유효성 검사
-    if (currentPassword !== 'password123!') {
+    if (currentPassword !== 'qwer1234') {
       return HttpResponse.json({ message: 'PASSWORD_INVALID' }, { status: 400 })
     }
 
