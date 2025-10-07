@@ -7,14 +7,15 @@ interface ChatBubbleProps {
   message: string
   isSender: boolean
   avatarUrl?: string
-  variant?: 'basic' | 'second' | 'sender'
+  variant?: 'basic' | 'second' | 'sender' | 'error'
   showIcon?: boolean
 }
 
 const bubbleVariants = {
-  basic: 'bg-white border border-gray-100 text-gray-800 rounded-lg rounded-tl-none', // 기본 답장
-  second: 'bg-white border border-gray-100 text-gray-800 rounded-lg', // 두번째 답장
+  basic: 'bg-white border border-gray-100 rounded-lg rounded-tl-none', // 기본 답장
+  second: 'bg-white border border-gray-100 rounded-lg', // 두번째 답장
   sender: 'bg-green-400 text-white rounded-lg rounded-tr-none', // 사용자 채팅
+  error: 'bg-white border border-orange-100 rounded-lg text-orange-200', // 에러 채팅
 }
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({
@@ -26,7 +27,8 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
 }) => {
   const baseBubbleClass = 'py-[6px] px-2 text-[14px] max-w-[265px] rounded-lg'
   const bubbleClass = `${baseBubbleClass} ${isSender ? bubbleVariants.sender : bubbleVariants[variant]}`
-  const marginClass = !isSender && (avatarUrl || variant === 'second') ? 'ml-10' : ''
+  const marginClass =
+    !isSender && (avatarUrl || variant === 'second' || variant === 'error') ? 'ml-10' : ''
 
   const [isBookmarked, setIsBookmarked] = useState(false)
   const { onPlay: playTTS, playing: isPlaying } = useTTS(message)
