@@ -21,6 +21,7 @@ const ChatPage: React.FC = () => {
   const footerRef = useRef<HTMLElement>(null)
   const [footerHeight, setFooterHeight] = useState(0)
   const [keyboardHeight, setKeyboardHeight] = useState(0)
+  const keyboardStateRef = useRef(false)
   const coachTimerRef = useRef<number | null>(null)
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
@@ -34,13 +35,16 @@ const ChatPage: React.FC = () => {
       const offset = window.innerHeight - visualViewport.height
       setKeyboardHeight(offset > 0 ? offset : 0)
 
-      if (offset > 100) {
+      const isCurrentlyOpen = offset > 100
+
+      if (isCurrentlyOpen && !keyboardStateRef.current) {
         requestAnimationFrame(() => {
           if (chatMainRef.current) {
             chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
           }
         })
       }
+      keyboardStateRef.current = isCurrentlyOpen
     }
 
     handleResize()
