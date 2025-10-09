@@ -117,7 +117,7 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col max-w-md mx-auto h-full bg-white overflow-hidden">
+    <div className="flex flex-col max-w-md mx-auto h-screen bg-white overflow-hidden">
       <main
         ref={chatMainRef}
         className="flex-1 overflow-y-auto px-5 pt-[15px]"
