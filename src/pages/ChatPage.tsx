@@ -18,21 +18,23 @@ const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
+  const [keyboardHeight, setKeyboardHeight] = useState(0)
   const coachTimerRef = useRef<number | null>(null)
-  const footerRef = useRef<HTMLElement>(null)
-  const [footerHeight, setFooterHeight] = useState(0)
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
 
+  // 키보드 높이 감지
   useEffect(() => {
-    if (!footerRef.current) return
-    const resizeObserver = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        setFooterHeight(entry.contentRect.height)
-      }
-    })
-    resizeObserver.observe(footerRef.current)
-    return () => resizeObserver.disconnect()
+    const visualViewport = window.visualViewport
+    if (!visualViewport) return
+
+    const handleResize = () => {
+      const offset = window.innerHeight - visualViewport.height
+      setKeyboardHeight(offset > 0 ? offset : 0)
+    }
+    handleResize() // 초기값 설정
+    visualViewport.addEventListener('resize', handleResize)
+    return () => visualViewport.removeEventListener('resize', handleResize)
   }, [])
 
   const handleInitReady = () => {
@@ -92,7 +94,7 @@ const ChatPage: React.FC = () => {
       <main
         ref={chatMainRef}
         className="flex-1 overflow-y-auto px-5 pt-[15px]"
-        style={{ paddingBottom: `${footerHeight}px` }}
+        style={{ paddingBottom: `${keyboardHeight + 57}px` }}
       >
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
@@ -127,8 +129,12 @@ const ChatPage: React.FC = () => {
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer ref={footerRef} className="fixed bottom-0 left-0 right-0 max-w-md mx-auto">
-        <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
+      <footer className="fixed bottom-0 left-0 right-0 max-w-md mx-auto">
+        <ChatFooter
+          inputRef={inputRef}
+          onSendMessage={handleSendMessage}
+          keyboardHeight={keyboardHeight}
+        />
       </footer>
     </div>
   )
