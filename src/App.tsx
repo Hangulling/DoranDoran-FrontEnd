@@ -6,7 +6,7 @@ import { Toaster } from 'react-hot-toast'
 
 function App() {
   return (
-    <div className="relative mx-auto w-full max-w-md min-h-dvh bg-white">
+    <div className="relative mx-auto w-full max-w-md h-dvh bg-white overflow-hidden">
       <Toaster position="bottom-center" />
       <AppLayout>
         <Suspense fallback={<LoadingSpinner />}>
