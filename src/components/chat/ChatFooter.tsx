@@ -1,4 +1,4 @@
-import { useEffect, useState, type RefObject } from 'react'
+import { useState, type RefObject } from 'react'
 import Send from '../../assets/icon/send.svg'
 import ActiveSend from '../../assets/icon/activeSend.svg'
 import showToast from '../common/CommonToast'
