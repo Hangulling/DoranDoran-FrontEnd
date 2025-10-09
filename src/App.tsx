@@ -3,6 +3,7 @@ import { Routes } from './router/routes'
 import LoadingSpinner from './components/common/LoadingSpinner'
 import AppLayout from './layouts/AppLayout'
 import { Toaster } from 'react-hot-toast'
+import Div100vh from 'react-div-100vh'
 
 function App() {
   useEffect(() => {
@@ -39,7 +40,7 @@ function App() {
           <Routes />
         </Suspense>
       </AppLayout>
-    </div>
+    </Div100vh>
   )
 }
 
