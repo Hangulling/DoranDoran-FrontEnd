@@ -14,12 +14,35 @@ const ChatPage: React.FC = () => {
   const coachMarkSeen = useCoachStore(s => s.coachMarkSeen)
   const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
   const [showCoachMark, setShowCoachMark] = useState(false)
+  const [keyboardVisible, setKeyboardVisible] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
+
+  useEffect(() => {
+    const visualViewport = window.visualViewport
+    if (!visualViewport) return
+
+    const handleResize = () => {
+      const isKeyboardVisible = window.innerHeight - visualViewport.height > 150
+      setKeyboardVisible(isKeyboardVisible)
+
+      // 키보드가 나타났을 때만 스크롤을 맨 아래로 이동
+      if (isKeyboardVisible) {
+        setTimeout(() => {
+          if (chatMainRef.current) {
+            chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
+          }
+        }, 100) // 키보드 애니메이션 시간 고려
+      }
+    }
+
+    visualViewport.addEventListener('resize', handleResize)
+    return () => visualViewport.removeEventListener('resize', handleResize)
+  }, [])
 
   const handleInitReady = () => {
     if (coachMarkSeen) return
@@ -69,8 +92,12 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen max-w-md mx-auto bg-white overflow-hidden">
-      <main ref={chatMainRef} className="flex-1 overflow-y-auto px-5 pt-4">
+    <div
+      className={`flex flex-col h-full transition-all duration-300 ${
+        keyboardVisible ? 'pb-[env(safe-area-inset-bottom)]' : ''
+      }`}
+    >
+      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-4">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
         <div className="space-y-4">
