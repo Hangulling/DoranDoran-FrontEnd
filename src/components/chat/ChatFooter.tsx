@@ -38,7 +38,6 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
     const handleResize = () => {
       if (!inputRef.current) return
       // 키보드가 올라왔을 때 window.innerHeight 변화를 감지, textarea 높이 조정 가능
-      // 입력창 높이 제한(MAXROWS 등) 함께 고려
       const textarea = inputRef.current
       textarea.style.height = 'auto'
       const scrollHeight = textarea.scrollHeight
