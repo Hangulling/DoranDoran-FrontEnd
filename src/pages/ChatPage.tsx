@@ -14,12 +14,34 @@ const ChatPage: React.FC = () => {
   const coachMarkSeen = useCoachStore(s => s.coachMarkSeen)
   const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
   const [showCoachMark, setShowCoachMark] = useState(false)
+  const [keyboardHeight, setKeyboardHeight] = useState(0)
   const [messages, setMessages] = useState<Message[]>([])
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
+
+  useEffect(() => {
+    const visualViewport = window.visualViewport
+    if (!visualViewport) return
+
+    const handleResize = () => {
+      // 전체 창 높이에서 실제 보이는 영역의 높이를 빼서 키보드 높이를 계산
+      const newKeyboardHeight = window.innerHeight - visualViewport.height
+      setKeyboardHeight(newKeyboardHeight)
+
+      // 키보드가 올라왔을 때 스크롤을 맨 아래로 이동
+      setTimeout(() => {
+        if (chatMainRef.current) {
+          chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
+        }
+      }, 100)
+    }
+
+    visualViewport.addEventListener('resize', handleResize)
+    return () => visualViewport.removeEventListener('resize', handleResize)
+  }, [])
 
   const handleInitReady = () => {
     if (coachMarkSeen) return
@@ -104,7 +126,10 @@ const ChatPage: React.FC = () => {
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer className="fixed bottom-0 left-0 right-0 mx-auto max-w-md bg-white">
+      <footer
+        className="fixed left-0 right-0 mx-auto max-w-md bg-white"
+        style={{ bottom: keyboardHeight }}
+      >
         <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>
