@@ -19,35 +19,10 @@ const ChatPage: React.FC = () => {
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
-  const [viewportHeight, setViewportHeight] = useState(window.innerHeight)
   const footerRef = useRef<HTMLElement>(null)
   const [footerHeight, setFooterHeight] = useState(0)
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
-
-  useEffect(() => {
-    const visualViewport = window.visualViewport
-    if (!visualViewport) return
-
-    const handleResize = () => {
-      setViewportHeight(visualViewport.height)
-
-      // 키보드가 나타났을 때(화면 높이가 줄어들었을 때) 스크롤을 맨 아래로 이동
-      if (visualViewport.height < window.innerHeight && chatMainRef.current) {
-        setTimeout(() => {
-          if (chatMainRef.current) {
-            chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
-          }
-        }, 100) // 브라우저 리플로우 대기
-      }
-    }
-
-    // 초기 높이 설정
-    setViewportHeight(visualViewport.height)
-
-    visualViewport.addEventListener('resize', handleResize)
-    return () => visualViewport.removeEventListener('resize', handleResize)
-  }, [])
 
   useEffect(() => {
     if (!footerRef.current) return
@@ -113,10 +88,7 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div
-      className="flex flex-col max-w-md mx-auto bg-white overflow-hidden"
-      style={{ height: viewportHeight }}
-    >
+    <div className="flex flex-col max-w-md mx-auto h-full bg-white overflow-hidden">
       <main
         ref={chatMainRef}
         className="flex-1 overflow-y-auto px-5 pt-[15px]"
