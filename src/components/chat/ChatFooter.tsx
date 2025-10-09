@@ -31,9 +31,8 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
   }
 
   // 입력창 포커스
-  const handleInputFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+  const handleInputFocus = () => {
     setInputActive(true)
-    e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }
   const handleInputBlur = () => setInputActive(false)
 

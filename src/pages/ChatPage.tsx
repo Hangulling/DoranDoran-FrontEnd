@@ -19,24 +19,45 @@ const ChatPage: React.FC = () => {
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight)
+  const [viewportHeight, setViewportHeight] = useState(window.innerHeight)
   const footerRef = useRef<HTMLElement>(null)
   const [footerHeight, setFooterHeight] = useState(0)
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
 
   useEffect(() => {
+    const visualViewport = window.visualViewport
+    if (!visualViewport) return
+
     const handleResize = () => {
-      setWindowHeight(window.innerHeight)
+      setViewportHeight(visualViewport.height)
+
+      // 키보드가 나타났을 때(화면 높이가 줄어들었을 때) 스크롤을 맨 아래로 이동
+      if (visualViewport.height < window.innerHeight && chatMainRef.current) {
+        setTimeout(() => {
+          if (chatMainRef.current) {
+            chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
+          }
+        }, 100) // 브라우저 리플로우 대기
+      }
     }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+
+    // 초기 높이 설정
+    setViewportHeight(visualViewport.height)
+
+    visualViewport.addEventListener('resize', handleResize)
+    return () => visualViewport.removeEventListener('resize', handleResize)
   }, [])
 
   useEffect(() => {
-    if (footerRef.current) {
-      setFooterHeight(footerRef.current.offsetHeight)
-    }
+    if (!footerRef.current) return
+    const resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setFooterHeight(entry.contentRect.height)
+      }
+    })
+    resizeObserver.observe(footerRef.current)
+    return () => resizeObserver.disconnect()
   }, [])
 
   const handleInitReady = () => {
@@ -56,19 +77,6 @@ const ChatPage: React.FC = () => {
         window.clearTimeout(coachTimerRef.current)
       }
     }
-  }, [])
-
-  useEffect(() => {
-    if (!footerRef.current) return
-
-    const resizeObserver = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        setFooterHeight(entry.contentRect.height)
-      }
-    })
-
-    resizeObserver.observe(footerRef.current)
-    return () => resizeObserver.disconnect()
   }, [])
 
   // 메시지 추가될때마다 자동 스크롤
@@ -105,10 +113,13 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="relative bg-white flex flex-col" style={{ height: windowHeight }}>
+    <div
+      className="flex flex-col max-w-md mx-auto bg-white overflow-hidden"
+      style={{ height: viewportHeight }}
+    >
       <main
         ref={chatMainRef}
-        className="flex-1 overflow-y-auto px-5 pt-10"
+        className="flex-1 overflow-y-auto px-5 pt-[15px]"
         style={{ paddingBottom: `${footerHeight}px` }}
       >
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
@@ -144,10 +155,10 @@ const ChatPage: React.FC = () => {
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer ref={footerRef} className="fixed bottom-0 left-0 w-full z-50">
+      <footer ref={footerRef} className="fixed bottom-0 left-0 right-0 max-w-md mx-auto">
         <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>
   )
-} //왜 저장이 안돼
+}
 export default ChatPage
