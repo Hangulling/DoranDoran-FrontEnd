@@ -85,7 +85,7 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="relative flex flex-col h-screen overflow-hidden bg-white">
+    <div className="relative flex flex-col h-full overflow-hidden bg-white">
       <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
