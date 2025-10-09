@@ -3,6 +3,7 @@ import { useLocation, useMatch } from 'react-router-dom'
 import NavBar from '../components/common/NavBar'
 import useArchiveStore from '../stores/useArchiveStore'
 import ClosenessBar from '../components/chat/ClosenessBar'
+import useScreenHeight from '../hooks/useScreenHeight'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -25,6 +26,8 @@ const showBookmarkPaths = ['/']
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation()
+  const screenHeight = useScreenHeight()
+
   const skipNavPaths = ['/login']
   const pathname = location.pathname
 
@@ -61,7 +64,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="mx-auto flex h-screen w-full max-w-md flex-col">
+    <div className="mx-auto w-full max-w-md flex-col" style={{ height: screenHeight }}>
       {!hideNavBar && (
         <>
           <header className="flex-shrink-0">

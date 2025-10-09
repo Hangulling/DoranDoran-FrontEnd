@@ -7,8 +7,9 @@ const useScreenHeight = () => {
     const handleResize = () => {
       setHeight(window.innerHeight)
     }
-
     window.addEventListener('resize', handleResize)
+    handleResize() // 초기 높이 설정
+
     return () => {
       window.removeEventListener('resize', handleResize)
     }
@@ -16,5 +17,4 @@ const useScreenHeight = () => {
 
   return height
 }
-
 export default useScreenHeight
