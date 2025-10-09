@@ -15,31 +15,27 @@ const ChatPage: React.FC = () => {
   const coachMarkSeen = useCoachStore(s => s.coachMarkSeen)
   const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
   const [showCoachMark, setShowCoachMark] = useState(false)
+  const [isInitChatReady, setIsInitChatReady] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
-  const coachTimerRef = useRef<number | null>(null)
+
   const room = chatRooms.find(r => String(r.roomId) === String(id))
 
   // InitChat 렌더 후 콜백
   const handleInitReady = () => {
-    if (coachMarkSeen) return
-    if (coachTimerRef.current) {
-      window.clearTimeout(coachTimerRef.current)
-      coachTimerRef.current = null
-    }
-    coachTimerRef.current = window.setTimeout(() => {
-      setShowCoachMark(true)
-    }, 2000) // 2초 뒤 표시
+    setIsInitChatReady(true)
   }
 
   useEffect(() => {
-    return () => {
-      if (coachTimerRef.current) {
-        window.clearTimeout(coachTimerRef.current)
-      }
+    console.log('isInitChatReady, coachMarkSeen', isInitChatReady, coachMarkSeen)
+    if (isInitChatReady && !coachMarkSeen) {
+      const timer = setTimeout(() => {
+        setShowCoachMark(true)
+      }, 600)
+      return () => clearTimeout(timer)
     }
-  }, [])
+  }, [isInitChatReady, coachMarkSeen])
 
   useEffect(() => {
     const inputEl = inputRef.current
@@ -89,7 +85,7 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="relative flex flex-col h-screen overflow-hidden bg-white">
       <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
