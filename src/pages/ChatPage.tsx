@@ -21,7 +21,6 @@ const ChatPage: React.FC = () => {
   const coachTimerRef = useRef<number | null>(null)
   const footerRef = useRef<HTMLElement>(null)
   const [footerHeight, setFooterHeight] = useState(0)
-  const [keyboardHeight, setKeyboardHeight] = useState(0)
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
 
@@ -55,19 +54,6 @@ const ChatPage: React.FC = () => {
 
     resizeObserver.observe(footerRef.current)
     return () => resizeObserver.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const visualViewport = window.visualViewport
-    if (!visualViewport) return
-
-    const handleResize = () => {
-      const offset = window.innerHeight - visualViewport.height
-      setKeyboardHeight(offset > 0 ? offset : 0)
-    }
-
-    visualViewport.addEventListener('resize', handleResize)
-    return () => visualViewport.removeEventListener('resize', handleResize)
   }, [])
 
   // 메시지 추가될때마다 자동 스크롤
@@ -143,11 +129,7 @@ const ChatPage: React.FC = () => {
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer
-        ref={footerRef}
-        className="absolute left-0 w-full"
-        style={{ bottom: `${keyboardHeight}px`, transition: 'bottom 0.2s ease-out' }}
-      >
+      <footer ref={footerRef} className="fixed bottom-0 left-0 w-full">
         <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>
