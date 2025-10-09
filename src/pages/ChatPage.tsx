@@ -9,7 +9,6 @@ import InitChat from '../components/chat/InitChat'
 import { useCoachStore } from '../stores/useUiStateStore'
 import { useParams } from 'react-router-dom'
 import { chatRooms } from '../mocks/db/chat'
-import useScreenHeight from '../hooks/useScreenHeight'
 
 const ChatPage: React.FC = () => {
   const { id } = useParams()
