@@ -1,4 +1,4 @@
-import { useState, type RefObject } from 'react'
+import { useEffect, useState, type RefObject } from 'react'
 import Send from '../../assets/icon/send.svg'
 import ActiveSend from '../../assets/icon/activeSend.svg'
 import showToast from '../common/CommonToast'
@@ -17,6 +17,19 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
   const [inputValue, setInputValue] = useState('')
   const [textareaHeight, setTextareaHeight] = useState(SINGLE_LINE_HEIGHT)
   const [isComposing, setIsComposing] = useState(false)
+  const [footerOffset, setFooterOffset] = useState(0)
+
+  useEffect(() => {
+    // 키보드 감지해서 footer 위치 조정
+    const handleResize = () => {
+      if (window.visualViewport) {
+        const offset = window.innerHeight - window.visualViewport.height
+        setFooterOffset(offset > 0 ? offset : 0)
+      }
+    }
+    window.visualViewport?.addEventListener('resize', handleResize)
+    return () => window.visualViewport?.removeEventListener('resize', handleResize)
+  }, [])
 
   // 조합 확인
   const handleCompositionStart = () => setIsComposing(true)
@@ -84,7 +97,14 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md left-1/2 bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
+    <footer
+      className="fixed bottom-0 w-full max-w-md bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)] z-50"
+      style={{
+        transform: `translateY(-${footerOffset}px)`,
+        transition: 'transform .2s',
+      }}
+    >
+      {' '}
       <div className="flex items-start w-full max-w-md mx-auto px-5 py-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))]">
         <textarea
           ref={inputRef}
@@ -111,7 +131,7 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
           )}
         </button>
       </div>
-    </div>
+    </footer>
   )
 }
 
