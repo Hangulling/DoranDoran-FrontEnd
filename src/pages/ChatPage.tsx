@@ -33,7 +33,16 @@ const ChatPage: React.FC = () => {
     const handleResize = () => {
       const offset = window.innerHeight - visualViewport.height
       setKeyboardHeight(offset > 0 ? offset : 0)
+
+      if (offset > 100) {
+        requestAnimationFrame(() => {
+          if (chatMainRef.current) {
+            chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
+          }
+        })
+      }
     }
+
     handleResize()
     visualViewport.addEventListener('resize', handleResize)
     return () => visualViewport.removeEventListener('resize', handleResize)
@@ -104,7 +113,7 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col max-w-md mx-auto h-screen bg-white overflow-hidden">
+    <div className="flex flex-col max-w-md mx-auto h-full bg-white overflow-hidden">
       <main
         ref={chatMainRef}
         className="flex-1 overflow-y-auto px-5 pt-[15px]"
