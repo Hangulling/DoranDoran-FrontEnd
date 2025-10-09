@@ -1,4 +1,4 @@
-import { useState, type RefObject } from 'react'
+import { useEffect, useState, type RefObject } from 'react'
 import Send from '../../assets/icon/send.svg'
 import ActiveSend from '../../assets/icon/activeSend.svg'
 import showToast from '../common/CommonToast'
@@ -35,6 +35,21 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
     setInputActive(true)
   }
   const handleInputBlur = () => setInputActive(false)
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (!inputRef.current) return
+      // 키보드가 올라왔을 때 window.innerHeight 변화를 감지, textarea 높이 조정 가능
+      // 입력창 높이 제한(MAXROWS 등) 함께 고려
+      const textarea = inputRef.current
+      textarea.style.height = 'auto'
+      const scrollHeight = textarea.scrollHeight
+      textarea.style.height = `${scrollHeight}px`
+      setTextareaHeight(scrollHeight)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [inputRef])
 
   // 입력 제한, 높이 조절
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
