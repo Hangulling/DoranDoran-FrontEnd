@@ -90,10 +90,10 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="relative h-full bg-white">
+    <div className="relative h-full bg-white flex flex-col">
       <main
         ref={chatMainRef}
-        className="h-full overflow-y-auto px-5 pt-10"
+        className="flex-1 overflow-y-auto px-5 pt-10"
         style={{ paddingBottom: `${footerHeight}px` }}
       >
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
@@ -129,7 +129,7 @@ const ChatPage: React.FC = () => {
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer ref={footerRef} className="fixed bottom-0 left-0 w-full">
+      <footer ref={footerRef} className="sticky bottom-0 left-0 w-full z-50">
         <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>
