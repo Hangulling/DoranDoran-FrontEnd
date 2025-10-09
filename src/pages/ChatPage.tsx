@@ -19,32 +19,6 @@ const ChatPage: React.FC = () => {
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
 
-  const [keyboardHeight, setKeyboardHeight] = useState(0)
-
-  useEffect(() => {
-    const visualViewport = window.visualViewport
-    if (!visualViewport) return
-
-    const handleResize = () => {
-      // 전체 창 높이에서 실제 보이는 영역 높이를 빼서 정확한 키보드 높이를 계산
-      const newKeyboardHeight = window.innerHeight - visualViewport.height
-      setKeyboardHeight(newKeyboardHeight)
-
-      // 키보드가 올라왔을 때, 잠시 후 스크롤을 맨 아래로 이동
-      if (newKeyboardHeight > 0) {
-        setTimeout(() => {
-          if (chatMainRef.current) {
-            chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
-          }
-        }, 100)
-      }
-    }
-
-    visualViewport.addEventListener('resize', handleResize)
-    return () => visualViewport.removeEventListener('resize', handleResize)
-  }, [])
-
-  // 메시지가 추가될 때마다 스크롤을 맨 아래로 이동
   useEffect(() => {
     if (chatMainRef.current) {
       chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
@@ -53,6 +27,7 @@ const ChatPage: React.FC = () => {
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
 
+  // 코치 마크 오픈 시간
   const handleInitReady = () => {
     if (coachMarkSeen) return
     if (coachTimerRef.current) {
@@ -77,6 +52,15 @@ const ChatPage: React.FC = () => {
     setCoachMarkSeen(true)
   }
 
+  // 채팅 페이지만 스크롤 막기 위해
+  useEffect(() => {
+    document.body.classList.add('chat-page-active')
+    return () => {
+      document.body.classList.remove('chat-page-active')
+    }
+  }, [])
+
+  // 메시지 전송
   const handleSendMessage = (text: string) => {
     const newMessage: Message = {
       id: messages.length + 1,
@@ -88,13 +72,8 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="h-full relative">
-      <main
-        ref={chatMainRef}
-        className="absolute inset-0 overflow-y-auto px-5 pt-10"
-        // 계산된 키보드 높이만큼 하단에 여백을 추가하여 마지막 메시지가 가려지지 않게 함
-        style={{ paddingBottom: `calc(6rem + ${keyboardHeight}px)` }}
-      >
+    <div className="flex flex-col flex-grow min-h-0">
+      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
         <div className="space-y-4">
           {messages.map((msg, idx) => {
@@ -122,15 +101,12 @@ const ChatPage: React.FC = () => {
             )
           })}
         </div>
+        <div className="h-4" />
       </main>
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer
-        className="fixed left-0 right-0 mx-auto max-w-md"
-        // 키보드가 없을 땐 bottom: 0, 키보드가 나타나면 그 높이만큼 위로 올라옴
-        style={{ bottom: keyboardHeight }}
-      >
+      <footer>
         <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>

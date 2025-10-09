@@ -85,7 +85,7 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
 
   return (
     <div className="bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
-      <div className="flex items-center w-full px-5 py-2.5">
+      <div className="flex items-start w-full px-5 py-2.5">
         <textarea
           ref={inputRef}
           placeholder="Type a message"
