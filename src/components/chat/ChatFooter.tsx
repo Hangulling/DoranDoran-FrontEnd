@@ -6,13 +6,14 @@ import showToast from '../common/CommonToast'
 interface ChatFooterProps {
   inputRef: RefObject<HTMLTextAreaElement | null>
   onSendMessage: (message: string) => void
+  keyboardHeight: number
 }
 
 const MAX_ROWS = 3
 const LINE_HEIGHT = 21
 const SINGLE_LINE_HEIGHT = 37
 
-const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
+const ChatFooter = ({ inputRef, onSendMessage, keyboardHeight }: ChatFooterProps) => {
   const [inputActive, setInputActive] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [textareaHeight, setTextareaHeight] = useState(SINGLE_LINE_HEIGHT)
@@ -73,6 +74,10 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
     }
   }
 
+  const footerStyle = {
+    paddingBottom: `calc(${keyboardHeight}px + env(safe-area-inset-bottom))`,
+  }
+
   // 메시지 전송 처리 함수
   const handleSendClick = () => {
     if (inputValue.trim()) {
@@ -86,7 +91,7 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
   }
 
   return (
-    <div className="bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
+    <div className="bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]" style={footerStyle}>
       <div className="flex items-start w-full px-5 py-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))]">
         <textarea
           ref={inputRef}
