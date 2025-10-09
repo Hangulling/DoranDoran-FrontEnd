@@ -116,7 +116,7 @@ const ChatPage: React.FC = () => {
       <main
         ref={chatMainRef}
         className="flex-1 overflow-y-auto px-5 pt-[15px]"
-        style={{ paddingBottom: `${footerHeight}px` }}
+        style={{ paddingBottom: footerHeight }}
       >
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
