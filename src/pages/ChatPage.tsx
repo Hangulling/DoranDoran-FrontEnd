@@ -15,39 +15,68 @@ const ChatPage: React.FC = () => {
   const coachMarkSeen = useCoachStore(s => s.coachMarkSeen)
   const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
   const [showCoachMark, setShowCoachMark] = useState(false)
-  const [isInitChatReady, setIsInitChatReady] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
+  const coachTimerRef = useRef<number | null>(null)
+  const [viewportHeight, setViewportHeight] = useState(window.innerHeight)
+  const footerRef = useRef<HTMLElement>(null)
+  const [footerHeight, setFooterHeight] = useState(0)
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
 
-  // InitChat 렌더 후 콜백
+  useEffect(() => {
+    const visualViewport = window.visualViewport
+    if (!visualViewport) return
+
+    const handleResize = () => {
+      setViewportHeight(visualViewport.height)
+
+      // 키보드가 나타났을 때(화면 높이가 줄어들었을 때) 스크롤을 맨 아래로 이동
+      if (visualViewport.height < window.innerHeight && chatMainRef.current) {
+        setTimeout(() => {
+          if (chatMainRef.current) {
+            chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
+          }
+        }, 100) // 브라우저 리플로우 대기
+      }
+    }
+
+    // 초기 높이 설정
+    setViewportHeight(visualViewport.height)
+
+    visualViewport.addEventListener('resize', handleResize)
+    return () => visualViewport.removeEventListener('resize', handleResize)
+  }, [])
+
+  useEffect(() => {
+    if (!footerRef.current) return
+    const resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setFooterHeight(entry.contentRect.height)
+      }
+    })
+    resizeObserver.observe(footerRef.current)
+    return () => resizeObserver.disconnect()
+  }, [])
+
   const handleInitReady = () => {
-    setIsInitChatReady(true)
+    if (coachMarkSeen) return
+    if (coachTimerRef.current) {
+      window.clearTimeout(coachTimerRef.current)
+      coachTimerRef.current = null
+    }
+    coachTimerRef.current = window.setTimeout(() => {
+      setShowCoachMark(true)
+    }, 600)
   }
 
   useEffect(() => {
-    console.log('isInitChatReady, coachMarkSeen', isInitChatReady, coachMarkSeen)
-    if (isInitChatReady && !coachMarkSeen) {
-      const timer = setTimeout(() => {
-        setShowCoachMark(true)
-      }, 600)
-      return () => clearTimeout(timer)
+    return () => {
+      if (coachTimerRef.current) {
+        window.clearTimeout(coachTimerRef.current)
+      }
     }
-  }, [isInitChatReady, coachMarkSeen])
-
-  useEffect(() => {
-    const inputEl = inputRef.current
-    if (!inputEl) return
-    const handleFocus = () => {
-      setTimeout(() => {
-        chatMainRef.current?.scrollTo({ top: chatMainRef.current.scrollHeight, behavior: 'smooth' })
-      }, 100) // 키보드 올라올 대기시간 고려
-    }
-
-    inputEl.addEventListener('focus', handleFocus)
-    return () => inputEl.removeEventListener('focus', handleFocus)
   }, [])
 
   // 메시지 추가될때마다 자동 스크롤
@@ -71,7 +100,6 @@ const ChatPage: React.FC = () => {
   const handleCloseCoachMark = () => {
     setShowCoachMark(false)
     setCoachMarkSeen(true)
-    // await api.post('/user/coachMark'); // 확인 시 API 전달
   }
 
   const handleSendMessage = (text: string) => {
@@ -85,8 +113,15 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="relative flex flex-col h-screen overflow-hidden bg-white">
-      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
+    <div
+      className="flex flex-col max-w-md mx-auto bg-white overflow-hidden"
+      style={{ height: viewportHeight }}
+    >
+      <main
+        ref={chatMainRef}
+        className="flex-1 overflow-y-auto px-5 pt-[15px]"
+        style={{ paddingBottom: `${footerHeight}px` }}
+      >
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
         <div className="space-y-4">
@@ -115,13 +150,12 @@ const ChatPage: React.FC = () => {
             )
           })}
         </div>
-        {/* 입력창 사이의 여백 */}
         <div className="h-6" />
       </main>
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer className="flex-shrink-0">
+      <footer ref={footerRef} className="fixed bottom-0 left-0 right-0 max-w-md mx-auto">
         <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>
