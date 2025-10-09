@@ -20,7 +20,6 @@ const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
-  const screenHeight = useScreenHeight()
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
 
@@ -87,15 +86,8 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div
-      className="flex flex-col max-w-md mx-auto bg-white overflow-hidden"
-      style={{ height: screenHeight }}
-    >
-      <main
-        ref={chatMainRef}
-        className="flex-grow overflow-y-auto px-5 pt-10"
-        style={{ minHeight: 0 }}
-      >
+    <div className="relative flex flex-col h-screen overflow-hidden bg-white">
+      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
         <div className="space-y-4">
