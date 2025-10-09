@@ -9,6 +9,7 @@ import InitChat from '../components/chat/InitChat'
 import { useCoachStore } from '../stores/useUiStateStore'
 import { useParams } from 'react-router-dom'
 import { chatRooms } from '../mocks/db/chat'
+import useScreenHeight from '../hooks/useScreenHeight'
 
 const ChatPage: React.FC = () => {
   const { id } = useParams()
@@ -19,6 +20,7 @@ const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
+  const screenHeight = useScreenHeight()
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
 
@@ -85,7 +87,10 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div
+      className="flex flex-col max-w-md mx-auto bg-white overflow-hidden"
+      style={{ height: screenHeight }}
+    >
       <main ref={chatMainRef} className="flex-1 overflow-y-auto px-5 pt-10">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
