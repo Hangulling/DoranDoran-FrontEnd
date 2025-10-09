@@ -156,7 +156,14 @@ const ChatPage: React.FC = () => {
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer ref={footerRef} className="fixed bottom-0 left-0 right-0 max-w-md mx-auto">
+      <footer
+        ref={footerRef}
+        className="fixed bottom-0 left-0 right-0 max-w-md mx-auto"
+        style={{
+          transform: `translateY(-${keyboardHeight}px)`,
+          transition: 'transform 0.2s ease-out',
+        }}
+      >
         <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>
