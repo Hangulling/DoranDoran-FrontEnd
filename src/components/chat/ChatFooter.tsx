@@ -31,7 +31,10 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
   }
 
   // 입력창 포커스
-  const handleInputFocus = () => setInputActive(true)
+  const handleInputFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+    setInputActive(true)
+    e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  }
   const handleInputBlur = () => setInputActive(false)
 
   // 입력 제한, 높이 조절
