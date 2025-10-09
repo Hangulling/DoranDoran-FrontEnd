@@ -91,7 +91,11 @@ const ChatPage: React.FC = () => {
       className="flex flex-col max-w-md mx-auto bg-white overflow-hidden"
       style={{ height: screenHeight }}
     >
-      <main ref={chatMainRef} className="flex-1 overflow-y-auto px-5 pt-10">
+      <main
+        ref={chatMainRef}
+        className="flex-grow overflow-y-auto px-5 pt-10"
+        style={{ minHeight: 0 }}
+      >
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
         <div className="space-y-4">
