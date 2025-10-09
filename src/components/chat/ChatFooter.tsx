@@ -18,21 +18,6 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
   const [textareaHeight, setTextareaHeight] = useState(SINGLE_LINE_HEIGHT)
   const [isComposing, setIsComposing] = useState(false)
 
-  const [baseViewportHeight, setBaseViewportHeight] = useState(window.innerHeight)
-  const [viewportHeight, setViewportHeight] = useState(window.innerHeight)
-
-  useEffect(() => {
-    setBaseViewportHeight(window.innerHeight) // 마운트 시점에서 기준 높이 저장
-
-    const handleResize = () => {
-      setViewportHeight(window.innerHeight)
-    }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  const keyboardHeight = Math.max(0, baseViewportHeight - viewportHeight)
-
   // 조합 확인
   const handleCompositionStart = () => setIsComposing(true)
   const handleCompositionEnd = (e: React.CompositionEvent<HTMLTextAreaElement>) => {
@@ -50,21 +35,6 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
     setInputActive(true)
   }
   const handleInputBlur = () => setInputActive(false)
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (!inputRef.current) return
-      // 키보드가 올라왔을 때 window.innerHeight 변화를 감지, textarea 높이 조정 가능
-
-      const textarea = inputRef.current
-      textarea.style.height = 'auto'
-      const scrollHeight = textarea.scrollHeight
-      textarea.style.height = `${scrollHeight}px`
-      setTextareaHeight(scrollHeight)
-    }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [inputRef])
 
   // 입력 제한, 높이 조절
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -116,13 +86,8 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
   }
 
   return (
-    <div
-      className="mx-auto w-full max-w-md left-1/2 bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]"
-      style={{
-        paddingBottom: `calc(0.625rem + env(safe-area-inset-bottom) + ${keyboardHeight}px)`,
-      }}
-    >
-      <div className="flex items-start w-full max-w-md mx-auto px-5 py-2.5">
+    <div className="mx-auto w-full max-w-md left-1/2 bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
+      <div className="flex items-start w-full max-w-md mx-auto px-5 py-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))]">
         <textarea
           ref={inputRef}
           placeholder="Type a message"
