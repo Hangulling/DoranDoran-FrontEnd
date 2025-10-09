@@ -4,7 +4,7 @@ import BookmarkIcon from './BookmarkIcon'
 import useTTS from '../../hooks/useTTS'
 
 interface ChatBubbleProps {
-  message: string
+  message: React.ReactNode
   isSender: boolean
   avatarUrl?: string
   variant?: 'basic' | 'second' | 'sender' | 'error'
@@ -31,7 +31,8 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
     !isSender && (avatarUrl || variant === 'second' || variant === 'error') ? 'ml-10' : ''
 
   const [isBookmarked, setIsBookmarked] = useState(false)
-  const { onPlay: playTTS, playing: isPlaying } = useTTS(message)
+  const ttsText = typeof message === 'string' ? message : ''
+  const { onPlay: playTTS, playing: isPlaying } = useTTS(ttsText)
 
   const toggleBookmark = () => setIsBookmarked(!isBookmarked)
 
