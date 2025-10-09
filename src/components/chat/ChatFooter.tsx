@@ -1,7 +1,7 @@
 import { useState, type RefObject } from 'react'
 import Send from '../../assets/icon/send.svg'
 import ActiveSend from '../../assets/icon/activeSend.svg'
-//import showToast from '../common/CommonToast'
+import showToast from '../common/CommonToast'
 
 interface ChatFooterProps {
   inputRef: RefObject<HTMLTextAreaElement | null>
@@ -25,7 +25,7 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
     const sanitizedValue = value.replace(/[a-zA-Z]/g, '')
     if (value !== sanitizedValue) {
       setInputValue(sanitizedValue)
-      //showToast({ message: 'Input is only available in Korean', iconType: 'error' })
+      showToast({ message: 'Input is only available in Korean', iconType: 'error' })
     }
   }
 
@@ -47,13 +47,13 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
     const sanitizedValue = originalValue.replace(/[a-zA-Z]/g, '')
 
     if (originalValue && originalValue !== sanitizedValue) {
-      //showToast({ message: 'Input is only available in Korean', iconType: 'error' })
+      showToast({ message: 'Input is only available in Korean', iconType: 'error' })
     }
 
     let finalValue = sanitizedValue
 
     if (finalValue.length > 50) {
-      // showToast({ message: 'Maximum of 50 characters allowed', iconType: 'error' })
+      showToast({ message: 'Maximum of 50 characters allowed', iconType: 'error' })
       finalValue = finalValue.substring(0, 50)
     }
 
