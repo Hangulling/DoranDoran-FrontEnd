@@ -20,15 +20,14 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
   const [footerOffset, setFooterOffset] = useState(0)
 
   useEffect(() => {
-    // 키보드 감지해서 footer 위치 조정
-    const handleResize = () => {
+    const cb = () => {
       if (window.visualViewport) {
         const offset = window.innerHeight - window.visualViewport.height
         setFooterOffset(offset > 0 ? offset : 0)
       }
     }
-    window.visualViewport?.addEventListener('resize', handleResize)
-    return () => window.visualViewport?.removeEventListener('resize', handleResize)
+    window.visualViewport?.addEventListener('resize', cb)
+    return () => window.visualViewport?.removeEventListener('resize', cb)
   }, [])
 
   // 조합 확인
