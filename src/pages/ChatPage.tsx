@@ -3,6 +3,7 @@ import ChatBubble from '../components/chat/ChatBubble'
 import CoachMark from '../components/chat/CoachMark'
 import ChatFooter from '../components/chat/ChatFooter'
 import DescriptionBubble from '../components/chat/DescriptionBubble'
+//import { initialMessages } from '../mocks/db/chat'
 import type { Message } from '../types/chat'
 import InitChat from '../components/chat/InitChat'
 import { useCoachStore } from '../stores/useUiStateStore'
@@ -14,45 +15,30 @@ const ChatPage: React.FC = () => {
   const coachMarkSeen = useCoachStore(s => s.coachMarkSeen)
   const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
   const [showCoachMark, setShowCoachMark] = useState(false)
-  const [isInitChatReady, setIsInitChatReady] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
-  const [viewportHeight, setViewportHeight] = useState<number | undefined>(undefined)
-
+  const coachTimerRef = useRef<number | null>(null)
   const room = chatRooms.find(r => String(r.roomId) === String(id))
 
   const handleInitReady = () => {
-    setIsInitChatReady(true)
+    if (coachMarkSeen) return
+    if (coachTimerRef.current) {
+      window.clearTimeout(coachTimerRef.current)
+      coachTimerRef.current = null
+    }
+    coachTimerRef.current = window.setTimeout(() => {
+      setShowCoachMark(true)
+    }, 2000)
   }
 
-  // viewportHeight 상태 업데이트
   useEffect(() => {
-    const visualViewport = window.visualViewport
-    // visualViewport API가 지원되지 않으면 아무것도 하지 않음
-    if (!visualViewport) return
-
-    const handleResize = () => {
-      setViewportHeight(visualViewport.height)
-      // 레이아웃 버그를 해결하기 위해 스크롤 위치를 강제로 재조정
-      window.scrollTo(0, 0)
+    return () => {
+      if (coachTimerRef.current) {
+        window.clearTimeout(coachTimerRef.current)
+      }
     }
-
-    handleResize() // 초기 높이 설정
-
-    visualViewport.addEventListener('resize', handleResize)
-    return () => visualViewport.removeEventListener('resize', handleResize)
   }, [])
-
-  useEffect(() => {
-    console.log('isInitChatReady, coachMarkSeen', isInitChatReady, coachMarkSeen)
-    if (isInitChatReady && !coachMarkSeen) {
-      const timer = setTimeout(() => {
-        setShowCoachMark(true)
-      }, 600)
-      return () => clearTimeout(timer)
-    }
-  }, [isInitChatReady, coachMarkSeen])
 
   // 메시지 추가될때마다 자동 스크롤
   useEffect(() => {
@@ -62,17 +48,37 @@ const ChatPage: React.FC = () => {
   }, [messages])
 
   useEffect(() => {
-    const inputEl = inputRef.current
-    if (!inputEl) return
-    const handleFocus = () => {
-      setTimeout(() => {
-        chatMainRef.current?.scrollTo({ top: chatMainRef.current.scrollHeight, behavior: 'smooth' })
-      }, 100)
+    const visualViewport = window.visualViewport
+    if (!visualViewport) return
+
+    const handleResize = () => {
+      const isKeyboardVisible = window.innerHeight - visualViewport.height > 150
+
+      if (isKeyboardVisible && chatMainRef.current) {
+        setTimeout(() => {
+          if (chatMainRef.current) {
+            chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
+          }
+        }, 100)
+      }
     }
 
-    inputEl.addEventListener('focus', handleFocus)
-    return () => inputEl.removeEventListener('focus', handleFocus)
+    visualViewport.addEventListener('resize', handleResize)
+    return () => {
+      visualViewport.removeEventListener('resize', handleResize)
+    }
   }, [])
+
+  // API 연동 위해 작성
+  useEffect(() => {
+    // const checkCoachMarkSeen = async () => {
+    //   const hasSeen = await api.get('/user/coachMark'); // API 호출
+    //   if (hasSeen) {
+    //     setShowCoachMark(false);
+    //   }
+    // };
+    // checkCoachMarkSeen();
+  }, []) // 한 번만 실행
 
   const handleCloseCoachMark = () => {
     setShowCoachMark(false)
@@ -90,11 +96,8 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div
-      className="flex flex-col overflow-hidden bg-white h-screen"
-      style={{ height: viewportHeight ? `${viewportHeight}px` : '100vh' }}
-    >
-      <main ref={chatMainRef} className="flex-1 overflow-y-auto px-5 pt-10">
+    <div className="flex flex-col h-full bg-white">
+      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
         <div className="space-y-4">
@@ -123,6 +126,7 @@ const ChatPage: React.FC = () => {
             )
           })}
         </div>
+        <div className="h-6" />
       </main>
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />

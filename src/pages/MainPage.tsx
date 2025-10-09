@@ -1,116 +1,70 @@
-// ChatPage.tsx
-
-import { useEffect, useRef, useState } from 'react'
-// ✨ 1. 라이브러리 import
-import Div100vh from 'react-div-100vh'
-import ChatBubble from '../components/chat/ChatBubble'
-import CoachMark from '../components/chat/CoachMark'
-import ChatFooter from '../components/chat/ChatFooter'
-import DescriptionBubble from '../components/chat/DescriptionBubble'
-import type { Message } from '../types/chat'
-import InitChat from '../components/chat/InitChat'
-import { useCoachStore } from '../stores/useUiStateStore'
-import { useParams } from 'react-router-dom'
+import Character from '../assets/main/mainCharacter.svg'
+import { useNavigate } from 'react-router-dom'
 import { chatRooms } from '../mocks/db/chat'
+import { useEffect, useState } from 'react'
+import { useUserStore } from '../stores/useUserStore'
 
-const ChatPage: React.FC = () => {
-  const { id } = useParams()
-  const coachMarkSeen = useCoachStore(s => s.coachMarkSeen)
-  const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
-  const [showCoachMark, setShowCoachMark] = useState(false)
-  const [isInitChatReady, setIsInitChatReady] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
-  const chatMainRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLTextAreaElement | null>(null)
+const MainPage = () => {
+  const navigate = useNavigate()
+  const [userName, setUserName] = useState<string>('')
+  const setStoreName = useUserStore(state => state.setName)
 
-  const room = chatRooms.find(r => String(r.roomId) === String(id))
-
-  const handleInitReady = () => {
-    setIsInitChatReady(true)
-  }
-
+  // 사용자 정보 GET, store 저장
   useEffect(() => {
-    if (isInitChatReady && !coachMarkSeen) {
-      const timer = setTimeout(() => {
-        setShowCoachMark(true)
-      }, 600)
-      return () => clearTimeout(timer)
-    }
-  }, [isInitChatReady, coachMarkSeen])
+    fetch('/api/users/me')
+      .then(res => res.json())
+      .then(profile => {
+        setUserName(profile.name)
+        setStoreName(profile.name)
+      })
+  }, [setStoreName])
 
-  useEffect(() => {
-    if (chatMainRef.current) {
-      chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
-    }
-  }, [messages])
-
-  useEffect(() => {
-    const inputEl = inputRef.current
-    if (!inputEl) return
-    const handleFocus = () => {
-      setTimeout(() => {
-        chatMainRef.current?.scrollTo({ top: chatMainRef.current.scrollHeight, behavior: 'smooth' })
-      }, 100)
-    }
-
-    inputEl.addEventListener('focus', handleFocus)
-    return () => inputEl.removeEventListener('focus', handleFocus)
-  }, [])
-
-  const handleCloseCoachMark = () => {
-    setShowCoachMark(false)
-    setCoachMarkSeen(true)
-  }
-
-  const handleSendMessage = (text: string) => {
-    const newMessage: Message = {
-      id: messages.length + 1,
-      text,
-      isSender: true,
-      variant: 'sender',
-    }
-    setMessages(prevMessages => [...prevMessages, newMessage])
+  const handleRoomClick = (id: number) => {
+    navigate(`/closeness/${id}`, { state: { showCoachMark: true, roomId: id } })
   }
 
   return (
-    <Div100vh className="flex flex-col overflow-hidden bg-white">
-      <main ref={chatMainRef} className="flex-1 overflow-y-auto px-5 pt-10">
-        <InitChat avatar={room?.avatar} onReady={handleInitReady} />
-
-        <div className="space-y-4">
-          {messages.map((msg, idx) => {
-            const prevMsg = idx > 0 ? messages[idx - 1] : null
-            const isSenderChanged = prevMsg ? prevMsg.isSender !== msg.isSender : false
-            const marginClass = isSenderChanged ? 'mt-5' : 'mt-0'
-            return (
-              <div key={msg.id} className={marginClass}>
-                <ChatBubble
-                  message={msg.text}
-                  isSender={msg.isSender}
-                  avatarUrl={msg.avatarUrl}
-                  variant={msg.variant ?? 'basic'}
-                  showIcon={msg.showIcon}
-                />
-                {msg.explanation && (
-                  <DescriptionBubble
-                    word={msg.explanation.word}
-                    pronunciation={msg.explanation.pronunciation}
-                    descriptionByTab={msg.explanation.descriptionByTab}
-                    initialTab={msg.explanation.selectedTab}
-                  />
-                )}
-              </div>
-            )
-          })}
+    <>
+      {/* 상단 환영 메시지 */}
+      <div className="w-full bg-[#9ADAD5] h-[99px] relative max-w-md mx-auto overflow-hidden">
+        <div className="absolute top-[14px] left-[20px]">
+          <div className="text-[14px]">Welcome,</div>
+          <div className="text-[16px]">
+            <span className="text-title">{userName}</span>
+            <span> :)</span>
+          </div>
+          <p className="mt-[8px] text-[12px] text-gray-600">Learn Korean expressions by chat!</p>
         </div>
-      </main>
+        <img src={Character} alt="캐릭터 이미지" className="absolute top-[23px] right-[20.16px]" />
+      </div>
 
-      <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
+      <div className="max-w-md mx-auto px-5 pb-16 mt-[30px]">
+        {/* 채팅방 목록 */}
+        <div className="text-title mb-4 text-[20px] border-b border-gray-80 pb-2">Chats</div>
+        <div className="flex flex-col gap-[10px]">
+          {chatRooms.map(room => (
+            <button
+              key={room.roomId}
+              onClick={() => handleRoomClick(room.roomId)}
+              className="flex items-center gap-4 w-full h-21 bg-white rounded-lg shadow-[1px_1px_10px_rgba(0,0,0,0.1)] py-3 px-4 active:bg-green-80"
+            >
+              <div className="w-13 h-13 rounded-full flex items-center justify-center overflow-hidden bg-gray-100">
+                <img src={room.avatar} alt={room.roomName} className="w-full h-full object-cover" />
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="text-title text-[16px]">{room.roomName}</span>
+                <span className="text-gray-600 text-[14px]">{room.message}</span>
+              </div>
+            </button>
+          ))}
+        </div>
 
-      <footer className="flex-shrink-0">
-        <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
-      </footer>
-    </Div100vh>
+        <p className="mt-45 text-center text-gray-300 text-[12px]">
+          Copyright 2025. dorandoran all rights reserved.
+        </p>
+      </div>
+    </>
   )
 }
-export default ChatPage
+
+export default MainPage
