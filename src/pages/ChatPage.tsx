@@ -149,5 +149,5 @@ const ChatPage: React.FC = () => {
       </footer>
     </div>
   )
-}
+} //왜 저장이 안돼
 export default ChatPage
