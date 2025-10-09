@@ -19,7 +19,6 @@ const ChatPage: React.FC = () => {
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const footerRef = useRef<HTMLElement>(null)
   const [footerHeight, setFooterHeight] = useState(0)
-  const [keyboardHeight, setKeyboardHeight] = useState(0)
   const [windowHeight, setWindowHeight] = useState(window.innerHeight)
   const keyboardOpenRef = useRef(false)
   const coachTimerRef = useRef<number | null>(null)
@@ -42,17 +41,7 @@ const ChatPage: React.FC = () => {
     const handleResize = () => {
       const offset = window.innerHeight - visualViewport.height
       const newKeyboardHeight = offset > 0 ? offset : 0
-
-      setKeyboardHeight(newKeyboardHeight)
       const isKeyboardOpen = newKeyboardHeight > 100
-
-      if (isKeyboardOpen && !keyboardOpenRef.current) {
-        requestAnimationFrame(() => {
-          if (chatMainRef.current) {
-            chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
-          }
-        })
-      }
       keyboardOpenRef.current = isKeyboardOpen
     }
 
@@ -161,11 +150,7 @@ const ChatPage: React.FC = () => {
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
       <footer ref={footerRef} className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white">
-        <ChatFooter
-          inputRef={inputRef}
-          onSendMessage={handleSendMessage}
-          keyboardHeight={keyboardHeight}
-        />
+        <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>
   )
