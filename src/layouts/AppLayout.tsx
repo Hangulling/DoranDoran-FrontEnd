@@ -25,6 +25,7 @@ const showBookmarkPaths = ['/']
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation()
+
   const skipNavPaths = ['/login']
   const pathname = location.pathname
 
@@ -60,23 +61,36 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     title = 'Delete'
   }
 
+  const navBarHeight = 60
+  const closenessBarHeight = closenessId ? 33 : 0
+
   return (
-    <div className="mx-auto flex h-screen w-full max-w-md flex-col">
+    <div className="mx-auto w-full max-w-md flex flex-col h-screen relative">
       {!hideNavBar && (
         <>
-          <header className="flex-shrink-0">
+          <header className="fixed top-0 left-0 right-0 z-50" style={{ height: navBarHeight }}>
             <NavBar
               isMain={isMain}
               title={title}
               showBookmark={showBookmark}
               showDelete={showDelete}
             />
-            <div className="h-15" />
           </header>
-          {/* 친밀도 바 */}
-          {closenessId && <ClosenessBar chatRoomId={closenessId} />}
+
+          {closenessId && (
+            <div
+              className="fixed left-0 right-0 z-50"
+              style={{ top: navBarHeight, height: closenessBarHeight }}
+            >
+              <ClosenessBar chatRoomId={closenessId} />
+            </div>
+          )}
+
+          {/* NavBar + 친밀도 바 높이만큼 공간 확보용 빈 div */}
+          <div style={{ height: navBarHeight + closenessBarHeight }} />
         </>
       )}
+
       <main className="flex-grow overflow-y-auto min-h-0">{children}</main>
     </div>
   )
