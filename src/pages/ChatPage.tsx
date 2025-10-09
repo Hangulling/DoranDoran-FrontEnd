@@ -16,6 +16,7 @@ const ChatPage: React.FC = () => {
   const coachMarkSeen = useCoachStore(s => s.coachMarkSeen)
   const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
   const [showCoachMark, setShowCoachMark] = useState(false)
+  const [keyboardVisible, setKeyboardVisible] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
@@ -28,6 +29,28 @@ const ChatPage: React.FC = () => {
   }, [messages])
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
+
+  useEffect(() => {
+    const visualViewport = window.visualViewport
+    if (!visualViewport) return
+
+    const handleResize = () => {
+      const isKeyboardVisible = window.innerHeight - visualViewport.height > 150
+      setKeyboardVisible(isKeyboardVisible)
+
+      // 키보드가 나타났을 때만 스크롤을 맨 아래로 이동
+      if (isKeyboardVisible) {
+        setTimeout(() => {
+          if (chatMainRef.current) {
+            chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
+          }
+        }, 100) // 키보드 애니메이션 시간 고려
+      }
+    }
+
+    visualViewport.addEventListener('resize', handleResize)
+    return () => visualViewport.removeEventListener('resize', handleResize)
+  }, [])
 
   // 코치 마크 오픈 시간
   const handleInitReady = () => {
