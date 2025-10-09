@@ -18,6 +18,8 @@ const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
+  const footerRef = useRef<HTMLElement>(null)
+  const [footerHeight, setFooterHeight] = useState(0)
   const [keyboardHeight, setKeyboardHeight] = useState(0)
   const coachTimerRef = useRef<number | null>(null)
 
@@ -32,9 +34,21 @@ const ChatPage: React.FC = () => {
       const offset = window.innerHeight - visualViewport.height
       setKeyboardHeight(offset > 0 ? offset : 0)
     }
-    handleResize() // 초기값 설정
+    handleResize()
     visualViewport.addEventListener('resize', handleResize)
     return () => visualViewport.removeEventListener('resize', handleResize)
+  }, [])
+
+  // footer 높이
+  useEffect(() => {
+    if (!footerRef.current) return
+    const resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setFooterHeight(entry.contentRect.height)
+      }
+    })
+    resizeObserver.observe(footerRef.current)
+    return () => resizeObserver.disconnect()
   }, [])
 
   const handleInitReady = () => {
@@ -94,7 +108,7 @@ const ChatPage: React.FC = () => {
       <main
         ref={chatMainRef}
         className="flex-1 overflow-y-auto px-5 pt-[15px]"
-        style={{ paddingBottom: `${keyboardHeight + 57}px` }}
+        style={{ paddingBottom: `${footerHeight}px` }}
       >
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
@@ -129,12 +143,15 @@ const ChatPage: React.FC = () => {
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer className="fixed bottom-0 left-0 right-0 max-w-md mx-auto">
-        <ChatFooter
-          inputRef={inputRef}
-          onSendMessage={handleSendMessage}
-          keyboardHeight={keyboardHeight}
-        />
+      <footer
+        ref={footerRef}
+        className="fixed bottom-0 left-0 right-0 max-w-md mx-auto"
+        style={{
+          transform: `translateY(-${keyboardHeight}px)`,
+          transition: 'transform 0.2s ease-out',
+        }}
+      >
+        <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>
   )
