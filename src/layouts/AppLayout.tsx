@@ -61,7 +61,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="mx-auto flex h-screen w-full max-w-md flex-col">
+    <div className="mx-auto flex h-vdh w-full max-w-md flex-col">
       {!hideNavBar && (
         <>
           <header className="flex-shrink-0">
