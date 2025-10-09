@@ -17,7 +17,6 @@ const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
-  const footerRef = useRef<HTMLElement>(null)
   const coachTimerRef = useRef<number | null>(null)
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
@@ -70,8 +69,8 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col max-w-md mx-auto h-full bg-white overflow-hidden">
-      <main ref={chatMainRef} className="flex-1 overflow-y-auto px-5 pt-[15px]">
+    <div>
+      <main ref={chatMainRef} className="px-5 pt-4 pb-[57px]">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
         <div className="space-y-4">
@@ -105,7 +104,7 @@ const ChatPage: React.FC = () => {
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer ref={footerRef}>
+      <footer className="fixed bottom-0 left-0 right-0 mx-auto max-w-md bg-white">
         <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>

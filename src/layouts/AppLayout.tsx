@@ -77,7 +77,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           {closenessId && <ClosenessBar chatRoomId={closenessId} />}
         </>
       )}
-      <main className="flex-grow overflow-y-auto min-h-0">{children}</main>
+      <main className="flex-grow min-h-0">{children}</main>
     </div>
   )
 }
