@@ -28,17 +28,20 @@ const ChatPage: React.FC = () => {
 
   // viewportHeight 상태 업데이트
   useEffect(() => {
+    const visualViewport = window.visualViewport
+    // visualViewport API가 지원되지 않으면 아무것도 하지 않음
+    if (!visualViewport) return
+
     const handleResize = () => {
-      if (window.visualViewport) {
-        setViewportHeight(window.visualViewport.height)
-      }
+      setViewportHeight(visualViewport.height)
+      // 레이아웃 버그를 해결하기 위해 스크롤 위치를 강제로 재조정
+      window.scrollTo(0, 0)
     }
 
-    // 초기 높이 설정
-    handleResize()
+    handleResize() // 초기 높이 설정
 
-    window.visualViewport?.addEventListener('resize', handleResize)
-    return () => window.visualViewport?.removeEventListener('resize', handleResize)
+    visualViewport.addEventListener('resize', handleResize)
+    return () => visualViewport.removeEventListener('resize', handleResize)
   }, [])
 
   useEffect(() => {
@@ -91,7 +94,7 @@ const ChatPage: React.FC = () => {
       className="flex flex-col overflow-hidden bg-white h-screen"
       style={{ height: viewportHeight ? `${viewportHeight}px` : '100vh' }}
     >
-      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
+      <main ref={chatMainRef} className="flex-1 overflow-y-auto px-5 pt-10">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
         <div className="space-y-4">
