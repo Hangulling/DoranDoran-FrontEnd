@@ -3,7 +3,6 @@ import ChatBubble from '../components/chat/ChatBubble'
 import CoachMark from '../components/chat/CoachMark'
 import ChatFooter from '../components/chat/ChatFooter'
 import DescriptionBubble from '../components/chat/DescriptionBubble'
-//import { initialMessages } from '../mocks/db/chat'
 import type { Message } from '../types/chat'
 import InitChat from '../components/chat/InitChat'
 import { useCoachStore } from '../stores/useUiStateStore'
@@ -19,13 +18,28 @@ const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
+  const [viewportHeight, setViewportHeight] = useState<number | undefined>(undefined)
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
 
-  // InitChat 렌더 후 콜백
   const handleInitReady = () => {
     setIsInitChatReady(true)
   }
+
+  // viewportHeight 상태 업데이트
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.visualViewport) {
+        setViewportHeight(window.visualViewport.height)
+      }
+    }
+
+    // 초기 높이 설정
+    handleResize()
+
+    window.visualViewport?.addEventListener('resize', handleResize)
+    return () => window.visualViewport?.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     console.log('isInitChatReady, coachMarkSeen', isInitChatReady, coachMarkSeen)
@@ -37,19 +51,6 @@ const ChatPage: React.FC = () => {
     }
   }, [isInitChatReady, coachMarkSeen])
 
-  useEffect(() => {
-    const inputEl = inputRef.current
-    if (!inputEl) return
-    const handleFocus = () => {
-      setTimeout(() => {
-        chatMainRef.current?.scrollTo({ top: chatMainRef.current.scrollHeight, behavior: 'smooth' })
-      }, 100) // 키보드 올라올 대기시간 고려
-    }
-
-    inputEl.addEventListener('focus', handleFocus)
-    return () => inputEl.removeEventListener('focus', handleFocus)
-  }, [])
-
   // 메시지 추가될때마다 자동 스크롤
   useEffect(() => {
     if (chatMainRef.current) {
@@ -57,21 +58,22 @@ const ChatPage: React.FC = () => {
     }
   }, [messages])
 
-  // API 연동 위해 작성
   useEffect(() => {
-    // const checkCoachMarkSeen = async () => {
-    //   const hasSeen = await api.get('/user/coachMark'); // API 호출
-    //   if (hasSeen) {
-    //     setShowCoachMark(false);
-    //   }
-    // };
-    // checkCoachMarkSeen();
-  }, []) // 한 번만 실행
+    const inputEl = inputRef.current
+    if (!inputEl) return
+    const handleFocus = () => {
+      setTimeout(() => {
+        chatMainRef.current?.scrollTo({ top: chatMainRef.current.scrollHeight, behavior: 'smooth' })
+      }, 100)
+    }
+
+    inputEl.addEventListener('focus', handleFocus)
+    return () => inputEl.removeEventListener('focus', handleFocus)
+  }, [])
 
   const handleCloseCoachMark = () => {
     setShowCoachMark(false)
     setCoachMarkSeen(true)
-    // await api.post('/user/coachMark'); // 확인 시 API 전달
   }
 
   const handleSendMessage = (text: string) => {
@@ -85,7 +87,10 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="relative flex flex-col h-screen overflow-hidden bg-white">
+    <div
+      className="flex flex-col overflow-hidden bg-white h-screen"
+      style={{ height: viewportHeight ? `${viewportHeight}px` : '100vh' }}
+    >
       <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
@@ -115,8 +120,6 @@ const ChatPage: React.FC = () => {
             )
           })}
         </div>
-        {/* 입력창 사이의 여백 */}
-        <div className="h-6" />
       </main>
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
