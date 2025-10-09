@@ -19,10 +19,25 @@ const ChatPage: React.FC = () => {
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight)
   const footerRef = useRef<HTMLElement>(null)
   const [footerHeight, setFooterHeight] = useState(0)
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowHeight(window.innerHeight)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  useEffect(() => {
+    if (footerRef.current) {
+      setFooterHeight(footerRef.current.offsetHeight)
+    }
+  }, [])
 
   const handleInitReady = () => {
     if (coachMarkSeen) return
@@ -90,7 +105,7 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="relative bg-white flex flex-col">
+    <div className="relative bg-white flex flex-col" style={{ height: windowHeight }}>
       <main
         ref={chatMainRef}
         className="flex-1 overflow-y-auto px-5 pt-10"
