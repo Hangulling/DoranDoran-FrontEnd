@@ -21,10 +21,19 @@ const ChatPage: React.FC = () => {
   const footerRef = useRef<HTMLElement>(null)
   const [footerHeight, setFooterHeight] = useState(0)
   const [keyboardHeight, setKeyboardHeight] = useState(0)
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight)
   const keyboardOpenRef = useRef(false)
   const coachTimerRef = useRef<number | null>(null)
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
+
+  useEffect(() => {
+    const onResize = () => {
+      setWindowHeight(window.innerHeight)
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   // 키보드 높이 감지
   useEffect(() => {
@@ -122,7 +131,10 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col max-w-md mx-auto bg-white overflow-hidden">
+    <div
+      className="flex flex-col max-w-md mx-auto bg-white overflow-hidden"
+      style={{ height: windowHeight }}
+    >
       <main
         ref={chatMainRef}
         className="flex-1 overflow-y-auto px-5 pt-[15px]"
@@ -168,11 +180,7 @@ const ChatPage: React.FC = () => {
           transform: `translateY(-${keyboardHeight}px)`,
         }}
       >
-        <ChatFooter
-          inputRef={inputRef}
-          onSendMessage={handleSendMessage}
-          keyboardHeight={keyboardHeight}
-        />
+        <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>
   )
