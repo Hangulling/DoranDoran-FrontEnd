@@ -21,7 +21,7 @@ const ChatPage: React.FC = () => {
   const footerRef = useRef<HTMLElement>(null)
   const [footerHeight, setFooterHeight] = useState(0)
   const [keyboardHeight, setKeyboardHeight] = useState(0)
-  const keyboardStateRef = useRef(false)
+  const keyboardOpenRef = useRef(false)
   const coachTimerRef = useRef<number | null>(null)
 
   const room = chatRooms.find(r => String(r.roomId) === String(id))
@@ -33,33 +33,38 @@ const ChatPage: React.FC = () => {
 
     const handleResize = () => {
       const offset = window.innerHeight - visualViewport.height
-      setKeyboardHeight(offset > 0 ? offset : 0)
+      const newKeyboardHeight = offset > 0 ? offset : 0
 
-      const isCurrentlyOpen = offset > 100
+      setKeyboardHeight(newKeyboardHeight)
 
-      if (isCurrentlyOpen && !keyboardStateRef.current) {
+      const isKeyboardOpen = newKeyboardHeight > 100
+
+      if (isKeyboardOpen && !keyboardOpenRef.current) {
         requestAnimationFrame(() => {
           if (chatMainRef.current) {
             chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
           }
         })
       }
-      keyboardStateRef.current = isCurrentlyOpen
+      keyboardOpenRef.current = isKeyboardOpen
     }
 
-    handleResize()
     visualViewport.addEventListener('resize', handleResize)
+    handleResize()
+
     return () => visualViewport.removeEventListener('resize', handleResize)
   }, [])
 
   // footer 높이
   useEffect(() => {
     if (!footerRef.current) return
+
     const resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
         setFooterHeight(entry.contentRect.height)
       }
     })
+
     resizeObserver.observe(footerRef.current)
     return () => resizeObserver.disconnect()
   }, [])
@@ -121,7 +126,7 @@ const ChatPage: React.FC = () => {
       <main
         ref={chatMainRef}
         className="flex-1 overflow-y-auto px-5 pt-[15px]"
-        style={{ paddingBottom: `${footerHeight + keyboardHeight}px` }}
+        style={{ paddingBottom: `${footerHeight + keyboardHeight}` }}
       >
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
