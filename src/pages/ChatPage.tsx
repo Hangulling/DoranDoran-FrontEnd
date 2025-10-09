@@ -3,7 +3,6 @@ import ChatBubble from '../components/chat/ChatBubble'
 import CoachMark from '../components/chat/CoachMark'
 import ChatFooter from '../components/chat/ChatFooter'
 import DescriptionBubble from '../components/chat/DescriptionBubble'
-//import { initialMessages } from '../mocks/db/chat'
 import type { Message } from '../types/chat'
 import InitChat from '../components/chat/InitChat'
 import { useCoachStore } from '../stores/useUiStateStore'
@@ -45,7 +44,6 @@ const ChatPage: React.FC = () => {
       const newKeyboardHeight = offset > 0 ? offset : 0
 
       setKeyboardHeight(newKeyboardHeight)
-
       const isKeyboardOpen = newKeyboardHeight > 100
 
       if (isKeyboardOpen && !keyboardOpenRef.current) {
@@ -64,7 +62,7 @@ const ChatPage: React.FC = () => {
     return () => visualViewport.removeEventListener('resize', handleResize)
   }, [])
 
-  // footer 높이
+  // footer 높이 감지
   useEffect(() => {
     if (!footerRef.current) return
 
@@ -97,23 +95,12 @@ const ChatPage: React.FC = () => {
     }
   }, [])
 
-  // 메시지 추가될때마다 자동 스크롤
+  // 메시지 자동 스크롤
   useEffect(() => {
     if (chatMainRef.current) {
       chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
     }
   }, [messages])
-
-  // API 연동 위해 작성
-  useEffect(() => {
-    // const checkCoachMarkSeen = async () => {
-    //   const hasSeen = await api.get('/user/coachMark'); // API 호출
-    //   if (hasSeen) {
-    //     setShowCoachMark(false);
-    //   }
-    // };
-    // checkCoachMarkSeen();
-  }, []) // 한 번만 실행
 
   const handleCloseCoachMark = () => {
     setShowCoachMark(false)
@@ -133,12 +120,12 @@ const ChatPage: React.FC = () => {
   return (
     <div
       className="flex flex-col max-w-md mx-auto bg-white overflow-hidden"
-      style={{ height: windowHeight }}
+      style={{ height: windowHeight - 93 }}
     >
       <main
         ref={chatMainRef}
         className="flex-1 overflow-y-auto px-5 pt-[15px]"
-        style={{ paddingBottom: `${footerHeight + keyboardHeight}` }}
+        style={{ paddingBottom: `${footerHeight}px` }}
       >
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
@@ -175,14 +162,20 @@ const ChatPage: React.FC = () => {
 
       <footer
         ref={footerRef}
-        className="fixed bottom-0 left-0 right-0 max-w-md mx-auto"
+        className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white"
         style={{
           transform: `translateY(-${keyboardHeight}px)`,
+          transition: 'transform 0.25s ease-out',
         }}
       >
-        <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
+        <ChatFooter
+          inputRef={inputRef}
+          onSendMessage={handleSendMessage}
+          keyboardHeight={keyboardHeight}
+        />
       </footer>
     </div>
   )
 }
+
 export default ChatPage

@@ -6,19 +6,19 @@ import showToast from '../common/CommonToast'
 interface ChatFooterProps {
   inputRef: RefObject<HTMLTextAreaElement | null>
   onSendMessage: (message: string) => void
+  keyboardHeight: number
 }
 
 const MAX_ROWS = 3
 const LINE_HEIGHT = 21
 const SINGLE_LINE_HEIGHT = 37
 
-const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
+const ChatFooter = ({ inputRef, onSendMessage, keyboardHeight }: ChatFooterProps) => {
   const [inputActive, setInputActive] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [textareaHeight, setTextareaHeight] = useState(SINGLE_LINE_HEIGHT)
   const [isComposing, setIsComposing] = useState(false)
 
-  // 조합 확인
   const handleCompositionStart = () => setIsComposing(true)
   const handleCompositionEnd = (e: React.CompositionEvent<HTMLTextAreaElement>) => {
     setIsComposing(false)
@@ -30,13 +30,13 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
     }
   }
 
-  // 입력창 포커스
   const handleInputFocus = () => {
     setInputActive(true)
   }
-  const handleInputBlur = () => setInputActive(false)
+  const handleInputBlur = () => {
+    setInputActive(false)
+  }
 
-  // 입력 제한, 높이 조절
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const originalValue = e.target.value
 
@@ -73,7 +73,6 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
     }
   }
 
-  // 메시지 전송 처리 함수
   const handleSendClick = () => {
     if (inputValue.trim()) {
       onSendMessage(inputValue.trim())
@@ -85,9 +84,15 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
     }
   }
 
+  // footer paddingBottom + safe area inset 반환
+  const footerPadding = `calc(${keyboardHeight}px + env(safe-area-inset-bottom))`
+
   return (
-    <div className="bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
-      <div className="flex items-start w-full px-5 py-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))]">
+    <div
+      className="bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]"
+      style={{ paddingBottom: footerPadding }}
+    >
+      <div className="flex items-start w-full px-5 py-2.5">
         <textarea
           ref={inputRef}
           placeholder="Type a message"
@@ -103,7 +108,7 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
             lineHeight: `${LINE_HEIGHT}px`,
             resize: 'none',
           }}
-          className="flex-grow px-3 py-2 mr-2 border border-gray-100 bg-gray-50 rounded-full focus:border-gray-100 focus:outline-none  [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex-grow px-3 py-2 mr-2 border border-gray-100 bg-gray-50 rounded-full focus:border-gray-100 focus:outline-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         />
         <button onClick={handleSendClick}>
           {inputActive && inputValue.trim() ? (
