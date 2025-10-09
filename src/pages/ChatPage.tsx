@@ -19,6 +19,10 @@ const ChatPage: React.FC = () => {
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
+  const footerRef = useRef<HTMLElement>(null)
+  const [footerHeight, setFooterHeight] = useState(0)
+  const [keyboardHeight, setKeyboardHeight] = useState(0)
+
   const room = chatRooms.find(r => String(r.roomId) === String(id))
 
   const handleInitReady = () => {
@@ -29,7 +33,7 @@ const ChatPage: React.FC = () => {
     }
     coachTimerRef.current = window.setTimeout(() => {
       setShowCoachMark(true)
-    }, 2000)
+    }, 600)
   }
 
   useEffect(() => {
@@ -40,34 +44,38 @@ const ChatPage: React.FC = () => {
     }
   }, [])
 
-  // 메시지 추가될때마다 자동 스크롤
   useEffect(() => {
-    if (chatMainRef.current) {
-      chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
-    }
-  }, [messages])
+    if (!footerRef.current) return
+
+    const resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setFooterHeight(entry.contentRect.height)
+      }
+    })
+
+    resizeObserver.observe(footerRef.current)
+    return () => resizeObserver.disconnect()
+  }, [])
 
   useEffect(() => {
     const visualViewport = window.visualViewport
     if (!visualViewport) return
 
     const handleResize = () => {
-      const isKeyboardVisible = window.innerHeight - visualViewport.height > 150
-
-      if (isKeyboardVisible && chatMainRef.current) {
-        setTimeout(() => {
-          if (chatMainRef.current) {
-            chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
-          }
-        }, 100)
-      }
+      const offset = window.innerHeight - visualViewport.height
+      setKeyboardHeight(offset > 0 ? offset : 0)
     }
 
     visualViewport.addEventListener('resize', handleResize)
-    return () => {
-      visualViewport.removeEventListener('resize', handleResize)
-    }
+    return () => visualViewport.removeEventListener('resize', handleResize)
   }, [])
+
+  // 메시지 추가될때마다 자동 스크롤
+  useEffect(() => {
+    if (chatMainRef.current) {
+      chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
+    }
+  }, [messages])
 
   // API 연동 위해 작성
   useEffect(() => {
@@ -96,8 +104,12 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-white">
-      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
+    <div className="relative h-full bg-white">
+      <main
+        ref={chatMainRef}
+        className="h-full overflow-y-auto px-5 pt-10"
+        style={{ paddingBottom: `${footerHeight}px` }}
+      >
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
 
         <div className="space-y-4">
@@ -131,7 +143,11 @@ const ChatPage: React.FC = () => {
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer className="flex-shrink-0">
+      <footer
+        ref={footerRef}
+        className="absolute left-0 w-full"
+        style={{ bottom: `${keyboardHeight}px`, transition: 'bottom 0.2s ease-out' }}
+      >
         <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>
