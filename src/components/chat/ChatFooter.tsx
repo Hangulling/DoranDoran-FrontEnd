@@ -84,7 +84,6 @@ const ChatFooter = ({ inputRef, onSendMessage, keyboardHeight }: ChatFooterProps
     }
   }
 
-  // footer paddingBottom + safe area inset 반환
   const footerPadding = `calc(${keyboardHeight}px + env(safe-area-inset-bottom))`
 
   return (
