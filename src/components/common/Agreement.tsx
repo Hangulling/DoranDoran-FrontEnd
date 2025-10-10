@@ -5,6 +5,7 @@ import disabledCheck from '../../assets/icon/disabledCheck.svg'
 import disabledCheckAll from '../../assets/icon/disabledCheckAll.svg'
 import infoIcon from '../../assets/icon/info.svg'
 import Button from './Button'
+import { Link } from 'react-router-dom'
 
 type TermId = 'service' | 'privacy' | 'marketing'
 export type AgreementValue = Record<TermId, boolean>
@@ -15,8 +16,14 @@ interface AgreementProps {
 }
 
 export default function Agreement({ value, onChange }: AgreementProps) {
-  const allChecked = useMemo(() => value.service && value.privacy && value.marketing, [value])
-  const someChecked = useMemo(() => value.service || value.privacy || value.marketing, [value])
+  const allChecked = useMemo(
+    () => value.service && value.privacy && value.marketing,
+    [value.service, value.privacy, value.marketing]
+  )
+  const someChecked = useMemo(
+    () => value.service || value.privacy || value.marketing,
+    [value.service, value.privacy, value.marketing]
+  )
 
   const toggleAll = () => {
     const next = {
@@ -76,15 +83,17 @@ export default function Agreement({ value, onChange }: AgreementProps) {
             </button>
 
             {t.required && (
-              <Button
-                type="button"
-                variant="text"
-                size="xs"
-                className="w-6 h-6 p-1"
-                aria-label={`${t.label} details`}
-              >
-                <img src={infoIcon} alt="info" className="w-5 h-5 opacity-60" />
-              </Button>
+              <Link to={`/policy/${id}`}>
+                <Button
+                  type="button"
+                  variant="text"
+                  size="xs"
+                  className="w-6 h-6 p-1"
+                  aria-label={`${t.label} details`}
+                >
+                  <img src={infoIcon} alt="info" className="w-5 h-5 opacity-60" />
+                </Button>
+              </Link>
             )}
           </div>
         )

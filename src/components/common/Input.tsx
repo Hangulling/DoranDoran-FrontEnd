@@ -14,6 +14,7 @@ interface InputProps {
   value?: string
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
 }
 
 export default function Input({
@@ -27,6 +28,7 @@ export default function Input({
   value,
   onChange,
   onBlur,
+  onKeyDown,
 }: InputProps) {
   const [show, setShow] = useState<boolean>(false)
   const isPassword = type === 'password'
@@ -57,6 +59,7 @@ export default function Input({
           value={value}
           onChange={onChange}
           onBlur={onBlur}
+          onKeyDown={onKeyDown}
         />
         {isPassword && value && value.length > 0 && (
           <Button type="button" variant="text" size="xs" onClick={() => setShow(s => !s)}>
