@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
-import Agreement, { type AgreementValue } from '../components/common/Agreement'
+import Agreement from '../components/common/Agreement'
 import { validateEmail, validateName } from '../utils/validations'
 import CommonModal from '../components/common/CommonModal'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useAgreementStore } from '../stores/useAgreementStore'
 
 export default function SignupPage() {
   const [firstName, setFirstName] = useState('')
@@ -22,27 +23,29 @@ export default function SignupPage() {
 
   const [openModal, setOpenModal] = useState(false)
 
-  const [agreements, setAgreements] = useState<AgreementValue>({
-    service: false,
-    privacy: false,
-    marketing: false,
-  })
-
   const navigate = useNavigate()
+  const location = useLocation() as { state?: { fromPolicy?: boolean } }
+  const reset = useAgreementStore(s => s.reset)
 
   const handleFirstNameChange = (v: string) => {
-    setFirstName(v)
-    if (firstNameError && validateName(v) === null) setFirstNameError(null)
+    const noSpace = v.replace(/\s+/g, '') // 공백 제거
+    setFirstName(noSpace)
+    if (firstNameError && validateName(noSpace) === null) setFirstNameError(null)
   }
+
   const handleLastNameChange = (v: string) => {
-    setLastName(v)
-    if (lastNameError && validateName(v) === null) setLastNameError(null)
+    const noSpace = v.replace(/\s+/g, '') // 공백 제거
+    setLastName(noSpace)
+    if (lastNameError && validateName(noSpace) === null) setLastNameError(null)
   }
+
   const handleEmailChange = (v: string) => {
-    setEmail(v)
-    if (emailError && validateEmail(v) === null) setEmailError(null)
+    const noSpace = v.replace(/\s+/g, '') // 공백 제거
+    setEmail(noSpace)
+    if (emailError && validateEmail(noSpace) === null) setEmailError(null)
     setEmailSuccess(null)
   }
+
   const handleEmailBlur = () => {
     const err = validateEmail(email)
     setEmailError(err)
@@ -81,8 +84,10 @@ export default function SignupPage() {
     passwordCheck.length > 0 &&
     password === passwordCheck
 
-  const requiredAgreed = agreements.service && agreements.privacy
+  const agreements = useAgreementStore(s => s.value)
+  const setMany = useAgreementStore(s => s.setMany)
 
+  const requiredAgreed = agreements.service && agreements.privacy
   const isPasswordLenValid = password.length >= 8 && password.length <= 20
   const isPasswordValidForSubmit =
     isPasswordLenValid && passwordCheck.length > 0 && password === passwordCheck
@@ -96,6 +101,7 @@ export default function SignupPage() {
     validateEmail(email) === null &&
     isPasswordValidForSubmit &&
     requiredAgreed
+
   const handleOpenModal = () => {
     if (!isFormValid) return
     setOpenModal(true)
@@ -117,15 +123,20 @@ export default function SignupPage() {
     })
   }
 
+  useEffect(() => {
+    if (!location.state?.fromPolicy) reset()
+    navigate('.', { replace: true, state: null })
+  }, [])
+
   return (
     <div className="mt-4">
       <div className="flex flex-col justify-center items-center">
         <div>
           <Input
             type="text"
-            label="First name"
+            label="First name *"
             variant={firstNameError ? 'error' : 'primary'}
-            placeholder="Enter your first name"
+            placeholder="Enter your first name (1-15 characters)"
             onChange={e => handleFirstNameChange(e.target.value)}
             onBlur={() => setFirstNameError(validateName(firstName))}
             value={firstName}
@@ -136,8 +147,8 @@ export default function SignupPage() {
         <div>
           <Input
             type="text"
-            label="Last name"
-            placeholder="Enter your last name"
+            label="Last name *"
+            placeholder="Enter your last name (1-15 characters)"
             variant={lastNameError ? 'error' : 'primary'}
             onChange={e => handleLastNameChange(e.target.value)}
             onBlur={() => setLastNameError(validateName(lastName))}
@@ -150,12 +161,15 @@ export default function SignupPage() {
           <div className="flex items-end justify-between">
             <Input
               type="email"
-              label="E-mail"
+              label="E-mail *"
               placeholder="Enter your E-mail"
               size="md"
               value={email}
               onChange={e => handleEmailChange(e.target.value)}
               onBlur={handleEmailBlur}
+              onKeyDown={e => {
+                if (e.key === ' ') e.preventDefault()
+              }}
               variant={emailError ? 'error' : 'primary'}
             />
             <Button
@@ -178,10 +192,10 @@ export default function SignupPage() {
         <div className="w-[335px]">
           <Input
             type="password"
-            label="Password"
+            label="Password *"
             placeholder="Enter your password (8-20 characters)"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value.replace(/\s+/g, ''))}
             onBlur={() => setPwdTouched(true)}
             variant={pwdLenError || pwdMatchError ? 'error' : 'primary'}
           />
@@ -192,7 +206,7 @@ export default function SignupPage() {
             type="password"
             placeholder="Enter your password (8-20 characters)"
             value={passwordCheck}
-            onChange={e => setPasswordCheck(e.target.value)}
+            onChange={e => setPasswordCheck(e.target.value.replace(/\s+/g, ''))}
             onBlur={() => setPwdCheckTouched(true)}
             variant={pwdMatchError ? 'error' : 'primary'}
           />
@@ -204,10 +218,10 @@ export default function SignupPage() {
         </div>
 
         <div className="my-2">
-          <Agreement value={agreements} onChange={setAgreements} />
+          <Agreement value={agreements} onChange={setMany} />
         </div>
 
-        <div className="m-2 ">
+        <div className="m-2">
           <Button
             type="submit"
             className="bg-gray-800"
