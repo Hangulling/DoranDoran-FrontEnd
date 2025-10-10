@@ -3,7 +3,7 @@ export interface ExpressionItem {
   id: string
   chatRoom: 'Senior' | 'Honey' | 'Coworker' | 'Client'
   text: string
-  level: number
+  intimacy: number
   ttsUrl?: string
   savedAt?: string
 }
