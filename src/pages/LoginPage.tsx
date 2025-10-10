@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import loginCharacter from '../assets/loginCharcter.svg'
-import doran from '../assets/doranText.svg'
+import loginCharacter from '../assets/auth/loginCharacter.png'
+import doran from '../assets/auth/doranText.svg'
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
 import { Link, useNavigate } from 'react-router-dom'
