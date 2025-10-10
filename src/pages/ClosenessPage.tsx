@@ -17,6 +17,7 @@ const ClosenessPage = () => {
   const setCloseness = useClosenessStore(state => state.setCloseness)
   const [sliderValue, setSliderValue] = useState(closeness)
   const [touched, setTouched] = useState(false)
+  const [isExiting, setIsExiting] = useState(false)
   const room = chatRooms.find(r => String(r.roomId) === String(id))
 
   // 슬라이더값 initial
@@ -34,13 +35,20 @@ const ClosenessPage = () => {
   // 확인 버튼
   const handleConfirm = () => {
     if (!id) return
-    setCloseness(id, sliderValue) // store에 저장
-    navigate(`/chat/${id}`)
+    setCloseness(id, sliderValue)
+    setIsExiting(true) // 애니메이션 시작
+    setTimeout(() => {
+      navigate(`/chat/${id}`)
+    }, 550)
   }
 
   return (
     <div className="h-full flex flex-col items-center bg-white pt-10 px-5">
-      <div className="max-w-md w-full flex flex-col">
+      <div
+        className={`max-w-md w-full flex flex-col
+        transition-all duration-500
+        ${isExiting ? 'opacity-0 -translate-y-5 pointer-events-none' : 'opacity-100 translate-y-0'}`}
+      >
         <div className="chat chat-start gap-x-[8px] pt-0 pb-2 relative flex items-start">
           <div className="chat-image avatar absolute top-1 left-0 w-8 h-8">
             <div className="w-8 h-8 rounded-full overflow-hidden">

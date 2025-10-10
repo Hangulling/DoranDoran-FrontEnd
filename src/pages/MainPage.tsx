@@ -24,7 +24,7 @@ const MainPage = () => {
   }
 
   return (
-    <>
+    <div>
       {/* 상단 환영 메시지 */}
       <div className="w-full bg-[#9ADAD5] h-[99px] relative max-w-md mx-auto overflow-hidden">
         <div className="absolute top-[14px] left-[20px]">
@@ -63,7 +63,7 @@ const MainPage = () => {
           Copyright 2025. dorandoran all rights reserved.
         </p>
       </div>
-    </>
+    </div>
   )
 }
 
