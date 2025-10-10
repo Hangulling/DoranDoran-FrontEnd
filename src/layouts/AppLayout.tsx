@@ -61,7 +61,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="mx-auto flex h-screen w-full max-w-md flex-col">
+    <div className="mx-auto flex h-full w-full max-w-md flex-col">
       {!hideNavBar && (
         <>
           <header className="flex-shrink-0">
@@ -77,7 +77,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           {closenessId && <ClosenessBar chatRoomId={closenessId} />}
         </>
       )}
-      <main className="flex-grow overflow-y-auto min-h-0">{children}</main>
+      <main className="flex flex-col flex-grow min-h-0">{children}</main>
     </div>
   )
 }
