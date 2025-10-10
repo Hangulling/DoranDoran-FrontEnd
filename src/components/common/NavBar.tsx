@@ -25,7 +25,7 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
   const closenessMatch = useMatch('/closeness/:id')
   const archiveMatch = useMatch('/archive/:id')
   const currentId = chatMatch?.params.id ?? closenessMatch?.params.id ?? archiveMatch?.params.id
-
+  console.log(currentId, 'currentId')
   // 뒤로가기
   const goBack = () => {
     if (chatMatch) {
@@ -55,13 +55,19 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
       navigate('/archive/2')
       return
     }
-    if (chatMatch) {
-      navigate(`/archive/${currentId}`)
-    } else if (closenessMatch) {
-      navigate(`/archive/${currentId}`)
+
+    if (chatMatch || closenessMatch) {
+      navigate(`/archive/${currentId}`, { state: { from: 'chat' } })
     } else {
       navigate(`/chat/${currentId}`)
     }
+    // if (chatMatch) {
+    //   navigate(`/archive/${currentId}`, { state: { from: 'chat' } })
+    // } else if (closenessMatch) {
+    //   navigate(`/archive/${currentId}`)
+    // } else {
+    //   navigate(`/chat/${currentId}`)
+    // }
   }
 
   // 사이드바 토글
@@ -127,7 +133,7 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
           )}
           {selectionMode && deleteMode && (
             <Button variant="archive" onClick={delectAll}>
-              Delete All
+              Deselect All
             </Button>
           )}
         </div>
