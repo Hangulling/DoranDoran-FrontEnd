@@ -6,7 +6,7 @@ import Button from '../components/common/Button'
 import checkCircle from '../assets/icon/checkRound.svg'
 import { useEffect, useMemo, useState } from 'react'
 import useArchiveStore from '../stores/useArchiveStore'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { fakeArchiveItems } from '../mocks/db/archive'
 
 export default function ArchivePage() {
@@ -22,6 +22,9 @@ export default function ArchivePage() {
   const [openModal, setOpenModal] = useState(false)
   const [showToast, setShowToast] = useState(false)
   const list = items.filter(i => i.chatRoom === activeRoom)
+  const location = useLocation()
+  console.log(location.state, 'location')
+  const fromChat = (location.state as { from?: string } | null)?.from === 'chat'
   const { id } = useParams<{ id?: string }>()
   const idToRoom: Record<string, Room> = useMemo(
     () => ({ '1': 'Senior', '2': 'Honey', '3': 'Coworker', '4': 'Client' }),
@@ -37,11 +40,13 @@ export default function ArchivePage() {
   }, [id, idToRoom, setActiveRoom])
 
   return (
-    <div className="min-h-screen bg-gray-50 h-full pb-20">
-      <ArchiveTabs key={activeRoom} activeTab={activeRoom} onChange={setActiveRoom} />
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {!fromChat && (
+        <ArchiveTabs key={activeRoom} activeTab={activeRoom} onChange={setActiveRoom} />
+      )}
 
       {list.length > 0 ? (
-        <div>
+        <div className="mt-5">
           {list.map(item => (
             <ExpressionCard key={item.id} item={item} />
           ))}
@@ -54,7 +59,7 @@ export default function ArchivePage() {
         <div className="flex justify-center items-center">
           <Button
             variant="text"
-            className={`min-w-md h-11 bg-white fixed bottom-0 ${selectedIds.size > 0 ? 'text-orange-300' : 'text-orange-100'}`}
+            className={`min-w-md h-11 bg-white fixed bottom-0 ${selectedIds.size > 0 ? 'text-orange-300' : 'text-orange-100'} active:text-orange-600 hover:text-orange-600`}
             size="xl"
             onClick={() => setOpenModal(true)}
             disabled={selectedIds.size < 1}
