@@ -1,29 +1,30 @@
-import SchoolAvatar from '/chat/school.svg'
-import LoverAvatar from '/chat/lover.svg'
-import CompanyAvatar from '/chat/company.svg'
-import ClientAvatar from '/chat/client.svg'
-
 // 채팅방
 export const chatRooms = [
   {
     roomId: 1,
     roomName: 'Senior',
-    avatar: SchoolAvatar,
+    avatar: '/chat/school.svg',
     message: '족보 필요하면 연락해~!',
     intimacy: 1,
   },
-  { roomId: 2, roomName: 'Honey', avatar: LoverAvatar, message: '자기 어디야?', intimacy: 1 },
+  {
+    roomId: 2,
+    roomName: 'Honey',
+    avatar: '/chat/lover.svg',
+    message: '자기 어디야?',
+    intimacy: 1,
+  },
   {
     roomId: 3,
     roomName: 'Coworker',
-    avatar: CompanyAvatar,
+    avatar: '/chat/company.svg',
     message: '수정 사항 완료 되었나요?',
     intimacy: 1,
   },
   {
     roomId: 4,
     roomName: 'Client',
-    avatar: ClientAvatar,
+    avatar: '/chat/client.svg',
     message: '내일 미팅 10시 괜찮으세요?',
     intimacy: 1,
   },
