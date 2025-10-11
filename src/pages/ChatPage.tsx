@@ -93,7 +93,7 @@ const ChatPage: React.FC = () => {
     const handleResize = () => {
       if (window.visualViewport) {
         const viewport = window.visualViewport
-        const footer = document.querySelector('footer')
+        const footer = document.querySelector('chat-footer')
 
         if (footer) {
           // 키보드가 열려서 줄어든 뷰포트 높이 만큼 footer를 올림 (translateY)
@@ -154,7 +154,7 @@ const ChatPage: React.FC = () => {
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer>
+      <footer className="chat-footer">
         <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>
