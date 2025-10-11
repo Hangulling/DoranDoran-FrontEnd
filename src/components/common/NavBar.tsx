@@ -8,18 +8,21 @@ import Hamburger from '../../assets/icon/hamburger.svg?react'
 import useArchiveStore from '../../stores/useArchiveStore'
 import Button from './Button'
 import { useState } from 'react'
-import Sidebar from './SideBar'
 import type { NavBarProps } from '../../types/common'
 import { useModalStore } from '../../stores/useUiStateStore'
 import ExitModal from '../chat/ExitModal'
 
-const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete }) => {
+const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
+  title,
+  isMain,
+  showBookmark,
+  showDelete,
+  onToggleSidebar,
+}) => {
   const navigate = useNavigate()
   const { selectionMode, deleteMode, enterSelectionMode, exitSelectionMode, selectAll, delectAll } =
     useArchiveStore()
   const noShowAgain = useModalStore(state => state.noShowAgain)
-
-  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const chatMatch = useMatch('/chat/:id')
   const closenessMatch = useMatch('/closeness/:id')
@@ -70,14 +73,9 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
     // }
   }
 
-  // 사이드바 토글
-  const toggleSidebar = () => {
-    setSidebarOpen(open => !open)
-  }
-
   return (
     <>
-      <div className="fixed top-0 mx-auto w-full max-w-md left-1/2 translate-x-[-50%] navbar bg-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] h-15 min-h-15 p-0 z-50">
+      <div className="fixed top-0 mx-auto w-full max-w-md inset-x-0 navbar bg-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] h-15 min-h-15 p-0 z-50">
         <div className="navbar-start ml-5">
           {/* 뒤로가기 */}
           {!isMain && !selectionMode && (
@@ -94,7 +92,7 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
 
           {/* 햄버거 */}
           {isMain && !selectionMode && (
-            <button onClick={toggleSidebar}>
+            <button onClick={onToggleSidebar}>
               <Hamburger />
             </button>
           )}
@@ -137,9 +135,6 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
             </Button>
           )}
         </div>
-
-        {/* 사이드바 표시 */}
-        <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
       </div>
       {/* 나가기 확인 모달 */}
       <ExitModal open={modalOpen} onConfirm={handleConfirm} onCancel={handleCancel} />

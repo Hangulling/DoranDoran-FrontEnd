@@ -48,7 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black opacity-80 z-50 h-screen"
+          className="absolute inset-0 bg-black opacity-80 z-50 h-screen"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -56,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {/* 사이드바 패널 */}
       <div
         className={`
-          fixed top-0 left-0 z-900 bg-[#fafafa] h-dvh w-[303px]
+          absolute top-0 left-0 z-900 bg-[#fafafa] h-dvh w-[303px]
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}

@@ -3,6 +3,8 @@ import { useLocation, useMatch } from 'react-router-dom'
 import NavBar from '../components/common/NavBar'
 import useArchiveStore from '../stores/useArchiveStore'
 import ClosenessBar from '../components/chat/ClosenessBar'
+import { useState } from 'react'
+import Sidebar from '../components/common/SideBar'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -24,6 +26,8 @@ const chatRoomNames: Record<string, string> = {
 const showBookmarkPaths = ['/']
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const toggleSidebar = () => setSidebarOpen(open => !open)
   const location = useLocation()
   const pathname = location.pathname
   const skipNavPaths = ['/login']
@@ -66,7 +70,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-md flex-col pt-15">
+    <div className="relative mx-auto flex h-full w-full max-w-md flex-col pt-15">
+      <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
+
       {!hideNavBar && (
         <>
           <NavBar
@@ -74,6 +80,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             title={title}
             showBookmark={showBookmark}
             showDelete={showDelete}
+            onToggleSidebar={toggleSidebar}
           />
           {closenessId && <ClosenessBar chatRoomId={closenessId} />}
         </>
