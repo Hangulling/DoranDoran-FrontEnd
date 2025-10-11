@@ -54,6 +54,16 @@ const ChatPage: React.FC = () => {
     setCoachMarkSeen(true)
   }
 
+  useEffect(() => {
+    // 페이지에 들어왔을 때
+    document.body.classList.add('chat-page-active')
+
+    // 페이지에서 나갈 때 (cleanup 함수)
+    return () => {
+      document.body.classList.remove('chat-page-active')
+    }
+  }, [])
+
   // 메시지 전송
   const handleSendMessage = (text: string) => {
     const newMessage: Message = {

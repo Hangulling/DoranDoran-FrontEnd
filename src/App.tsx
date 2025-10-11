@@ -32,7 +32,7 @@ function App() {
   }, [])
 
   return (
-    <div className="relative mx-auto w-full max-w-md bg-white h-[calc(var(--vh,1vh)*100)] overflow-hidden">
+    <div className="relative mx-auto w-full max-w-md bg-white h-[calc(var(--vh,1vh)*100)]">
       <Toaster position="bottom-center" />
       <AppLayout>
         <Suspense fallback={<LoadingSpinner />}>

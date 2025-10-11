@@ -44,6 +44,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   const { selectionMode } = useArchiveStore()
 
+  const isChatPage = /^\/chat\//.test(location.pathname)
+
   // 타이틀
   let title = ''
   if (chatRoomId) {
@@ -73,7 +75,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           {closenessId && <ClosenessBar chatRoomId={closenessId} />}
         </>
       )}
-      <main className="flex flex-col flex-grow min-h-0">{children}</main>
+      <main
+        className={`flex flex-col flex-grow min-h-0 ${
+          isChatPage ? 'overflow-hidden' : 'overflow-y-auto'
+        }`}
+      >
+        {children}
+      </main>
     </div>
   )
 }

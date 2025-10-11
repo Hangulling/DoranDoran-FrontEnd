@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import checkIcon from '../../assets/icon/signupCheck.svg'
 import Button from './Button'
 import type { CommonModalProps } from '../../types/common'
@@ -17,7 +18,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
 
   const isSignup = variant === 'signup'
 
-  return (
+  return ReactDOM.createPortal(
     <div className="modal modal-open mx-auto w-full max-w-md" role="dialog">
       <div className="modal-box rounded-lg max-w-[303px] py-5 px-4 flex flex-col items-center">
         {isSignup && (
@@ -66,7 +67,8 @@ const CommonModal: React.FC<CommonModalProps> = ({
       </div>
 
       <div className="modal-backdrop bg-black/80" onClick={onCancel}></div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
