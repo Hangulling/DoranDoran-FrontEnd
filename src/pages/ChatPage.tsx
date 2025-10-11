@@ -21,64 +21,22 @@ const ChatPage: React.FC = () => {
 
   useEffect(() => {
     const mainElement = chatMainRef.current
-    const viewport = window.visualViewport
+    if (!mainElement) return
 
-    if (!mainElement || !viewport) return
-
-    // 스크롤을 맨 아래로 강제 이동시키는 함수
     const scrollToBottom = () => {
       setTimeout(() => {
         mainElement.scrollTop = mainElement.scrollHeight
       }, 100)
     }
 
-    // 키보드가 올라왔을 때 스크롤 위치를 보정
-    viewport.addEventListener('resize', scrollToBottom)
-    const preventScrollChaining = (event: TouchEvent) => {
-      const isTargetInMain = mainElement.contains(event.target as Node)
-      if (!isTargetInMain) {
-        return
-      }
+    scrollToBottom()
 
-      const { scrollTop, scrollHeight, clientHeight } = mainElement
-      const isAtTop = scrollTop === 0
-      const isAtBottom = scrollTop + clientHeight >= scrollHeight
-
-      const currentY = event.touches[0].clientY
-      // @ts-expect-error : _lastY는 이 함수 스코프 내에서 동적으로 추가
-      const deltaY = currentY - (mainElement._lastY || currentY)
-
-      // 위로 스크롤(내용을 아래로 내림)할 때 맨 위에 도달했다면
-      if (isAtTop && deltaY > 0) {
-        event.preventDefault()
-      }
-
-      // 아래로 스크롤(내용을 위로 올림)할 때 맨 아래에 도달했다면
-      if (isAtBottom && deltaY < 0) {
-        event.preventDefault()
-      }
-
-      // 현재 터치 위치를 저장
-      // @ts-expect-error scroll
-      mainElement._lastY = currentY
+    const viewport = window.visualViewport
+    if (viewport) {
+      viewport.addEventListener('resize', scrollToBottom)
+      return () => viewport.removeEventListener('resize', scrollToBottom)
     }
-
-    const resetLastY = () => {
-      // @ts-expect-error scroll
-      mainElement._lastY = null
-    }
-
-    // 채팅창 내부에서 터치가 시작되면 스크롤 체이닝 방지 로직을 활성화
-    mainElement.addEventListener('touchstart', resetLastY)
-    mainElement.addEventListener('touchmove', preventScrollChaining, { passive: false })
-
-    // 컴포넌트가 사라질 때 모든 이벤트 리스너를 정리
-    return () => {
-      viewport.removeEventListener('resize', scrollToBottom)
-      mainElement.removeEventListener('touchstart', resetLastY)
-      mainElement.removeEventListener('touchmove', preventScrollChaining)
-    }
-  }, [])
+  }, [messages])
 
   useEffect(() => {
     if (chatMainRef.current) {
@@ -133,7 +91,7 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex flex-col flex-grow min-h-0">
-      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
+      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10 overscroll-contain">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
         <div className="space-y-4">
           {messages.map((msg, idx) => {
