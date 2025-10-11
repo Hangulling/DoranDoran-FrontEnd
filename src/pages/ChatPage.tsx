@@ -30,7 +30,9 @@ const ChatPage: React.FC = () => {
         }
       }, 100)
     }
+
     viewport.addEventListener('resize', handleResize)
+
     return () => {
       viewport.removeEventListener('resize', handleResize)
     }
@@ -89,7 +91,7 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex flex-col flex-grow min-h-0">
-      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
+      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10 overscroll-contain">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
         <div className="space-y-4">
           {messages.map((msg, idx) => {
