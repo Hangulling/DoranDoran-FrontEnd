@@ -50,6 +50,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   const { selectionMode } = useArchiveStore()
 
+  const isChatPage = /^\/chat\//.test(location.pathname)
+
   // 타이틀
   let title = ''
   if (selectionMode) {
@@ -67,20 +69,22 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     <div className="mx-auto flex h-full w-full max-w-md flex-col">
       {!hideNavBar && (
         <>
-          <header className="flex-shrink-0">
-            <NavBar
-              isMain={isMain}
-              title={title}
-              showBookmark={showBookmark}
-              showDelete={showDelete}
-            />
-            <div className="h-15" />
-          </header>
-          {/* 친밀도 바 */}
+          <NavBar
+            isMain={isMain}
+            title={title}
+            showBookmark={showBookmark}
+            showDelete={showDelete}
+          />
           {closenessId && <ClosenessBar chatRoomId={closenessId} />}
         </>
       )}
-      <main className="flex flex-col flex-grow min-h-0">{children}</main>
+      <main
+        className={`flex flex-col flex-grow min-h-0 ${
+          isChatPage ? 'overflow-hidden' : 'overflow-y-auto'
+        }`}
+      >
+        {children}
+      </main>
     </div>
   )
 }
