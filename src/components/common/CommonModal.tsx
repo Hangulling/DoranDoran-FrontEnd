@@ -18,8 +18,9 @@ const CommonModal: React.FC<CommonModalProps> = ({
   const isSignup = variant === 'signup'
 
   return (
-    <div className="modal modal-open mx-auto w-full max-w-md" role="dialog">
-      <div className="modal-box rounded-lg max-w-[303px] py-5 px-4 flex flex-col items-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog">
+      <div className="absolute inset-0 bg-black/80" onClick={onCancel}></div>
+      <div className="relative z-10 flex flex-col items-center w-[303px] rounded-lg bg-white py-5 px-4">
         {isSignup && (
           <div className="m-2">
             <img src={checkIcon} className="w-10 h-10" />
@@ -37,7 +38,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
         )}
 
         {isSignup ? (
-          <div className="modal-action w-full flex mt-4">
+          <div className="w-full flex mt-4">
             <Button
               variant="confirm"
               onClick={onConfirm}
@@ -48,7 +49,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
             </Button>
           </div>
         ) : (
-          <div className="modal-action w-full flex gap-x-[14px] mt-4">
+          <div className="w-full flex gap-x-[14px] mt-4">
             <button
               className="bg-gray-80 text-subtitle text-[14px] text-gray-600 rounded-lg flex-1 py-[14px]"
               onClick={onCancel}
@@ -64,8 +65,6 @@ const CommonModal: React.FC<CommonModalProps> = ({
           </div>
         )}
       </div>
-
-      <div className="modal-backdrop bg-black/80" onClick={onCancel}></div>
     </div>
   )
 }
