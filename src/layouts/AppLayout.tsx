@@ -61,19 +61,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-md flex-col">
+    <div className="mx-auto flex h-full w-full max-w-md flex-col pt-15">
       {!hideNavBar && (
         <>
-          <header className="flex-shrink-0">
-            <NavBar
-              isMain={isMain}
-              title={title}
-              showBookmark={showBookmark}
-              showDelete={showDelete}
-            />
-            <div className="h-15" />
-          </header>
-          {/* 친밀도 바 */}
+          <NavBar
+            isMain={isMain}
+            title={title}
+            showBookmark={showBookmark}
+            showDelete={showDelete}
+          />
           {closenessId && <ClosenessBar chatRoomId={closenessId} />}
         </>
       )}
