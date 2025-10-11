@@ -6,15 +6,29 @@ import { Toaster } from 'react-hot-toast'
 
 function App() {
   useEffect(() => {
-    // 실제 뷰포트 높이를 계산해서 CSS 변수 '--vh'에 저장하는 함수
     const setViewportHeight = () => {
-      const vh = window.innerHeight * 0.01
+      const height = window.visualViewport ? window.visualViewport.height : window.innerHeight
+      const vh = height * 0.01
       document.documentElement.style.setProperty('--vh', `${vh}px`)
     }
 
     setViewportHeight()
-    window.addEventListener('resize', setViewportHeight)
-    return () => window.removeEventListener('resize', setViewportHeight)
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', setViewportHeight)
+      window.visualViewport.addEventListener('scroll', setViewportHeight)
+    } else {
+      window.addEventListener('resize', setViewportHeight)
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', setViewportHeight)
+        window.visualViewport.removeEventListener('scroll', setViewportHeight)
+      } else {
+        window.removeEventListener('resize', setViewportHeight)
+      }
+    }
   }, [])
 
   return (

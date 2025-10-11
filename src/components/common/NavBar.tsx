@@ -7,11 +7,11 @@ import MainLogo from '../../assets/main/mainLogo.svg'
 import Hamburger from '../../assets/icon/hamburger.svg?react'
 import useArchiveStore from '../../stores/useArchiveStore'
 import Button from './Button'
-//import { useState } from 'react'
-//import Sidebar from './SideBar'
+import { useState } from 'react'
+import Sidebar from './SideBar'
 import type { NavBarProps } from '../../types/common'
 import { useModalStore } from '../../stores/useUiStateStore'
-//import ExitModal from '../chat/ExitModal'
+import ExitModal from '../chat/ExitModal'
 
 const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete }) => {
   const navigate = useNavigate()
@@ -19,8 +19,8 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
     useArchiveStore()
   const noShowAgain = useModalStore(state => state.noShowAgain)
 
-  //const [sidebarOpen, setSidebarOpen] = useState(false)
-  //const [modalOpen, setModalOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
   const chatMatch = useMatch('/chat/:id')
   const closenessMatch = useMatch('/closeness/:id')
   const archiveMatch = useMatch('/archive/:id')
@@ -32,7 +32,7 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
       if (noShowAgain) {
         navigate('/')
       } else {
-        //    setModalOpen(true)
+        setModalOpen(true)
       }
     } else {
       navigate(-1)
@@ -40,14 +40,14 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
   }
 
   // 채팅창 뒤로가기 확인 모달
-  //const handleConfirm = () => {
-  //  setModalOpen(false)
-  //  navigate('/')
-  //}
+  const handleConfirm = () => {
+    setModalOpen(false)
+    navigate('/')
+  }
 
-  // const handleCancel = () => {
-  //   setModalOpen(false)
-  // }
+  const handleCancel = () => {
+    setModalOpen(false)
+  }
 
   // 북마크 바로가기
   const handleBookmarkClick = () => {
@@ -66,7 +66,7 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
 
   // 사이드바 토글
   const toggleSidebar = () => {
-    //  setSidebarOpen(open => !open)
+    setSidebarOpen(open => !open)
   }
 
   return (
@@ -133,10 +133,10 @@ const NavBar: React.FC<NavBarProps> = ({ title, isMain, showBookmark, showDelete
         </div>
 
         {/* 사이드바 표시 */}
-        {/* <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} /> */}
+        <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
       </div>
       {/* 나가기 확인 모달 */}
-      {/* <ExitModal open={modalOpen} onConfirm={handleConfirm} onCancel={handleCancel} /> */}
+      <ExitModal open={modalOpen} onConfirm={handleConfirm} onCancel={handleCancel} />
     </>
   )
 }
