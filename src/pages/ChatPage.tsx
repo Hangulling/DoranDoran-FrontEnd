@@ -1,5 +1,3 @@
-// ChatPage.tsx - --vh 방식과 호환되는 최종 순수 Flexbox 구조
-
 import { useEffect, useRef, useState } from 'react'
 import ChatBubble from '../components/chat/ChatBubble'
 import CoachMark from '../components/chat/CoachMark'
@@ -20,6 +18,25 @@ const ChatPage: React.FC = () => {
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    const mainElement = chatMainRef.current
+    if (!mainElement) return
+
+    const scrollToBottom = () => {
+      setTimeout(() => {
+        mainElement.scrollTop = mainElement.scrollHeight
+      }, 100)
+    }
+
+    scrollToBottom()
+
+    const viewport = window.visualViewport
+    if (viewport) {
+      viewport.addEventListener('resize', scrollToBottom)
+      return () => viewport.removeEventListener('resize', scrollToBottom)
+    }
+  }, [messages])
 
   useEffect(() => {
     if (chatMainRef.current) {
@@ -55,10 +72,7 @@ const ChatPage: React.FC = () => {
   }
 
   useEffect(() => {
-    // 페이지에 들어왔을 때
     document.body.classList.add('chat-page-active')
-
-    // 페이지에서 나갈 때 (cleanup 함수)
     return () => {
       document.body.classList.remove('chat-page-active')
     }
@@ -74,6 +88,36 @@ const ChatPage: React.FC = () => {
     }
     setMessages(prevMessages => [...prevMessages, newMessage])
   }
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.visualViewport) {
+        const viewport = window.visualViewport
+        const footer = document.querySelector('footer')
+
+        if (footer) {
+          // 키보드가 열려서 줄어든 뷰포트 높이 만큼 footer를 올림 (translateY)
+          const offset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
+          footer.style.transform = `translateY(-${offset}px)`
+        }
+      }
+    }
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize)
+      window.visualViewport.addEventListener('scroll', handleResize)
+    }
+
+    // 초기 실행
+    handleResize()
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize)
+        window.visualViewport.removeEventListener('scroll', handleResize)
+      }
+    }
+  }, [])
 
   return (
     <div className="flex flex-col flex-grow min-h-0">
