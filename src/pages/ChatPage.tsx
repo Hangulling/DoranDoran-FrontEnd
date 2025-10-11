@@ -18,25 +18,28 @@ const ChatPage: React.FC = () => {
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
+  const [keyboardHeight, setKeyboardHeight] = useState(0)
 
   useEffect(() => {
-    const mainElement = chatMainRef.current
-    if (!mainElement) return
-
-    const scrollToBottom = () => {
-      setTimeout(() => {
-        mainElement.scrollTop = mainElement.scrollHeight
-      }, 100)
-    }
-
-    scrollToBottom()
-
     const viewport = window.visualViewport
-    if (viewport) {
-      viewport.addEventListener('resize', scrollToBottom)
-      return () => viewport.removeEventListener('resize', scrollToBottom)
+    if (!viewport) return
+
+    const handleResize = () => {
+      const vh = window.innerHeight
+      const keyboardH = vh - viewport.height > 0 ? vh - viewport.height : 0
+      setKeyboardHeight(keyboardH)
     }
-  }, [messages])
+
+    handleResize()
+
+    viewport.addEventListener('resize', handleResize)
+    viewport.addEventListener('scroll', handleResize)
+
+    return () => {
+      viewport.removeEventListener('resize', handleResize)
+      viewport.removeEventListener('scroll', handleResize)
+    }
+  }, [])
 
   useEffect(() => {
     if (chatMainRef.current) {
@@ -91,7 +94,11 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex flex-col flex-grow min-h-0">
-      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10 overscroll-contain">
+      <main
+        ref={chatMainRef}
+        className="flex-grow overflow-y-auto px-5 pt-10"
+        style={{ paddingBottom: keyboardHeight + 50 }}
+      >
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
         <div className="space-y-4">
           {messages.map((msg, idx) => {
