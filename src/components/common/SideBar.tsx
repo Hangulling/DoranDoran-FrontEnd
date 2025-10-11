@@ -56,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {/* 사이드바 패널 */}
       <div
         className={`
-          fixed top-0 left-0 z-900 bg-[#fafafa] h-screen w-[303px]
+          fixed top-0 left-0 z-900 bg-[#fafafa] h-dvh w-[303px]
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
@@ -66,7 +66,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           <CloseIcon />
         </button>
         {/* 컨텐츠 */}
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full pb-[env(safe-area-inset-bottom)]">
           {/* 메뉴 리스트 */}
           <div className="flex flex-col gap-y-1 mt-20 py-2 text-[14px] border-t border-b border-gray-80">
             <button className={menuBtn}>
