@@ -1,5 +1,4 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import { useModalStore } from '../../stores/useUiStateStore'
 import CommonModal from '../common/CommonModal'
 import CheckIcon from '../../assets/icon/checkAll.svg'
@@ -21,12 +20,8 @@ const ExitModal: React.FC<Props> = ({ open, onConfirm, onCancel }) => {
 
   if (!open) return null
 
-  const verticalOffset = 125
-  const translateXpx = window.innerWidth / 2 - 151.5
-
   return (
-    <>
-      {/* 모달 */}
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4">
       <CommonModal
         open={open}
         title="Leave chat room"
@@ -44,34 +39,23 @@ const ExitModal: React.FC<Props> = ({ open, onConfirm, onCancel }) => {
         onCancel={onCancel}
       />
 
-      {/* 다시 보지 않기 */}
-      {ReactDOM.createPortal(
-        <div className="fixed w-full inset-x-0 top-1/2 z-[1001] -translate-y-1/2 pointer-events-none">
-          <div
-            className="w-[149px]"
-            style={{
-              transform: `translateX(${translateXpx}px) translateY(${verticalOffset}px)`,
-            }}
-          >
-            <label className="flex items-center gap-2 text-[14px] text-white pointer-events-auto w-fit">
-              <input
-                type="checkbox"
-                id="noShowAgainCheck"
-                className="hidden"
-                checked={checked}
-                onChange={e => setChecked(e.target.checked)}
-              />
-              <img
-                src={checked ? CheckIcon : DisabledCheckIcon}
-                alt={checked ? 'checked' : 'unchecked'}
-              />
-              <span>don't watch again</span>
-            </label>
-          </div>
-        </div>,
-        document.body
-      )}
-    </>
+      <div className="relative z-10 mt-4">
+        <label className="flex items-center gap-2 text-[14px] text-white w-fit cursor-pointer">
+          <input
+            type="checkbox"
+            id="noShowAgainCheck"
+            className="hidden"
+            checked={checked}
+            onChange={e => setChecked(e.target.checked)}
+          />
+          <img
+            src={checked ? CheckIcon : DisabledCheckIcon}
+            alt={checked ? 'checked' : 'unchecked'}
+          />
+          <span>don't watch again</span>
+        </label>
+      </div>
+    </div>
   )
 }
 
