@@ -20,6 +20,33 @@ const ChatPage: React.FC = () => {
   const coachTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
+    const handleResize = () => {
+      // 키보드 올라올 때 root 스크롤 영역이 생기지 않도록 강제 고정
+      document.documentElement.style.height = `${window.visualViewport?.height || window.innerHeight}px`
+      document.body.style.height = `${window.visualViewport?.height || window.innerHeight}px`
+      document.body.style.overflow = 'hidden'
+    }
+
+    const reset = () => {
+      document.documentElement.style.height = ''
+      document.body.style.height = ''
+      document.body.style.overflow = ''
+    }
+
+    const viewport = window.visualViewport
+    if (viewport) {
+      viewport.addEventListener('resize', handleResize)
+    }
+
+    handleResize() // 초기 진입 시 1회 실행
+
+    return () => {
+      reset()
+      if (viewport) viewport.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
+  useEffect(() => {
     const mainElement = chatMainRef.current
     if (!mainElement) return
 
