@@ -116,6 +116,39 @@ const ChatPage: React.FC = () => {
     setMessages(prevMessages => [...prevMessages, newMessage])
   }
 
+  useEffect(() => {
+    const root = document.getElementById('root')
+    const viewport = window.visualViewport
+
+    const fixRootHeight = () => {
+      if (!root || !viewport) return
+      root.style.height = viewport.height + 'px'
+      root.style.overflow = 'hidden' // 루트 스크롤 완전 차단
+    }
+
+    const resetRootHeight = () => {
+      if (!root) return
+      root.style.height = ''
+      root.style.overflow = ''
+    }
+
+    if (viewport) {
+      viewport.addEventListener('resize', fixRootHeight)
+      viewport.addEventListener('scroll', fixRootHeight) // 일부 기기에서 resize 대신 scroll 발생
+    }
+
+    // 진입 시 바로 적용
+    fixRootHeight()
+
+    return () => {
+      resetRootHeight()
+      if (viewport) {
+        viewport.removeEventListener('resize', fixRootHeight)
+        viewport.removeEventListener('scroll', fixRootHeight)
+      }
+    }
+  }, [])
+
   return (
     <div className="flex flex-col flex-grow min-h-0">
       <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
