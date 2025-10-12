@@ -28,7 +28,7 @@ const stepData = {
           1
         </div>
         <p>
-          <span className="text-green-300">Save</span> this expression
+          <span className="text-green-300">Save</span> this expression.
         </p>
       </div>
       <img src={Arrow2} alt="두번째 화살표" className="absolute top-[202.33px] left-[156px]" />
