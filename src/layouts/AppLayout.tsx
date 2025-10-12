@@ -69,8 +69,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     title = pageTitles[pathname] || '페이지'
   }
 
+  const navBarHeight = '3.75rem'
+  const closenessBarHeight = '33px'
+
+  const mainPaddingTop = closenessId
+    ? `calc(${navBarHeight} + ${closenessBarHeight})`
+    : navBarHeight
+
   return (
-    <div className="relative mx-auto flex h-full w-full max-w-md flex-col pt-15">
+    <div className="relative mx-auto flex h-full w-full max-w-md flex-col">
       <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
 
       {!hideNavBar && (
@@ -82,13 +89,18 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             showDelete={showDelete}
             onToggleSidebar={toggleSidebar}
           />
-          {closenessId && <ClosenessBar chatRoomId={closenessId} />}
+          {closenessId && (
+            <div className="fixed w-full max-w-md z-50" style={{ top: navBarHeight }}>
+              <ClosenessBar chatRoomId={closenessId} />
+            </div>
+          )}
         </>
       )}
       <main
         className={`flex flex-col flex-grow min-h-0 ${
           isChatPage ? 'overflow-hidden' : 'overflow-y-auto'
         }`}
+        style={{ paddingTop: !hideNavBar ? mainPaddingTop : 0 }}
       >
         {children}
       </main>
