@@ -1,5 +1,3 @@
-// ChatPage.tsx - --vh 방식과 호환되는 최종 순수 Flexbox 구조
-
 import { useEffect, useRef, useState } from 'react'
 import ChatBubble from '../components/chat/ChatBubble'
 import CoachMark from '../components/chat/CoachMark'
@@ -20,6 +18,25 @@ const ChatPage: React.FC = () => {
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    const mainElement = chatMainRef.current
+    if (!mainElement) return
+
+    const scrollToBottom = () => {
+      setTimeout(() => {
+        mainElement.scrollTop = mainElement.scrollHeight
+      }, 100)
+    }
+
+    scrollToBottom()
+
+    const viewport = window.visualViewport
+    if (viewport) {
+      viewport.addEventListener('resize', scrollToBottom)
+      return () => viewport.removeEventListener('resize', scrollToBottom)
+    }
+  }, [messages])
 
   useEffect(() => {
     if (chatMainRef.current) {
@@ -55,10 +72,7 @@ const ChatPage: React.FC = () => {
   }
 
   useEffect(() => {
-    // 페이지에 들어왔을 때
     document.body.classList.add('chat-page-active')
-
-    // 페이지에서 나갈 때 (cleanup 함수)
     return () => {
       document.body.classList.remove('chat-page-active')
     }

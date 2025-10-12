@@ -3,6 +3,8 @@ import { useLocation, useMatch } from 'react-router-dom'
 import NavBar from '../components/common/NavBar'
 import useArchiveStore from '../stores/useArchiveStore'
 import ClosenessBar from '../components/chat/ClosenessBar'
+import { useState } from 'react'
+import Sidebar from '../components/common/SideBar'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -24,12 +26,18 @@ const chatRoomNames: Record<string, string> = {
 const showBookmarkPaths = ['/']
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const toggleSidebar = () => setSidebarOpen(open => !open)
   const location = useLocation()
-  const skipNavPaths = ['/login']
   const pathname = location.pathname
+  const skipNavPaths = ['/login']
 
   const isMain = pathname === '/'
-  const onArchive = !!useMatch('/archive/:id')
+
+  const archiveMatch = useMatch('/archive/:id')
+  const onArchive = !!archiveMatch
+  const archiveId = archiveMatch?.params.id
+
   const showDelete = onArchive
   const hideNavBar = skipNavPaths.includes(pathname)
 
@@ -42,28 +50,29 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const chatRoomId = chatRoomMatch ? chatRoomMatch[2] : null
   const showBookmark = showBookmarkPaths.includes(pathname) || chatRoomId !== null
 
+  const fromChat = (location.state as { from?: string } | null)?.from === 'chat'
+
   const { selectionMode } = useArchiveStore()
 
   const isChatPage = /^\/chat\//.test(location.pathname)
 
   // 타이틀
   let title = ''
-  if (chatRoomId) {
+  if (selectionMode) {
+    title = 'Delete'
+  } else if (onArchive) {
+    title =
+      (fromChat && archiveId && (chatRoomNames[archiveId] || `채팅방 ${archiveId}`)) || 'Archive'
+  } else if (chatRoomId) {
     title = chatRoomNames[chatRoomId] || `채팅방 ${chatRoomId}`
   } else {
     title = pageTitles[pathname] || '페이지'
   }
 
-  if (onArchive) {
-    title = 'Archive'
-  }
-
-  if (selectionMode) {
-    title = 'Delete'
-  }
-
   return (
-    <div className="mx-auto flex h-full w-full max-w-md flex-col">
+    <div className="relative mx-auto flex h-full w-full max-w-md flex-col pt-15">
+      <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
+
       {!hideNavBar && (
         <>
           <NavBar
@@ -71,6 +80,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             title={title}
             showBookmark={showBookmark}
             showDelete={showDelete}
+            onToggleSidebar={toggleSidebar}
           />
           {closenessId && <ClosenessBar chatRoomId={closenessId} />}
         </>

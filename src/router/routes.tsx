@@ -7,6 +7,7 @@ const LoginPage = lazy(() => import('../pages/LoginPage'))
 const ClosenessPage = lazy(() => import('../pages/ClosenessPage'))
 const ChatPage = lazy(() => import('../pages/ChatPage'))
 const ArchivePage = lazy(() => import('../pages/ArchivePage'))
+const PolicyPage = lazy(() => import('../pages/PolicyPage'))
 
 export function Routes() {
   return (
@@ -17,6 +18,7 @@ export function Routes() {
       <Route path="/closeness/:id" element={<ClosenessPage />} />
       <Route path="/chat/:id" element={<ChatPage />} />
       <Route path="/archive/:id" element={<ArchivePage />} />
+      <Route path="/policy/:term" element={<PolicyPage />} />
     </RouterRoutes>
   )
 }
