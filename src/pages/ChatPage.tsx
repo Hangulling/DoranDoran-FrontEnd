@@ -90,7 +90,7 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col flex-grow min-h-0">
+    <div className="flex flex-col h-full">
       <div ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
         <div className="space-y-4">
@@ -124,7 +124,7 @@ const ChatPage: React.FC = () => {
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer>
+      <footer className="shrink-0">
         <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>

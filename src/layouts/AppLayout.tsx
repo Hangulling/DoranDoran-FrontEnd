@@ -54,8 +54,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   const { selectionMode } = useArchiveStore()
 
-  const isChatPage = /^\/chat\//.test(location.pathname)
-
   // 타이틀
   let title = ''
   if (selectionMode) {
@@ -97,9 +95,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </div>
       )}
       <main
-        className={`flex flex-col flex-grow min-h-0 ${
-          isChatPage ? 'overflow-hidden' : 'overflow-y-auto'
-        }`}
+        className={'flex flex-col flex-grow min-h-0'}
         style={{ paddingTop: !hideNavBar ? mainPaddingTop : 0 }}
       >
         {children}
