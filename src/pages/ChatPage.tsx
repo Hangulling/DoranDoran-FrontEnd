@@ -20,33 +20,6 @@ const ChatPage: React.FC = () => {
   const coachTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
-    const handleResize = () => {
-      // 키보드 올라올 때 root 스크롤 영역이 생기지 않도록 강제 고정
-      document.documentElement.style.height = `${window.visualViewport?.height || window.innerHeight}px`
-      document.body.style.height = `${window.visualViewport?.height || window.innerHeight}px`
-      document.body.style.overflow = 'hidden'
-    }
-
-    const reset = () => {
-      document.documentElement.style.height = ''
-      document.body.style.height = ''
-      document.body.style.overflow = ''
-    }
-
-    const viewport = window.visualViewport
-    if (viewport) {
-      viewport.addEventListener('resize', handleResize)
-    }
-
-    handleResize() // 초기 진입 시 1회 실행
-
-    return () => {
-      reset()
-      if (viewport) viewport.removeEventListener('resize', handleResize)
-    }
-  }, [])
-
-  useEffect(() => {
     const mainElement = chatMainRef.current
     if (!mainElement) return
 
@@ -120,31 +93,44 @@ const ChatPage: React.FC = () => {
     const root = document.getElementById('root')
     const viewport = window.visualViewport
 
-    const fixRootHeight = () => {
+    // 스크롤을 완전히 차단하는 함수
+    const lockScroll = () => {
       if (!root || !viewport) return
-      root.style.height = viewport.height + 'px'
-      root.style.overflow = 'hidden' // 루트 스크롤 완전 차단
+      const height = viewport.height
+      const offsetTop = viewport.offsetTop
+
+      // visualViewport의 offsetTop을 고려해서 루트 위치를 맞춰줌
+      root.style.position = 'fixed'
+      root.style.top = `-${offsetTop}px`
+      root.style.left = '0'
+      root.style.right = '0'
+      root.style.height = `${height}px`
+      root.style.overflow = 'hidden'
     }
 
-    const resetRootHeight = () => {
+    const unlockScroll = () => {
       if (!root) return
+      root.style.position = ''
+      root.style.top = ''
+      root.style.left = ''
+      root.style.right = ''
       root.style.height = ''
       root.style.overflow = ''
     }
 
     if (viewport) {
-      viewport.addEventListener('resize', fixRootHeight)
-      viewport.addEventListener('scroll', fixRootHeight) // 일부 기기에서 resize 대신 scroll 발생
+      viewport.addEventListener('resize', lockScroll)
+      viewport.addEventListener('scroll', lockScroll)
     }
 
-    // 진입 시 바로 적용
-    fixRootHeight()
+    // 진입 시 적용
+    lockScroll()
 
     return () => {
-      resetRootHeight()
+      unlockScroll()
       if (viewport) {
-        viewport.removeEventListener('resize', fixRootHeight)
-        viewport.removeEventListener('scroll', fixRootHeight)
+        viewport.removeEventListener('resize', lockScroll)
+        viewport.removeEventListener('scroll', lockScroll)
       }
     }
   }, [])
