@@ -67,19 +67,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     title = pageTitles[pathname] || '페이지'
   }
 
-  const navBarHeight = '3.75rem'
-  const closenessBarHeight = '33px'
-
-  const mainPaddingTop = closenessId
-    ? `calc(${navBarHeight} + ${closenessBarHeight})`
-    : navBarHeight
-
   return (
     <div className="relative mx-auto flex h-full w-full max-w-md flex-col">
       <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
 
       {!hideNavBar && (
-        <div className="fixed top-0 z-50 w-full max-w-md bg-white">
+        <header className="shrink-0 z-50">
           <NavBar
             isMain={isMain}
             title={title}
@@ -87,19 +80,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             showDelete={showDelete}
             onToggleSidebar={toggleSidebar}
           />
-          {closenessId && (
-            <div className="fixed w-full max-w-md z-50" style={{ top: navBarHeight }}>
-              <ClosenessBar chatRoomId={closenessId} />
-            </div>
-          )}
-        </div>
+          {closenessId && <ClosenessBar chatRoomId={closenessId} />}
+        </header>
       )}
-      <main
-        className={'flex flex-col flex-grow min-h-0'}
-        style={{ paddingTop: !hideNavBar ? mainPaddingTop : 0 }}
-      >
-        {children}
-      </main>
+      <main className="flex-grow min-h-0 overflow-y-auto">{children}</main>
     </div>
   )
 }
