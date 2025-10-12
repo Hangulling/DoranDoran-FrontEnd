@@ -20,23 +20,28 @@ const ChatPage: React.FC = () => {
   const coachTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
-    const mainElement = chatMainRef.current
-    if (!mainElement) return
+    const pageElement = document.documentElement
+    const initialHeight = window.innerHeight
 
-    const scrollToBottom = () => {
-      setTimeout(() => {
-        mainElement.scrollTop = mainElement.scrollHeight
-      }, 100)
+    const handleViewportResize = () => {
+      if (!window.visualViewport) return
+
+      const keyboardHeight = initialHeight - window.visualViewport.height
+
+      if (keyboardHeight > 0) {
+        pageElement.style.setProperty('--keyboard-inset-bottom', `${keyboardHeight}px`)
+      } else {
+        pageElement.style.setProperty('--keyboard-inset-bottom', '0px')
+      }
     }
 
-    scrollToBottom()
+    window.visualViewport?.addEventListener('resize', handleViewportResize)
 
-    const viewport = window.visualViewport
-    if (viewport) {
-      viewport.addEventListener('resize', scrollToBottom)
-      return () => viewport.removeEventListener('resize', scrollToBottom)
+    return () => {
+      window.visualViewport?.removeEventListener('resize', handleViewportResize)
+      pageElement.style.removeProperty('--keyboard-inset-bottom')
     }
-  }, [messages])
+  }, [])
 
   useEffect(() => {
     document.body.classList.add('chat-page-active')
@@ -118,7 +123,13 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div
+      className="flex flex-col h-full"
+      style={{
+        paddingBottom: 'var(--keyboard-inset-bottom, 0px)',
+        transition: 'padding-bottom 0.1s ease-out',
+      }}
+    >
       <div ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
         <div className="space-y-4">
@@ -152,7 +163,7 @@ const ChatPage: React.FC = () => {
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer className="shrink-0">
+      <footer className="sticky bottom-0 shrink-0">
         <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>
