@@ -24,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     if (isOpen) {
       setVisible(true)
       // 마운트 후 약간 딜레이 후 애니메이션 시작
-      setTimeout(() => setIsActive(true), 10)
+      setTimeout(() => setIsActive(true), 150)
     } else {
       setIsActive(false)
       const timer = setTimeout(() => setVisible(false), 300)
@@ -62,15 +62,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     <>
       {/* 배경 오버레이 */}
       <div
-        className={`fixed inset-0 z-50 h-screen bg-black transition-opacity duration-300 ${
-          isActive ? 'opacity-60' : 'opacity-0 pointer-events-none'
+        className={`absolute inset-0 z-50 h-screen bg-black transition-opacity duration-300 ${
+          isActive ? 'opacity-80' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
         aria-hidden="true"
       />
       {/* 사이드바 */}
       <div
-        className={`fixed top-0 left-0 z-60 bg-[#fafafa] h-screen w-[303px] transform transition-transform duration-300 ease-in-out ${
+        className={`absolute top-0 left-0 z-60 bg-[#fafafa] h-screen w-[303px] transform transition-transform duration-300 ease-in-out ${
           isActive ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
