@@ -1,3 +1,11 @@
+export interface ChatRoom {
+  roomId: number
+  roomName: string
+  avatar: string
+  message: string
+  intimacy: number
+}
+
 export interface Message {
   id: number
   text: string
