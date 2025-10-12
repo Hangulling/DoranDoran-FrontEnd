@@ -23,7 +23,7 @@ const ClosenessBar: React.FC<ClosenessBarProps> = ({ chatRoomId }) => {
 
   return (
     <div
-      className={`mx-auto w-full max-w-md h-[33px] ${bgClass} overflow-hidden relative flex items-center justify-center text-white text-[14px] select-none`}
+      className={`mx-auto w-full max-w-md h-[33px] ${bgClass} overflow-hidden relative flex items-center justify-center text-white text-[14px] select-none shadow-[0_1px_2px_rgba(0,0,0,0.12)]`}
     >
       Chatting with a {closenessText} {chatRoomLabel.toLowerCase()}
     </div>

@@ -25,6 +25,7 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
   const noShowAgain = useModalStore(state => state.noShowAgain)
   const [modalOpen, setModalOpen] = useState(false)
   const chatMatch = useMatch('/chat/:id')
+  const isChatPage = Boolean(chatMatch) // 채팅페이지인지 확인
   const closenessMatch = useMatch('/closeness/:id')
   const archiveMatch = useMatch('/archive/:id')
   const currentId = chatMatch?.params.id ?? closenessMatch?.params.id ?? archiveMatch?.params.id
@@ -75,7 +76,11 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
 
   return (
     <>
-      <div className="fixed top-0 mx-auto w-full max-w-md inset-x-0 navbar bg-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] h-15 min-h-15 p-0 z-50">
+      <div
+        className={`fixed top-0 mx-auto w-full max-w-md inset-x-0 navbar bg-white h-15 min-h-15 p-0 z-50
+        ${isChatPage ? '' : 'shadow-[0_1px_2px_rgba(0,0,0,0.12)]'}
+      `}
+      >
         <div className="navbar-start ml-5">
           {/* 뒤로가기 */}
           {!isMain && !selectionMode && (
