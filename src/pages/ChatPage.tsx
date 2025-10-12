@@ -72,13 +72,6 @@ const ChatPage: React.FC = () => {
     setCoachMarkSeen(true)
   }
 
-  useEffect(() => {
-    document.body.classList.add('chat-page-active')
-    return () => {
-      document.body.classList.remove('chat-page-active')
-    }
-  }, [])
-
   // 메시지 전송
   const handleSendMessage = (text: string) => {
     const newMessage: Message = {
@@ -91,13 +84,13 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" style={{ overflow: 'hidden' }}>
       <div
         ref={chatMainRef}
         className="flex-grow overflow-y-auto px-5 pt-10"
         style={{
-          paddingBottom: 'var(--keyboard-inset-bottom, 0px)',
-          transition: 'padding-bottom 0.1s ease-out',
+          height: `calc(100vh - var(--keyboard-inset-bottom, 0px) - 57px)`,
+          transition: 'height 0.1s ease-out',
         }}
       >
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
