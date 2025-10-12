@@ -23,21 +23,15 @@ const ChatPage: React.FC = () => {
   useEffect(() => {
     if (!window.visualViewport) return
 
-    const initialHeight = window.innerHeight
-
-    const handleViewportResize = () => {
+    const handleResize = () => {
       if (!window.visualViewport) return
-      const newKeyboardHeight = initialHeight - window.visualViewport.height
-      if (newKeyboardHeight > 0) {
-        setKeyboardHeight(newKeyboardHeight)
-      } else {
-        setTimeout(() => setKeyboardHeight(0), 100)
-      }
+      const newKeyboardHeight = window.innerHeight - window.visualViewport.height
+      setKeyboardHeight(newKeyboardHeight)
     }
 
-    window.visualViewport.addEventListener('resize', handleViewportResize)
+    window.visualViewport.addEventListener('resize', handleResize)
     return () => {
-      window.visualViewport?.removeEventListener('resize', handleViewportResize)
+      window.visualViewport?.removeEventListener('resize', handleResize)
     }
   }, [])
 
@@ -87,7 +81,11 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
+      <div
+        ref={chatMainRef}
+        className="flex-grow overflow-y-auto px-5 pt-10"
+        style={{ paddingBottom: `calc(4rem + ${keyboardHeight}px)` }}
+      >
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
         <div className="space-y-4">
           {messages.map((msg, idx) => {
@@ -120,7 +118,13 @@ const ChatPage: React.FC = () => {
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer className="shrink-0">
+      <footer
+        className="shrink-0"
+        style={{
+          transform: `translateY(-${keyboardHeight}px)`,
+          transition: 'transform 0.1s ease-out',
+        }}
+      >
         <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
 
