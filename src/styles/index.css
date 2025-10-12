@@ -36,10 +36,12 @@
     height: 100%;
   }
   body.chat-page-active {
-    overflow: hidden !important;
-    overscroll-behavior: none !important;
+    overflow: hidden;
+    overscroll-behavior: none;
     position: fixed;
+    inset: 0;
     width: 100%;
+    height: 100%;
   }
   body.chat-page-active #root {
     height: 100%;

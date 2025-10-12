@@ -89,52 +89,6 @@ const ChatPage: React.FC = () => {
     setMessages(prevMessages => [...prevMessages, newMessage])
   }
 
-  useEffect(() => {
-    const root = document.getElementById('root')
-    const viewport = window.visualViewport
-
-    // 스크롤을 완전히 차단하는 함수
-    const lockScroll = () => {
-      if (!root || !viewport) return
-      const height = viewport.height
-      const offsetTop = viewport.offsetTop
-
-      // visualViewport의 offsetTop을 고려해서 루트 위치를 맞춰줌
-      root.style.position = 'fixed'
-      root.style.top = `-${offsetTop}px`
-      root.style.left = '0'
-      root.style.right = '0'
-      root.style.height = `${height}px`
-      root.style.overflow = 'hidden'
-    }
-
-    const unlockScroll = () => {
-      if (!root) return
-      root.style.position = ''
-      root.style.top = ''
-      root.style.left = ''
-      root.style.right = ''
-      root.style.height = ''
-      root.style.overflow = ''
-    }
-
-    if (viewport) {
-      viewport.addEventListener('resize', lockScroll)
-      viewport.addEventListener('scroll', lockScroll)
-    }
-
-    // 진입 시 적용
-    lockScroll()
-
-    return () => {
-      unlockScroll()
-      if (viewport) {
-        viewport.removeEventListener('resize', lockScroll)
-        viewport.removeEventListener('scroll', lockScroll)
-      }
-    }
-  }, [])
-
   return (
     <div className="flex flex-col flex-grow min-h-0">
       <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
