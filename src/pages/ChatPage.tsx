@@ -20,26 +20,6 @@ const ChatPage: React.FC = () => {
   const coachTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
-    if (!window.visualViewport) return
-
-    const pageElement = document.documentElement
-    const initialHeight = window.innerHeight
-
-    const handleViewportResize = () => {
-      if (!window.visualViewport) return
-      const keyboardHeight = initialHeight - window.visualViewport.height
-      if (keyboardHeight > 0) {
-        pageElement.style.setProperty('--keyboard-inset-bottom', `${keyboardHeight}px`)
-      } else {
-        pageElement.style.setProperty('--keyboard-inset-bottom', '0px')
-      }
-    }
-
-    window.visualViewport.addEventListener('resize', handleViewportResize)
-    return () => window.visualViewport.removeEventListener('resize', handleViewportResize)
-  }, [])
-
-  useEffect(() => {
     if (chatMainRef.current) {
       chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
     }
@@ -85,14 +65,7 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full" style={{ overflow: 'hidden' }}>
-      <div
-        ref={chatMainRef}
-        className="flex-grow overflow-y-auto px-5 pt-10"
-        style={{
-          height: `calc(100vh - var(--keyboard-inset-bottom, 0px) - 57px)`,
-          transition: 'height 0.1s ease-out',
-        }}
-      >
+      <div ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
         <div className="space-y-4">
           {messages.map((msg, idx) => {
