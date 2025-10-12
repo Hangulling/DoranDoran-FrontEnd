@@ -39,6 +39,34 @@ const ChatPage: React.FC = () => {
   }, [messages])
 
   useEffect(() => {
+    document.body.classList.add('chat-page-active')
+
+    const setViewportHeight = () => {
+      const vh = window.visualViewport
+        ? window.visualViewport.height * 0.01
+        : window.innerHeight * 0.01
+      document.documentElement.style.setProperty('--vh', `${vh}px`)
+    }
+
+    setViewportHeight()
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', setViewportHeight)
+    } else {
+      window.addEventListener('resize', setViewportHeight)
+    }
+
+    return () => {
+      document.body.classList.remove('chat-page-active')
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', setViewportHeight)
+      } else {
+        window.removeEventListener('resize', setViewportHeight)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
     if (chatMainRef.current) {
       chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
     }
