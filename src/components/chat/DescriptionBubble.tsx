@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import useTTS from '../../hooks/useTTS'
+import TTSIcon from './VolumeIcon'
 
 interface DescriptionBubbleProps {
   word: string
@@ -19,10 +21,15 @@ const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
   const [selectedTab, setSelectedTab] = useState(initialTab)
   const tabs = ['Kor', 'Eng']
 
+  const { onPlay: playTTS, playing } = useTTS(word)
+
   return (
     <div className={bubbleSecondClass}>
       <div className="flex items-center justify-between text-[12px] mb-1">
         <div className="flex items-center">
+          <div className="mr-1 h-5 w-5">
+            <TTSIcon playing={playing} onPlay={playTTS} />
+          </div>
           <span className="text-title">{`‘${word}’`}</span>
           {pronunciation && <span className="ml-2 text-gray-400">[{pronunciation}]</span>}
         </div>

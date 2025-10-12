@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
+import useClosenessStore from '../../stores/useClosenessStore'
 
 interface CorrectionBubbleProps {
-  level: string
+  chatRoomId: string
   initialTab?: string
   descriptionByTab: Record<string, string>
 }
@@ -9,11 +10,14 @@ interface CorrectionBubbleProps {
 const bubbleClass = 'bg-green-50 rounded-lg px-[10px] py-[10px] max-w-[265px] mb-2'
 
 const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
-  level = 'Lv. 1',
+  chatRoomId,
   initialTab = 'Kor',
   descriptionByTab,
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
+  const closeness = useClosenessStore(state => state.closenessMap[chatRoomId] ?? 1)
+  const closenessText = closeness === 1 ? 'casual' : closeness === 2 ? 'friendly' : 'close'
+
   const tabs = ['Kor', 'Eng']
 
   const wrapperClass = 'chat chat-end'
@@ -24,7 +28,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
         <div className="flex items-center justify-between text-[12px] mb-1">
           <div className="flex items-center text-title">
             <p>
-              친밀도<span>{` ${level}`}</span>
+              closeness level -<span>{closenessText}</span>
             </p>
           </div>
           <div className="flex p-0.5 bg-green-80 rounded-[6px]">
