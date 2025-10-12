@@ -89,36 +89,6 @@ const ChatPage: React.FC = () => {
     setMessages(prevMessages => [...prevMessages, newMessage])
   }
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.visualViewport) {
-        const viewport = window.visualViewport
-        const footer = document.querySelector('footer')
-
-        if (footer) {
-          // 키보드가 열려서 줄어든 뷰포트 높이 만큼 footer를 올림 (translateY)
-          const offset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
-          footer.style.transform = `translateY(-${offset}px)`
-        }
-      }
-    }
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleResize)
-      window.visualViewport.addEventListener('scroll', handleResize)
-    }
-
-    // 초기 실행
-    handleResize()
-
-    return () => {
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleResize)
-        window.visualViewport.removeEventListener('scroll', handleResize)
-      }
-    }
-  }, [])
-
   return (
     <div className="flex flex-col flex-grow min-h-0">
       <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
