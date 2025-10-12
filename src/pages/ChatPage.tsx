@@ -20,14 +20,14 @@ const ChatPage: React.FC = () => {
   const coachTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
+    if (!window.visualViewport) return
+
     const pageElement = document.documentElement
     const initialHeight = window.innerHeight
 
     const handleViewportResize = () => {
       if (!window.visualViewport) return
-
       const keyboardHeight = initialHeight - window.visualViewport.height
-
       if (keyboardHeight > 0) {
         pageElement.style.setProperty('--keyboard-inset-bottom', `${keyboardHeight}px`)
       } else {
@@ -35,40 +35,8 @@ const ChatPage: React.FC = () => {
       }
     }
 
-    window.visualViewport?.addEventListener('resize', handleViewportResize)
-
-    return () => {
-      window.visualViewport?.removeEventListener('resize', handleViewportResize)
-      pageElement.style.removeProperty('--keyboard-inset-bottom')
-    }
-  }, [])
-
-  useEffect(() => {
-    document.body.classList.add('chat-page-active')
-
-    const setViewportHeight = () => {
-      const vh = window.visualViewport
-        ? window.visualViewport.height * 0.01
-        : window.innerHeight * 0.01
-      document.documentElement.style.setProperty('--vh', `${vh}px`)
-    }
-
-    setViewportHeight()
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', setViewportHeight)
-    } else {
-      window.addEventListener('resize', setViewportHeight)
-    }
-
-    return () => {
-      document.body.classList.remove('chat-page-active')
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', setViewportHeight)
-      } else {
-        window.removeEventListener('resize', setViewportHeight)
-      }
-    }
+    window.visualViewport.addEventListener('resize', handleViewportResize)
+    return () => window.visualViewport.removeEventListener('resize', handleViewportResize)
   }, [])
 
   useEffect(() => {
@@ -123,14 +91,15 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div
-      className="flex flex-col h-full"
-      style={{
-        paddingBottom: 'var(--keyboard-inset-bottom, 0px)',
-        transition: 'padding-bottom 0.1s ease-out',
-      }}
-    >
-      <div ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
+    <div className="flex flex-col h-full">
+      <div
+        ref={chatMainRef}
+        className="flex-grow overflow-y-auto px-5 pt-10"
+        style={{
+          paddingBottom: 'var(--keyboard-inset-bottom, 0px)',
+          transition: 'padding-bottom 0.1s ease-out',
+        }}
+      >
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
         <div className="space-y-4">
           {messages.map((msg, idx) => {
