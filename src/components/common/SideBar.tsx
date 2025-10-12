@@ -24,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     if (isOpen) {
       setVisible(true)
       // 마운트 후 약간 딜레이 후 애니메이션 시작
-      setTimeout(() => setIsActive(true), 10)
+      setTimeout(() => setIsActive(true), 150)
     } else {
       setIsActive(false)
       const timer = setTimeout(() => setVisible(false), 300)
