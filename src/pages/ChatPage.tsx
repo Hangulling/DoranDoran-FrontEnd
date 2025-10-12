@@ -91,7 +91,7 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex flex-col flex-grow min-h-0">
-      <main ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
+      <div ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
         <div className="space-y-4">
           {messages.map((msg, idx) => {
@@ -120,7 +120,7 @@ const ChatPage: React.FC = () => {
           })}
         </div>
         <div className="h-4" />
-      </main>
+      </div>
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 

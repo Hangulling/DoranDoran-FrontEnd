@@ -81,7 +81,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
 
       {!hideNavBar && (
-        <>
+        <div className="fixed top-0 z-50 w-full max-w-md bg-white">
           <NavBar
             isMain={isMain}
             title={title}
@@ -94,7 +94,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               <ClosenessBar chatRoomId={closenessId} />
             </div>
           )}
-        </>
+        </div>
       )}
       <main
         className={`flex flex-col flex-grow min-h-0 ${
