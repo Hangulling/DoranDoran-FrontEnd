@@ -62,15 +62,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     <>
       {/* 배경 오버레이 */}
       <div
-        className={`fixed inset-0 z-50 h-screen bg-black transition-opacity duration-300 ${
-          isActive ? 'opacity-60' : 'opacity-0 pointer-events-none'
+        className={`absolute inset-0 z-50 h-screen bg-black transition-opacity duration-300 ${
+          isActive ? 'opacity-80' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
         aria-hidden="true"
       />
       {/* 사이드바 */}
       <div
-        className={`fixed top-0 left-0 z-60 bg-[#fafafa] h-screen w-[303px] transform transition-transform duration-300 ease-in-out ${
+        className={`absolute top-0 left-0 z-60 bg-[#fafafa] h-screen w-[303px] transform transition-transform duration-300 ease-in-out ${
           isActive ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
