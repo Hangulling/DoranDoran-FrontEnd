@@ -35,17 +35,6 @@
   body {
     height: 100%;
   }
-  body.chat-page-active {
-    overflow: hidden;
-    scroll-behavior: none;
-  }
-  body.chat-page-active #root {
-    height: 100%;
-    overflow: hidden;
-  }
-  body.chat-page-active #root main {
-    overflow-y: auto;
-  }
   body {
     font-family: var(--font-family-sans);
   }
