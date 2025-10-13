@@ -1,3 +1,14 @@
+export interface User {
+  email: string
+  password: string
+  name: string
+  firstName: string
+  lastName: string
+  preferences: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 // eslint-disable-next-line prefer-const
 export let userProfile = {
   id: '123e4567-e89b-12d3-a456-426614174000',

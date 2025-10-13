@@ -8,29 +8,37 @@ import { Link, useNavigate } from 'react-router-dom'
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<'email' | 'password' | 'both' | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
-  const handleLogin = () => {
-    const isEmail = email === 'test@example.com'
-    const isPassword = password === 'qwer1234'
-
+  const handleLogin = async () => {
     setError(null)
 
-    if (!isEmail && !isPassword) {
-      setError('both')
-      return
-    }
-    if (!isEmail) {
-      setError('email')
-      return
-    }
-    if (!isPassword) {
-      setError('password')
-      return
-    }
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
 
-    navigate('/')
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.message || '로그인 실패')
+        return
+      }
+
+      if (data.success) {
+        console.log('🎉 로그인 성공!')
+        console.log('발급된 토큰:', data.data.accessToken)
+        console.log('로그인 유저 정보:', data.data.user)
+        localStorage.setItem('accessToken', data.data.accessToken)
+        navigate('/')
+      }
+    } catch (err) {
+      console.error('error', err)
+      setError('네트워크 오류가 발생했습니다.')
+    }
   }
 
   return (
@@ -42,33 +50,24 @@ export default function LoginPage() {
             Chat your way to real-life Korean
           </span>
         </div>
-        <img src={loginCharacter} />
+
+        <img src={loginCharacter} alt="login character" />
         <div className="mt-4">
-          <div>
-            <Input
-              type="email"
-              variant={error === 'email' || error === 'both' ? 'error' : 'primary'}
-              placeholder="E-mail"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <Input
-              type="password"
-              placeholder="Password"
-              variant={error === 'password' || error === 'both' ? 'error' : 'primary'}
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-            />
-            {error && (
-              <span className="mt-1 block text-xs text-orange-500 text-body">
-                {error === 'email' && 'Email error'}
-                {error === 'password' && 'Password error'}
-                {error === 'both' && 'Email error + Password error'}
-              </span>
-            )}
-          </div>
+          <Input
+            type="email"
+            variant={error ? 'error' : 'primary'}
+            placeholder="E-mail"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
+          <Input
+            type="password"
+            variant={error ? 'error' : 'primary'}
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+          />
+          {error && <span className="mt-1 block text-xs text-orange-500 text-body">{error}</span>}
 
           <Button
             variant="primary"

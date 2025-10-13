@@ -6,13 +6,18 @@ import { validateEmail, validateName } from '../utils/validations'
 import CommonModal from '../components/common/CommonModal'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAgreementStore } from '../stores/useAgreementStore'
+import { useSignupFormStore } from '../stores/useSignupStore'
 
 export default function SignupPage() {
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [passwordCheck, setPasswordCheck] = useState('')
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    passwordCheck,
+    setMany,
+    reset: resetForm,
+  } = useSignupFormStore()
 
   const [firstNameError, setFirstNameError] = useState<string | null>(null)
   const [lastNameError, setLastNameError] = useState<string | null>(null)
@@ -20,28 +25,30 @@ export default function SignupPage() {
   const [emailSuccess, setEmailSuccess] = useState<string | null>(null)
   const [pwdTouched, setPwdTouched] = useState(false)
   const [pwdCheckTouched, setPwdCheckTouched] = useState(false)
-
   const [openModal, setOpenModal] = useState(false)
 
   const navigate = useNavigate()
   const location = useLocation() as { state?: { fromPolicy?: boolean } }
-  const reset = useAgreementStore(s => s.reset)
+
+  const agreements = useAgreementStore(s => s.value)
+  const setManyAgreements = useAgreementStore(s => s.setMany)
+  const resetAgreements = useAgreementStore(s => s.reset)
 
   const handleFirstNameChange = (v: string) => {
-    const noSpace = v.replace(/\s+/g, '') // 공백 제거
-    setFirstName(noSpace)
+    const noSpace = v.replace(/\s+/g, '')
+    setMany({ firstName: noSpace })
     if (firstNameError && validateName(noSpace) === null) setFirstNameError(null)
   }
 
   const handleLastNameChange = (v: string) => {
-    const noSpace = v.replace(/\s+/g, '') // 공백 제거
-    setLastName(noSpace)
+    const noSpace = v.replace(/\s+/g, '')
+    setMany({ lastName: noSpace })
     if (lastNameError && validateName(noSpace) === null) setLastNameError(null)
   }
 
   const handleEmailChange = (v: string) => {
-    const noSpace = v.replace(/\s+/g, '') // 공백 제거
-    setEmail(noSpace)
+    const noSpace = v.replace(/\s+/g, '')
+    setMany({ email: noSpace })
     if (emailError && validateEmail(noSpace) === null) setEmailError(null)
     setEmailSuccess(null)
   }
@@ -51,6 +58,7 @@ export default function SignupPage() {
     setEmailError(err)
     if (err) setEmailSuccess(null)
   }
+
   const handleVerify = () => {
     const err = validateEmail(email) || (email.trim() === '' ? 'Please enter your email.' : null)
     if (err) {
@@ -84,9 +92,6 @@ export default function SignupPage() {
     passwordCheck.length > 0 &&
     password === passwordCheck
 
-  const agreements = useAgreementStore(s => s.value)
-  const setMany = useAgreementStore(s => s.setMany)
-
   const requiredAgreed = agreements.service && agreements.privacy
   const isPasswordLenValid = password.length >= 8 && password.length <= 20
   const isPasswordValidForSubmit =
@@ -115,16 +120,17 @@ export default function SignupPage() {
   const handleSubmit = () => {
     if (!isFormValid) return
     navigate('/login')
-    console.log('submit', {
-      firstName,
-      lastName,
-      email,
-      agreements,
-    })
+    resetForm()
+    resetAgreements()
+
+    console.log('submit', { firstName, lastName, email, agreements })
   }
 
   useEffect(() => {
-    if (!location.state?.fromPolicy) reset()
+    if (!location.state?.fromPolicy) {
+      resetForm()
+      resetAgreements()
+    }
     navigate('.', { replace: true, state: null })
   }, [])
 
@@ -195,7 +201,7 @@ export default function SignupPage() {
             label="Password *"
             placeholder="Enter your password (8-20 characters)"
             value={password}
-            onChange={e => setPassword(e.target.value.replace(/\s+/g, ''))}
+            onChange={e => setMany({ password: e.target.value.replace(/\s+/g, '') })}
             onBlur={() => setPwdTouched(true)}
             variant={pwdLenError || pwdMatchError ? 'error' : 'primary'}
           />
@@ -206,7 +212,7 @@ export default function SignupPage() {
             type="password"
             placeholder="Enter your password (8-20 characters)"
             value={passwordCheck}
-            onChange={e => setPasswordCheck(e.target.value.replace(/\s+/g, ''))}
+            onChange={e => setMany({ passwordCheck: e.target.value.replace(/\s+/g, '') })}
             onBlur={() => setPwdCheckTouched(true)}
             variant={pwdMatchError ? 'error' : 'primary'}
           />
@@ -218,7 +224,7 @@ export default function SignupPage() {
         </div>
 
         <div className="my-2">
-          <Agreement value={agreements} onChange={setMany} />
+          <Agreement value={agreements} onChange={setManyAgreements} />
         </div>
 
         <div className="m-2">
@@ -233,6 +239,7 @@ export default function SignupPage() {
             Sign Up
           </Button>
         </div>
+
         {openModal && (
           <CommonModal
             variant="signup"
