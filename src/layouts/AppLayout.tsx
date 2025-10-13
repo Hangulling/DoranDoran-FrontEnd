@@ -30,7 +30,19 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const toggleSidebar = () => setSidebarOpen(open => !open)
   const location = useLocation()
   const pathname = location.pathname
-  const skipNavPaths = ['/login', '/error', '/*']
+
+  // 알 수 없는 페이지 (*)
+  const isUnknownPath = !(
+    pathname === '/' ||
+    pathname.startsWith('/signup') ||
+    pathname.startsWith('/archive') ||
+    pathname.startsWith('/chat') ||
+    pathname.startsWith('/closeness') ||
+    pathname.startsWith('/policy') ||
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/error')
+  )
+  const skipNavPaths = ['/login', '/error']
 
   const isMain = pathname === '/'
 
@@ -39,7 +51,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const archiveId = archiveMatch?.params.id
 
   const showDelete = onArchive
-  const hideNavBar = skipNavPaths.includes(pathname)
+  const hideNavBar = skipNavPaths.includes(pathname) || isUnknownPath
 
   // 친밀도 바(채팅에서만)
   const closenessMatch = pathname.match(/^\/chat\/(\d+)$/)
