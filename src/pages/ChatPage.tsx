@@ -20,25 +20,6 @@ const ChatPage: React.FC = () => {
   const coachTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
-    const mainElement = chatMainRef.current
-    if (!mainElement) return
-
-    const scrollToBottom = () => {
-      setTimeout(() => {
-        mainElement.scrollTop = mainElement.scrollHeight
-      }, 100)
-    }
-
-    scrollToBottom()
-
-    const viewport = window.visualViewport
-    if (viewport) {
-      viewport.addEventListener('resize', scrollToBottom)
-      return () => viewport.removeEventListener('resize', scrollToBottom)
-    }
-  }, [messages])
-
-  useEffect(() => {
     if (chatMainRef.current) {
       chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
     }
@@ -90,7 +71,7 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col flex-grow min-h-0">
+    <div className="flex flex-col h-full overflow-hidden">
       <div ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
         <InitChat avatar={room?.avatar} onReady={handleInitReady} />
         <div className="space-y-4">
@@ -124,7 +105,7 @@ const ChatPage: React.FC = () => {
 
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
 
-      <footer>
+      <footer className="shrink-0">
         <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
       </footer>
     </div>

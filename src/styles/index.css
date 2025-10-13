@@ -32,11 +32,8 @@
 
 @layer base {
   html,
-  body,
-  #root {
-    height: calc(var(--vh, 1vh) * 100);
-    overflow: hidden;
-    position: relative;
+  body {
+    height: 100%;
   }
   body {
     font-family: var(--font-family-sans);
