@@ -23,3 +23,43 @@ export interface Message {
     }
   }
 }
+
+// api --> 후수정
+
+export interface ApiChatRoom {
+  id: string
+  userId: string
+  chatbotId: string
+  name: string
+  isDeleted: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateChatroomPayload {
+  userId: string
+  chatbotId: string
+  name: string
+}
+
+export interface ChatroomListParams {
+  userId?: string
+  page?: number
+  size?: number
+}
+
+export interface ApiMessage {
+  id: string
+  chatroomId: string
+  senderId: string
+  senderType: 'user' | 'ai'
+  content: string
+  contentType: string
+  createdAt: string
+}
+
+export interface SendMessagePayload {
+  content: string
+  contentType: string
+  senderType: 'user' | 'ai'
+}
