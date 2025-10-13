@@ -8,14 +8,14 @@ interface DistanceSliderProps {
 }
 
 const marksAll = [
-  { value: 1, label: 'Casual' },
-  { value: 2, label: 'Friendly' },
-  { value: 3, label: 'Close' },
+  { value: 1, label: 'Polite' },
+  { value: 2, label: 'Casual' },
+  { value: 3, label: 'Friendly' },
 ]
 
 const marksHoney = [
-  { value: 1, label: 'Casual' },
-  { value: 3, label: 'Close' },
+  { value: 1, label: 'Polite' },
+  { value: 3, label: 'Friendly' },
 ]
 
 const thumbSize = 28
@@ -111,7 +111,7 @@ const DistanceSlider: React.FC<DistanceSliderProps> = ({ value, onChange, roomId
             ...(marks.length === 2
               ? {
                   '&[data-index="0"]': { transform: 'translateX(0%)' },
-                  '&[data-index="1"]': { transform: 'translateX(-100%)' }, // Close 라벨 위치
+                  '&[data-index="1"]': { transform: 'translateX(-100%)' }, // Friendly 라벨 위치
                 }
               : {
                   '&[data-index="0"]': { transform: 'translateX(0%)' },
