@@ -1,5 +1,16 @@
+export interface User {
+  email: string
+  password: string
+  name: string
+  firstName: string
+  lastName: string
+  preferences: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 // eslint-disable-next-line prefer-const
-export let userProfile = {
+export let userProfile: User = {
   email: 'test@example.com',
   password: 'qwer1234',
   name: 'Eun Lee',
