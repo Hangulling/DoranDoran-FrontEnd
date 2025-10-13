@@ -6,7 +6,6 @@ export default function PolicyPage() {
   const { term } = useParams<{ term: TermId }>()
   const navigate = useNavigate()
   const setOne = useAgreementStore(s => s.setOne)
-
   const handleConfirm = () => {
     if (term) setOne(term, true)
     navigate('/signup', { replace: true, state: { fromPolicy: true } })
@@ -14,7 +13,20 @@ export default function PolicyPage() {
 
   return (
     <div>
-      <div>PolicyPage {term ? `(${term})` : null}</div>
+      <iframe
+        src={
+          term === 'privacy'
+            ? 'https://melodic-weather-784.notion.site/ebd/28a9b5c9498980a284c6fda283dc6caf'
+            : 'https://melodic-weather-784.notion.site/ebd/28a9b5c9498980b1aba3db76c15f6792'
+        }
+        className="w-[100vw] h-[calc(100vh-80px)] overflow-x-hidden scale-[1.0] origin-top bg-white"
+        style={{
+          border: 'none',
+          transform: 'scale(1)',
+          transformOrigin: '0 0',
+        }}
+      />
+
       <div className="m-2">
         <Button
           onClick={handleConfirm}
