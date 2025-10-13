@@ -7,10 +7,7 @@ import MainLogo from '../../assets/main/mainLogo.svg'
 import Hamburger from '../../assets/icon/hamburger.svg?react'
 import useArchiveStore from '../../stores/useArchiveStore'
 import Button from './Button'
-import { useState } from 'react'
 import type { NavBarProps } from '../../types/common'
-import { useModalStore } from '../../stores/useUiStateStore'
-import ExitModal from '../chat/ExitModal'
 
 const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
   title,
@@ -22,35 +19,16 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
   const navigate = useNavigate()
   const { selectionMode, deleteMode, enterSelectionMode, exitSelectionMode, selectAll, delectAll } =
     useArchiveStore()
-  const noShowAgain = useModalStore(state => state.noShowAgain)
-  const [modalOpen, setModalOpen] = useState(false)
   const chatMatch = useMatch('/chat/:id')
   const isChatPage = Boolean(chatMatch) // 채팅페이지인지 확인
   const closenessMatch = useMatch('/closeness/:id')
   const archiveMatch = useMatch('/archive/:id')
   const currentId = chatMatch?.params.id ?? closenessMatch?.params.id ?? archiveMatch?.params.id
   console.log(currentId, 'currentId')
+
   // 뒤로가기
   const goBack = () => {
-    if (chatMatch) {
-      if (noShowAgain) {
-        navigate('/')
-      } else {
-        setModalOpen(true)
-      }
-    } else {
-      navigate(-1)
-    }
-  }
-
-  // 채팅창 뒤로가기 확인 모달
-  const handleConfirm = () => {
-    setModalOpen(false)
-    navigate('/')
-  }
-
-  const handleCancel = () => {
-    setModalOpen(false)
+    navigate(-1)
   }
 
   // 북마크 바로가기
@@ -77,7 +55,7 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
   return (
     <>
       <div
-        className={`mx-auto w-full max-w-md inset-x-0 navbar bg-white h-15 min-h-15 p-0 z-50
+        className={`mx-auto w-full max-w-md inset-x-0 navbar bg-white h-15 min-h-15 p-0
         ${isChatPage ? '' : 'shadow-[0_1px_2px_rgba(0,0,0,0.12)]'}
       `}
       >
@@ -141,8 +119,6 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
           )}
         </div>
       </div>
-      {/* 나가기 확인 모달 */}
-      <ExitModal open={modalOpen} onConfirm={handleConfirm} onCancel={handleCancel} />
     </>
   )
 }
