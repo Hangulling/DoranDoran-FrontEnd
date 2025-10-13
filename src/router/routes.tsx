@@ -1,6 +1,5 @@
 import { lazy } from 'react'
 import { Route, Routes as RouterRoutes } from 'react-router-dom'
-import ErrorPage from '../pages/ErrorPage'
 
 const MainPage = lazy(() => import('../pages/MainPage'))
 const SignupPage = lazy(() => import('../pages/SignupPage'))
@@ -9,6 +8,7 @@ const ClosenessPage = lazy(() => import('../pages/ClosenessPage'))
 const ChatPage = lazy(() => import('../pages/ChatPage'))
 const ArchivePage = lazy(() => import('../pages/ArchivePage'))
 const PolicyPage = lazy(() => import('../pages/PolicyPage'))
+const ErrorPage = lazy(() => import('../pages/ErrorPage'))
 
 export function Routes() {
   return (
