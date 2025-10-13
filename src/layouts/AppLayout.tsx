@@ -72,7 +72,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
 
       {!hideNavBar && (
-        <header className="shrink-0 z-50">
+        <header className="sticky top-0 shrink-0 z-40 bg-white">
           <NavBar
             isMain={isMain}
             title={title}

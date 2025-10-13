@@ -94,6 +94,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               Privacy Policy
               <img src={RightArrowIcon} />
             </button>
+            <button className={menuBtn}>
+              Contact Us
+              <img src={RightArrowIcon} />
+            </button>
           </div>
 
           {/* 하단 버튼 그룹 */}
