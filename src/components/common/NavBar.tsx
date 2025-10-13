@@ -1,6 +1,6 @@
 import type React from 'react'
 import { Link, useMatch, useNavigate } from 'react-router-dom'
-import LeftArrowIcon from '../../assets/icon/leftArrow.svg'
+import LeftArrowIcon from '../../assets/icon/leftArrow.svg?react'
 import CloseIcon from '../../assets/icon/close.svg'
 import BookmarkIcon from '../../assets/icon/bookmark.svg?react'
 import MainLogo from '../../assets/main/mainLogo.svg'
@@ -63,7 +63,7 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
           {/* 뒤로가기 */}
           {!isMain && !selectionMode && (
             <button onClick={goBack}>
-              <img src={LeftArrowIcon} alt="뒤로가기" />
+              <LeftArrowIcon className="gray-400" />
             </button>
           )}
 
