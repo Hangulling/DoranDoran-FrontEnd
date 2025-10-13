@@ -1,5 +1,6 @@
 import { lazy } from 'react'
 import { Route, Routes as RouterRoutes } from 'react-router-dom'
+import ErrorPage from '../pages/ErrorPage'
 
 const MainPage = lazy(() => import('../pages/MainPage'))
 const SignupPage = lazy(() => import('../pages/SignupPage'))
@@ -19,6 +20,8 @@ export function Routes() {
       <Route path="/chat/:id" element={<ChatPage />} />
       <Route path="/archive/:id" element={<ArchivePage />} />
       <Route path="/policy/:term" element={<PolicyPage />} />
+      <Route path="/error" element={<ErrorPage errorCode={500} />} />
+      <Route path="*" element={<ErrorPage errorCode={404} />} />
     </RouterRoutes>
   )
 }

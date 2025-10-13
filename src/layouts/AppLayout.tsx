@@ -30,7 +30,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const toggleSidebar = () => setSidebarOpen(open => !open)
   const location = useLocation()
   const pathname = location.pathname
-  const skipNavPaths = ['/login']
+  const skipNavPaths = ['/login', '/error', '/*']
 
   const isMain = pathname === '/'
 

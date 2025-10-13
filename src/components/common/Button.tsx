@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
-type Variant = 'primary' | 'cancel' | 'text' | 'confirm' | 'tab' | 'archive'
+type Variant = 'primary' | 'cancel' | 'text' | 'confirm' | 'tab' | 'archive' | 'home'
 type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'archive' | 'confirm'
 
 const VARIANTS: Record<Variant, string> = {
@@ -10,6 +10,7 @@ const VARIANTS: Record<Variant, string> = {
   confirm: 'bg-green-400 text-white rounded-lg',
   tab: 'rounded-[18px] max-w-[91px] text-body text-sm',
   archive: 'text-gray-500 text-sm text-body',
+  home: 'bg-green-400 text-white rounded-[18px] border border-green-400',
 }
 
 const SIZES: Record<Size, string> = {
