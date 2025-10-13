@@ -17,10 +17,10 @@ const pageTitles: Record<string, string> = {
 }
 
 const chatRoomNames: Record<string, string> = {
-  '1': 'Senior',
+  '1': 'Friend',
   '2': 'Honey',
   '3': 'Coworker',
-  '4': 'Client',
+  '4': 'Senior',
 }
 
 const showBookmarkPaths = ['/']

@@ -10,13 +10,14 @@ export interface User {
 }
 
 // eslint-disable-next-line prefer-const
-export let userProfile: User = {
+export let userProfile = {
+  id: '123e4567-e89b-12d3-a456-426614174000',
   email: 'test@example.com',
-  password: 'qwer1234',
   name: 'Eun Lee',
   firstName: 'Eun',
   lastName: 'Lee',
-  preferences: '도란도란',
+  status: 'ACTIVE',
+  role: 'ROLE_USER',
   createdAt: new Date('2025-09-01T09:00:00'),
   updatedAt: new Date('2025-09-20T14:30:00'),
 }
