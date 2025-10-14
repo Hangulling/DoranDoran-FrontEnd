@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import axios from 'axios'
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
 import Agreement from '../components/common/Agreement'
@@ -7,6 +8,7 @@ import CommonModal from '../components/common/CommonModal'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAgreementStore } from '../stores/useAgreementStore'
 import { useSignupFormStore } from '../stores/useSignupStore'
+import { signup, getUserByEmailOrNull } from '../api/auth'
 
 export default function SignupPage() {
   const {
@@ -23,9 +25,12 @@ export default function SignupPage() {
   const [lastNameError, setLastNameError] = useState<string | null>(null)
   const [emailError, setEmailError] = useState<string | null>(null)
   const [emailSuccess, setEmailSuccess] = useState<string | null>(null)
+  const [emailVerified, setEmailVerified] = useState(false)
   const [pwdTouched, setPwdTouched] = useState(false)
   const [pwdCheckTouched, setPwdCheckTouched] = useState(false)
   const [openModal, setOpenModal] = useState(false)
+  const [, setSubmitError] = useState<string | null>(null)
+  const [verifyLoading, setVerifyLoading] = useState(false)
 
   const navigate = useNavigate()
   const location = useLocation() as { state?: { fromPolicy?: boolean } }
@@ -51,29 +56,54 @@ export default function SignupPage() {
     setMany({ email: noSpace })
     if (emailError && validateEmail(noSpace) === null) setEmailError(null)
     setEmailSuccess(null)
+    setEmailVerified(false)
   }
 
   const handleEmailBlur = () => {
     const err = validateEmail(email)
     setEmailError(err)
-    if (err) setEmailSuccess(null)
+    if (err) {
+      setEmailSuccess(null)
+      setEmailVerified(false)
+    }
   }
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const err = validateEmail(email) || (email.trim() === '' ? 'Please enter your email.' : null)
     if (err) {
       setEmailError(err)
       setEmailSuccess(null)
+      setEmailVerified(false)
       return
     }
-    setEmailError(null)
-    setEmailSuccess('Verified successfully.')
-  }
-  const isEmailFormatValid = email.trim() !== '' && validateEmail(email) === null
 
+    try {
+      setVerifyLoading(true)
+      setEmailError(null)
+      setEmailSuccess(null)
+
+      const existing = await getUserByEmailOrNull(email)
+      if (existing) {
+        setEmailError('This email is already registered.')
+        setEmailVerified(false)
+      } else {
+        setEmailSuccess('Verified successfully.')
+        setEmailVerified(true)
+      }
+    } catch (e: unknown) {
+      const msg = axios.isAxiosError(e)
+        ? e.response?.data?.message || 'Email verification failed.'
+        : 'Email verification failed.'
+      setEmailError(msg)
+      setEmailVerified(false)
+    } finally {
+      setVerifyLoading(false)
+    }
+  }
+
+  const isEmailFormatValid = email.trim() !== '' && validateEmail(email) === null
   const pwdLenError =
     pwdTouched && password.length > 0 && (password.length < 8 || password.length > 20)
-
   const pwdMatchError =
     pwdCheckTouched && passwordCheck.length > 0 && !pwdLenError && password !== passwordCheck
 
@@ -105,25 +135,38 @@ export default function SignupPage() {
     validateName(lastName) === null &&
     validateEmail(email) === null &&
     isPasswordValidForSubmit &&
-    requiredAgreed
+    requiredAgreed &&
+    emailVerified
+
+  const handleConfirmModal = async () => {
+    setOpenModal(false)
+    setSubmitError(null)
+
+    try {
+      const payload = {
+        email,
+        firstName,
+        lastName,
+        name: `${firstName} ${lastName}`.trim(),
+        password,
+      }
+      const res = await signup(payload)
+      if (import.meta.env.DEV) console.log('🎉 회원가입 성공:', res)
+
+      resetForm()
+      resetAgreements()
+      navigate('/login', { replace: true })
+    } catch (e: unknown) {
+      const msg = axios.isAxiosError(e)
+        ? e.response?.data?.message || 'Sign up failed.'
+        : 'Sign up failed.'
+      setSubmitError(msg)
+    }
+  }
 
   const handleOpenModal = () => {
     if (!isFormValid) return
     setOpenModal(true)
-  }
-
-  const handleConfirmModal = () => {
-    setOpenModal(false)
-    handleSubmit()
-  }
-
-  const handleSubmit = () => {
-    if (!isFormValid) return
-    navigate('/login')
-    resetForm()
-    resetAgreements()
-
-    console.log('submit', { firstName, lastName, email, agreements })
   }
 
   useEffect(() => {
@@ -135,7 +178,7 @@ export default function SignupPage() {
   }, [])
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 max-w-md">
       <div className="flex flex-col justify-center items-center">
         <div>
           <Input
@@ -180,12 +223,12 @@ export default function SignupPage() {
             />
             <Button
               variant="primary"
-              disabled={!isEmailFormatValid}
+              disabled={!isEmailFormatValid || verifyLoading}
               className="bg-gray-800 my-2 text-subtitle"
               size="sm"
               onClick={handleVerify}
             >
-              Verify
+              {verifyLoading ? 'Checking…' : 'Verify'}
             </Button>
           </div>
           {emailError ? (
@@ -227,17 +270,19 @@ export default function SignupPage() {
           <Agreement value={agreements} onChange={setManyAgreements} />
         </div>
 
-        <div className="m-2">
-          <Button
-            type="submit"
-            className="bg-gray-800"
-            variant="primary"
-            disabled={!isFormValid}
-            size="xl"
-            onClick={handleOpenModal}
-          >
-            Sign Up
-          </Button>
+        <div className="flex justify-center w-full bg-white shadow-[0_-1px_2px_0_rgba(0,0,0,0.08)]">
+          <div className="m-2">
+            <Button
+              type="submit"
+              className="bg-gray-800"
+              variant="primary"
+              disabled={!isFormValid}
+              size="xl"
+              onClick={handleOpenModal}
+            >
+              Sign up
+            </Button>
+          </div>
         </div>
 
         {openModal && (
