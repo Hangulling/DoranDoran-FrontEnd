@@ -23,6 +23,11 @@ const chatRoomNames: Record<string, string> = {
   '4': 'Senior',
 }
 
+const agreementTitles: Record<string, string> = {
+  service: 'Terms of Service',
+  privacy: 'Privacy Policy',
+}
+
 const showBookmarkPaths = ['/']
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
@@ -49,6 +54,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const archiveMatch = useMatch('/archive/:id')
   const onArchive = !!archiveMatch
   const archiveId = archiveMatch?.params.id
+  const agreementMatch = useMatch('/policy/:id')
+  const agreementId = agreementMatch?.params.id
 
   const showDelete = onArchive
   const hideNavBar = skipNavPaths.includes(pathname) || isUnknownPath
@@ -75,6 +82,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       (fromChat && archiveId && (chatRoomNames[archiveId] || `채팅방 ${archiveId}`)) || 'Archive'
   } else if (chatRoomId) {
     title = chatRoomNames[chatRoomId] || `채팅방 ${chatRoomId}`
+  } else if (agreementId) {
+    title = agreementTitles[agreementId]
   } else {
     title = pageTitles[pathname] || '페이지'
   }

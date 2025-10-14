@@ -15,8 +15,36 @@ const getBaseURL = () => {
 const api = axios.create({
   baseURL: getBaseURL(),
   timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 })
 
-// 토큰 추가 필요
+api.interceptors.request.use(
+  config => {
+    // const token = localStorage.getItem('accessToken')
+    // if (token) {
+    //   config.headers.Authorization = `Bearer ${token}`
+    // }
+    return config
+  },
+  error => {
+    console.error('🚨 요청 설정 중 에러:', error)
+    return Promise.reject(error)
+  }
+)
+
+api.interceptors.response.use(
+  response => response,
+  error => {
+    // const status = error.response?.status
+    // if (status === 401) {
+    //   console.warn('인증 만료')
+    //   localStorage.removeItem('accessToken')
+    //   window.location.href = '/login'
+    // }
+    return Promise.reject(error)
+  }
+)
 
 export default api

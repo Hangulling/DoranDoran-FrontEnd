@@ -5,6 +5,7 @@ import LogoutIcon from '../../assets/icon/logout.svg?react'
 import SignupIcon from '../../assets/icon/signup.svg?react'
 import type { SidebarProps } from '../../types/common'
 import CommonModal from './CommonModal'
+import { useNavigate } from 'react-router-dom'
 
 const LOGOUT_DESC = ['You can log in again anytime.']
 const SIGNOUT_DESC = ['This action cannot be undone.', 'Are you sure you want to continue?']
@@ -19,6 +20,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const [modalType, setModalType] = useState<'logout' | 'signup' | null>(null)
   const [visible, setVisible] = useState(isOpen)
   const [isActive, setIsActive] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (isOpen) {
@@ -58,6 +60,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     setModalOpen(false)
   }
 
+  const goPolicy = (term: 'service' | 'privacy') => {
+    onClose()
+    navigate(`/policy/${term}`, {
+      state: { hideConfirm: true, from: 'sidebar' },
+    })
+  }
+  
   return (
     <>
       {/* 배경 오버레이 */}
@@ -86,11 +95,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               About the Service
               <img src={RightArrowIcon} />
             </button>
-            <button className={menuBtn}>
+            <button className={menuBtn} onClick={() => goPolicy('service')}>
               Terms of Service
               <img src={RightArrowIcon} />
             </button>
-            <button className={menuBtn}>
+            <button className={menuBtn} onClick={() => goPolicy('privacy')}>
               Privacy Policy
               <img src={RightArrowIcon} />
             </button>

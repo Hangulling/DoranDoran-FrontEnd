@@ -19,7 +19,7 @@ export function Routes() {
       <Route path="/closeness/:id" element={<ClosenessPage />} />
       <Route path="/chat/:id" element={<ChatPage />} />
       <Route path="/archive/:id" element={<ArchivePage />} />
-      <Route path="/policy/:term" element={<PolicyPage />} />
+      <Route path="/policy/:id" element={<PolicyPage />} />
       <Route path="/error" element={<ErrorPage errorCode={500} />} />
       <Route path="*" element={<ErrorPage errorCode={404} />} />
     </RouterRoutes>
