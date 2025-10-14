@@ -3,11 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import { chatRooms } from '../mocks/db/chat'
 import { useEffect, useState } from 'react'
 import { useUserStore } from '../stores/useUserStore'
+import { useGoBack } from '../hooks/useGoBack'
 
 const MainPage = () => {
   const navigate = useNavigate()
   const [userName, setUserName] = useState<string>('')
   const setStoreName = useUserStore(state => state.setName)
+
+  // 뒤로 가기 방지
+  useGoBack()
 
   // 사용자 정보 GET, store 저장
   useEffect(() => {

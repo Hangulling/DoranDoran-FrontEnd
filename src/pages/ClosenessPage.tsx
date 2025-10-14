@@ -63,7 +63,7 @@ const ClosenessPage = () => {
             </span>
             <div className="h-[1px] bg-gray-80 w-full mb-[1px]" />
 
-            <DistanceSlider value={sliderValue} onChange={handleSliderChange} />
+            <DistanceSlider value={sliderValue} onChange={handleSliderChange} roomId={Number(id)} />
 
             <Button
               variant="primary"

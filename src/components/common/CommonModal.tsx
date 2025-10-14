@@ -18,7 +18,10 @@ const CommonModal: React.FC<CommonModalProps> = ({
   const isSignup = variant === 'signup'
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center" role="dialog">
+    <div
+      className="fixed inset-0 w-full mx-auto max-w-md z-100 flex items-center justify-center"
+      role="dialog"
+    >
       <div className="absolute inset-0 bg-black/80" onClick={onCancel}></div>
       <div className="relative z-10 flex flex-col items-center w-[303px] rounded-lg bg-white py-5 px-4">
         {isSignup && (

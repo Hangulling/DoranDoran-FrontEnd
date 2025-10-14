@@ -79,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       />
       {/* 사이드바 */}
       <div
-        className={`absolute top-0 left-0 z-60 bg-[#fafafa] h-screen w-[303px] transform transition-transform duration-300 ease-in-out ${
+        className={`absolute top-0 left-0 z-60 bg-[#fafafa] h-full w-[303px] transform transition-transform duration-300 ease-in-out ${
           isActive ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -101,6 +101,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             </button>
             <button className={menuBtn} onClick={() => goPolicy('privacy')}>
               Privacy Policy
+              <img src={RightArrowIcon} />
+            </button>
+            <button className={menuBtn}>
+              Contact Us
               <img src={RightArrowIcon} />
             </button>
           </div>

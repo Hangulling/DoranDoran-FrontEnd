@@ -2,7 +2,7 @@
 export const chatRooms = [
   {
     roomId: 1,
-    roomName: 'Senior',
+    roomName: 'Friend',
     avatar: '/chat/school.svg',
     message: '족보 필요하면 연락해~!',
     intimacy: 1,
@@ -23,7 +23,7 @@ export const chatRooms = [
   },
   {
     roomId: 4,
-    roomName: 'Client',
+    roomName: 'Senior',
     avatar: '/chat/client.svg',
     message: '내일 미팅 10시 괜찮으세요?',
     intimacy: 1,

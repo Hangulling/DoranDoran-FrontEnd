@@ -1,22 +1,52 @@
-import { useState, type RefObject } from 'react'
+import { useState, type JSX, type RefObject } from 'react'
 import Send from '../../assets/icon/send.svg'
 import ActiveSend from '../../assets/icon/activeSend.svg'
-import showToast from '../common/CommonToast'
+import ErrorIcon from '../../assets/icon/error.svg'
+import CheckIcon from '../../assets/icon/checkRound.svg'
 
 interface ChatFooterProps {
   inputRef: RefObject<HTMLTextAreaElement | null>
   onSendMessage: (message: string) => void
 }
 
+type IconType = 'error' | 'checkRound'
+
+type ToastMessageProps = {
+  message: string
+  iconType: IconType
+}
+
 const MAX_ROWS = 3
 const LINE_HEIGHT = 21
 const SINGLE_LINE_HEIGHT = 37
+
+// 위치 문제로 따로 구현
+const ToastMessage = ({ message, iconType }: ToastMessageProps) => {
+  const iconMap: Record<IconType, JSX.Element> = {
+    error: <img src={ErrorIcon} alt="error" />,
+    checkRound: <img src={CheckIcon} alt="check" />,
+  }
+
+  return (
+    <div className="flex items-start w-full mx-[20px] mb-[20px] bg-[rgba(15,16,16,0.8)] px-[14px] py-[16px] rounded-[12px] gap-[8px]">
+      {iconType && iconMap[iconType]}
+      <span className="text-subtitle text-[14px] text-white">{message}</span>
+    </div>
+  )
+}
 
 const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
   const [inputActive, setInputActive] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [textareaHeight, setTextareaHeight] = useState(SINGLE_LINE_HEIGHT)
   const [isComposing, setIsComposing] = useState(false)
+  const [toast, setToast] = useState<ToastMessageProps | null>(null)
+
+  const showToast = (message: string, iconType: IconType) => {
+    if (toast) return // 중복 방지
+    setToast({ message, iconType })
+    setTimeout(() => setToast(null), 4000)
+  }
 
   const handleCompositionStart = () => setIsComposing(true)
   const handleCompositionEnd = (e: React.CompositionEvent<HTMLTextAreaElement>) => {
@@ -25,7 +55,7 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
     const sanitizedValue = value.replace(/[a-zA-Z]/g, '')
     if (value !== sanitizedValue) {
       setInputValue(sanitizedValue)
-      showToast({ message: 'Input is only available in Korean', iconType: 'error' })
+      showToast('Input is only available in Korean', 'error')
     }
   }
 
@@ -47,13 +77,13 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
     const sanitizedValue = originalValue.replace(/[a-zA-Z]/g, '')
 
     if (originalValue && originalValue !== sanitizedValue) {
-      showToast({ message: 'Input is only available in Korean', iconType: 'error' })
+      showToast('Input is only available in Korean', 'error')
     }
 
     let finalValue = sanitizedValue
 
     if (finalValue.length > 50) {
-      showToast({ message: 'Maximum of 50 characters allowed', iconType: 'error' })
+      showToast('Maximum of 50 characters allowed', 'error')
       finalValue = finalValue.substring(0, 50)
     }
 
@@ -85,6 +115,12 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
 
   return (
     <div className="bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
+      {toast && (
+        <div className="relative bottom-full left-0 w-full flex justify-center">
+          <ToastMessage message={toast.message} iconType={toast.iconType} />
+        </div>
+      )}
+
       <div className="flex items-center w-full px-5 py-2.5">
         <textarea
           ref={inputRef}

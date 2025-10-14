@@ -17,10 +17,10 @@ const pageTitles: Record<string, string> = {
 }
 
 const chatRoomNames: Record<string, string> = {
-  '1': 'Senior',
+  '1': 'Friend',
   '2': 'Honey',
   '3': 'Coworker',
-  '4': 'Client',
+  '4': 'Senior',
 }
 
 const agreementTitles: Record<string, string> = {
@@ -35,7 +35,19 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const toggleSidebar = () => setSidebarOpen(open => !open)
   const location = useLocation()
   const pathname = location.pathname
-  const skipNavPaths = ['/login']
+
+  // 알 수 없는 페이지 (*)
+  const isUnknownPath = !(
+    pathname === '/' ||
+    pathname.startsWith('/signup') ||
+    pathname.startsWith('/archive') ||
+    pathname.startsWith('/chat') ||
+    pathname.startsWith('/closeness') ||
+    pathname.startsWith('/policy') ||
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/error')
+  )
+  const skipNavPaths = ['/login', '/error']
 
   const isMain = pathname === '/'
 
@@ -46,7 +58,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const agreementId = agreementMatch?.params.id
 
   const showDelete = onArchive
-  const hideNavBar = skipNavPaths.includes(pathname)
+  const hideNavBar = skipNavPaths.includes(pathname) || isUnknownPath
 
   // 친밀도 바(채팅에서만)
   const closenessMatch = pathname.match(/^\/chat\/(\d+)$/)
@@ -60,8 +72,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const fromChat = (location.state as { from?: string } | null)?.from === 'chat'
 
   const { selectionMode } = useArchiveStore()
-
-  const isChatPage = /^\/chat\//.test(location.pathname)
 
   // 타이틀
   let title = ''
@@ -79,11 +89,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="relative mx-auto flex h-full w-full max-w-md flex-col pt-15">
+    <div className="relative mx-auto flex h-full w-full max-w-md flex-col">
       <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
 
       {!hideNavBar && (
-        <>
+        <header className="sticky top-0 shrink-0 z-40 bg-white">
           <NavBar
             isMain={isMain}
             title={title}
@@ -92,15 +102,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             onToggleSidebar={toggleSidebar}
           />
           {closenessId && <ClosenessBar chatRoomId={closenessId} />}
-        </>
+        </header>
       )}
-      <main
-        className={`flex flex-col flex-grow min-h-0 ${
-          isChatPage ? 'overflow-hidden' : 'overflow-y-auto'
-        }`}
-      >
-        {children}
-      </main>
+      <main className="flex-grow min-h-0 overflow-y-auto">{children}</main>
     </div>
   )
 }
