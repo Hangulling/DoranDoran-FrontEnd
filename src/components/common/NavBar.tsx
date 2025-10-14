@@ -29,7 +29,7 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
   const closenessMatch = useMatch('/closeness/:id')
   const archiveMatch = useMatch('/archive/:id')
   const currentId = chatMatch?.params.id ?? closenessMatch?.params.id ?? archiveMatch?.params.id
-  console.log(currentId, 'currentId')
+
   // 뒤로가기
   const goBack = () => {
     if (chatMatch) {
@@ -62,16 +62,7 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
 
     if (chatMatch || closenessMatch) {
       navigate(`/archive/${currentId}`, { state: { from: 'chat' } })
-    } else {
-      navigate(`/chat/${currentId}`)
     }
-    // if (chatMatch) {
-    //   navigate(`/archive/${currentId}`, { state: { from: 'chat' } })
-    // } else if (closenessMatch) {
-    //   navigate(`/archive/${currentId}`)
-    // } else {
-    //   navigate(`/chat/${currentId}`)
-    // }
   }
 
   return (
