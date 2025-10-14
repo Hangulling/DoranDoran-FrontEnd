@@ -2,6 +2,7 @@
 
 // Chat API
 export * from './chats'
+export * from './auth'
 
 // Endpoints
 export * from './endpoints'
