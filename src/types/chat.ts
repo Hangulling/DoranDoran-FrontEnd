@@ -1,3 +1,4 @@
+// 컴포넌트용
 export interface ChatRoom {
   roomId: number
   roomName: string
@@ -24,28 +25,65 @@ export interface Message {
   }
 }
 
-// api --> 후수정
+// api
+export interface CreateChatroomPayload {
+  userId?: string // (JWT에서 자동추출)
+  chatbotId: string
+  name: string
+  concept: string // FRIEND, LOVER, COWORKER, BOSS
+  intimacyLevel?: number
+}
 
 export interface ApiChatRoom {
   id: string
   userId: string
   chatbotId: string
   name: string
+  description: string
+  concept: string
+  intimacyLevel: number
+  lastMessageAt: string
+  lastMessageId: string
+  isArchived: boolean
   isDeleted: boolean
   createdAt: string
   updatedAt: string
 }
 
-export interface CreateChatroomPayload {
-  userId: string
-  chatbotId: string
-  name: string
+// 페이징 정보 타입
+export interface Pageable {
+  sort: {
+    sorted: boolean
+    unsorted: boolean
+  }
+  pageNumber: number
+  pageSize: number
 }
 
-export interface ChatroomListParams {
-  userId?: string
-  page?: number
-  size?: number
+export interface ChatRoomListParams {
+  content: ChatRoom[]
+  pageable: Pageable
+  totalElements: number
+  totalPages: number
+  last: boolean
+  first: boolean
+  numberOfElements: number
+}
+
+export interface MessageListResponse {
+  content: Message[]
+  pageable: Pageable
+  totalElements: number
+  totalPages: number
+  last: boolean
+  first: boolean
+  numberOfElements: number
+}
+
+export interface SendMessagePayload {
+  senderType?: 'user' | 'bot' | 'system' // 기본값 user
+  content: string
+  contentType?: string // text, code, system 기본값 text
 }
 
 export interface ApiMessage {
@@ -58,8 +96,6 @@ export interface ApiMessage {
   createdAt: string
 }
 
-export interface SendMessagePayload {
-  content: string
-  contentType: string
-  senderType: 'user' | 'ai'
+export interface UpdateIntimacyPayload {
+  intimacyLevel: number // 1-3
 }
