@@ -14,10 +14,10 @@ const BG_COLORS: Record<string, string> = {
 const ClosenessBar: React.FC<ClosenessBarProps> = ({ chatRoomId }) => {
   const closeness = useClosenessStore(state => state.closenessMap[chatRoomId] ?? 1)
 
-  const room = chatRooms.find(room => room.roomId === Number(chatRoomId))
+  const room = chatRooms.find(room => room.roomRouteId === Number(chatRoomId))
   const chatRoomLabel = room ? room.roomName : `ChatRoom ${chatRoomId}`
 
-  const closenessText = closeness == 1 ? 'formal' : closeness == 2 ? 'casual' : 'close'
+  const closenessText = closeness == 1 ? 'politely' : closeness == 2 ? 'casually' : 'closely'
 
   const bgClass = BG_COLORS[closenessText] || 'bg-green-350'
 

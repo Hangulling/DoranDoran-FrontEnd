@@ -16,7 +16,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
   const closeness = useClosenessStore(state => state.closenessMap[chatRoomId] ?? 1)
-  const closenessText = closeness === 1 ? 'Polite' : closeness === 2 ? 'Casual' : 'Friendly'
+  const closenessText = closeness === 1 ? 'Polite' : closeness === 2 ? 'Casual' : 'Close'
 
   const tabs = ['Kor', 'Eng']
 
