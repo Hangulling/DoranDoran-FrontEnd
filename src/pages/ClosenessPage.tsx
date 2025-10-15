@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import DistanceSlider from '../components/chat/DistanceSlider'
 import Button from '../components/common/Button'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import useClosenessStore from '../stores/useClosenessStore'
 import { chatRooms } from '../mocks/db/chat'
+import { createChatRoom, updateIntimacy } from '../api'
+import { useUserStore } from '../stores/useUserStore'
 
 const bubbleBase = 'py-[6px] px-2 text-[14px] text-gray-700 rounded-lg flex flex-col'
 const bubbleBasic =
@@ -12,13 +14,20 @@ const bubbleSecond = bubbleBase + ' bg-white border border-gray-100 relative ml-
 
 const ClosenessPage = () => {
   const { id } = useParams()
+  const location = useLocation()
   const navigate = useNavigate()
+
+  const concept = location.state?.roomName || ''
+
+  const userId = useUserStore(state => state.id)
   const closeness = useClosenessStore(state => state.closenessMap[id ?? ''] ?? 1)
   const setCloseness = useClosenessStore(state => state.setCloseness)
+
   const [sliderValue, setSliderValue] = useState(closeness)
   const [touched, setTouched] = useState(false)
   const [isExiting, setIsExiting] = useState(false)
-  const room = chatRooms.find(r => String(r.roomId) === String(id))
+
+  const room = chatRooms.find(r => String(r.roomRouteId) === String(id))
 
   // 슬라이더값 initial
   useEffect(() => {
@@ -33,13 +42,30 @@ const ClosenessPage = () => {
   }
 
   // 확인 버튼
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!id) return
-    setCloseness(id, sliderValue)
-    setIsExiting(true) // 애니메이션 시작
-    setTimeout(() => {
-      navigate(`/chat/${id}`)
-    }, 550)
+
+    try {
+      // 채팅방 생성
+      const newRoom = await createChatRoom({
+        userId,
+        concept: concept,
+        intimacyLevel: sliderValue,
+      })
+
+      // 친밀도 업데이트
+      await updateIntimacy(newRoom.id, { intimacyLevel: sliderValue })
+
+      setCloseness(id, sliderValue) // store
+      setIsExiting(true) // 모션
+
+      // 채팅 페이지
+      setTimeout(() => {
+        navigate(`/chat/${newRoom.id}`)
+      }, 550)
+    } catch (error) {
+      console.error('채팅방 생성 또는 친밀도 설정 실패:', error)
+    }
   }
 
   return (
