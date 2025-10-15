@@ -2,29 +2,36 @@ import React, { useState } from 'react'
 import useTTS from '../../hooks/useTTS'
 import TTSIcon from './VolumeIcon'
 
+type VARIANT = 'chat' | 'archive'
+
+const VARIANTS: Record<VARIANT, string> = {
+  chat: 'ml-10 bg-white border border-gray-100 rounded-lg px-[10px] py-[10px] max-w-[265px] mb-2',
+  archive: 'ml-0 bg-white rounded-lg px-4 pb-[10px] w-[335px] mb-2',
+}
+
 interface DescriptionBubbleProps {
   word: string
   pronunciation: string
   initialTab?: string
   descriptionByTab: Record<string, string>
+  variant?: VARIANT
 }
-
-const bubbleSecondClass =
-  'ml-10 bg-white border border-gray-100 rounded-lg px-[10px] py-[10px] max-w-[265px] mb-2'
 
 const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
   word,
   pronunciation,
   initialTab = 'Kor',
   descriptionByTab,
+  variant = 'chat',
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
   const tabs = ['Kor', 'Eng']
 
   const { onPlay: playTTS, playing } = useTTS(word)
+  const containerClass = VARIANTS[variant] ?? VARIANTS.chat
 
   return (
-    <div className={bubbleSecondClass}>
+    <div className={containerClass}>
       <div className="flex items-center justify-between text-[12px] mb-1">
         <div className="flex items-center">
           <div className="mr-1 h-5 w-5">
@@ -51,7 +58,7 @@ const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
           ))}
         </div>
       </div>
-      <div className="h-[1px] bg-gray-80 w-full my-2" />
+      {variant === 'chat' && <div className="h-[1px] bg-gray-80 w-full my-2" />}
       <div className="text-[14px] text-gray-700">{descriptionByTab[selectedTab]}</div>
     </div>
   )
