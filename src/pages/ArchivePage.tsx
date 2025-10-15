@@ -23,7 +23,7 @@ export default function ArchivePage() {
   const [showToast, setShowToast] = useState(false)
   const list = items.filter(i => i.chatRoom === activeRoom)
   const location = useLocation()
-  console.log(location.state, 'location')
+
   const fromChat = (location.state as { from?: string } | null)?.from === 'chat'
   const { id } = useParams<{ id?: string }>()
   const idToRoom: Record<string, Room> = useMemo(
