@@ -4,27 +4,84 @@ import { chatRooms } from '../mocks/db/chat'
 import { useEffect, useState } from 'react'
 import { useUserStore } from '../stores/useUserStore'
 import { useGoBack } from '../hooks/useGoBack'
+import { chatRoomList } from '../api'
+import { getDaysDiff } from '../utils/getDaysDiff'
+
+interface ChatRoomWithMessage {
+  roomRouteId: number
+  roomName: string
+  concept: string
+  avatar: string
+  message: string
+}
 
 const MainPage = () => {
   const navigate = useNavigate()
   const [userName, setUserName] = useState<string>('')
+  const [userId, setUserId] = useState<string>('')
+  const [chatMsg, setChatMsg] = useState<ChatRoomWithMessage[]>([])
   const setStoreName = useUserStore(state => state.setName)
+  const setStoreId = useUserStore(state => state.setId)
 
   // 뒤로 가기 방지
   useGoBack()
 
   // 사용자 정보 GET, store 저장
   useEffect(() => {
-    fetch('/api/users/me')
+    fetch('/api/auth/me')
       .then(res => res.json())
       .then(profile => {
-        setUserName(profile.name)
-        setStoreName(profile.name)
+        setUserName(profile.data.name)
+        setStoreName(profile.data.name)
+        setUserId(profile.data.id)
+        setStoreId(profile.data.id)
       })
-  }, [setStoreName])
+      .catch(err => {
+        console.error('사용자 정보 로드 실패:', err)
+        //   navigate('/error', { state: { from: '/main' } })
+      })
+  }, [setStoreName, setStoreId, navigate])
 
-  const handleRoomClick = (id: number) => {
-    navigate(`/closeness/${id}`, { state: { showCoachMark: true, roomId: id } })
+  // 상태 메세지 설정
+  useEffect(() => {
+    if (!userId) return
+
+    const statusMessage = (diffDays: number | undefined): string => {
+      if (diffDays === undefined) return '반가워요! 우리 대화를 시작해 볼까요?'
+      if (diffDays === 0) return '우리 더 대화해 볼까요?'
+      if (diffDays === 2) return '왜 이제 왔어요~ 우리 수다 떨어요!'
+      return '오랜만에 함께 이야기 나눠요!'
+    }
+
+    // chatRoomList 호출 시 반환 타입은 ChatRoomListParams
+    chatRoomList(0, 20, userId)
+      .then(response => {
+        // response.content는 ApiChatRoom[] 타입
+        const mergedRooms = chatRooms.map(mockRoom => {
+          const serverRoom = response.content.find(r => r.concept === mockRoom.roomName)
+          const diffDays = serverRoom?.lastMessageAt
+            ? getDaysDiff(serverRoom.lastMessageAt)
+            : undefined
+          const message = statusMessage(diffDays)
+
+          return {
+            ...mockRoom,
+            message,
+            concept: mockRoom.roomName,
+          }
+        })
+        setChatMsg(mergedRooms)
+      })
+      .catch(err => {
+        console.error('채팅방 목록 로드 실패:', err)
+        //  navigate('/error', { state: { from: '/main' } })
+      })
+  }, [userId, navigate])
+
+  const handleRoomClick = (id: number, roomName: string) => {
+    navigate(`/closeness/${id}`, {
+      state: { roomRouteId: id, concept: roomName },
+    })
   }
 
   return (
@@ -46,10 +103,10 @@ const MainPage = () => {
         {/* 채팅방 목록 */}
         <div className="text-title mb-4 text-[20px] border-b border-gray-80 pb-2">Chats</div>
         <div className="flex flex-col gap-[10px]">
-          {chatRooms.map(room => (
+          {chatMsg.map(room => (
             <button
-              key={room.roomId}
-              onClick={() => handleRoomClick(room.roomId)}
+              key={room.roomRouteId}
+              onClick={() => handleRoomClick(room.roomRouteId, room.roomName)}
               className="flex items-center gap-4 w-full h-21 bg-white rounded-lg shadow-[1px_1px_10px_rgba(0,0,0,0.1)] py-3 px-4 active:bg-green-80"
             >
               <div className="w-13 h-13 rounded-full flex items-center justify-center overflow-hidden bg-gray-100">
