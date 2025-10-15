@@ -33,7 +33,7 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
   // 북마크 바로가기
   const handleBookmarkClick = () => {
     if (!currentId) {
-      navigate('/archive/2')
+      navigate('/archive/1')
       return
     }
 

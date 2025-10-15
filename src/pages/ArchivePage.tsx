@@ -4,8 +4,8 @@ import CommonModal from '../components/common/CommonModal'
 import EmptyCard from '../components/archive/EmptyCard'
 import Button from '../components/common/Button'
 import checkCircle from '../assets/icon/checkRound.svg'
-import { useEffect, useMemo, useState } from 'react'
 import useArchiveStore from '../stores/useArchiveStore'
+import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { fakeArchiveItems } from '../mocks/db/archive'
 
@@ -27,7 +27,7 @@ export default function ArchivePage() {
   const fromChat = (location.state as { from?: string } | null)?.from === 'chat'
   const { id } = useParams<{ id?: string }>()
   const idToRoom: Record<string, Room> = useMemo(
-    () => ({ '1': 'Senior', '2': 'Honey', '3': 'Coworker', '4': 'Client' }),
+    () => ({ '1': 'Friend', '2': 'Honey', '3': 'Coworker', '4': 'Client' }),
     []
   )
 
