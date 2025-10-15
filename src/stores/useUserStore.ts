@@ -1,12 +1,16 @@
 import { create } from 'zustand'
 
 interface UserState {
+  id: string
   name: string
+  setId: (id: string) => void
   setName: (name: string) => void
 }
 
-// 사용자 이름(풀네임) 저장
+// ID, 이름 저장
 export const useUserStore = create<UserState>(set => ({
+  id: '',
   name: '',
+  setId: id => set({ id }),
   setName: name => set({ name }),
 }))

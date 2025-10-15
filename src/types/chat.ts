@@ -28,16 +28,16 @@ export interface Message {
 // api
 export interface CreateChatroomPayload {
   userId?: string // (JWT에서 자동추출)
-  chatbotId: string
-  name: string
-  concept: string // FRIEND, LOVER, COWORKER, BOSS
+  chatbotId?: string
+  name?: string
+  concept: string // FRIEND, HONEY, COWORKER, SENIOR
   intimacyLevel?: number
 }
 
 export interface ApiChatRoom {
   id: string
   userId: string
-  chatbotId: string
+  chatbotId?: string
   name: string
   description: string
   concept: string
@@ -61,7 +61,7 @@ export interface Pageable {
 }
 
 export interface ChatRoomListParams {
-  content: ChatRoom[]
+  content: ApiChatRoom[]
   pageable: Pageable
   totalElements: number
   totalPages: number
