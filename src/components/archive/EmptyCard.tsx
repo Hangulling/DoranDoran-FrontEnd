@@ -11,7 +11,7 @@ export default function EmptyCard() {
   const fromChat = (location.state as { from?: string } | null)?.from === 'chat'
   const { activeRoom } = useArchiveStore()
   const roomToChatId: Record<Room, string> = {
-    Senior: '1',
+      Friend: '1',
     Honey: '2',
     Coworker: '3',
     Client: '4',
