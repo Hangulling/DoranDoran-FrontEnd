@@ -66,7 +66,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       state: { hideConfirm: true, from: 'sidebar' },
     })
   }
-  
+
+  const goForm = () => {
+    onClose()
+    window.open('https://forms.gle/dRBuvgKjwK7enscy6', '_blank')
+  }
+
   return (
     <>
       {/* 배경 오버레이 */}
@@ -103,7 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               Privacy Policy
               <img src={RightArrowIcon} />
             </button>
-            <button className={menuBtn}>
+            <button className={menuBtn} onClick={() => goForm()}>
               Contact Us
               <img src={RightArrowIcon} />
             </button>
@@ -122,6 +127,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
       </div>
+
       {/* 모달 */}
       <CommonModal
         open={modalOpen}
