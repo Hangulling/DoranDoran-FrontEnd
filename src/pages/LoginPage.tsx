@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import axios from 'axios'
-import loginCharacter from '../assets/auth/loginCharacter.png'
+import loginCharacter from '../assets/auth/loginCharacter.svg'
 import doran from '../assets/auth/doranText.svg'
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
