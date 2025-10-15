@@ -1,14 +1,14 @@
 import { create } from 'zustand'
 export interface ExpressionItem {
   id: string
-  chatRoom: 'Senior' | 'Honey' | 'Coworker' | 'Client'
+  chatRoom: 'Friend' | 'Honey' | 'Coworker' | 'Client'
   text: string
   intimacy: number
   ttsUrl?: string
   savedAt?: string
 }
 
-type Room = 'Senior' | 'Honey' | 'Coworker' | 'Client'
+type Room = 'Friend' | 'Honey' | 'Coworker' | 'Client'
 
 interface ArchiveState {
   items: ExpressionItem[]
