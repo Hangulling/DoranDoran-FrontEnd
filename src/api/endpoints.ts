@@ -6,6 +6,9 @@ export const USER_ENDPOINTS = {
   GET_BY_ID: (userId: string) => `/api/users/${userId}`,
   GET_BY_EMAIL: (email: string) => `/api/users/email/${email}`,
 
+  // 이메일 중복 확인
+  CHECK_EMAIL: (email: string) => `/api/users/check-email/${email}`,
+
   // 사용자 정보 업데이트
   UPDATE: (userId: string) => `/api/users/${userId}`,
 
