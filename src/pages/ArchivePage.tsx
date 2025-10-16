@@ -21,6 +21,7 @@ export default function ArchivePage() {
   } = useArchiveStore()
   const [openModal, setOpenModal] = useState(false)
   const [showToast, setShowToast] = useState(false)
+  const [openId, setOpenId] = useState<string | null>(null)
   const list = items.filter(i => i.chatRoom === activeRoom)
   const location = useLocation()
 
@@ -30,6 +31,10 @@ export default function ArchivePage() {
     () => ({ '1': 'Friend', '2': 'Honey', '3': 'Coworker', '4': 'Client' }),
     []
   )
+
+  useEffect(() => {
+    setOpenId(null)
+  }, [activeRoom])
 
   useEffect(() => {
     if (items.length === 0) seedItems(fakeArchiveItems)
@@ -48,7 +53,12 @@ export default function ArchivePage() {
       {list.length > 0 ? (
         <div className="mt-5">
           {list.map(item => (
-            <ExpressionCard key={item.id} item={item} />
+            <ExpressionCard
+              key={item.id}
+              item={item}
+              open={openId === item.id}
+              onToggle={() => setOpenId(prev => (prev === item.id ? null : item.id))}
+            />
           ))}
         </div>
       ) : (
