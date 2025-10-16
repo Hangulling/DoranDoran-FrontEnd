@@ -1,5 +1,11 @@
 import axios from 'axios'
-import type { LoginRequest, LoginResponse, SignupRequest, SignupResponse } from '../types/auth'
+import type {
+  LoginRequest,
+  LoginResponse,
+  LogoutResponse,
+  SignupRequest,
+  SignupResponse,
+} from '../types/auth'
 import api from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
 
@@ -42,6 +48,17 @@ export async function getUserByEmailOrNull(email: string) {
     if (axios.isAxiosError(e) && e.response?.status === 404) {
       return null
     }
+    throw e
+  }
+}
+
+// 로그아웃
+export async function logout(): Promise<LogoutResponse> {
+  try {
+    const res = await api.post(AUTH_ENDPOINTS.LOGOUT)
+    return res.data
+  } catch (e) {
+    console.error('로그아웃 요청 실패:', e)
     throw e
   }
 }
