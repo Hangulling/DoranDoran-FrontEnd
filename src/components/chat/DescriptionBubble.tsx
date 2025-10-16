@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import useTTS from '../../hooks/useTTS'
 import TTSIcon from './VolumeIcon'
+import useArchiveStore from '../../stores/useArchiveStore'
 
 type VARIANT = 'chat' | 'archive'
 
 const VARIANTS: Record<VARIANT, string> = {
   chat: 'ml-10 bg-white border border-gray-100 rounded-lg px-[10px] py-[10px] max-w-[265px] mb-2',
-  archive: 'ml-0 bg-white rounded-lg px-4 pb-[10px] w-[335px] mb-2',
+  archive: 'ml-0 bg-white rounded-lg px-4 pb-[10px] w-[330px] mb-2',
 }
 
 interface DescriptionBubbleProps {
@@ -15,6 +16,7 @@ interface DescriptionBubbleProps {
   initialTab?: string
   descriptionByTab: Record<string, string>
   variant?: VARIANT
+  isSelected?: boolean
 }
 
 const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
@@ -23,12 +25,17 @@ const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
   initialTab = 'Kor',
   descriptionByTab,
   variant = 'chat',
+  isSelected,
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
   const tabs = ['Kor', 'Eng']
-
+  const { selectionMode } = useArchiveStore()
   const { onPlay: playTTS, playing } = useTTS(word)
-  const containerClass = VARIANTS[variant] ?? VARIANTS.chat
+
+  const containerClass = [
+    VARIANTS[variant],
+    variant === 'archive' && (selectionMode ? isSelected : isSelected) ? '!bg-green-50 ' : '',
+  ].join(' ')
 
   return (
     <div className={containerClass}>

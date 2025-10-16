@@ -99,7 +99,7 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
           )}
           {selectionMode && !deleteMode && (
             <Button variant="archive" onClick={selectAll}>
-              Select all{' '}
+              Select all
             </Button>
           )}
           {selectionMode && deleteMode && (
