@@ -5,9 +5,10 @@ import App from './App.tsx'
 import './styles/index.css'
 
 const isDev = import.meta.env.DEV
+const USE_MSW = import.meta.env.VITE_USE_MSW === 'false'
 
 const prepare = async () => {
-  if (isDev) {
+  if (isDev && USE_MSW) {
     const { worker } = await import('./mocks/browser')
     await worker.start()
   }
