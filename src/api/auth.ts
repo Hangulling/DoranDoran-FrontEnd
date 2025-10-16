@@ -6,11 +6,11 @@ import type {
   SignupRequest,
   SignupResponse,
 } from '../types/auth'
-import api from './api'
+import { authApi } from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
 
 export async function login(data: LoginRequest) {
-  const res = await api.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, data)
+  const res = await authApi.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, data)
   // const { accessToken, refreshToken, user } = res.data.data
   const { user } = res.data.data
   // localStorage.setItem('accessToken', accessToken)
@@ -23,7 +23,7 @@ export async function login(data: LoginRequest) {
 }
 
 export async function signup(data: SignupRequest) {
-  const res = await api.post<SignupResponse>(USER_ENDPOINTS.CREATE, data)
+  const res = await authApi.post<SignupResponse>(USER_ENDPOINTS.CREATE, data)
   if (import.meta.env.DEV) console.log('🆕 회원가입 응답:', res.data)
   return res.data
 }
@@ -42,7 +42,7 @@ export async function signup(data: SignupRequest) {
 
 export async function getUserByEmailOrNull(email: string) {
   try {
-    const { data } = await api.get(`/api/users/email/${encodeURIComponent(email)}`)
+    const { data } = await authApi.get(`/api/users/email/${encodeURIComponent(email)}`)
     return data?.data ?? data ?? null
   } catch (e) {
     if (axios.isAxiosError(e) && e.response?.status === 404) {
@@ -55,7 +55,7 @@ export async function getUserByEmailOrNull(email: string) {
 // 로그아웃
 export async function logout(): Promise<LogoutResponse> {
   try {
-    const res = await api.post(AUTH_ENDPOINTS.LOGOUT)
+    const res = await authApi.post(AUTH_ENDPOINTS.LOGOUT)
     return res.data
   } catch (e) {
     console.error('로그아웃 요청 실패:', e)
