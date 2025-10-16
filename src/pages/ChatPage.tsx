@@ -60,7 +60,7 @@ const ChatPage: React.FC = () => {
     }
   }, [messages])
 
-  const room = chatRooms.find(r => String(r.roomId) === String(id))
+  const room = chatRooms.find(r => String(r.roomRouteId) === String(id))
 
   // 코치 마크 오픈 시간
   const handleInitReady = () => {
@@ -86,13 +86,6 @@ const ChatPage: React.FC = () => {
     setShowCoachMark(false)
     setCoachMarkSeen(true)
   }
-
-  useEffect(() => {
-    document.body.classList.add('chat-page-active')
-    return () => {
-      document.body.classList.remove('chat-page-active')
-    }
-  }, [])
 
   // 메시지 전송
   const handleSendMessage = (text: string) => {
