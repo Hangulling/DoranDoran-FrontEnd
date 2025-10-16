@@ -11,7 +11,7 @@ const bubbleClass = 'bg-green-50 rounded-lg px-[10px] py-[10px] max-w-[265px] mb
 
 const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   chatRoomId,
-  initialTab = 'Kor',
+  initialTab = 'Eng',
   descriptionByTab,
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
@@ -26,10 +26,11 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
     <div className={wrapperClass}>
       <div className={bubbleClass}>
         <div className="flex items-center justify-between text-[12px] mb-1">
-          <div className="flex items-center text-title">
+          <div className="flex flex-col space-y-3 items-center text-title">
             <p className="text-green-500">
               closeness level -<span> {closenessText}</span>
             </p>
+            <p>교정문구</p>
           </div>
           <div className="flex p-0.5 bg-green-80 rounded-[6px]">
             {tabs.map(tab => (

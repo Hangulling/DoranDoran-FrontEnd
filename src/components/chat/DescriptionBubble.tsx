@@ -22,7 +22,7 @@ interface DescriptionBubbleProps {
 const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
   word,
   pronunciation,
-  initialTab = 'Kor',
+  initialTab = 'Eng',
   descriptionByTab,
   variant = 'chat',
   isSelected,
