@@ -1,13 +1,13 @@
-export type BadgeVariant = 'Close' | 'Friendly' | 'Casual'
+export type BadgeVariant = 'Friendly' | 'Polite' | 'Casual'
 
 interface BadgeProps {
   variant: BadgeVariant
 }
 
 const VARIANT_STYLES: Record<BadgeVariant, string> = {
-  Close: 'bg-label-pink',
-  Friendly: 'bg-label-yellow',
-  Casual: 'bg-label-blue',
+  Friendly: 'bg-label-pink',
+  Polite: 'bg-label-blue',
+  Casual: 'bg-label-yellow',
 }
 
 export default function Badge({ variant }: BadgeProps) {
