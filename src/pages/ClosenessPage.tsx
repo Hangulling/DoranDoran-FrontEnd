@@ -95,7 +95,7 @@ const ClosenessPage = () => {
               variant="primary"
               size="confirm"
               className="bg-gray-800 w-full text-subtitle mb-2"
-              disabled={!touched}
+              disabled={false}
               onClick={handleConfirm}
             >
               Confirm
@@ -104,6 +104,7 @@ const ClosenessPage = () => {
         </div>
 
         {/* 안내2 */}
+        <div className={bubbleSecond}>Slide to adjust the closeness.</div>
         <div className={bubbleSecond}>Leave and return to reset your closeness settings.</div>
       </div>
     </div>
