@@ -8,8 +8,8 @@ import CommonModal from '../components/common/CommonModal'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAgreementStore } from '../stores/useAgreementStore'
 import { useSignupFormStore } from '../stores/useSignupStore'
-import { signup, getUserByEmailOrNull } from '../api/auth'
-
+import { checkEmailExists } from '../api/auth'
+import { createUser } from '../api/user'
 export default function SignupPage() {
   const {
     firstName,
@@ -82,8 +82,8 @@ export default function SignupPage() {
       setEmailError(null)
       setEmailSuccess(null)
 
-      const existing = await getUserByEmailOrNull(email)
-      if (existing) {
+      const isDuplicate = await checkEmailExists(email)
+      if (isDuplicate) {
         setEmailError('This email is already registered.')
         setEmailVerified(false)
       } else {
@@ -143,6 +143,19 @@ export default function SignupPage() {
     setSubmitError(null)
 
     try {
+      const emailErr = validateEmail(email)
+      if (emailErr) {
+        setEmailError(emailErr)
+        setEmailVerified(false)
+        return
+      }
+      const dup = await checkEmailExists(email)
+      if (dup) {
+        setEmailError('This email is already registered.')
+        setEmailVerified(false)
+        return
+      }
+
       const payload = {
         email,
         firstName,
@@ -150,7 +163,8 @@ export default function SignupPage() {
         name: `${firstName} ${lastName}`.trim(),
         password,
       }
-      const res = await signup(payload)
+
+      const res = await createUser(payload)
       if (import.meta.env.DEV) console.log('🎉 회원가입 성공:', res)
 
       resetForm()
