@@ -10,12 +10,12 @@ interface DistanceSliderProps {
 const marksAll = [
   { value: 1, label: 'Polite' },
   { value: 2, label: 'Casual' },
-  { value: 3, label: 'Close' },
+  { value: 3, label: 'Friendly' },
 ]
 
 const marksHoney = [
   { value: 1, label: 'Polite' },
-  { value: 3, label: 'Close' },
+  { value: 3, label: 'Friendly' },
 ]
 
 const thumbSize = 28
