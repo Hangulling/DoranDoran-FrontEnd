@@ -45,7 +45,7 @@ export default function ArchivePage() {
   }, [id, idToRoom, setActiveRoom])
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-full bg-gray-50 flex flex-col">
       {!fromChat && (
         <ArchiveTabs key={activeRoom} activeTab={activeRoom} onChange={setActiveRoom} />
       )}
