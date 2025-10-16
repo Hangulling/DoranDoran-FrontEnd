@@ -1,4 +1,4 @@
-import type { User } from "./user"
+import type { User } from './user'
 
 export interface LoginRequest {
   email: string
@@ -31,10 +31,17 @@ export interface SignupResponse {
   id: string
   email: string
   firstName: string
-  lastName: string  
+  lastName: string
   name: string
   status: string
   role: string
   createdAt: string
   updatedAt: string
+}
+
+export interface LogoutResponse {
+  success: boolean
+  message: string
+  data: null
+  errorCode: string | null
 }
