@@ -3,20 +3,20 @@ export const USER_ENDPOINTS = {
   CREATE: '/api/users',
 
   // 사용자 조회
-  GET_BY_ID: (userId: string) => `:8082/api/users/${userId}`,
-  GET_BY_EMAIL: (email: string) => `:8082/api/users/email/${email}`,
+  GET_BY_ID: (userId: string) => `/api/users/${userId}`,
+  GET_BY_EMAIL: (email: string) => `/api/users/email/${email}`,
 
   // 사용자 정보 업데이트
-  UPDATE: (userId: string) => `:8082/api/users/${userId}`,
+  UPDATE: (userId: string) => `/api/users/${userId}`,
 
   // 사용자 상태 업데이트
-  UPDATE_STATUS: (userId: string) => `:8082/api/users/${userId}/status`,
+  UPDATE_STATUS: (userId: string) => `/api/users/${userId}/status`,
 
   // 비밀번호 재설정
-  PASSWORD_RESET: ':8082/api/users/password/reset',
+  PASSWORD_RESET: '/api/users/password/reset',
 
   // 회원탈퇴(소프트 삭제)
-  DELETE: (userId: string) => `:8082/api/users/${userId}`,
+  DELETE: (userId: string) => `/api/users/${userId}`,
 
   // 헬스체크
   HEALTH: '/api/users/health',
@@ -25,34 +25,34 @@ export const USER_ENDPOINTS = {
 // Auth endpoints
 export const AUTH_ENDPOINTS = {
   // 로그인
-  LOGIN: ':8081/api/auth/login',
+  LOGIN: '/api/auth/login',
 
   // 로그아웃
-  LOGOUT: ':8081/api/auth/logout',
+  LOGOUT: '/api/auth/logout',
 
   // 토큰 검증
-  VALIDATE_TOKEN: ':8081/api/auth/validate',
+  VALIDATE_TOKEN: '/api/auth/validate',
 
   // 토큰 갱신
-  REFRESH_TOKEN: ':8081/api/auth/refresh',
+  REFRESH_TOKEN: '/api/auth/refresh',
 
   // 비밀번호 재설정 요청
-  PASSWORD_RESET_REQUEST: ':8081/api/auth/password/reset/request',
+  PASSWORD_RESET_REQUEST: '/api/auth/password/reset/request',
 
   // 비밀번호 재설정 실행
-  PASSWORD_RESET_EXECUTE: ':8081api/auth/password/reset/execute',
+  PASSWORD_RESET_EXECUTE: '/api/auth/password/reset/execute',
 
   // 현재 사용자 정보 조회
-  CURRENT_USER: ':8081/api/auth/me',
+  CURRENT_USER: '/api/auth/me',
 
   // 헬스체크
-  HEALTH: ':8081/api/auth/health',
+  HEALTH: '/api/auth/health',
 }
 
 // Chat endpoints
 export const CHAT_ENDPOINTS = {
   // 채팅방 생성/조회
-  CREATE: ':8083/api/chat/chatrooms',
+  CREATE: '/api/chat/chatrooms',
 
   // 채팅방 목록 조회
   CHATROOM_LIST: (userId?: string, page: number = 0, size: number = 20) => {
@@ -60,7 +60,7 @@ export const CHAT_ENDPOINTS = {
     if (userId) params.append('userId', userId)
     params.append('page', page.toString())
     params.append('size', size.toString())
-    return `:8083/api/chat/chatrooms?${params.toString()}`
+    return `/api/chat/chatrooms?${params.toString()}`
   },
 
   // 메시지 목록 조회
@@ -69,25 +69,25 @@ export const CHAT_ENDPOINTS = {
     if (userId) params.append('userId', userId)
     params.append('page', page.toString())
     params.append('size', size.toString())
-    return `:8083/api/chat/chatrooms/${chatroomId}/messages?${params.toString()}`
+    return `/api/chat/chatrooms/${chatroomId}/messages?${params.toString()}`
   },
 
   // 메시지 전송
-  SEND_MESSAGE: (chatroomId: string) => `:8083/api/chat/chatrooms/${chatroomId}/messages`,
+  SEND_MESSAGE: (chatroomId: string) => `/api/chat/chatrooms/${chatroomId}/messages`,
 
   // 친밀도 업데이트
-  UPDATE_INTIMACY_LEVEL: (chatroomId: string) => `:8083/api/chat/chatrooms/${chatroomId}/intimacy`,
+  UPDATE_INTIMACY_LEVEL: (chatroomId: string) => `/api/chat/chatrooms/${chatroomId}/intimacy`,
 
   // 채팅방 나가기 (소프트 삭제)
-  LEAVE_CHATROOM: (chatroomId: string) => `:8083/api/chat/chatrooms/${chatroomId}/leave`,
+  LEAVE_CHATROOM: (chatroomId: string) => `/api/chat/chatrooms/${chatroomId}/leave`,
 
   // WebSocket 채팅 연결
   WEBSOCKET_CHAT: (chatroomId: string, userId?: string) =>
-    `:8083/ws/chat/${chatroomId}${userId ? `?userId=${userId}` : ''}`,
+    `/ws/chat/${chatroomId}${userId ? `?userId=${userId}` : ''}`,
 
   // SSE
   MESSAGE_STREAM: (chatroomId: string, userId?: string) =>
-    `:8083/api/chat/stream/${chatroomId}${userId ? `?userId=${userId}` : ''}`,
+    `/api/chat/stream/${chatroomId}${userId ? `?userId=${userId}` : ''}`,
 }
 
 // Bookmark Endpoints

@@ -1,26 +1,35 @@
 import axios from 'axios'
 
-const getBaseURL = () => {
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-
-  if (!apiBaseUrl) {
-    console.error('❌ VITE_API_BASE_URL이 설정되지 않았습니다!')
-    return 'http://3.21.177.186'
+const getBaseURL = (port?: number): string => {
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://3.21.177.186'
+  if (!import.meta.env.VITE_API_BASE_URL) {
+    console.error('❌ VITE_API_BASE_URL이 설정되지 않았습니다! 기본값을 사용합니다.')
   }
-
-  console.log('🌐 API Base URL:', apiBaseUrl)
-  return apiBaseUrl
+  return port ? `${apiBaseUrl}:${port}` : apiBaseUrl
 }
 
-const api = axios.create({
-  baseURL: getBaseURL(),
+// 인증 서비스 (포트 8081)
+export const authApi = axios.create({
+  baseURL: getBaseURL(8081),
   timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 })
 
-api.interceptors.request.use(
+// 사용자 서비스 (포트 8082)
+export const userApi = axios.create({
+  baseURL: getBaseURL(8082),
+  timeout: 10000,
+  headers: { 'Content-Type': 'application/json' },
+})
+
+// 채팅 서비스 (포트 8083)
+export const chatApi = axios.create({
+  baseURL: getBaseURL(8083),
+  timeout: 10000,
+  headers: { 'Content-Type': 'application/json' },
+})
+
+userApi.interceptors.request.use(
   config => {
     // const token = localStorage.getItem('accessToken')
     // if (token) {
@@ -34,7 +43,7 @@ api.interceptors.request.use(
   }
 )
 
-api.interceptors.response.use(
+userApi.interceptors.response.use(
   response => response,
   error => {
     // const status = error.response?.status
@@ -47,4 +56,8 @@ api.interceptors.response.use(
   }
 )
 
-export default api
+export default {
+  userApi,
+  authApi,
+  chatApi,
+}
