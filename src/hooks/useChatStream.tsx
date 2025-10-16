@@ -22,6 +22,7 @@ export function useChatStream<T = unknown>(
     if (!chatroomId) return
 
     const sseUrl = getSseUrl(chatroomId, userId)
+    // 서버와 연결 시작
     const eventSource = new EventSource(sseUrl)
 
     // 기본 메시지 이벤트 처리
@@ -31,7 +32,7 @@ export function useChatStream<T = unknown>(
       }
     }
 
-    // 배열에 있는 이벤트
+    // 배열에 있는 이벤트들 이름 구독, 이벤트 발생 시 콜백
     eventNames.forEach(name => {
       eventSource.addEventListener(name, (event: MessageEvent) => {
         if (onEventReceived) {
@@ -46,6 +47,7 @@ export function useChatStream<T = unknown>(
 
     eventSourceRef.current = eventSource
 
+    // 채팅방 나갈때 자동으로 끊기
     return () => {
       eventSource.close()
     }

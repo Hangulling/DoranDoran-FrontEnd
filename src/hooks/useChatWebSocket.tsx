@@ -16,6 +16,7 @@ export function useChatWebSocket(
     if (!chatroomId) return
 
     const wsUrl = getWebSocketUrl(chatroomId, userId)
+    // 웹소켓 연결
     const socket = new WebSocket(wsUrl)
 
     socket.onopen = () => {
@@ -25,6 +26,7 @@ export function useChatWebSocket(
       }
     }
 
+    // 서버로부터 메시지 오면 콜백 실행하여 화면에 표시
     socket.onmessage = event => {
       if (onMessage) {
         onMessage(event.data)
@@ -51,6 +53,7 @@ export function useChatWebSocket(
     }
   }, [chatroomId, userId, onMessage, onOpen, onClose, onError])
 
+  // 반환 함수. 메시지 보낼 때 호출, 서버로 메시지 전송
   const sendMessage = useCallback((senderId: string, senderType: string, content: string) => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
       const msg = `${senderId}|${senderType}|${content}`
