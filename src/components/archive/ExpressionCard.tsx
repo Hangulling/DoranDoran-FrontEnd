@@ -8,7 +8,6 @@ import useArchiveStore from '../../stores/useArchiveStore'
 import useTTS from '../../hooks/useTTS'
 import Badge, { type BadgeVariant } from '../common/Badge'
 import DescriptionBubble from '../chat/DescriptionBubble'
-import { useState } from 'react'
 
 interface ExpressionCardProps {
   item: {
@@ -16,11 +15,13 @@ interface ExpressionCardProps {
     text: string
     intimacy: number
   }
+
+  open?: boolean
+  onToggle?: () => void
 }
 
-export default function ExpressionCard({ item }: ExpressionCardProps) {
+export default function ExpressionCard({ item, open, onToggle }: ExpressionCardProps) {
   const { selectionMode, selectedIds, toggleSelect } = useArchiveStore()
-  const [openCard, setOpenCard] = useState(false)
   const isSelected = selectedIds.has(item.id)
   const { onPlay, playing } = useTTS(item.text)
   const getBadgeVariant = (level: number): BadgeVariant => {
@@ -73,17 +74,22 @@ export default function ExpressionCard({ item }: ExpressionCardProps) {
                 alt={playing ? '읽는 중' : '읽기'}
                 onClick={handleSpeakerClick}
               />
-              <span className="text-body text-sm text-gray-800 truncate">{item.text}</span>
+              <span
+                className={`text-body text-sm text-gray-800 ${open ? 'whitespace-pre-line' : 'truncate'}`}
+              >
+                {item.text}
+              </span>
             </div>
-            <button onClick={() => setOpenCard(prev => !prev)}>
-              <img src={openCard ? clsoeExpandIcon : expandIcon} />
+            <button onClick={onToggle}>
+              <img src={open ? clsoeExpandIcon : expandIcon} />
             </button>
           </div>
 
-          {openCard && (
+          {open && (
             <div>
-              <div className="mx-4 my-2 h-px bg-gray-80" />
+              <div className="mx-4 my-2 h-px bg-gray-80 " />
               <DescriptionBubble
+                isSelected={isSelected}
                 variant="archive"
                 word="치맥"
                 pronunciation="chi-maek"
