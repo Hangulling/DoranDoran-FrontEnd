@@ -62,3 +62,17 @@ export async function logout(): Promise<LogoutResponse> {
     throw e
   }
 }
+
+// 사용자 정보 조회
+export async function getCurrentUser() {
+  try {
+    const res = await api.get(AUTH_ENDPOINTS.CURRENT_USER)
+    if (import.meta.env.DEV) {
+      console.log('현재 사용자 정보:', res.data.data)
+    }
+    return res.data
+  } catch (e) {
+    console.error('현재 사용자 정보 조회 실패:', e)
+    throw e
+  }
+}
