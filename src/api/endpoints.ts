@@ -103,3 +103,37 @@ export const CHAT_ENDPOINTS = {
   GET_AGENT_PROMPT: (chatbotId: string, agentType: string) =>
     `/api/chat/chatbots/${chatbotId}/agents/${agentType}`,
 }
+
+// Bookmark Endpoints
+export const BOOKMARK_ENDPOINTS = {
+  //  북마크 저장 (POST)
+  CREATE: '/api/store/bookmarks',
+
+  //  전체 조회 (GET)
+  LIST_ALL: '/api/store/bookmarks',
+
+  // 커서 기반 조회 (무한 스크롤)
+  LIST_CURSOR: (lastId?: string, size: number = 20) => {
+    const params = new URLSearchParams()
+    if (lastId) params.append('lastId', lastId)
+    params.append('size', size.toString())
+    return `/api/store/bookmarks/cursor?${params.toString()}`
+  },
+
+  // 페이지 기반 조회 (Offset Pagination)
+  LIST_PAGE: (page: number = 0, size: number = 20, sort = 'createdAt,desc') =>
+    `/api/store/bookmarks/page?page=${page}&size=${size}&sort=${sort}`,
+
+  // 챗봇 타입별 북마크 조회
+  LIST_BY_BOT_TYPE: (botType: 'friend' | 'honey' | 'coworker' | 'senior') =>
+    `/api/store/bookmarks/bot-type/${botType}`,
+
+  // 북마크 개수 조회
+  COUNT: '/api/store/bookmarks/count',
+
+  // 단일 북마크 삭제
+  DELETE_ONE: (bookmarkId: string) => `/api/store/bookmarks/${bookmarkId}`,
+
+  // 여러 북마크 일괄 삭제
+  DELETE_MANY: '/api/store/bookmarks',
+}
