@@ -1,4 +1,3 @@
-import { chatRooms } from '../../mocks/db/chat'
 import useClosenessStore from '../../stores/useClosenessStore'
 
 interface ClosenessBarProps {
@@ -14,10 +13,7 @@ const BG_COLORS: Record<string, string> = {
 const ClosenessBar: React.FC<ClosenessBarProps> = ({ chatRoomId }) => {
   const closeness = useClosenessStore(state => state.closenessMap[chatRoomId] ?? 1)
 
-  const room = chatRooms.find(room => room.roomRouteId === Number(chatRoomId))
-  const chatRoomLabel = room ? room.roomName : `ChatRoom ${chatRoomId}`
-
-  const closenessText = closeness == 1 ? 'politely' : closeness == 2 ? 'casually' : 'closely'
+  const closenessText = closeness == 1 ? 'Polite' : closeness == 2 ? 'Casual' : 'Friendly'
 
   const bgClass = BG_COLORS[closenessText] || 'bg-green-350'
 
@@ -25,7 +21,7 @@ const ClosenessBar: React.FC<ClosenessBarProps> = ({ chatRoomId }) => {
     <div
       className={`mx-auto w-full max-w-md h-[33px] ${bgClass} overflow-hidden relative flex items-center justify-center text-white text-[14px] select-none shadow-[0_1px_2px_rgba(0,0,0,0.12)]`}
     >
-      Chatting with a {closenessText} {chatRoomLabel.toLowerCase()}
+      Chatting in {closenessText} Mode
     </div>
   )
 }

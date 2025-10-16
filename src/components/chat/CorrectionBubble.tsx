@@ -16,7 +16,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
   const closeness = useClosenessStore(state => state.closenessMap[chatRoomId] ?? 1)
-  const closenessText = closeness === 1 ? 'Polite' : closeness === 2 ? 'Casual' : 'Close'
+  const closenessText = closeness === 1 ? 'Polite' : closeness === 2 ? 'Casual' : 'Friendly'
 
   const tabs = ['Kor', 'Eng']
 
@@ -27,8 +27,8 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
       <div className={bubbleClass}>
         <div className="flex items-center justify-between text-[12px] mb-1">
           <div className="flex items-center text-title">
-            <p>
-              closeness level -<span>{closenessText}</span>
+            <p className="text-green-500">
+              closeness level -<span> {closenessText}</span>
             </p>
           </div>
           <div className="flex p-0.5 bg-green-80 rounded-[6px]">
@@ -49,7 +49,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
             ))}
           </div>
         </div>
-        <div className="h-[1px] bg-gray-80 w-full my-2" />
+        <div className="h-[1px] bg-green-80 w-full my-2" />
         <div className="text-[14px] text-gray-700">{descriptionByTab[selectedTab]}</div>
       </div>
     </div>

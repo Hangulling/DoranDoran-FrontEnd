@@ -57,7 +57,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({ errorCode }) => {
         </div>
         <Button variant="home" className="py-2 pl-[14px] pr-2" onClick={handleClick}>
           <span className="flex items-center text-[14px] gap-x-0">
-            Back to home
+            Go Back
             <Arrow className="rotate-180 w-[18px] h-[18px]" />
           </span>
         </Button>

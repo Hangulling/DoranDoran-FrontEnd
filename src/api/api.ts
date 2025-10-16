@@ -5,7 +5,7 @@ const getBaseURL = () => {
 
   if (!apiBaseUrl) {
     console.error('❌ VITE_API_BASE_URL이 설정되지 않았습니다!')
-    return 'http://localhost:8080' // 배포 시 변경해야함
+    return 'http://3.21.177.186'
   }
 
   console.log('🌐 API Base URL:', apiBaseUrl)
