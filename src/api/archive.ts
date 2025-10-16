@@ -1,5 +1,11 @@
+import type { BookmarkRequest } from '../types/archive'
 import api from './api'
 import { BOOKMARK_ENDPOINTS } from './endpoints'
+
+export async function createBookmark(data: BookmarkRequest) {
+  const res = await api.post(BOOKMARK_ENDPOINTS.CREATE, data)
+  return res.data
+}
 
 export async function getAllBookmarks() {
   const res = await api.get(BOOKMARK_ENDPOINTS.LIST_ALL)
