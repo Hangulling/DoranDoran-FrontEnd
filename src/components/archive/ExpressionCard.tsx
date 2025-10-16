@@ -27,13 +27,13 @@ export default function ExpressionCard({ item, open, onToggle }: ExpressionCardP
   const getBadgeVariant = (level: number): BadgeVariant => {
     switch (level) {
       case 1:
-        return 'Casual'
+        return 'Polite'
       case 2:
-        return 'Friendly'
-      case 3:
-        return 'Close'
-      default:
         return 'Casual'
+      case 3:
+        return 'Friendly'
+      default:
+        return 'Polite'
     }
   }
 
@@ -44,6 +44,11 @@ export default function ExpressionCard({ item, open, onToggle }: ExpressionCardP
   const handleSpeakerClick = (e: React.MouseEvent<HTMLImageElement>) => {
     e.stopPropagation()
     onPlay()
+  }
+
+  const handleToggleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    onToggle?.()
   }
 
   return (
@@ -80,7 +85,7 @@ export default function ExpressionCard({ item, open, onToggle }: ExpressionCardP
                 {item.text}
               </span>
             </div>
-            <button onClick={onToggle}>
+            <button onClick={handleToggleClick}>
               <img src={open ? clsoeExpandIcon : expandIcon} />
             </button>
           </div>
