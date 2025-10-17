@@ -30,6 +30,31 @@ export const authApi = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+api.interceptors.request.use(
+  config => {
+    if (!config.headers) {
+      config.headers = {} as AxiosRequestHeaders
+    }
+
+    const token = localStorage.getItem('accessToken')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+
+    const userId = getCurrentUserId()
+    if (userId) {
+      config.headers['X-User-Id'] = userId
+      if (config.method?.toLowerCase() === 'get') {
+        config.params = { ...config.params, userId }
+      }
+    }
+
+    console.log('api 요청 헤더:', config.headers)
+    return config
+  },
+  error => Promise.reject(error)
+)
+
 // api.ts 혹은 authApi 설정파일에서
 authApi.interceptors.request.use(config => {
   if (!config.headers) {

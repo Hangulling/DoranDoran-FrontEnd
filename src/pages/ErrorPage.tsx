@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/common/Button'
-import ServerError from '/public/serverError.svg'
-import ClientError from '/public/clientError.svg'
+import ServerError from '/serverError.svg'
+import ClientError from '/clientError.svg'
 import Arrow from '../assets/icon/leftArrow.svg?react'
 
 interface ErrorPageProps {
