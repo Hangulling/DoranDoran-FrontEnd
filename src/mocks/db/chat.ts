@@ -2,28 +2,28 @@
 export const chatRooms = [
   {
     roomRouteId: 1,
-    roomName: 'Friend',
+    roomName: 'friend',
     avatar: '/chat/school.svg',
     message: '반가워요! 우리 대화를 시작해 볼까요?',
     intimacy: 1,
   },
   {
     roomRouteId: 2,
-    roomName: 'Honey',
+    roomName: 'honey',
     avatar: '/chat/lover.svg',
     message: '반가워요! 우리 대화를 시작해 볼까요?',
     intimacy: 1,
   },
   {
     roomRouteId: 3,
-    roomName: 'Coworker',
+    roomName: 'coworker',
     avatar: '/chat/company.svg',
     message: '반가워요! 우리 대화를 시작해 볼까요?',
     intimacy: 1,
   },
   {
     roomRouteId: 4,
-    roomName: 'Senior',
+    roomName: 'senior',
     avatar: '/chat/client.svg',
     message: '반가워요! 우리 대화를 시작해 볼까요?',
     intimacy: 1,

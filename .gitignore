@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 .env.development
 API_SPECIFICATION.md
+API_SPECIFICATION_V2.md
+SSE_IMPLEMENTATION_GUIDE.md

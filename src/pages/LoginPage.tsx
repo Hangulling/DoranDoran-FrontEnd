@@ -6,6 +6,7 @@ import Button from '../components/common/Button'
 import Input from '../components/common/Input'
 import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../api/auth'
+import { useUserStore } from '../stores/useUserStore'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -13,6 +14,8 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const setStoreId = useUserStore(state => state.setId)
+  const setStoreName = useUserStore(state => state.setName)
 
   const handleLogin = async () => {
     if (loading) return
@@ -40,10 +43,14 @@ export default function LoginPage() {
         return
       }
 
-      const accessToken = res?.data?.accessToken as string | undefined
+      // const accessToken = res?.data?.accessToken as string | undefined
       const user = res?.data?.user
 
-      console.log('🎉 로그인 성공!', { user, accessToken })
+      if (user) {
+        console.log('🎉 로그인 성공! 스토어에 유저 정보 저장:', user)
+        setStoreId(user.id)
+        setStoreName(user.name)
+      }
 
       // if (accessToken) {
       //   localStorage.setItem('accessToken', accessToken)
