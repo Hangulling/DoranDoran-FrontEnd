@@ -7,25 +7,23 @@ import { USER_ENDPOINTS } from './endpoints'
 //   const response = await api.post<User>(USER_ENDPOINTS.CREATE, payload)
 //   return response.data
 // }
+// export const createUser = async (payload: CreatePayload): Promise<User> => {
+//   const res = await userApi.post(USER_ENDPOINTS.CREATE, payload)
+//   // BE가 { success, data, message } 를 줄 수도 있어 안전하게 파싱
+//   return (res.data?.data ?? res.data) as User
+// }
 
 export const createUser = async (payload: CreatePayload): Promise<User> => {
-  try {
-    if (import.meta.env.DEV) console.log('📨 createUser payload:', payload)
+  if (import.meta.env.DEV) console.log('📨 createUser payload:', payload)
 
-    const res = await userApi.post(USER_ENDPOINTS.CREATE, payload)
-    const body = res.data
-    if (import.meta.env.DEV) console.log('📩 createUser response:', body)
+  const res = await userApi.post(USER_ENDPOINTS.CREATE, payload)
+  const body = res.data
+  if (import.meta.env.DEV) console.log('📩 createUser response:', body)
 
-    if (body?.success === false) {
-      throw new Error(body?.message || 'Sign up failed')
-    }
-    return (body?.data ?? body) as User
-  } catch (e: any) {
-    const msg =
-      e?.response?.data?.message || e?.response?.data?.error || e?.message || 'Sign up failed'
-    if (import.meta.env.DEV) console.error('🚨 createUser failed:', e?.response?.data || e)
-    throw new Error(msg)
+  if (body?.success === false) {
+    throw new Error(body?.message || 'Sign up failed')
   }
+  return (body?.data ?? body) as User
 }
 
 // ID로 정보 조회
