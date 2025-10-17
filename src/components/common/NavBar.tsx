@@ -73,7 +73,6 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
 
         {/* 로고 및 페이지이름 */}
         <div className="navbar-center">
-          {/* 임시 Link */}
           {isMain ? (
             <img src={MainLogo} alt="메인로고" />
           ) : (
