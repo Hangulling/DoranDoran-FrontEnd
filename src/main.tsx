@@ -5,7 +5,7 @@ import App from './App.tsx'
 import './styles/index.css'
 
 const isDev = import.meta.env.DEV
-const USE_MSW = import.meta.env.VITE_USE_MSW === 'false'
+const USE_MSW = import.meta.env.VITE_USE_MSW === 'true'
 
 const prepare = async () => {
   if (isDev && USE_MSW) {
