@@ -1,5 +1,5 @@
 import type { LoginRequest, LoginResponse } from '../types/auth'
-import { publicApi, userApi } from './api'
+import api, {  userApi } from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
 
 // export async function login(data: LoginRequest) {
@@ -12,7 +12,7 @@ import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
 
 export async function login(data: LoginRequest) {
   try {
-    const res = await publicApi.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, data)
+    const res = await api.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, data)
     const { success, data: resData, message } = res.data
 
     if (import.meta.env.DEV) {
