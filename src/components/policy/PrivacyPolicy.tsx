@@ -1,8 +1,6 @@
 const PrivacyPolicy: React.FC = () => {
   return (
-    <div className="max-w-4xl mx-auto px-6 py-10 text-gray-800 leading-relaxed">
-      <h1 className="text-3xl font-bold text-center mb-8">Dorandoran Privacy Policy</h1>
-
+    <div className="max-w-4xl mx-auto px-6 py-2 text-gray-800 leading-relaxed">
       <p className="mb-6">
         Dorandoran (“we,” “our,” or “the Company”) respects your privacy and is committed to
         protecting your personal information. This Privacy Policy describes how we collect, use,

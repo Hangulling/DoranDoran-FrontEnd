@@ -2,9 +2,7 @@ import React from 'react'
 
 const ServicePolicy: React.FC = () => {
   return (
-    <div className="max-w-4xl mx-auto px-6 py-10 text-gray-800 leading-relaxed">
-      <h1 className="text-3xl font-bold text-center mb-10">Terms and Conditions</h1>
-
+    <div className="max-w-4xl mx-auto px-6 py-4 text-gray-800 leading-relaxed">
       {/* Article 1 */}
       <h2 className="text-2xl font-extrabold mb-3">Article 1 (Definitions)</h2>
       <p className="mb-4 font-semibold">
