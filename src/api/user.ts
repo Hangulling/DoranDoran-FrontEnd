@@ -1,11 +1,31 @@
 import type { User, CreatePayload, UpdatePayload, UserStatus } from '../types/user'
-import api from './api'
+import api, { userApi } from './api'
 import { USER_ENDPOINTS } from './endpoints'
 
 // 생성
+// export const createUser = async (payload: CreatePayload): Promise<User> => {
+//   const response = await api.post<User>(USER_ENDPOINTS.CREATE, payload)
+//   return response.data
+// }
+
 export const createUser = async (payload: CreatePayload): Promise<User> => {
-  const response = await api.post<User>(USER_ENDPOINTS.CREATE, payload)
-  return response.data
+  try {
+    if (import.meta.env.DEV) console.log('📨 createUser payload:', payload)
+
+    const res = await userApi.post(USER_ENDPOINTS.CREATE, payload)
+    const body = res.data
+    if (import.meta.env.DEV) console.log('📩 createUser response:', body)
+
+    if (body?.success === false) {
+      throw new Error(body?.message || 'Sign up failed')
+    }
+    return (body?.data ?? body) as User
+  } catch (e: any) {
+    const msg =
+      e?.response?.data?.message || e?.response?.data?.error || e?.message || 'Sign up failed'
+    if (import.meta.env.DEV) console.error('🚨 createUser failed:', e?.response?.data || e)
+    throw new Error(msg)
+  }
 }
 
 // ID로 정보 조회
