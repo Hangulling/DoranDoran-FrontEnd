@@ -9,6 +9,10 @@ import { useCoachStore, useModalStore } from '../stores/useUiStateStore'
 import { useNavigate, useParams } from 'react-router-dom'
 import { chatRooms } from '../mocks/db/chat'
 import ExitModal from '../components/chat/ExitModal'
+import { useChatStream } from '../hooks/useChatStream'
+import { useUserStore } from '../stores/useUserStore'
+import useRoomIdStore from '../stores/useRoomIdStore'
+import type { EventDataMap } from '../types/sseEvents'
 
 const ChatPage: React.FC = () => {
   const navigate = useNavigate()
@@ -22,6 +26,10 @@ const ChatPage: React.FC = () => {
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
+  const userId = useUserStore(state => state.id)
+  const roomsMap = useRoomIdStore(state => state.roomsMap)
+  const chatroomId = id ? roomsMap[id] : undefined
+  const accessToken = localStorage.getItem('accessToken') ?? ''
 
   useEffect(() => {
     window.history.pushState(null, '', window.location.href)
@@ -43,6 +51,16 @@ const ChatPage: React.FC = () => {
       window.removeEventListener('popstate', handlePopState)
     }
   }, [navigate, noShowAgain])
+
+  // SSE
+  const handleSseEvent = (eventType: string, data: EventDataMap[keyof EventDataMap]) => {
+    // 이벤트
+  }
+
+  // 여기서 useChatStream 호출
+  useChatStream<EventDataMap>(chatroomId ?? '', userId, accessToken, handleSseEvent, e =>
+    console.error('SSE Error', e)
+  )
 
   // 버튼 핸들러
   const handleConfirm = () => {

@@ -78,5 +78,12 @@ export async function leaveChatroom(chatroomId: string): Promise<void> {
 
 // SSE(실시간 메시지 스트림)
 export function getSseUrl(chatroomId: string, userId?: string): string {
-  return CHAT_ENDPOINTS.MESSAGE_STREAM(chatroomId, userId)
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+  const url = new URL(`${baseUrl}${CHAT_ENDPOINTS.MESSAGE_STREAM(chatroomId)}`)
+
+  if (userId) {
+    url.searchParams.append('userId', userId)
+  }
+
+  return url.toString()
 }
