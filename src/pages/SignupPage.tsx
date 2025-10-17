@@ -3,13 +3,14 @@ import axios from 'axios'
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
 import Agreement from '../components/common/Agreement'
-import { validateEmail, validateName } from '../utils/validations'
+import { PASSWORD_REGEX, validateEmail, validateName } from '../utils/validations'
 import CommonModal from '../components/common/CommonModal'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAgreementStore } from '../stores/useAgreementStore'
 import { useSignupFormStore } from '../stores/useSignupStore'
 import { checkEmailExists } from '../api/auth'
 import { createUser } from '../api/user'
+
 export default function SignupPage() {
   const {
     firstName,
@@ -31,7 +32,7 @@ export default function SignupPage() {
   const [openModal, setOpenModal] = useState(false)
   const [, setSubmitError] = useState<string | null>(null)
   const [verifyLoading, setVerifyLoading] = useState(false)
-  const [pwdError, setPwdError] = useState<string | null>(null)
+  const [, setPwdError] = useState<string | null>(null)
   const [, setPwdCheckError] = useState<string | null>(null)
 
   const navigate = useNavigate()
@@ -67,7 +68,7 @@ export default function SignupPage() {
     if (emailError && validateEmail(noSpace) === null) setEmailError(null)
     setEmailSuccess(null)
     setEmailVerified(false)
-    const err = validateEmail(email)
+    const err = validateEmail(noSpace)
     setEmailError(err)
     if (err) {
       setEmailSuccess(null)
@@ -92,6 +93,7 @@ export default function SignupPage() {
     if (value.length === 0) setPwdError(null)
     else if (value.length < 8) setPwdError('Must be at least 8 characters.')
     else if (value.length > 20) setPwdError('Must be 20 characters or fewer.')
+    else if (!PASSWORD_REGEX.test(value)) setPwdError('Please check your password format.')
     else setPwdError(null)
 
     if (passwordCheck.length > 0) {
@@ -105,11 +107,9 @@ export default function SignupPage() {
     setMany({ passwordCheck: value })
     setPwdCheckTouched(true)
 
-    if (!pwdError && password.length >= 8 && password.length <= 20) {
-      setPwdCheckError(password === value ? null : 'Passwords do not match.')
-    } else {
-      setPwdCheckError(null)
-    }
+    const baseOk = PASSWORD_REGEX.test(password)
+    if (baseOk) setPwdCheckError(password === value ? null : 'Passwords do not match.')
+    else setPwdCheckError(null)
   }
 
   const handleVerify = async () => {
@@ -146,30 +146,28 @@ export default function SignupPage() {
   }
 
   const isEmailFormatValid = email.trim() !== '' && validateEmail(email) === null
-  const pwdLenError =
-    pwdTouched && password.length > 0 && (password.length < 8 || password.length > 20)
-  const pwdMatchError =
-    pwdCheckTouched && passwordCheck.length > 0 && !pwdLenError && password !== passwordCheck
 
-  const passwordHelper = pwdLenError
-    ? password.length < 8
-      ? 'Must be at least 8 characters.'
-      : 'Must be 20 characters or fewer.'
+  const pwdFormatError = pwdTouched && password.length > 0 && !PASSWORD_REGEX.test(password)
+
+  const pwdMatchError =
+    pwdCheckTouched && passwordCheck.length > 0 && !pwdFormatError && password !== passwordCheck
+
+  const passwordHelper = pwdFormatError
+    ? 'Please check your password format.'
     : pwdMatchError
       ? 'Passwords do not match.'
       : null
 
   const passwordsMatch =
     pwdCheckTouched &&
-    password.length >= 8 &&
-    password.length <= 20 &&
+    PASSWORD_REGEX.test(password) &&
     passwordCheck.length > 0 &&
     password === passwordCheck
 
   const requiredAgreed = agreements.service && agreements.privacy
-  const isPasswordLenValid = password.length >= 8 && password.length <= 20
+
   const isPasswordValidForSubmit =
-    isPasswordLenValid && passwordCheck.length > 0 && password === passwordCheck
+    PASSWORD_REGEX.test(password) && passwordCheck.length > 0 && password === passwordCheck
 
   const isFormValid =
     firstName.trim() !== '' &&
@@ -304,7 +302,7 @@ export default function SignupPage() {
             value={password}
             onChange={e => handlePasswordChange(e.target.value)}
             onBlur={() => setPwdTouched(true)}
-            variant={pwdLenError || pwdMatchError ? 'error' : 'primary'}
+            variant={pwdFormatError || pwdMatchError ? 'error' : 'primary'}
           />
         </div>
 
