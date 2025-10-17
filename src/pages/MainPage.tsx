@@ -49,9 +49,9 @@ const MainPage = () => {
     if (!userId) return
 
     const statusMessage = (diffDays: number | undefined): string => {
-      if (diffDays === undefined) return '지금 바로 첫 대화를 시작해 보아요'
-      if (diffDays <= 0) return '새로운 주제로 다시 대화해 보아요' // 24시간 이내
-      return '오랜만에 대화를 나눠보아요!'
+      if (diffDays === undefined) return 'Start your first chat now'
+      if (diffDays <= 0) return 'Talk again with a new topic' // 24시간 이내
+      return 'It’s been a while! Let’s chat again'
     }
 
     getChatRoomListLimited(userId)
@@ -79,6 +79,7 @@ const MainPage = () => {
   }, [userId, navigate])
 
   const handleRoomClick = (id: number, roomName: string) => {
+    console.log('클릭된 방 concept:', roomName)
     navigate(`/closeness/${id}`, {
       state: { roomRouteId: id, concept: roomName },
     })

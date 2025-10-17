@@ -4,20 +4,23 @@ import Button from '../components/common/Button'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import useClosenessStore from '../stores/useClosenessStore'
 import { chatRooms } from '../mocks/db/chat'
-import { createChatRoom, updateIntimacy } from '../api'
+import { createChatRoom } from '../api'
 import { useUserStore } from '../stores/useUserStore'
 
-const bubbleBase = 'py-[6px] px-2 text-[14px] text-gray-700 rounded-lg flex flex-col'
+const bubbleBase = 'py-[6px] px-2 text-[14px] text-gray-700 rounded-lg'
 const bubbleBasic =
   bubbleBase + ' bg-white border border-gray-100 max-w-[265px] rounded-tl-none relative'
-const bubbleSecond = bubbleBase + ' bg-white border border-gray-100 relative ml-10 w-[186px]'
+const bubbleSecond =
+  bubbleBase + ' bg-white border border-gray-100 relative ml-10 inline-block max-w-[210px]'
+const bubbleThird =
+  bubbleBase + ' bg-white border border-gray-100 relative ml-10 inline-block max-w-[186px]'
 
 const ClosenessPage = () => {
   const { id } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
 
-  const concept = location.state?.roomName || ''
+  const concept = location.state?.concept || ''
 
   const userId = useUserStore(state => state.id)
   const closeness = useClosenessStore(state => state.closenessMap[id ?? ''] ?? 1)
@@ -41,30 +44,49 @@ const ClosenessPage = () => {
     if (!touched) setTouched(true)
   }
 
+  const chatBotIdByConcept = (conceptValue: string): string => {
+    switch (conceptValue) {
+      case 'friend':
+        return '22222222-2222-2222-2222-222222222221'
+      case 'honey':
+        return '22222222-2222-2222-2222-222222222222'
+      case 'coworker':
+        return '22222222-2222-2222-2222-222222222223'
+      case 'senior':
+        return '22222222-2222-2222-2222-222222222224'
+    }
+    return ''
+  }
+
   // 확인 버튼
   const handleConfirm = async () => {
     if (!id) return
 
     try {
-      // 채팅방 생성
-      const newRoom = await createChatRoom({
-        userId,
-        concept: concept,
-        intimacyLevel: sliderValue,
-      })
+      const chatbotId = chatBotIdByConcept(concept)
 
-      // 친밀도 업데이트
-      await updateIntimacy(newRoom.id, { intimacyLevel: sliderValue })
+      let newRoom
+      try {
+        // 채팅방 생성
+        newRoom = await createChatRoom({
+          userId,
+          concept: concept,
+          chatbotId: chatbotId,
+          intimacyLevel: sliderValue,
+        })
+      } catch (error) {
+        console.error('채팅방 생성 실패:', error)
+        return
+      }
 
       setCloseness(id, sliderValue) // store
       setIsExiting(true) // 모션
 
-      // 채팅 페이지
       setTimeout(() => {
         navigate(`/chat/${newRoom.id}`)
       }, 550)
     } catch (error) {
-      console.error('채팅방 생성 또는 친밀도 설정 실패:', error)
+      console.error('알 수 없는 에러 발생:', error)
     }
   }
 
@@ -104,8 +126,14 @@ const ClosenessPage = () => {
         </div>
 
         {/* 안내2 */}
-        <div className={bubbleSecond}>Slide to adjust the closeness.</div>
-        <div className={bubbleSecond}>Leave and return to reset your closeness settings.</div>
+        <div className="flex flex-col gap-2">
+          <div className={bubbleSecond}>Slide to adjust the closeness.</div>
+          <div className={bubbleThird}>
+            Leave and return to reset
+            <br />
+            your closeness settings.
+          </div>
+        </div>
       </div>
     </div>
   )

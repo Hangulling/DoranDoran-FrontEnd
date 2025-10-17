@@ -76,11 +76,6 @@ export async function leaveChatroom(chatroomId: string): Promise<void> {
   await api.post(CHAT_ENDPOINTS.LEAVE_CHATROOM(chatroomId))
 }
 
-// WebSocket 채팅 연결 -> 확인하기
-export function getWebSocketUrl(chatroomId: string, userId?: string): string {
-  return CHAT_ENDPOINTS.WEBSOCKET_CHAT(chatroomId, userId)
-}
-
 // SSE(실시간 메시지 스트림)
 export function getSseUrl(chatroomId: string, userId?: string): string {
   return CHAT_ENDPOINTS.MESSAGE_STREAM(chatroomId, userId)
