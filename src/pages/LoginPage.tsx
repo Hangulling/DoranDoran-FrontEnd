@@ -8,18 +8,51 @@ import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../api/auth'
 import { useUserStore } from '../stores/useUserStore'
 
+type ErrorKind = 'email' | 'password' | 'both' | 'general' | null
+
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<ErrorKind>(null)
+  const [errorMsg, setErrorMsg] = useState('')
   const navigate = useNavigate()
-  const setStoreId = useUserStore(state => state.setId)
-  const setStoreName = useUserStore(state => state.setName)
+
+  const setStoreId = useUserStore(s => s.setId)
+  const setStoreName = useUserStore(s => s.setName)
+
+  const mapAuthError = ({
+    status,
+    errorCode,
+    code,
+    message,
+  }: {
+    status?: number
+    errorCode?: string
+    code?: string
+    message?: string
+  }): { type: ErrorKind; msg?: string } => {
+    const ec = (errorCode || code || '').toUpperCase()
+    const msg = (message || '').toLowerCase()
+
+    const isEmailError =
+      status === 404 || ec === 'USER_NOT_FOUND' || /(이메일|존재하지 않|email|not found)/i.test(msg)
+
+    const isPasswordError =
+      status === 401 ||
+      ec === 'INVALID_PASSWORD' ||
+      ec === 'INVALID_CREDENTIALS' ||
+      /(비밀번호|password)/i.test(msg)
+
+    if (isEmailError && isPasswordError) return { type: 'both' } 
+    if (isEmailError) return { type: 'email' } 
+    if (isPasswordError) return { type: 'password' }
+
+    return { type: 'both', msg: 'Email error + Password error' }
+  }
 
   const handleLogin = async () => {
-    if (loading) return
     setError(null)
+    setErrorMsg('')
 
     if (!email && !password) {
       setError('both')
@@ -34,39 +67,49 @@ export default function LoginPage() {
       return
     }
 
-    setLoading(true)
     try {
       const res = await login({ email, password })
-      // res = { success, message, data: {...} }
+
       if (!res?.success) {
-        setError(res?.message || '로그인 실패')
+        const mapped = mapAuthError({
+          errorCode: (res as { errorCode?: string }).errorCode,
+          message: (res as { message?: string }).message,
+        })
+        setError(mapped.type)
+        setErrorMsg(mapped.msg ?? '')
         return
       }
 
-      // const accessToken = res?.data?.accessToken as string | undefined
       const user = res?.data?.user
-
       if (user) {
-        console.log('🎉 로그인 성공! 스토어에 유저 정보 저장:', user)
         setStoreId(user.id)
         setStoreName(user.name)
       }
 
-      // if (accessToken) {
-      //   localStorage.setItem('accessToken', accessToken)
-      // }
-
       navigate('/')
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || '네트워크 오류가 발생했습니다.')
+        const status = err.response?.status
+        const data = (err.response?.data ?? {}) as {
+          errorCode?: string
+          code?: string
+          message?: string
+        }
+
+        const mapped = mapAuthError({
+          status,
+          errorCode: data.errorCode,
+          code: data.code,
+          message: data.message,
+        })
+        setError(mapped.type)
+        setErrorMsg(mapped.msg ?? '')
         console.error('🚨 로그인 에러:', err.response?.data || err)
       } else {
-        setError('알 수 없는 오류가 발생했습니다.')
+        setError('both')
+        setErrorMsg('Email error + Password error')
         console.error('🚨 로그인 에러(unknown):', err)
       }
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -83,6 +126,7 @@ export default function LoginPage() {
             Chat your way to real-life Korean
           </span>
         </div>
+
         <div className="flex justify-center">
           <img src={loginCharacter} alt="login character" />
         </div>
@@ -106,7 +150,7 @@ export default function LoginPage() {
               onKeyDown={onKeyDown}
             />
 
-            {error && (
+            {(error || errorMsg) && (
               <span className="mt-1 block text-xs text-orange-500 text-body">
                 {error === 'email' && 'Email error'}
                 {error === 'password' && 'Password error'}
@@ -119,10 +163,8 @@ export default function LoginPage() {
               size="xl"
               className="bg-gray-800 my-4 w-full text-subtitle"
               onClick={handleLogin}
-              // disabled={loading}
             >
               Login
-              {/* {loading ? 'Logging in…' : 'Login'} */}
             </Button>
           </div>
         </div>
