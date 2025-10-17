@@ -45,6 +45,7 @@ function attachAuth(instance: AxiosInstance) {
       // console.log('➡️', (cfg.method || 'GET').toUpperCase(), instance.getUri({ ...cfg, url: cfg.url || '' }))
       // console.log('   Authorization:', (cfg.headers.Authorization as string)?.slice(0, 25) + '...')
     }
+
     return cfg
   })
 }

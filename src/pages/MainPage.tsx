@@ -4,7 +4,7 @@ import { chatRooms } from '../mocks/db/chat'
 import { useEffect, useState } from 'react'
 import { useUserStore } from '../stores/useUserStore'
 import { useGoBack } from '../hooks/useGoBack'
-import { chatRoomList } from '../api'
+import { getChatRoomListLimited, getCurrentUser } from '../api'
 import { getDaysDiff } from '../utils/getDaysDiff'
 
 interface ChatRoomWithMessage {
@@ -26,39 +26,39 @@ const MainPage = () => {
   // 뒤로 가기 방지
   useGoBack()
 
-  // 사용자 정보 GET, store 저장
+  // 사용자 조회
   useEffect(() => {
-    fetch('/api/auth/me')
-      .then(res => res.json())
-      .then(profile => {
-        setUserName(profile.data.name)
-        setStoreName(profile.data.name)
-        setUserId(profile.data.id)
-        setStoreId(profile.data.id)
-      })
-      .catch(err => {
+    async function fetchUser() {
+      try {
+        const response = await getCurrentUser()
+        const profile = response.data
+        setUserName(profile.name)
+        setStoreName(profile.name)
+        setUserId(profile.id)
+        setStoreId(profile.id)
+      } catch (err) {
         console.error('사용자 정보 로드 실패:', err)
-        //   navigate('/error', { state: { from: '/main' } })
-      })
-  }, [setStoreName, setStoreId, navigate])
+        // navigate('/error', { state: { from: '/main' } })
+      }
+    }
+    fetchUser()
+  }, [setStoreName, setStoreId, setUserName, setUserId])
 
   // 상태 메세지 설정
   useEffect(() => {
     if (!userId) return
 
     const statusMessage = (diffDays: number | undefined): string => {
-      if (diffDays === undefined) return '반가워요! 우리 대화를 시작해 볼까요?'
-      if (diffDays === 0) return '우리 더 대화해 볼까요?'
-      if (diffDays === 2) return '왜 이제 왔어요~ 우리 수다 떨어요!'
-      return '오랜만에 함께 이야기 나눠요!'
+      if (diffDays === undefined) return '지금 바로 첫 대화를 시작해 보아요'
+      if (diffDays <= 0) return '새로운 주제로 다시 대화해 보아요' // 24시간 이내
+      return '오랜만에 대화를 나눠보아요!'
     }
 
-    // chatRoomList 호출 시 반환 타입은 ChatRoomListParams
-    chatRoomList(0, 20, userId)
+    getChatRoomListLimited(userId)
       .then(response => {
-        // response.content는 ApiChatRoom[] 타입
+        // response는 ApiChatRoom[] 타입 (배열)
         const mergedRooms = chatRooms.map(mockRoom => {
-          const serverRoom = response.content.find(r => r.concept === mockRoom.roomName)
+          const serverRoom = response.find(r => r.concept === mockRoom.roomName)
           const diffDays = serverRoom?.lastMessageAt
             ? getDaysDiff(serverRoom.lastMessageAt)
             : undefined
@@ -74,7 +74,7 @@ const MainPage = () => {
       })
       .catch(err => {
         console.error('채팅방 목록 로드 실패:', err)
-        //  navigate('/error', { state: { from: '/main' } })
+        // navigate('/error', { state: { from: '/main' } })
       })
   }, [userId, navigate])
 
