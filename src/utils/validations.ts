@@ -17,11 +17,22 @@ export const validateEmail = (email: string): string | null => {
   return null
 }
 
+export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,20}$/
+
 export const validatePassword = (password: string, confirm: string): string | null => {
-  if (password.length < 8) return 'Must be at least 8 characters.'
-  if (password.length > 20) return 'Must be 20 characters or fewer.'
-  if (confirm.length > 0 && password !== confirm) {
+  const v = password.trim()
+
+  if (v.length === 0) return null
+  if (v.length < 8) return 'Must be at least 8 characters.'
+  if (v.length > 20) return 'Must be 20 characters or fewer.'
+
+  if (!PASSWORD_REGEX.test(v)) {
+    return 'Please check your password format.'
+  }
+
+  if (confirm.length > 0 && v !== confirm) {
     return 'Passwords do not match.'
   }
+
   return null
 }
