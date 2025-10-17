@@ -26,6 +26,20 @@ export async function chatRoomList(
   return response.data
 }
 
+// 채팅방 단건 조회
+export async function getChatRoom(chatroomId: string, userId?: string): Promise<ApiChatRoom> {
+  const params = userId ? { userId } : {}
+  const res = await api.get(CHAT_ENDPOINTS.GET_CHATROOM(chatroomId), { params })
+  return res.data
+}
+
+// 채팅방 목록 (최대 4개) 조회
+export async function getChatRoomListLimited(userId?: string): Promise<ApiChatRoom[]> {
+  const params = userId ? { userId } : {}
+  const res = await api.get(CHAT_ENDPOINTS.CHATROOM_LIST_LIMITED, { params })
+  return res.data
+}
+
 // 메시지 목록 조회
 export async function getMessages(
   chatroomId: string,

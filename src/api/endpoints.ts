@@ -66,6 +66,12 @@ export const CHAT_ENDPOINTS = {
     return `/api/chat/chatrooms?${params.toString()}`
   },
 
+  // 채팅방 단건 조회
+  GET_CHATROOM: (chatroomId: string) => `/api/chat/chatrooms/${chatroomId}`,
+
+  // 채팅방 목록 (최대 4개) 조회
+  CHATROOM_LIST_LIMITED: '/api/chat/chatrooms/all',
+
   // 메시지 목록 조회
   MESSAGES_LIST: (chatroomId: string, userId?: string, page: number = 0, size: number = 50) => {
     const params = new URLSearchParams()
