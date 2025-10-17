@@ -10,7 +10,6 @@ export default function PolicyPage() {
 
   const location = useLocation()
   const path = location.pathname
-  console.log(location.pathname)
   const setOne = useAgreementStore(s => s.setOne)
 
   const handleConfirm = () => {
