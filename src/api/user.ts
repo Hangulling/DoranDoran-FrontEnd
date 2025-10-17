@@ -1,11 +1,29 @@
 import type { User, CreatePayload, UpdatePayload, UserStatus } from '../types/user'
-import api from './api'
+import api, { userApi } from './api'
 import { USER_ENDPOINTS } from './endpoints'
 
 // 생성
+// export const createUser = async (payload: CreatePayload): Promise<User> => {
+//   const response = await api.post<User>(USER_ENDPOINTS.CREATE, payload)
+//   return response.data
+// }
+// export const createUser = async (payload: CreatePayload): Promise<User> => {
+//   const res = await userApi.post(USER_ENDPOINTS.CREATE, payload)
+//   // BE가 { success, data, message } 를 줄 수도 있어 안전하게 파싱
+//   return (res.data?.data ?? res.data) as User
+// }
+
 export const createUser = async (payload: CreatePayload): Promise<User> => {
-  const response = await api.post<User>(USER_ENDPOINTS.CREATE, payload)
-  return response.data
+  if (import.meta.env.DEV) console.log('📨 createUser payload:', payload)
+
+  const res = await userApi.post(USER_ENDPOINTS.CREATE, payload)
+  const body = res.data
+  if (import.meta.env.DEV) console.log('📩 createUser response:', body)
+
+  if (body?.success === false) {
+    throw new Error(body?.message || 'Sign up failed')
+  }
+  return (body?.data ?? body) as User
 }
 
 // ID로 정보 조회

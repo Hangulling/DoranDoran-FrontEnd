@@ -1,59 +1,67 @@
-import axios from 'axios'
+import axios, { type AxiosInstance } from 'axios'
 
-/** .env에서 값 미리 불러오기 */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
-const AUTH_BASE_URL = import.meta.env.VITE_AUTH_BASE_URL || 'http://localhost:8082'
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://3.21.177.186:8080').replace(
+  /\/+$/,
+  ''
+)
+const AUTH_BASE_URL = (import.meta.env.VITE_AUTH_BASE_URL || '').replace(/\/+$/, '')
+const USER_BASE_URL = (import.meta.env.VITE_USER_BASE_URL || '').replace(/\/+$/, '')
 
-/** 콘솔로 현재 환경 확인 (개발 중 유용) */
-console.log('🌐 API Base URL:', API_BASE_URL)
-console.log('🔐 AUTH Base URL:', AUTH_BASE_URL)
-
-/** 공개 API (회원가입 / 이메일중복 등, 토큰 미첨부) */
 export const publicApi = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 })
 
-/** 일반 API (로그인 후 사용하는 Gateway, User, Chat 등 / 토큰 자동 첨부) */
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 })
 
-/** Auth 전용 API (로그인/리프레시 전용) */
 export const authApi = axios.create({
-  baseURL: AUTH_BASE_URL,
-  timeout: 10000,
+  baseURL: AUTH_BASE_URL || API_BASE_URL,
+  timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 })
 
-/** 요청 인터셉터: 자동 토큰 첨부 (api 전용) */
-api.interceptors.request.use(
-  config => {
+export const userApi = axios.create({
+  baseURL: USER_BASE_URL || API_BASE_URL,
+  timeout: 15000,
+  headers: { 'Content-Type': 'application/json' },
+})
+
+/** 공통: Authorization 붙이는 인터셉터 */
+function attachAuth(instance: AxiosInstance) {
+  instance.interceptors.request.use(cfg => {
     const token = localStorage.getItem('accessToken')
     if (token) {
-      config.headers = config.headers ?? {}
-      config.headers.Authorization = `Bearer ${token}`
+      cfg.headers = cfg.headers ?? {}
+      if (!('Authorization' in cfg.headers)) {
+        cfg.headers.Authorization = `Bearer ${token}`
+      }
+      console.log('🟢 Authorization 헤더 적용됨:', token.slice(0, 30) + '...')
+      // 디버깅용
+      // console.log('➡️', (cfg.method || 'GET').toUpperCase(), instance.getUri({ ...cfg, url: cfg.url || '' }))
+      // console.log('   Authorization:', (cfg.headers.Authorization as string)?.slice(0, 25) + '...')
     }
-    return config
-  },
-  error => Promise.reject(error)
-)
+    return cfg
+  })
+}
 
-/** 응답 인터셉터: 401 시 처리 (api 전용) */
-api.interceptors.response.use(
-  response => response,
-  error => {
-    const status = error.response?.status
-    if (status === 401) {
-      console.warn('🔒 인증 만료 — 로그인 페이지로 이동')
-      localStorage.removeItem('accessToken')
-      window.location.href = '/login'
-    }
-    return Promise.reject(error)
-  }
-)
+// 디버그 로그
+authApi.interceptors.request.use(c => {
+  console.log('🔐 AUTH →', c.method?.toUpperCase(), authApi.getUri({ ...c, url: c.url || '' }))
+  return c
+})
+userApi.interceptors.request.use(c => {
+  console.log('👤 USER →', c.method?.toUpperCase(), userApi.getUri({ ...c, url: c.url || '' }))
+  return c
+})
+publicApi.interceptors.request.use(c => {
+  console.log('🌐 PUBLIC →', c.method?.toUpperCase(), publicApi.getUri({ ...c, url: c.url || '' }))
+  return c
+})
+;[api, authApi, userApi, publicApi].forEach(attachAuth)
 
 export default api

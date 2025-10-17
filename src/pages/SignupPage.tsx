@@ -31,6 +31,8 @@ export default function SignupPage() {
   const [openModal, setOpenModal] = useState(false)
   const [, setSubmitError] = useState<string | null>(null)
   const [verifyLoading, setVerifyLoading] = useState(false)
+  const [pwdError, setPwdError] = useState<string | null>(null)
+  const [, setPwdCheckError] = useState<string | null>(null)
 
   const navigate = useNavigate()
   const location = useLocation() as { state?: { fromPolicy?: boolean } }
@@ -41,12 +43,20 @@ export default function SignupPage() {
 
   const handleFirstNameChange = (v: string) => {
     const noSpace = v.replace(/\s+/g, '')
+    if (noSpace.length > 15) {
+      setFirstNameError('You can enter up to 15 characters.')
+      return
+    }
     setMany({ firstName: noSpace })
     if (firstNameError && validateName(noSpace) === null) setFirstNameError(null)
   }
 
   const handleLastNameChange = (v: string) => {
     const noSpace = v.replace(/\s+/g, '')
+    if (noSpace.length > 15) {
+      setLastNameError('You can enter up to 15 characters.')
+      return
+    }
     setMany({ lastName: noSpace })
     if (lastNameError && validateName(noSpace) === null) setLastNameError(null)
   }
@@ -57,6 +67,12 @@ export default function SignupPage() {
     if (emailError && validateEmail(noSpace) === null) setEmailError(null)
     setEmailSuccess(null)
     setEmailVerified(false)
+    const err = validateEmail(email)
+    setEmailError(err)
+    if (err) {
+      setEmailSuccess(null)
+      setEmailVerified(false)
+    }
   }
 
   const handleEmailBlur = () => {
@@ -65,6 +81,34 @@ export default function SignupPage() {
     if (err) {
       setEmailSuccess(null)
       setEmailVerified(false)
+    }
+  }
+
+  const handlePasswordChange = (v: string) => {
+    const value = v.replace(/\s+/g, '')
+    setMany({ password: value })
+    setPwdTouched(true)
+
+    if (value.length === 0) setPwdError(null)
+    else if (value.length < 8) setPwdError('Must be at least 8 characters.')
+    else if (value.length > 20) setPwdError('Must be 20 characters or fewer.')
+    else setPwdError(null)
+
+    if (passwordCheck.length > 0) {
+      setPwdCheckTouched(true)
+      setPwdCheckError(value === passwordCheck ? null : 'Passwords do not match.')
+    }
+  }
+
+  const handlePasswordCheckChange = (v: string) => {
+    const value = v.replace(/\s+/g, '')
+    setMany({ passwordCheck: value })
+    setPwdCheckTouched(true)
+
+    if (!pwdError && password.length >= 8 && password.length <= 20) {
+      setPwdCheckError(password === value ? null : 'Passwords do not match.')
+    } else {
+      setPwdCheckError(null)
     }
   }
 
@@ -199,7 +243,7 @@ export default function SignupPage() {
             type="text"
             label="First name *"
             variant={firstNameError ? 'error' : 'primary'}
-            placeholder="Enter your first name (1-15 characters)"
+            placeholder="Enter 1-15 characters"
             onChange={e => handleFirstNameChange(e.target.value)}
             onBlur={() => setFirstNameError(validateName(firstName))}
             value={firstName}
@@ -211,7 +255,7 @@ export default function SignupPage() {
           <Input
             type="text"
             label="Last name *"
-            placeholder="Enter your last name (1-15 characters)"
+            placeholder="Enter 1-15 characters"
             variant={lastNameError ? 'error' : 'primary'}
             onChange={e => handleLastNameChange(e.target.value)}
             onBlur={() => setLastNameError(validateName(lastName))}
@@ -256,9 +300,9 @@ export default function SignupPage() {
           <Input
             type="password"
             label="Password *"
-            placeholder="Enter your password (8-20 characters)"
+            placeholder="Enter 8-20 characters & letters+numbers"
             value={password}
-            onChange={e => setMany({ password: e.target.value.replace(/\s+/g, '') })}
+            onChange={e => handlePasswordChange(e.target.value)}
             onBlur={() => setPwdTouched(true)}
             variant={pwdLenError || pwdMatchError ? 'error' : 'primary'}
           />
@@ -267,9 +311,9 @@ export default function SignupPage() {
         <div className="w-[335px]">
           <Input
             type="password"
-            placeholder="Enter your password (8-20 characters)"
+            placeholder="Enter 8-20 characters & letters+numbers"
             value={passwordCheck}
-            onChange={e => setMany({ passwordCheck: e.target.value.replace(/\s+/g, '') })}
+            onChange={e => handlePasswordCheckChange(e.target.value)}
             onBlur={() => setPwdCheckTouched(true)}
             variant={pwdMatchError ? 'error' : 'primary'}
           />
