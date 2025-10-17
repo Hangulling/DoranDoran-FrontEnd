@@ -1,8 +1,9 @@
-import axios from 'axios'
+import axios, { type AxiosRequestHeaders } from 'axios'
+import { getCurrentUserId } from './auth'
 
 /** .env에서 값 미리 불러오기 */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
-const AUTH_BASE_URL = import.meta.env.VITE_AUTH_BASE_URL || 'http://localhost:8082'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://3.21.177.186:8080'
+const AUTH_BASE_URL = import.meta.env.VITE_AUTH_BASE_URL || 'http://3.21.177.186:8081'
 
 /** 콘솔로 현재 환경 확인 (개발 중 유용) */
 console.log('🌐 API Base URL:', API_BASE_URL)
@@ -29,14 +30,38 @@ export const authApi = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-/** 요청 인터셉터: 자동 토큰 첨부 (api 전용) */
-api.interceptors.request.use(
+// api.ts 혹은 authApi 설정파일에서
+authApi.interceptors.request.use(config => {
+  if (!config.headers) {
+    config.headers = {} as AxiosRequestHeaders
+  }
+  const token = localStorage.getItem('accessToken')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+/** 요청 인터셉터: 자동 토큰 첨부 (publicApi 전용) */
+publicApi.interceptors.request.use(
   config => {
+    if (!config.headers) {
+      config.headers = {} as AxiosRequestHeaders
+    }
+
     const token = localStorage.getItem('accessToken')
     if (token) {
-      config.headers = config.headers ?? {}
       config.headers.Authorization = `Bearer ${token}`
     }
+
+    const userId = getCurrentUserId()
+    if (userId) {
+      config.headers['X-User-Id'] = userId
+      if (config.method === 'get') {
+        config.params = { ...config.params, userId }
+      }
+    }
+    console.log('요청 헤더:', config.headers)
     return config
   },
   error => Promise.reject(error)

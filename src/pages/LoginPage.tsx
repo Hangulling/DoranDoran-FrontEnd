@@ -45,9 +45,9 @@ export default function LoginPage() {
 
       console.log('🎉 로그인 성공!', { user, accessToken })
 
-      // if (accessToken) {
-      //   localStorage.setItem('accessToken', accessToken)
-      // }
+      if (accessToken) {
+        localStorage.setItem('accessToken', accessToken)
+      }
 
       navigate('/')
     } catch (err: unknown) {
