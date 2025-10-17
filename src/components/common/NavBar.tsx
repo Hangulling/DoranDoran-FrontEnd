@@ -1,5 +1,5 @@
 import type React from 'react'
-import { Link, useMatch, useNavigate } from 'react-router-dom'
+import { useMatch, useNavigate } from 'react-router-dom'
 import LeftArrowIcon from '../../assets/icon/leftArrow.svg?react'
 import CloseIcon from '../../assets/icon/close.svg'
 import BookmarkIcon from '../../assets/icon/bookmark.svg?react'
@@ -75,9 +75,7 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
         <div className="navbar-center">
           {/* 임시 Link */}
           {isMain ? (
-            <Link to="/login">
-              <img src={MainLogo} alt="메인로고" />
-            </Link>
+            <img src={MainLogo} alt="메인로고" />
           ) : (
             <a className="text-title text-[16px] normal-case">{title}</a>
           )}
