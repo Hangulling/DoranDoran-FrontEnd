@@ -7,15 +7,6 @@ export interface ExpressionItem {
   savedAt?: string
 }
 
-export interface ExpressionItem {
-  id: string
-  chatRoom: 'Friend' | 'Honey' | 'Coworker' | 'Client'
-  text: string
-  intimacy: number
-  ttsUrl?: string
-  savedAt?: string
-}
-
 // --- 챗봇 타입 ---
 export type BotType = 'friend' | 'honey' | 'coworker' | 'senior'
 
