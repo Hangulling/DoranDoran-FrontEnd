@@ -25,20 +25,21 @@ export interface Vocabulary {
 
 // --- AI 피드백 ---
 export interface AiResponse {
-  intimacyLevel: string // 예: "Close" | "Casual"
-  description: string
-  translation: Translation
-  vocabulary: Vocabulary[]
-  corrections: string[]
+  intimacyLevel?: string // 예: "Close" | "Casual"
+  description?: string
+  translation?: Translation
+  vocabulary?: Vocabulary[]
+  corrections?: string[]
 }
 
 // --- 북마크 저장 요청 ---
 export interface BookmarkRequest {
   messageId: string // 메시지 ID (UUID)
   chatroomId: string // 채팅방 ID (UUID)
+  chatbotId: string // 챗봇 ID (UUID)
   content: string // 원본 표현
   aiResponse: AiResponse // AI 피드백
-  botType: BotType // 챗봇 타입
+  botType?: BotType // 챗봇 타입
 }
 
 // --- 북마크 응답 ---

@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { getSseUrl } from '../api'
+import { EventSourcePolyfill } from 'event-source-polyfill'
 
 const eventNames = [
   'intimacy_analysis', // 친밀도 분석 결과
   'vocabulary_extracted', // 어휘 추출 결과
-  'vocabulary_translated', // 번역 결과
-  'conversation_chunk', // 대화 응답 스트림
+  'vocabulary_translated', // 번역 결과 --> 위와 합쳐짐
+  'conversation_chunk', // 대화 응답 스트림 -> 필요없을듯
   'conversation_complete', // 대화 완료
   'aggregated_complete', // 전체 결과 집계
 ]
@@ -13,6 +14,7 @@ const eventNames = [
 export function useChatStream<T = unknown>(
   chatroomId: string,
   userId?: string,
+  accessToken?: string,
   onEventReceived?: (eventType: string, data: T) => void,
   onError?: (event: Event) => void
 ) {
@@ -23,7 +25,12 @@ export function useChatStream<T = unknown>(
 
     const sseUrl = getSseUrl(chatroomId, userId)
     // 서버와 연결 시작
-    const eventSource = new EventSource(sseUrl)
+    const eventSource = new EventSourcePolyfill(sseUrl, {
+      headers: {
+        Authorization: accessToken ? `Bearer ${accessToken}` : '',
+      },
+      // 필요에 따라 withCredentials: true 추가 가능
+    })
 
     // 기본 메시지 이벤트 처리
     eventSource.onmessage = event => {
@@ -51,7 +58,7 @@ export function useChatStream<T = unknown>(
     return () => {
       eventSource.close()
     }
-  }, [chatroomId, userId, onEventReceived, onError])
+  }, [chatroomId, userId, onEventReceived, onError, accessToken])
 
   return eventSourceRef.current
 }

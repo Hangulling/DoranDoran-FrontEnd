@@ -2,8 +2,12 @@ import type { BookmarkRequest } from '../types/archive'
 import api from './api'
 import { BOOKMARK_ENDPOINTS } from './endpoints'
 
-export async function createBookmark(data: BookmarkRequest) {
-  const res = await api.post(BOOKMARK_ENDPOINTS.CREATE, data)
+// 헤더에 USERID 붙여야 함
+export async function createBookmark(
+  data: BookmarkRequest,
+  config?: { headers: Record<string, string> }
+) {
+  const res = await api.post(BOOKMARK_ENDPOINTS.CREATE, data, config)
   return res.data
 }
 

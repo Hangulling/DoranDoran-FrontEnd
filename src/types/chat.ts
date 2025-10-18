@@ -8,7 +8,7 @@ export interface ChatRoom {
 }
 
 export interface Message {
-  id: number
+  id: string
   text: string
   isSender: boolean
   avatarUrl?: string

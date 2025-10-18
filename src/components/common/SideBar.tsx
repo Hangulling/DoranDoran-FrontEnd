@@ -6,7 +6,8 @@ import SignupIcon from '../../assets/icon/signup.svg?react'
 import type { SidebarProps } from '../../types/common'
 import CommonModal from './CommonModal'
 import { useNavigate } from 'react-router-dom'
-import { logout } from '../../api'
+import { deleteUser, logout } from '../../api'
+import { useUserStore } from '../../stores/useUserStore'
 
 const LOGOUT_DESC = ['You can log in again anytime.']
 const SIGNOUT_DESC = ['This action cannot be undone.', 'Are you sure you want to continue?']
@@ -21,6 +22,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const [modalType, setModalType] = useState<'logout' | 'signup' | null>(null)
   const [visible, setVisible] = useState(isOpen)
   const [isActive, setIsActive] = useState(false)
+  const userId = useUserStore(state => state.id)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -58,8 +60,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         console.error('로그아웃 실패:', error)
       }
     } else if (modalType === 'signup') {
-      console.log('회원탈퇴')
-      // 회원탈퇴 처리 로직 추가
+      try {
+        await deleteUser(userId)
+        onClose()
+        navigate('/login')
+      } catch (error) {
+        console.error('회원 탈퇴 실패:', error)
+      }
     }
     setModalOpen(false)
   }

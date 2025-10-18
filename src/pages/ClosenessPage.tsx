@@ -6,6 +6,7 @@ import useClosenessStore from '../stores/useClosenessStore'
 import { chatRooms } from '../mocks/db/chat'
 import { createChatRoom } from '../api'
 import { useUserStore } from '../stores/useUserStore'
+import useRoomIdStore from '../stores/useRoomIdStore'
 
 const bubbleBase = 'py-[6px] px-2 text-[14px] text-gray-700 rounded-lg'
 const bubbleBasic =
@@ -78,12 +79,13 @@ const ClosenessPage = () => {
         console.error('채팅방 생성 실패:', error)
         return
       }
+      useRoomIdStore.getState().addRoomMapping(id, newRoom.id)
 
       setCloseness(id, sliderValue) // store
       setIsExiting(true) // 모션
 
       setTimeout(() => {
-        navigate(`/chat/${newRoom.id}`)
+        navigate(`/chat/${id}`)
       }, 550)
     } catch (error) {
       console.error('알 수 없는 에러 발생:', error)
