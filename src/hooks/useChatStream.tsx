@@ -5,8 +5,8 @@ import { EventSourcePolyfill } from 'event-source-polyfill'
 const eventNames = [
   'intimacy_analysis', // 친밀도 분석 결과
   'vocabulary_extracted', // 어휘 추출 결과
-  'vocabulary_translated', // 번역 결과
-  'conversation_chunk', // 대화 응답 스트림
+  'vocabulary_translated', // 번역 결과 --> 위와 합쳐짐
+  'conversation_chunk', // 대화 응답 스트림 -> 필요없을듯
   'conversation_complete', // 대화 완료
   'aggregated_complete', // 전체 결과 집계
 ]

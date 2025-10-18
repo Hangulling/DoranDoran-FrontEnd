@@ -1,38 +1,54 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import useClosenessStore from '../../stores/useClosenessStore'
+import TTSIcon from './VolumeIcon'
+import BookmarkIcon from './BookmarkIcon'
+import useTTS from '../../hooks/useTTS'
 
 interface CorrectionBubbleProps {
   chatRoomId: string
   initialTab?: string
   descriptionByTab: Record<string, string>
+  correctedSentence?: string
+  isSender?: boolean
 }
 
-const bubbleClass = 'bg-green-50 rounded-lg px-[10px] py-[10px] max-w-[265px] mb-2'
+const tabs = ['Kor', 'Eng']
+const wrapperClass = 'chat chat-end gap-0'
+const bubbleClass = 'bg-green-50 rounded-lg px-[10px] py-[10px] w-[265px] mb-2'
 
 const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   chatRoomId,
   initialTab = 'Eng',
   descriptionByTab,
+  correctedSentence,
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
+  const [currentDescription, setCurrentDescription] = useState(descriptionByTab)
+
+  useEffect(() => {
+    setCurrentDescription(descriptionByTab)
+  }, [descriptionByTab])
+
   const closeness = useClosenessStore(state => state.closenessMap[chatRoomId] ?? 1)
   const closenessText = closeness === 1 ? 'Polite' : closeness === 2 ? 'Casual' : 'Friendly'
 
-  const tabs = ['Kor', 'Eng']
+  const [isBookmarked, setIsBookmarked] = useState(false)
+  const ttsText = correctedSentence ?? ''
+  const { onPlay: playTTS, playing: isPlaying } = useTTS(ttsText)
 
-  const wrapperClass = 'chat chat-end'
+  const toggleBookmark = () => setIsBookmarked(!isBookmarked)
 
   return (
     <div className={wrapperClass}>
       <div className={bubbleClass}>
         <div className="flex items-center justify-between text-[12px] mb-1">
-          <div className="flex flex-col space-y-3 items-center text-title">
+          <div className="flex flex-col space-y-2 items-left text-title">
             <p className="text-green-500">
               closeness level -<span> {closenessText}</span>
             </p>
-            <p>교정문구</p>
+            <p>{correctedSentence}</p>
           </div>
-          <div className="flex p-0.5 bg-green-80 rounded-[6px]">
+          <div className="flex p-0.5 bg-green-80 rounded-[6px] mt-[26px]">
             {tabs.map(tab => (
               <button
                 key={tab}
@@ -51,7 +67,14 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
           </div>
         </div>
         <div className="h-[1px] bg-green-80 w-full my-2" />
-        <div className="text-[14px] text-gray-700">{descriptionByTab[selectedTab]}</div>
+        <div className="text-[14px] text-gray-700">{currentDescription[selectedTab]}</div>
+        <>
+          <div className="h-[1px] bg-gray-80 w-full my-1" />
+          <div className="flex flex-row justify-between">
+            <TTSIcon playing={isPlaying} onPlay={playTTS} />
+            <BookmarkIcon isBookmarked={isBookmarked} onToggle={toggleBookmark} />
+          </div>
+        </>
       </div>
     </div>
   )

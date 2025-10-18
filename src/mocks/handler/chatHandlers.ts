@@ -10,7 +10,7 @@ interface DetailedChatRoom {
 }
 
 let detailedChatRooms: DetailedChatRoom[] = initialChatRooms.map((room, index) => ({
-  roomId: room.roomId,
+  roomId: room.roomRouteId,
   roomName: room.roomName,
   lastMessage: room.message,
   category: ['SCHOOL', 'LOVER', 'COMPANY', 'CLIENT'][index % 4],
