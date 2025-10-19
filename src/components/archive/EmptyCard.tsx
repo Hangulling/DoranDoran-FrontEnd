@@ -3,18 +3,19 @@ import arrowActive from '../../assets/icon/arrowRight.svg'
 import emptyBookmark from '../../assets/icon/emptyBookmark.svg'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useArchiveStore from '../../stores/useArchiveStore'
-import type { Room } from './ArchiveTabs'
+import type { Room } from '../../types/archive'
 
 export default function EmptyCard() {
   const navigate = useNavigate()
   const location = useLocation()
   const fromChat = (location.state as { from?: string } | null)?.from === 'chat'
   const { activeRoom } = useArchiveStore()
+  console.log(activeRoom, 'activeRoom')
   const roomToChatId: Record<Room, string> = {
-      Friend: '1',
+    Friend: '1',
     Honey: '2',
     Coworker: '3',
-    Client: '4',
+    Senior: '4',
   }
 
   const handleClick = () => {
