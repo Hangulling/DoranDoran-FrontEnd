@@ -54,6 +54,8 @@ export interface BookmarkResponse {
   aiResponse: AiResponse
   botType: BotType
   createdAt: string
+  ttsUrl?: string
+  savedAt?: string
 }
 
 // --- 커서 기반 조회 응답 ---
