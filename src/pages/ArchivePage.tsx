@@ -11,11 +11,14 @@ import { useLocation, useParams } from 'react-router-dom'
 import {
   BOT_TO_ROOM,
   ROOM_TO_BOT,
-  type BookmarkResponse,
+  // type BookmarkResponse,
   type BotType,
   type Room,
 } from '../types/archive'
-import { deleteManyBookmarks, getBookmarksByBotType } from '../api/archive'
+import {
+  // deleteManyBookmarks,
+  getBookmarksByBotType,
+} from '../api/archive'
 
 export default function ArchivePage() {
   const {
