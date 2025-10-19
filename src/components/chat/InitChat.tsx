@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState, type FC } from 'react'
 import ChatBubble from './ChatBubble'
-import DescriptionBubble from './DescriptionBubble'
+// import DescriptionBubble from './DescriptionBubble'
+import useClosenessStore from '../../stores/useClosenessStore'
+import { useParams } from 'react-router-dom'
+import { greetingMessage } from '../../mocks/db/greetingMessages'
+import { conceptMap } from '../../utils/conceptMap'
 
 interface InitChatProps {
   avatar?: string
@@ -9,11 +13,38 @@ interface InitChatProps {
 const LoadingDot = () => <span className="loading loading-dots loading-[5px] text-gray-200" />
 
 const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
+  const { id } = useParams<{ id: string }>()
   const [step, setStep] = useState(0)
   const lastMessageRef = useRef<HTMLDivElement>(null)
 
   const LOADING_DURATION = 600
   const PAUSE_DURATION = 700
+
+  // Closeness 상태 가져오기
+  const closenessLevel = useClosenessStore(state => state.getCloseness(id ?? '')) ?? 1
+
+  // id에 따른 컨셉 매핑 유틸 사용
+  const concept = conceptMap(id)
+
+  function getGreetingMessage(concept: string, closenessLevel: number) {
+    const filtered = greetingMessage.filter(
+      item => item.concept === concept && item.closenessLevel === closenessLevel
+    )
+    if (filtered.length === 0) {
+      return {
+        message: '메시지가 없습니다.',
+        systemMessage: '',
+      }
+    }
+    // 랜덤 선택
+    const randomItem = filtered[Math.floor(Math.random() * filtered.length)]
+    return {
+      message: randomItem.message,
+      systemMessage: randomItem.systemMessage,
+    }
+  }
+
+  const { message, systemMessage } = getGreetingMessage(concept, closenessLevel)
 
   const LoadingBubble: FC<{ showAvatar?: boolean }> = ({ showAvatar }) => (
     <ChatBubble
@@ -45,13 +76,7 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
       case 3: // 두 번째 버블 로딩 중
         schedule(() => setStep(4), LOADING_DURATION)
         break
-      case 4: // 두 번째 버블 완료
-        schedule(() => setStep(5), PAUSE_DURATION)
-        break
-      case 5: // 세 번째 버블 로딩 중
-        schedule(() => setStep(6), LOADING_DURATION)
-        break
-      case 6: // 렌더링 완료
+      case 4: // 렌더링 완료
         break
     }
 
@@ -68,11 +93,11 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
   }, [step, onReady])
 
   return (
-    <div>
+    <div className="flex flex-col gap-y-2">
       {step === 1 && <LoadingBubble showAvatar={true} />}
       {step >= 2 && (
         <ChatBubble
-          message={step === 1 ? <LoadingDot /> : '배고파~ 치맥 먹으러 갈래?'}
+          message={step === 1 ? <LoadingDot /> : message}
           isSender={false}
           avatarUrl={avatar}
           variant="basic"
@@ -80,7 +105,7 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
         />
       )}
 
-      {step === 3 && <LoadingBubble showAvatar={false} />}
+      {/* {step === 3 && <LoadingBubble showAvatar={false} />}
       {step >= 4 && (
         <DescriptionBubble
           word="치맥"
@@ -90,16 +115,12 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
             Eng: 'A Korean slang term for the popular pairing of fried chicken and beer (maekju).',
           }}
         />
-      )}
+      )} */}
 
-      {step === 5 && <LoadingBubble showAvatar={false} />}
-      {step >= 6 && (
+      {step === 3 && <LoadingBubble showAvatar={false} />}
+      {step >= 4 && (
         <div ref={lastMessageRef}>
-          <ChatBubble
-            message={'Let’s continue the conversation about what kind of chicken you want to eat!'}
-            isSender={false}
-            variant="second"
-          />
+          <ChatBubble message={systemMessage} isSender={false} variant="second" />
         </div>
       )}
     </div>
