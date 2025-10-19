@@ -12,3 +12,14 @@ export const conceptMap = (id: string | undefined): string => {
       return 'friend'
   }
 }
+
+// 친밀도 매핑
+const CLOSENESS_TEXT_MAP: Record<number, string> = {
+  1: 'Polite',
+  2: 'Casual',
+  3: 'Friendly',
+}
+
+export function getClosenessAsText(level: number): string {
+  return CLOSENESS_TEXT_MAP[level]
+}

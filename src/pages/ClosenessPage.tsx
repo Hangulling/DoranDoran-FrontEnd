@@ -80,6 +80,7 @@ const ClosenessPage = () => {
         return
       }
       useRoomIdStore.getState().addRoomMapping(id, newRoom.id)
+      useRoomIdStore.getState().setChatbotId(id, chatbotId)
 
       setCloseness(id, sliderValue) // store
       setIsExiting(true) // 모션

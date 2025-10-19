@@ -10,6 +10,10 @@ interface CorrectionBubbleProps {
   descriptionByTab: Record<string, string>
   correctedSentence?: string
   isSender?: boolean
+  messageId?: string // 북마크
+  originalContent?: string
+  correctedContent?: string
+  onBookmarkToggle?: (messageId: string, content: string, correctedContent: string) => void
 }
 
 const tabs = ['Kor', 'Eng']
@@ -21,6 +25,9 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   initialTab = 'Eng',
   descriptionByTab,
   correctedSentence,
+  messageId,
+  originalContent,
+  onBookmarkToggle,
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
   const [currentDescription, setCurrentDescription] = useState(descriptionByTab)
@@ -36,7 +43,13 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   const ttsText = correctedSentence ?? ''
   const { onPlay: playTTS, playing: isPlaying } = useTTS(ttsText)
 
-  const toggleBookmark = () => setIsBookmarked(!isBookmarked)
+  const toggleBookmark = () => {
+    setIsBookmarked(!isBookmarked)
+    if (onBookmarkToggle) {
+      if (!messageId) return
+      onBookmarkToggle(messageId, originalContent ?? '', correctedSentence ?? '')
+    }
+  }
 
   return (
     <div className={wrapperClass}>

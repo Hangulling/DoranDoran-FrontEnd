@@ -9,6 +9,8 @@ interface ChatBubbleProps {
   avatarUrl?: string
   variant?: 'basic' | 'second' | 'sender' | 'error'
   showIcon?: boolean
+  messageId?: string // 북마크
+  onBookmarkToggle?: (messageId: string, content: string) => void // 북마크
 }
 
 const bubbleVariants = {
@@ -24,6 +26,8 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
   avatarUrl,
   variant = 'basic',
   showIcon = false,
+  messageId,
+  onBookmarkToggle,
 }) => {
   const baseBubbleClass = 'py-[6px] px-2 text-[14px] max-w-[265px] rounded-lg'
   const bubbleClass = `${baseBubbleClass} ${isSender ? bubbleVariants.sender : bubbleVariants[variant]}`
@@ -34,7 +38,12 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
   const ttsText = typeof message === 'string' ? message : ''
   const { onPlay: playTTS, playing: isPlaying } = useTTS(ttsText)
 
-  const toggleBookmark = () => setIsBookmarked(!isBookmarked)
+  const toggleBookmark = () => {
+    setIsBookmarked(!isBookmarked)
+    if (onBookmarkToggle && messageId && typeof message === 'string') {
+      onBookmarkToggle(messageId, message)
+    }
+  }
 
   return (
     <div
