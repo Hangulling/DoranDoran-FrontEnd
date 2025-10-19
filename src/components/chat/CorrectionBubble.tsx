@@ -10,17 +10,24 @@ interface CorrectionBubbleProps {
   descriptionByTab: Record<string, string>
   correctedSentence?: string
   isSender?: boolean
+  messageId?: string // 북마크
+  originalContent?: string
+  correctedContent?: string
+  onBookmarkToggle?: (messageId: string, content: string, correctedContent: string) => void
 }
 
 const tabs = ['Kor', 'Eng']
-const wrapperClass = 'chat chat-end gap-0'
-const bubbleClass = 'bg-green-50 rounded-lg px-[10px] py-[10px] w-[265px] mb-2'
+const wrapperClass = 'chat chat-end gap-0 pt-[10px] pb-0'
+const bubbleClass = 'bg-green-50 rounded-lg px-[10px] py-[10px] w-[265px] mb-0'
 
 const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   chatRoomId,
   initialTab = 'Eng',
   descriptionByTab,
   correctedSentence,
+  messageId,
+  originalContent,
+  onBookmarkToggle,
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
   const [currentDescription, setCurrentDescription] = useState(descriptionByTab)
@@ -36,7 +43,13 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   const ttsText = correctedSentence ?? ''
   const { onPlay: playTTS, playing: isPlaying } = useTTS(ttsText)
 
-  const toggleBookmark = () => setIsBookmarked(!isBookmarked)
+  const toggleBookmark = () => {
+    setIsBookmarked(!isBookmarked)
+    if (onBookmarkToggle) {
+      if (!messageId) return
+      onBookmarkToggle(messageId, originalContent ?? '', correctedSentence ?? '')
+    }
+  }
 
   return (
     <div className={wrapperClass}>
@@ -69,7 +82,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
         <div className="h-[1px] bg-green-80 w-full my-2" />
         <div className="text-[14px] text-gray-700">{currentDescription[selectedTab]}</div>
         <>
-          <div className="h-[1px] bg-gray-80 w-full my-1" />
+          <div className="h-[1px] bg-green-80 w-full my-1" />
           <div className="flex flex-row justify-between">
             <TTSIcon playing={isPlaying} onPlay={playTTS} />
             <BookmarkIcon isBookmarked={isBookmarked} onToggle={toggleBookmark} />

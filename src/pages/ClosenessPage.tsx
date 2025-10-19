@@ -35,9 +35,9 @@ const ClosenessPage = () => {
 
   // 슬라이더값 initial
   useEffect(() => {
-    setSliderValue(closeness)
+    setSliderValue(1)
     setTouched(false)
-  }, [id, closeness])
+  }, [id])
 
   // 슬라이더 변경 전 버튼 비활성화
   const handleSliderChange = (val: number) => {
@@ -80,6 +80,7 @@ const ClosenessPage = () => {
         return
       }
       useRoomIdStore.getState().addRoomMapping(id, newRoom.id)
+      useRoomIdStore.getState().setChatbotId(id, chatbotId)
 
       setCloseness(id, sliderValue) // store
       setIsExiting(true) // 모션

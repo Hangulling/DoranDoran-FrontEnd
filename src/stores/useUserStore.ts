@@ -6,9 +6,9 @@ interface UserState {
   name: string
   setId: (id: string) => void
   setName: (name: string) => void
+  reset: () => void
 }
 
-// ID, 이름 저장
 export const useUserStore = create<UserState>()(
   persist(
     set => ({
@@ -16,6 +16,10 @@ export const useUserStore = create<UserState>()(
       name: '',
       setId: id => set({ id }),
       setName: name => set({ name }),
+      reset: () => {
+        set({ id: '', name: '' })
+        localStorage.removeItem('user-storage') // persist된 데이터 삭제
+      },
     }),
     {
       name: 'user-storage',
