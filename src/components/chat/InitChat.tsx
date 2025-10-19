@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, type FC } from 'react'
+import React, { useEffect, useMemo, useRef, useState, type FC } from 'react'
 import ChatBubble from './ChatBubble'
 // import DescriptionBubble from './DescriptionBubble'
 import useClosenessStore from '../../stores/useClosenessStore'
@@ -32,7 +32,7 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
     )
     if (filtered.length === 0) {
       return {
-        message: '메시지가 없습니다.',
+        message: '메시지가 없습니다.', // 수정 필요
         systemMessage: '',
       }
     }
@@ -44,7 +44,10 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
     }
   }
 
-  const { message, systemMessage } = getGreetingMessage(concept, closenessLevel)
+  // concept이나 closenessLevel이 바뀔 때만 함수 실행
+  const { message, systemMessage } = useMemo(() => {
+    return getGreetingMessage(concept, closenessLevel)
+  }, [concept, closenessLevel])
 
   const LoadingBubble: FC<{ showAvatar?: boolean }> = ({ showAvatar }) => (
     <ChatBubble
@@ -84,7 +87,7 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
   }, [step])
 
   useEffect(() => {
-    if (step === 6 && lastMessageRef.current) {
+    if (step === 4 && lastMessageRef.current) {
       setTimeout(() => {
         console.log('onReady called')
         onReady?.()
@@ -101,7 +104,6 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
           isSender={false}
           avatarUrl={avatar}
           variant="basic"
-          showIcon={true}
         />
       )}
 
