@@ -78,25 +78,25 @@ export default function ArchivePage() {
     fetchByRoom()
   }, [activeRoom, seedItems])
 
-  const handleConfirmDelete = async () => {
-    try {
-      if (selectedIds.size > 0) {
-        await deleteManyBookmarks([...selectedIds])
-      }
+  // const handleConfirmDelete = async () => {
+  //   try {
+  //     if (selectedIds.size > 0) {
+  //       await deleteManyBookmarks([...selectedIds])
+  //     }
 
-      setShowToast(true)
-      setTimeout(() => setShowToast(false), 4000)
-      exitSelectionMode()
-      const botType: BotType = ROOM_TO_BOT[activeRoom]
-      const data: BookmarkResponse[] = await getBookmarksByBotType(botType)
-      seedItems(data)
-    } catch (error) {
-      console.log(error)
-      setError('삭제 중 오류 발생')
-    } finally {
-      setOpenModal(false)
-    }
-  }
+  //     setShowToast(true)
+  //     setTimeout(() => setShowToast(false), 4000)
+  //     exitSelectionMode()
+  //     const botType: BotType = ROOM_TO_BOT[activeRoom]
+  //     const data: BookmarkResponse[] = await getBookmarksByBotType(botType)
+  //     seedItems(data)
+  //   } catch (error) {
+  //     console.log(error)
+  //     setError('삭제 중 오류 발생')
+  //   } finally {
+  //     setOpenModal(false)
+  //   }
+  // }
 
   return (
     <div className="min-h-full bg-gray-50 flex flex-col">
