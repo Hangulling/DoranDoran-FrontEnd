@@ -54,6 +54,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     if (modalType === 'logout') {
       try {
         await logout()
+        useUserStore.getState().reset() // 상태 초기화
         onClose()
         navigate('/login')
       } catch (error) {
@@ -62,6 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     } else if (modalType === 'signup') {
       try {
         await deleteUser(userId)
+        useUserStore.getState().reset()
         onClose()
         navigate('/login')
       } catch (error) {
