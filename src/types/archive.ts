@@ -1,6 +1,8 @@
+export type Room = 'Friend' | 'Honey' | 'Coworker' | 'Senior'
+
 export interface ExpressionItem {
   id: string
-  chatRoom: 'Friend' | 'Honey' | 'Coworker' | 'Client'
+  chatRoom: Room
   text: string
   intimacy: number
   ttsUrl?: string
@@ -52,6 +54,8 @@ export interface BookmarkResponse {
   aiResponse: AiResponse
   botType: BotType
   createdAt: string
+  ttsUrl?: string
+  savedAt?: string
 }
 
 // --- 커서 기반 조회 응답 ---
@@ -62,4 +66,18 @@ export interface CursorPage<T> {
   last: boolean
   first: boolean
   empty: boolean
+}
+
+export const BOT_TO_ROOM: Record<BotType, Room> = {
+  friend: 'Friend',
+  honey: 'Honey',
+  coworker: 'Coworker',
+  senior: 'Senior',
+}
+
+export const ROOM_TO_BOT: Record<Room, BotType> = {
+  Friend: 'friend',
+  Honey: 'honey',
+  Coworker: 'coworker',
+  Senior: 'senior',
 }

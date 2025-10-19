@@ -5,8 +5,6 @@ const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://3.21.177.186:
   /\/+$/,
   ''
 )
-const AUTH_BASE_URL = (import.meta.env.VITE_AUTH_BASE_URL || '').replace(/\/+$/, '')
-const USER_BASE_URL = (import.meta.env.VITE_USER_BASE_URL || '').replace(/\/+$/, '')
 
 export const publicApi = axios.create({
   baseURL: API_BASE_URL,
@@ -16,18 +14,6 @@ export const publicApi = axios.create({
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000,
-  headers: { 'Content-Type': 'application/json' },
-})
-
-export const authApi = axios.create({
-  baseURL: AUTH_BASE_URL || API_BASE_URL,
-  timeout: 15000,
-  headers: { 'Content-Type': 'application/json' },
-})
-
-export const userApi = axios.create({
-  baseURL: USER_BASE_URL || API_BASE_URL,
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 })
@@ -51,30 +37,30 @@ const tokenService = {
   },
 }
 
-// Request Interceptor: attach Authorization
 function attachAuth(instance: AxiosInstance) {
   instance.interceptors.request.use(cfg => {
     const token = tokenService.access
-    if (token) {
-      cfg.headers = cfg.headers ?? {}
-      if (!('Authorization' in cfg.headers)) {
-        cfg.headers.Authorization = `Bearer ${token}`
-      }
-      if (import.meta.env.DEV) {
-        console.log('🟢 Authorization 적용:', String(token).slice(0, 32) + '...')
-      }
+    const userId = localStorage.getItem('currentUserId') || ''
+
+    cfg.headers = cfg.headers ?? {}
+
+    if (token && !('Authorization' in cfg.headers)) {
+      cfg.headers.Authorization = `Bearer ${token}`
+    }
+
+    if (userId && !('X-User-Id' in cfg.headers)) {
+      cfg.headers['X-User-Id'] = userId
+    }
+
+    if (import.meta.env.DEV) {
+      console.log('🟢 Authorization 적용:', String(token).slice(0, 32) + '...')
+      console.log('🟢 X-User-Id 적용:', userId)
     }
     return cfg
   })
 }
-;[api, userApi].forEach(attachAuth)
+attachAuth(api)
 
-// Debug logs (optional) 
-authApi.interceptors.request.use(c => {
-  if (import.meta.env.DEV)
-    console.log('🔐 AUTH →', c.method?.toUpperCase(), authApi.getUri({ ...c, url: c.url || '' }))
-  return c
-})
 publicApi.interceptors.request.use(c => {
   if (import.meta.env.DEV)
     console.log(
@@ -84,13 +70,8 @@ publicApi.interceptors.request.use(c => {
     )
   return c
 })
-userApi.interceptors.request.use(c => {
-  if (import.meta.env.DEV)
-    console.log('👤 USER →', c.method?.toUpperCase(), userApi.getUri({ ...c, url: c.url || '' }))
-  return c
-})
 
-// Refresh Flow (401 전용)
+
 let isRefreshing = false
 let requestQueue: Array<(token: string | null) => void> = []
 
@@ -101,7 +82,6 @@ function onRefreshed(newToken: string | null) {
 function addToQueue(cb: (token: string | null) => void) {
   requestQueue.push(cb)
 }
-
 
 async function refreshAccessToken(): Promise<string | null> {
   try {
@@ -127,7 +107,7 @@ async function refreshAccessToken(): Promise<string | null> {
   }
 }
 
-// Response Interceptor (401 처리) 
+// Response Interceptor (401 처리)
 // 보호 API들(api, userApi)에만 장착
 function installResponseInterceptor(instance: AxiosInstance) {
   instance.interceptors.response.use(
@@ -177,6 +157,6 @@ function installResponseInterceptor(instance: AxiosInstance) {
     }
   )
 }
-;[api, userApi].forEach(installResponseInterceptor)
+installResponseInterceptor(api)
 
 export default api

@@ -33,3 +33,8 @@ export async function deleteBookmark(bookmarkId: string) {
 export async function deleteManyBookmarks(bookmarkIds: string[]) {
   await api.delete(BOOKMARK_ENDPOINTS.DELETE_MANY, { data: bookmarkIds })
 }
+
+export async function countBookmarks(): Promise<number> {
+  const res = await api.get<number>(BOOKMARK_ENDPOINTS.COUNT)
+  return res.data
+}

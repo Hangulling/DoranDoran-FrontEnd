@@ -8,14 +8,10 @@ import useArchiveStore from '../../stores/useArchiveStore'
 import useTTS from '../../hooks/useTTS'
 import Badge, { type BadgeVariant } from '../common/Badge'
 import DescriptionBubble from '../chat/DescriptionBubble'
+import type { BookmarkResponse } from '../../types/archive'
 
 interface ExpressionCardProps {
-  item: {
-    id: string
-    text: string
-    intimacy: number
-  }
-
+  item: BookmarkResponse
   open?: boolean
   onToggle?: () => void
 }
@@ -23,14 +19,14 @@ interface ExpressionCardProps {
 export default function ExpressionCard({ item, open, onToggle }: ExpressionCardProps) {
   const { selectionMode, selectedIds, toggleSelect } = useArchiveStore()
   const isSelected = selectedIds.has(item.id)
-  const { onPlay, playing } = useTTS(item.text)
-  const getBadgeVariant = (level: number): BadgeVariant => {
+  const { onPlay, playing } = useTTS(item.content)
+  const getBadgeVariant = (level: string | undefined): BadgeVariant => {
     switch (level) {
-      case 1:
+      case 'Polite':
         return 'Polite'
-      case 2:
+      case 'Casual':
         return 'Casual'
-      case 3:
+      case 'Friendly':
         return 'Friendly'
       default:
         return 'Polite'
@@ -60,7 +56,7 @@ export default function ExpressionCard({ item, open, onToggle }: ExpressionCardP
           } w-[335px] min-h-[71px] rounded-xl`}
         >
           <div className="flex w-full justify-between px-4 pt-[10px]">
-            <Badge variant={getBadgeVariant(item.intimacy)} />
+            <Badge variant={getBadgeVariant(item.aiResponse.intimacyLevel)} />
 
             {selectionMode && (
               <img
@@ -82,7 +78,7 @@ export default function ExpressionCard({ item, open, onToggle }: ExpressionCardP
               <span
                 className={`text-body text-sm text-gray-800 ${open ? 'whitespace-pre-line' : 'truncate'}`}
               >
-                {item.text}
+                {item.content}
               </span>
             </div>
             <button onClick={handleToggleClick}>
