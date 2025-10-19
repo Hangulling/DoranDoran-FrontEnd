@@ -13,8 +13,8 @@ interface CorrectionBubbleProps {
 }
 
 const tabs = ['Kor', 'Eng']
-const wrapperClass = 'chat chat-end gap-0'
-const bubbleClass = 'bg-green-50 rounded-lg px-[10px] py-[10px] w-[265px] mb-2'
+const wrapperClass = 'chat chat-end gap-0 pt-[10px] pb-0'
+const bubbleClass = 'bg-green-50 rounded-lg px-[10px] py-[10px] w-[265px] mb-0'
 
 const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   chatRoomId,
@@ -69,7 +69,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
         <div className="h-[1px] bg-green-80 w-full my-2" />
         <div className="text-[14px] text-gray-700">{currentDescription[selectedTab]}</div>
         <>
-          <div className="h-[1px] bg-gray-80 w-full my-1" />
+          <div className="h-[1px] bg-green-80 w-full my-1" />
           <div className="flex flex-row justify-between">
             <TTSIcon playing={isPlaying} onPlay={playTTS} />
             <BookmarkIcon isBookmarked={isBookmarked} onToggle={toggleBookmark} />

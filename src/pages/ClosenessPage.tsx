@@ -35,9 +35,9 @@ const ClosenessPage = () => {
 
   // 슬라이더값 initial
   useEffect(() => {
-    setSliderValue(closeness)
+    setSliderValue(1)
     setTouched(false)
-  }, [id, closeness])
+  }, [id])
 
   // 슬라이더 변경 전 버튼 비활성화
   const handleSliderChange = (val: number) => {

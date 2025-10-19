@@ -5,9 +5,9 @@ interface ClosenessBarProps {
 }
 
 const BG_COLORS: Record<string, string> = {
-  formal: 'bg-label-blue',
-  casual: 'bg-label-yellow',
-  close: 'bg-label-pink',
+  Polite: 'bg-label-blue',
+  Casual: 'bg-label-yellow',
+  Friendly: 'bg-label-pink',
 }
 
 const ClosenessBar: React.FC<ClosenessBarProps> = ({ chatRoomId }) => {
