@@ -6,7 +6,7 @@ import useArchiveStore from '../../stores/useArchiveStore'
 type VARIANT = 'chat' | 'archive'
 
 const VARIANTS: Record<VARIANT, string> = {
-  chat: 'ml-10 bg-white border border-gray-100 rounded-lg px-[10px] py-[10px] max-w-[265px] mb-0',
+  chat: 'mt-2 ml-10 bg-white border border-gray-100 rounded-lg px-[10px] py-[10px] max-w-[265px] mb-0',
   archive: 'ml-0 bg-white rounded-lg px-4 pb-[10px] w-[330px] mb-2',
 }
 

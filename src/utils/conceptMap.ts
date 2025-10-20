@@ -5,9 +5,9 @@ export const conceptMap = (id: string | undefined): string => {
     case '2':
       return 'honey'
     case '3':
-      return 'senior'
-    case '4':
       return 'coworker'
+    case '4':
+      return 'senior'
     default:
       return 'friend'
   }

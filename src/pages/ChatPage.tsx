@@ -274,11 +274,7 @@ const ChatPage: React.FC = () => {
         },
       }
 
-      const response = await createBookmark(requestBody, {
-        headers: {
-          'X-User-Id': userId, // 헤더에 userId 넣기
-        },
-      })
+      const response = await createBookmark(requestBody)
       console.log('북마크 추가 성공', response)
     } catch (error) {
       console.error('북마크 추가 실패', error)
@@ -362,7 +358,8 @@ const ChatPage: React.FC = () => {
               </div>
             )
           })}
-          <div className="mt-5">
+          {/* 
+        <div className="mt-5">
             {sseError && (
               <ChatBubble
                 message={'Failed to load AI response'}
@@ -371,7 +368,7 @@ const ChatPage: React.FC = () => {
                 showIcon={false}
               />
             )}
-          </div>
+          </div>*/}
         </div>
         <div className="h-4" />
       </div>
