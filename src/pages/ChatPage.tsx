@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Perfect from '../assets/chat/correct.svg'
 import ChatBubble from '../components/chat/ChatBubble'
 import CoachMark from '../components/chat/CoachMark'
@@ -25,6 +25,12 @@ import { createBookmark } from '../api/archive'
 import useClosenessStore from '../stores/useClosenessStore'
 import { getClosenessAsText } from '../utils/conceptMap'
 
+interface EnrichedMessage extends Message {
+  correction?: IntimacyAnalysisData | null // 교정 데이터 저장
+  vocabularyData?: VocabularyExtractedData | null // 어휘 데이터 저장
+  isPerfect?: boolean // Perfect 여부 저장
+}
+
 const chatBotIdByRoom = (conceptValue: string): string => {
   switch (conceptValue) {
     case '1':
@@ -47,7 +53,7 @@ const ChatPage: React.FC = () => {
   const coachMarkSeen = useCoachStore(s => s.coachMarkSeen)
   const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
   const [showCoachMark, setShowCoachMark] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<EnrichedMessage[]>([]) // 확장
   const [isModalOpen, setIsModalOpen] = useState(false)
   const noShowAgain = useModalStore(state => state.noShowAgain)
   const chatMainRef = useRef<HTMLDivElement>(null)
@@ -59,11 +65,14 @@ const ChatPage: React.FC = () => {
   const closenessLevel = useClosenessStore.getState().getCloseness(chatroomId ?? '') ?? 1
   const closenessText = getClosenessAsText(closenessLevel)
   const accessToken = localStorage.getItem('accessToken') ?? ''
+
+  const lastUserMsgIdRef = useRef<string | null>(null) // 마지막 사용자 메시지 ID
+  const lastAiMsgIdRef = useRef<string | null>(null) // 마지막 AI 메시지 ID
   const [sseError, setSseError] = useState<string | null>(null)
 
-  const [intimacyAnalysis, setIntimacyAnalysis] = useState<IntimacyAnalysisData | null>(null)
-  const [vocabulary, setVocabulary] = useState<VocabularyExtractedData | null>(null)
-  // const [aggregatedData, setAggregatedData] = useState<unknown>(null)
+  const room = useMemo(() => {
+    return chatRooms.find(r => String(r.roomRouteId) === String(id))
+  }, [id])
 
   // 코치 마크 조회 확인
   useEffect(() => {
@@ -124,27 +133,19 @@ const ChatPage: React.FC = () => {
         content: response.content,
       }) // 서버에서 반환한 메시지 데이터 배열 스토어에 저장
 
-      const tempMsgId = response.id // intimacy에 지정할것
+      // 마지막 사용자 메시지 ID를 ref에 저장
+      lastUserMsgIdRef.current = response.id
 
-      const newMessage: Message = {
+      // EnrichedMessage 타입으로 새 메시지 객체 생성
+      const newMessage: EnrichedMessage = {
         id: response.id,
         text: response.content,
         isSender: true,
         variant: 'sender',
+        // correction, vocabulary, isPerfect는 undefined로 시작
       }
 
       setMessages(prevMessages => [...prevMessages, newMessage])
-
-      setIntimacyAnalysis(prev =>
-        prev
-          ? { ...prev, messageId: tempMsgId }
-          : {
-              messageId: tempMsgId,
-              correctedSentence: '',
-              corrections: '',
-              feedback: { ko: '', en: '' },
-            }
-      )
     } catch (error) {
       console.error('메시지 전송 실패:', error)
     }
@@ -153,39 +154,69 @@ const ChatPage: React.FC = () => {
   // SSE 이벤트
   const handleSseEvent = useCallback(
     (eventType: string, data: unknown) => {
+      // 이벤트 수신되면 에러 초기화
+      setSseError(null)
+
       switch (eventType) {
         case 'conversation_complete': {
           const conversationData = data as EventDataMap['conversation_complete']
-          const room = chatRooms.find(r => String(r.roomRouteId) === String(id))
-          setMessages(prev => [
-            ...prev,
-            {
-              id: conversationData.messageId,
-              text: conversationData.content,
-              isSender: false,
-              avatarUrl: room?.avatar ?? '',
-              variant: 'basic',
-              showIcon: true,
-            },
-          ])
+          lastAiMsgIdRef.current = conversationData.messageId
+
+          const newAiMessage: EnrichedMessage = {
+            id: conversationData.messageId,
+            text: conversationData.content,
+            isSender: false,
+            avatarUrl: room?.avatar ?? '',
+            variant: 'basic',
+            showIcon: true,
+          }
+
+          setMessages(prev => [...prev, newAiMessage])
           break
         }
         case 'intimacy_analysis': {
           // 사용자 메시지 교정
           const intimacyData = data as IntimacyAnalysisData
-          if (intimacyData && intimacyData.correctedSentence) {
-            setIntimacyAnalysis(prev => ({
-              ...intimacyData,
-              messageId: prev?.messageId ?? '',
-            }))
-          } else {
-            setIntimacyAnalysis(null) // 교정 없으면 초기화
-          }
+          const targetMsgId = lastUserMsgIdRef.current // ref에서 마지막 사용자 ID 가져오기
+          if (!targetMsgId) break
+          setMessages(prev =>
+            prev.map(msg => {
+              if (msg.id === targetMsgId) {
+                // correctedSentence가 존재하고, corrections 필드에도 내용이 있을 때만 교정 버블 표시
+                if (intimacyData && intimacyData.correctedSentence && intimacyData.corrections) {
+                  return { ...msg, correction: intimacyData, isPerfect: false }
+                } else {
+                  // 교정할 내용이 없거나(correctedSentence가 없거나),
+                  // 교정 내용(corrections)이 비어있으면 'isPerfect'를 true로 설정
+                  return { ...msg, correction: null, isPerfect: true }
+                }
+              }
+              return msg
+            })
+          )
+
+          // 한 번 사용한 ref는 비워줘서 다음 교정이 엉뚱한 메시지에 붙는 것을 방지
+          lastUserMsgIdRef.current = null
           break
         }
-        case 'vocabulary_extracted': //ai 답장에 대한 설명
-          setVocabulary(data as VocabularyExtractedData)
+        case 'vocabulary_extracted': {
+          //ai 답장에 대한 설명
+          const vocabData = data as VocabularyExtractedData
+          const targetMsgId = lastAiMsgIdRef.current // ref에서 마지막 AI ID 가져오기
+
+          if (!targetMsgId) break // 대상 ID가 없으면 중단
+
+          setMessages(prev =>
+            prev.map(msg => {
+              if (msg.id === targetMsgId) {
+                return { ...msg, vocabularyData: vocabData }
+              }
+              return msg
+            })
+          )
+          lastAiMsgIdRef.current = null
           break
+        }
         // case 'aggregated_complete':
         // setAggregatedData(data)
         // break
@@ -201,7 +232,7 @@ const ChatPage: React.FC = () => {
           break
       }
     },
-    [id]
+    [room]
   )
 
   // useChatStream 호출
@@ -225,8 +256,6 @@ const ChatPage: React.FC = () => {
       chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
     }
   }, [messages])
-
-  const room = chatRooms.find(r => String(r.roomRouteId) === String(id))
 
   // 코치 마크 오픈 시간
   const handleInitReady = () => {
@@ -318,32 +347,33 @@ const ChatPage: React.FC = () => {
                   />
                 </div>
                 {/* 사용자 응답에 대한 교정 */}
-                {msg.isSender &&
-                  (intimacyAnalysis &&
-                  intimacyAnalysis.messageId === msg.id &&
-                  intimacyAnalysis.correctedSentence ? (
-                    <CorrectionBubble
-                      chatRoomId={chatroomId ?? ''}
-                      messageId={intimacyAnalysis.messageId}
-                      originalContent={msg.text}
-                      correctedContent={intimacyAnalysis.correctedSentence}
-                      descriptionByTab={{
-                        Kor: intimacyAnalysis.feedback.ko,
-                        Eng: intimacyAnalysis.feedback.en,
-                      }}
-                      isSender={true}
-                      onBookmarkToggle={handleCorrectionBubbleBookmark}
-                    />
-                  ) : (
-                    <div className="flex flex-row justify-end text-[#54BDB4] text-[12px] mt-1 font-medium">
-                      <img src={Perfect} alt="perfect" />
-                      perfect
-                    </div>
-                  ))}
+                {
+                  msg.isSender &&
+                    (msg.correction && msg.correction.correctedSentence ? (
+                      <CorrectionBubble
+                        chatRoomId={chatroomId ?? ''}
+                        messageId={msg.id} // msg.id 사용 (correction.messageId 아님)
+                        originalContent={msg.text}
+                        correctedContent={msg.correction.correctedSentence}
+                        descriptionByTab={{
+                          Kor: msg.correction.feedback.ko,
+                          Eng: msg.correction.feedback.en,
+                        }}
+                        isSender={true}
+                        onBookmarkToggle={handleCorrectionBubbleBookmark}
+                      />
+                    ) : msg.isPerfect ? ( // msg.isPerfect가 true일 때
+                      <div className="flex flex-row justify-end text-[#54BDB4] text-[12px] mt-1 font-medium">
+                        <img src={Perfect} alt="perfect" />
+                        perfect
+                      </div>
+                    ) : null) // (교정 데이터가 아직 안 왔으면 null)
+                }
 
-                {vocabulary &&
-                  vocabulary.words &&
-                  vocabulary.words.map((vocabWord, idx) => (
+                {!msg.isSender &&
+                  msg.vocabularyData &&
+                  msg.vocabularyData.words &&
+                  msg.vocabularyData.words.map((vocabWord, idx) => (
                     <DescriptionBubble
                       key={idx}
                       word={vocabWord.word}
@@ -358,8 +388,7 @@ const ChatPage: React.FC = () => {
               </div>
             )
           })}
-          {/* 
-        <div className="mt-5">
+          <div className="mt-5">
             {sseError && (
               <ChatBubble
                 message={'Failed to load AI response'}
@@ -368,7 +397,7 @@ const ChatPage: React.FC = () => {
                 showIcon={false}
               />
             )}
-          </div>*/}
+          </div>
         </div>
         <div className="h-4" />
       </div>
