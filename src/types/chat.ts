@@ -1,3 +1,5 @@
+import type { IntimacyAnalysisData, VocabularyWord } from './sseEvents'
+
 // 컴포넌트용
 export interface ChatRoom {
   roomId: number
@@ -23,6 +25,8 @@ export interface Message {
       Eng: string
     }
   }
+  correction?: IntimacyAnalysisData | null
+  vocabulary?: VocabularyWord[]
 }
 
 // api
