@@ -11,10 +11,6 @@ export async function login(data: LoginRequest) {
   if (resData.accessToken) localStorage.setItem('accessToken', resData.accessToken)
   if (resData.refreshToken) localStorage.setItem('refreshToken', resData.refreshToken)
 
-  if (resData.user?.id) {
-    localStorage.setItem('currentUserId', resData.user.id)
-  }
-
   return res.data
 }
 

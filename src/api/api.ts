@@ -37,10 +37,17 @@ const tokenService = {
   },
 }
 
+function dropHeader(headers: unknown, name: string) {
+  if (!headers) return
+  const h = headers as Record<string, unknown>
+  for (const k of Object.keys(h)) {
+    if (k.toLowerCase() === name.toLowerCase()) delete h[k]
+  }
+}
+
 function attachAuth(instance: AxiosInstance) {
   instance.interceptors.request.use(cfg => {
     const token = tokenService.access
-    const userId = localStorage.getItem('currentUserId') || ''
 
     cfg.headers = cfg.headers ?? {}
 
@@ -48,13 +55,13 @@ function attachAuth(instance: AxiosInstance) {
       cfg.headers.Authorization = `Bearer ${token}`
     }
 
-    if (userId && !('X-User-Id' in cfg.headers)) {
-      cfg.headers['X-User-Id'] = userId
+    const url = cfg.url || ''
+    if (url.includes(AUTH_ENDPOINTS.REFRESH_TOKEN)) {
+      dropHeader(cfg.headers, 'authorization')
     }
 
     if (import.meta.env.DEV) {
       console.log('🟢 Authorization 적용:', String(token).slice(0, 32) + '...')
-      console.log('🟢 X-User-Id 적용:', userId)
     }
     return cfg
   })
@@ -70,7 +77,6 @@ publicApi.interceptors.request.use(c => {
     )
   return c
 })
-
 
 let isRefreshing = false
 let requestQueue: Array<(token: string | null) => void> = []
