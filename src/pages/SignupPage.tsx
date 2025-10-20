@@ -18,6 +18,8 @@ export default function SignupPage() {
     email,
     password,
     passwordCheck,
+    verifiedEmail,
+    emailVerified,
     setMany,
     reset: resetForm,
   } = useSignupFormStore()
@@ -26,12 +28,10 @@ export default function SignupPage() {
   const [lastNameError, setLastNameError] = useState<string | null>(null)
   const [emailError, setEmailError] = useState<string | null>(null)
   const [emailSuccess, setEmailSuccess] = useState<string | null>(null)
-  const [emailVerified, setEmailVerified] = useState(false)
   const [pwdTouched, setPwdTouched] = useState(false)
   const [pwdCheckTouched, setPwdCheckTouched] = useState(false)
   const [openModal, setOpenModal] = useState(false)
   const [, setSubmitError] = useState<string | null>(null)
-  const [verifyLoading, setVerifyLoading] = useState(false)
   const [, setPwdError] = useState<string | null>(null)
   const [, setPwdCheckError] = useState<string | null>(null)
 
@@ -45,7 +45,7 @@ export default function SignupPage() {
   const handleFirstNameChange = (v: string) => {
     const noSpace = v.replace(/\s+/g, '')
     if (noSpace.length > 15) {
-      setFirstNameError('You can enter up to 15 characters.')
+      setFirstNameError('Enter 1-15 characters.')
       return
     }
     setMany({ firstName: noSpace })
@@ -55,7 +55,7 @@ export default function SignupPage() {
   const handleLastNameChange = (v: string) => {
     const noSpace = v.replace(/\s+/g, '')
     if (noSpace.length > 15) {
-      setLastNameError('You can enter up to 15 characters.')
+      setLastNameError('Enter 1-15 characters.')
       return
     }
     setMany({ lastName: noSpace })
@@ -65,23 +65,32 @@ export default function SignupPage() {
   const handleEmailChange = (v: string) => {
     const noSpace = v.replace(/\s+/g, '')
     setMany({ email: noSpace })
+
     if (emailError && validateEmail(noSpace) === null) setEmailError(null)
     setEmailSuccess(null)
-    setEmailVerified(false)
+
+    if (verifiedEmail && noSpace !== verifiedEmail) {
+      setMany({ emailVerified: false, verifiedEmail: null })
+    }
+
     const err = validateEmail(noSpace)
     setEmailError(err)
-    if (err) {
-      setEmailSuccess(null)
-      setEmailVerified(false)
-    }
   }
 
   const handleEmailBlur = () => {
     const err = validateEmail(email)
     setEmailError(err)
-    if (err) {
-      setEmailSuccess(null)
-      setEmailVerified(false)
+    if (err) setEmailSuccess(null)
+  }
+
+  const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === ' ') e.preventDefault()
+
+    if (e.nativeEvent.isComposing) return
+
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (isEmailFormatValid) handleVerify()
     }
   }
 
@@ -117,38 +126,36 @@ export default function SignupPage() {
     if (err) {
       setEmailError(err)
       setEmailSuccess(null)
-      setEmailVerified(false)
+      setMany({ emailVerified: false, verifiedEmail: null })
       return
     }
 
     try {
-      setVerifyLoading(true)
       setEmailError(null)
       setEmailSuccess(null)
 
       const isDuplicate = await checkEmailExists(email)
       if (isDuplicate) {
         setEmailError('This email is already registered.')
-        setEmailVerified(false)
+        setMany({ emailVerified: false, verifiedEmail: null })
       } else {
         setEmailSuccess('Verified successfully.')
-        setEmailVerified(true)
+        setMany({ emailVerified: true, verifiedEmail: email })
       }
     } catch (e: unknown) {
       const msg = axios.isAxiosError(e)
         ? e.response?.data?.message || 'Email verification failed.'
         : 'Email verification failed.'
       setEmailError(msg)
-      setEmailVerified(false)
-    } finally {
-      setVerifyLoading(false)
+      setMany({ emailVerified: false, verifiedEmail: null })
     }
   }
 
   const isEmailFormatValid = email.trim() !== '' && validateEmail(email) === null
 
-  const pwdFormatError = pwdTouched && password.length > 0 && !PASSWORD_REGEX.test(password)
+  const alreadyVerified = emailVerified && verifiedEmail === email
 
+  const pwdFormatError = pwdTouched && password.length > 0 && !PASSWORD_REGEX.test(password)
   const pwdMatchError =
     pwdCheckTouched && passwordCheck.length > 0 && !pwdFormatError && password !== passwordCheck
 
@@ -188,13 +195,11 @@ export default function SignupPage() {
       const emailErr = validateEmail(email)
       if (emailErr) {
         setEmailError(emailErr)
-        setEmailVerified(false)
         return
       }
       const dup = await checkEmailExists(email)
       if (dup) {
         setEmailError('This email is already registered.')
-        setEmailVerified(false)
         return
       }
 
@@ -241,7 +246,7 @@ export default function SignupPage() {
             type="text"
             label="First name *"
             variant={firstNameError ? 'error' : 'primary'}
-            placeholder="Enter 1-15 characters"
+            placeholder="Enter your first name (1-15 characters)"
             onChange={e => handleFirstNameChange(e.target.value)}
             onBlur={() => setFirstNameError(validateName(firstName))}
             value={firstName}
@@ -253,7 +258,7 @@ export default function SignupPage() {
           <Input
             type="text"
             label="Last name *"
-            placeholder="Enter 1-15 characters"
+            placeholder="Enter your last name (1-15 characters)"
             variant={lastNameError ? 'error' : 'primary'}
             onChange={e => handleLastNameChange(e.target.value)}
             onBlur={() => setLastNameError(validateName(lastName))}
@@ -272,23 +277,25 @@ export default function SignupPage() {
               value={email}
               onChange={e => handleEmailChange(e.target.value)}
               onBlur={handleEmailBlur}
-              onKeyDown={e => {
-                if (e.key === ' ') e.preventDefault()
-              }}
+              onKeyDown={handleEmailKeyDown}
               variant={emailError ? 'error' : 'primary'}
             />
             <Button
+              type="button"
               variant="primary"
-              disabled={!isEmailFormatValid || verifyLoading}
+              disabled={!isEmailFormatValid}
               className="bg-gray-800 my-2 text-subtitle"
               size="sm"
               onClick={handleVerify}
             >
-              {verifyLoading ? 'Checking…' : 'Verify'}
+              Verify
             </Button>
           </div>
+
           {emailError ? (
             <span className="text-xs text-orange-300">{emailError}</span>
+          ) : alreadyVerified ? (
+            <span className="text-xs text-blue-500">Verified successfully.</span>
           ) : emailSuccess ? (
             <span className="text-xs text-blue-500">{emailSuccess}</span>
           ) : null}
