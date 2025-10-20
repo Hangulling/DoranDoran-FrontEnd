@@ -66,6 +66,8 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
       timers.push(setTimeout(callback, duration))
     }
 
+    if (step >= 4) return
+
     switch (step) {
       case 0:
         schedule(() => setStep(1), 100)
@@ -78,8 +80,6 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
         break
       case 3: // 두 번째 버블 로딩 중
         schedule(() => setStep(4), LOADING_DURATION)
-        break
-      case 4: // 렌더링 완료
         break
     }
 
