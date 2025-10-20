@@ -6,6 +6,8 @@ interface SignupFormState {
   email: string
   password: string
   passwordCheck: string
+  emailVerified: boolean
+  verifiedEmail: string | null
   setMany: (p: Partial<SignupFormState>) => void
   reset: () => void
 }
@@ -16,7 +18,9 @@ export const useSignupFormStore = create<SignupFormState>(set => ({
   email: '',
   password: '',
   passwordCheck: '',
-  setMany: p => set(p),
+  emailVerified: false,
+  verifiedEmail: null,
+  setMany: p => set(s => ({ ...s, ...p })),
   reset: () =>
     set({
       firstName: '',
@@ -24,5 +28,7 @@ export const useSignupFormStore = create<SignupFormState>(set => ({
       email: '',
       password: '',
       passwordCheck: '',
+      emailVerified: false,
+      verifiedEmail: null,
     }),
 }))
