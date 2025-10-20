@@ -1,23 +1,14 @@
 import { create } from 'zustand'
-export interface ExpressionItem {
-  id: string
-  chatRoom: 'Friend' | 'Honey' | 'Coworker' | 'Client'
-  text: string
-  intimacy: number
-  ttsUrl?: string
-  savedAt?: string
-}
-
-type Room = 'Friend' | 'Honey' | 'Coworker' | 'Client'
+import type { BookmarkResponse, Room } from '../types/archive'
 
 interface ArchiveState {
-  items: ExpressionItem[]
+  items: BookmarkResponse[]
   selectedIds: Set<string>
   selectionMode: boolean
   deleteMode: boolean
   activeRoom: Room
 
-  seedItems: (items: ExpressionItem[]) => void
+  seedItems: (items: BookmarkResponse[]) => void
   setActiveRoom: (room: Room) => void
 
   enterSelectionMode: () => void
@@ -25,7 +16,7 @@ interface ArchiveState {
 
   toggleSelect: (id: string) => void
   selectAll: () => void
-  delectAll: () => void
+  deselectAll: () => void
 
   deleteSelected: () => void
 }
@@ -56,11 +47,13 @@ const useArchiveStore = create<ArchiveState>(set => ({
 
   selectAll: () =>
     set(state => ({
-      selectedIds: new Set(state.items.filter(i => i.chatRoom === state.activeRoom).map(i => i.id)),
+      selectedIds: new Set(
+        state.items.filter(i => i.chatroomName === state.activeRoom).map(i => i.id)
+      ),
       deleteMode: true,
     })),
 
-  delectAll: () =>
+  deselectAll: () =>
     set({
       selectedIds: new Set(),
       deleteMode: false,

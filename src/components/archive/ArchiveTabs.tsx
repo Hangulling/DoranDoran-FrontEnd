@@ -1,7 +1,6 @@
 import useArchiveStore from '../../stores/useArchiveStore'
+import type { Room } from '../../types/archive'
 import Button from '../common/Button'
-
-export type Room = 'Friend' | 'Honey' | 'Coworker' | 'Client'
 
 interface ArchiveTabsProps {
   activeTab: Room
@@ -10,7 +9,7 @@ interface ArchiveTabsProps {
 
 export default function ArchiveTabs({ activeTab, onChange }: ArchiveTabsProps) {
   const { selectionMode } = useArchiveStore()
-  const tabs: Room[] = ['Friend', 'Honey', 'Coworker', 'Client']
+  const tabs: Room[] = ['Friend', 'Honey', 'Coworker', 'Senior']
 
   return (
     <div className="flex justify-center">
