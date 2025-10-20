@@ -48,14 +48,7 @@ export function Routes() {
           </PrivateRoute>
         }
       />
-      <Route
-        path="/policy/:id"
-        element={
-          <PrivateRoute>
-            <PolicyPage />
-          </PrivateRoute>
-        }
-      />
+      <Route path="/policy/:id" element={<PolicyPage />} />
       <Route path="/error" element={<ErrorPage errorCode={500} />} />
       <Route path="*" element={<ErrorPage errorCode={404} />} />
     </RouterRoutes>
