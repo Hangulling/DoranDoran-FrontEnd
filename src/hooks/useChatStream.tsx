@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { getSseUrl } from '../api'
 import { EventSourcePolyfill } from 'event-source-polyfill'
 
@@ -11,18 +11,45 @@ const eventNames = [
   'aggregated_complete',
 ]
 
+export interface UseChatStreamResult {
+  isLoading: boolean
+  error: Error | null
+}
+
 export function useChatStream<T = unknown>(
   chatroomId: string,
   userId?: string,
   accessToken?: string,
   onEventReceived?: (eventType: string, data: T) => void,
   onError?: (event: Event) => void
-) {
+): UseChatStreamResult {
   const eventSourceRef = useRef<EventSource | null>(null)
+
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
+  const onEventReceivedRef = useRef(onEventReceived)
+  const onErrorRef = useRef(onError)
+
+  useLayoutEffect(() => {
+    onEventReceivedRef.current = onEventReceived
+  }, [onEventReceived])
+
+  // 콜백 prop이 변경될 때마다 ref를 업데이트
+  useLayoutEffect(() => {
+    onErrorRef.current = onError
+  }, [onError])
+
   useEffect(() => {
-    if (!chatroomId) return
+    if (!chatroomId) {
+      setIsLoading(false)
+      setError(null)
+      return
+    }
+
+    // 연결 시도 시작: 로딩 true, 에러 null
+    setIsLoading(true)
+    setError(null)
 
     let retryCount = 0
     const maxRetries = 5
@@ -38,43 +65,68 @@ export function useChatStream<T = unknown>(
         },
       })
 
+      // 연결 성공 시 리셋
+      eventSource.onopen = () => {
+        console.log('[SSE] Connection opened')
+        setIsLoading(false)
+        setError(null)
+        retryCount = 0
+        retryDelay = retryDelayInitial
+      }
+
       eventSource.onmessage = event => {
-        if (onEventReceived) {
-          onEventReceived('message', JSON.parse(event.data))
+        const parsedData = JSON.parse(event.data)
+        // 일반 메시지 콘솔 출력
+        console.log('[SSE Message]', parsedData)
+
+        // ref.current를 통해 최신 콜백 호출
+        if (onEventReceivedRef.current) {
+          onEventReceivedRef.current('message', parsedData) // 파싱된 데이터 이용?
         }
       }
 
       eventNames.forEach(name => {
         eventSource.addEventListener(name, (event: MessageEvent) => {
-          if (onEventReceived) {
-            onEventReceived(name, JSON.parse(event.data))
+          const parsedData = JSON.parse(event.data)
+
+          // 명명된 이벤트 콘솔 출력 (이벤트 타입과 함께)
+          console.log(`[SSE Event: ${name}]`, parsedData)
+          // ref.current를 통해 최신 콜백 호출
+          if (onEventReceivedRef.current) {
+            onEventReceivedRef.current(name, parsedData) // 파싱된 데이터 사용
           }
         })
       })
 
       eventSource.onerror = event => {
-        setError(new Error('SSE connection error'))
-        if (onError) {
-          onError(event)
+        if (onErrorRef.current) {
+          onErrorRef.current(event)
         }
         console.error('[SSE Error]', event)
 
         eventSource.close()
 
         if (retryCount < maxRetries) {
+          setIsLoading(true)
           retryTimeout = setTimeout(() => {
             retryCount++
-            retryDelay *= 2 // 지수 백오프(Exponential backoff)
+            const jitter = Math.random() * 1000
+            const nextDelay = Math.min(retryDelay * 2, 30000) // 최대 30초
+            retryDelay = nextDelay + jitter
+
+            console.log(
+              `[SSE] Retrying connection... (Attempt ${retryCount}, Delay: ${Math.round(retryDelay)}ms)`
+            )
             connect()
-          }, retryDelay)
+          }, retryDelay) // 직전 계산된 딜레이 사용
         } else {
           console.error('[SSE] 재접속 시도 최대 횟수 초과')
+          setError(new Error('SSE connection failed after max retries'))
+          setIsLoading(false)
         }
       }
 
       eventSourceRef.current = eventSource
-      retryCount = 0
-      retryDelay = retryDelayInitial
     }
 
     connect()
@@ -86,5 +138,7 @@ export function useChatStream<T = unknown>(
         eventSourceRef.current = null
       }
     }
-  }, [chatroomId, userId, onEventReceived, onError, accessToken, error])
+  }, [chatroomId, userId, accessToken])
+
+  return { isLoading, error }
 }
