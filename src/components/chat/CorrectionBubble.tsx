@@ -24,9 +24,9 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   chatRoomId,
   initialTab = 'Eng',
   descriptionByTab,
-  correctedSentence,
   messageId,
   originalContent,
+  correctedContent,
   onBookmarkToggle,
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
@@ -40,14 +40,13 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   const closenessText = closeness === 1 ? 'Polite' : closeness === 2 ? 'Casual' : 'Friendly'
 
   const [isBookmarked, setIsBookmarked] = useState(false)
-  const ttsText = correctedSentence ?? ''
-  const { onPlay: playTTS, playing: isPlaying } = useTTS(ttsText)
+  const { onPlay: playTTS, playing: isPlaying } = useTTS(correctedContent ?? '')
 
   const toggleBookmark = () => {
     setIsBookmarked(!isBookmarked)
     if (onBookmarkToggle) {
       if (!messageId) return
-      onBookmarkToggle(messageId, originalContent ?? '', correctedSentence ?? '')
+      onBookmarkToggle(messageId, originalContent ?? '', correctedContent ?? '')
     }
   }
 
@@ -59,7 +58,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
             <p className="text-green-500">
               closeness level -<span> {closenessText}</span>
             </p>
-            <p>{correctedSentence}</p>
+            <p>{correctedContent}</p>
           </div>
           <div className="flex p-0.5 bg-green-80 rounded-[6px] mt-[26px]">
             {tabs.map(tab => (
