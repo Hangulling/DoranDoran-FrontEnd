@@ -11,10 +11,6 @@ export async function login(data: LoginRequest) {
   if (resData.accessToken) localStorage.setItem('accessToken', resData.accessToken)
   if (resData.refreshToken) localStorage.setItem('refreshToken', resData.refreshToken)
 
-  if (resData.user?.id) {
-    localStorage.setItem('currentUserId', resData.user.id)
-  }
-
   return res.data
 }
 
@@ -61,7 +57,7 @@ export async function getCurrentUser() {
     return res.data
   } catch (e) {
     console.error('현재 사용자 정보 조회 실패:', e)
-    currentUserId = null
+    currentUserId = null  
     throw e
   }
 }
