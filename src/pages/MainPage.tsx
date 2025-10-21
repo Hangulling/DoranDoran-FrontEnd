@@ -6,6 +6,7 @@ import { useUserStore } from '../stores/useUserStore'
 import { useGoBack } from '../hooks/useGoBack'
 import { getChatRoomListLimited, getCurrentUser } from '../api'
 import { getDaysDiff } from '../utils/getDaysDiff'
+import { capitalizeFirstLetter } from '../utils/capitalizeFirstLetter'
 
 interface ChatRoomWithMessage {
   roomRouteId: number
@@ -38,11 +39,11 @@ const MainPage = () => {
         setStoreId(profile.id)
       } catch (err) {
         console.error('사용자 정보 로드 실패:', err)
-        // navigate('/error', { state: { from: '/main' } })
+        //        navigate('/error', { state: { from: '/main' } })
       }
     }
     fetchUser()
-  }, [setStoreName, setStoreId, setUserName, setUserId])
+  }, [setStoreName, setStoreId, setUserName, setUserId, navigate])
 
   // 상태 메세지 설정
   useEffect(() => {
@@ -74,7 +75,7 @@ const MainPage = () => {
       })
       .catch(err => {
         console.error('채팅방 목록 로드 실패:', err)
-        // navigate('/error', { state: { from: '/main' } })
+        navigate('/error', { state: { from: '/main' } })
       })
   }, [userId, navigate])
 
@@ -114,7 +115,9 @@ const MainPage = () => {
                 <img src={room.avatar} alt={room.roomName} className="w-full h-full object-cover" />
               </div>
               <div className="flex flex-col items-start">
-                <span className="text-title text-[16px]">{room.roomName}</span>
+                <span className="text-title text-[16px]">
+                  {capitalizeFirstLetter(room.roomName)}
+                </span>
                 <span className="text-gray-600 text-[14px]">{room.message}</span>
               </div>
             </button>
