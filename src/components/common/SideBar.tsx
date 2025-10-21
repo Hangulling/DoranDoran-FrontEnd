@@ -9,6 +9,9 @@ import { useNavigate } from 'react-router-dom'
 import { deleteUser, logout } from '../../api'
 import { useUserStore } from '../../stores/useUserStore'
 import showToast from './CommonToast'
+import useClosenessStore from '../../stores/useClosenessStore'
+import useRoomIdStore from '../../stores/useRoomIdStore'
+import { useCoachStore, useModalStore } from '../../stores/useUiStateStore'
 
 const LOGOUT_DESC = ['You can log in again anytime.']
 const SIGNOUT_DESC = ['This action cannot be undone.', 'Are you sure you want to continue?']
@@ -56,6 +59,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       try {
         await logout()
         useUserStore.getState().reset() // 상태 초기화
+        useClosenessStore.getState().reset()
+        useRoomIdStore.getState().reset()
+        useCoachStore.getState().reset()
+        useModalStore.getState().reset()
         onClose()
         navigate('/login')
       } catch (error) {
@@ -66,6 +73,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       try {
         await deleteUser(userId)
         useUserStore.getState().reset()
+        useClosenessStore.getState().reset()
+        useRoomIdStore.getState().reset()
+        useCoachStore.getState().reset()
+        useModalStore.getState().reset()
         onClose()
         navigate('/login')
       } catch (error) {

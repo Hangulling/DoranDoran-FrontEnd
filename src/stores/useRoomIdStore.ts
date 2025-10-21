@@ -16,7 +16,7 @@ interface RoomIdState {
   removeChatbotId: (numId: string) => void
 }
 
-const useRoomIdStore = create<RoomIdState>()(
+const useRoomIdStore = create<RoomIdState & { reset: () => void }>()(
   persist(
     set => ({
       roomsMap: {},
@@ -45,13 +45,13 @@ const useRoomIdStore = create<RoomIdState>()(
           delete copy[numId]
           return { chatbotMap: copy }
         }),
+
+      reset: () => set({ roomsMap: {}, chatbotMap: {} }),
     }),
     {
-      name: 'room-id-storage', // localStorage key
+      name: 'room-id-storage',
     }
   )
 )
 
 export default useRoomIdStore
-
-// 나갈 때 useRoomIdStore.getState().removeRoomMapping(id) 사용
