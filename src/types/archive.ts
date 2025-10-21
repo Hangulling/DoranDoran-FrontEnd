@@ -15,7 +15,7 @@ export type BotType = 'friend' | 'honey' | 'coworker' | 'senior'
 // --- 번역 정보 ---
 export interface Translation {
   english: string
-  pronunciation: string
+  pronunciation?: string
 }
 
 // --- 어휘 정보 ---
