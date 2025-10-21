@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { BookmarkResponse, Room } from '../types/archive'
+import { BOT_TO_ROOM } from '../types/archive'
 
 interface ArchiveState {
   items: BookmarkResponse[]
@@ -29,29 +30,36 @@ const useArchiveStore = create<ArchiveState>(set => ({
   deleteMode: false,
 
   seedItems: items => set({ items }),
-  setActiveRoom: room => set({ activeRoom: room }),
+
+  setActiveRoom: room => set({ activeRoom: room, selectedIds: new Set(), deleteMode: false }),
 
   enterSelectionMode: () => set({ selectionMode: true }),
-  exitSelectionMode: () => set({ selectionMode: false, selectedIds: new Set() }),
+  exitSelectionMode: () => set({ selectionMode: false, selectedIds: new Set(), deleteMode: false }),
 
   toggleSelect: (id: string) =>
     set(state => {
       const next = new Set(state.selectedIds)
-      if (next.has(id)) {
-        next.delete(id)
-      } else {
-        next.add(id)
-      }
-      return { selectedIds: next }
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+
+      const idsInRoom = state.items
+        .filter(i => BOT_TO_ROOM[i.botType] === state.activeRoom)
+        .map(i => i.id)
+      const allSelectedInRoom = idsInRoom.length > 0 && idsInRoom.every(x => next.has(x))
+
+      return { selectedIds: next, deleteMode: allSelectedInRoom }
     }),
 
   selectAll: () =>
-    set(state => ({
-      selectedIds: new Set(
-        state.items.filter(i => i.chatroomName === state.activeRoom).map(i => i.id)
-      ),
-      deleteMode: true,
-    })),
+    set(state => {
+      const idsInRoom = state.items
+        .filter(i => BOT_TO_ROOM[i.botType] === state.activeRoom)
+        .map(i => i.id)
+      return {
+        selectedIds: new Set(idsInRoom),
+        deleteMode: idsInRoom.length > 0, 
+      }
+    }),
 
   deselectAll: () =>
     set({
@@ -66,6 +74,7 @@ const useArchiveStore = create<ArchiveState>(set => ({
         items: remain,
         selectedIds: new Set(),
         selectionMode: false,
+        deleteMode: false,
       }
     }),
 }))
