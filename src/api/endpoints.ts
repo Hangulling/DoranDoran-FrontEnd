@@ -88,7 +88,8 @@ export const CHAT_ENDPOINTS = {
   UPDATE_INTIMACY_LEVEL: (chatroomId: string) => `/api/chat/chatrooms/${chatroomId}/intimacy`,
 
   // 채팅방 나가기 (소프트 삭제)
-  LEAVE_CHATROOM: (chatroomId: string) => `/api/chat/chatrooms/${chatroomId}/leave`,
+  LEAVE_CHATROOM: (chatroomId: string, userId: string) =>
+    `/api/chat/chatrooms/${chatroomId}/leave?userId=${userId}`,
 
   // WebSocket 채팅 연결
   WEBSOCKET_CHAT: (chatroomId: string, userId?: string) =>
