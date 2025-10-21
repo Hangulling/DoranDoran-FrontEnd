@@ -8,6 +8,7 @@ import CommonModal from './CommonModal'
 import { useNavigate } from 'react-router-dom'
 import { deleteUser, logout } from '../../api'
 import { useUserStore } from '../../stores/useUserStore'
+import showToast from './CommonToast'
 
 const LOGOUT_DESC = ['You can log in again anytime.']
 const SIGNOUT_DESC = ['This action cannot be undone.', 'Are you sure you want to continue?']
@@ -58,6 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         onClose()
         navigate('/login')
       } catch (error) {
+        showToast({ message: 'Failed to log out. Please try again', iconType: 'error' })
         console.error('로그아웃 실패:', error)
       }
     } else if (modalType === 'signup') {
@@ -67,6 +69,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         onClose()
         navigate('/login')
       } catch (error) {
+        showToast({ message: 'Failed to delete account. Please try again', iconType: 'error' })
         console.error('회원 탈퇴 실패:', error)
       }
     }

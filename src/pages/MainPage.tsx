@@ -7,6 +7,7 @@ import { useGoBack } from '../hooks/useGoBack'
 import { getChatRoomListLimited, getCurrentUser } from '../api'
 import { getDaysDiff } from '../utils/getDaysDiff'
 import { capitalizeFirstLetter } from '../utils/capitalizeFirstLetter'
+import LoadingSpinner from '../components/common/LoadingSpinner'
 
 interface ChatRoomWithMessage {
   roomRouteId: number
@@ -21,6 +22,7 @@ const MainPage = () => {
   const [userName, setUserName] = useState<string>('')
   const [userId, setUserId] = useState<string>('')
   const [chatMsg, setChatMsg] = useState<ChatRoomWithMessage[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const setStoreName = useUserStore(state => state.setName)
   const setStoreId = useUserStore(state => state.setId)
 
@@ -39,7 +41,7 @@ const MainPage = () => {
         setStoreId(profile.id)
       } catch (err) {
         console.error('사용자 정보 로드 실패:', err)
-        //        navigate('/error', { state: { from: '/main' } })
+        navigate('/error', { state: { from: '/main' } })
       }
     }
     fetchUser()
@@ -48,6 +50,8 @@ const MainPage = () => {
   // 상태 메세지 설정
   useEffect(() => {
     if (!userId) return
+
+    setIsLoading(true)
 
     const statusMessage = (diffDays: number | undefined): string => {
       if (diffDays === undefined) return 'Start your first chat now'
@@ -77,6 +81,9 @@ const MainPage = () => {
         console.error('채팅방 목록 로드 실패:', err)
         navigate('/error', { state: { from: '/main' } })
       })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }, [userId, navigate])
 
   const handleRoomClick = (id: number, roomName: string) => {
@@ -105,23 +112,31 @@ const MainPage = () => {
         {/* 채팅방 목록 */}
         <div className="text-title mb-4 text-[20px] border-b border-gray-80 pb-2">Chats</div>
         <div className="flex flex-col gap-[10px]">
-          {chatMsg.map(room => (
-            <button
-              key={room.roomRouteId}
-              onClick={() => handleRoomClick(room.roomRouteId, room.roomName)}
-              className="flex items-center gap-4 w-full h-21 bg-white rounded-lg shadow-[1px_1px_10px_rgba(0,0,0,0.1)] py-3 px-4 active:bg-green-80"
-            >
-              <div className="w-13 h-13 rounded-full flex items-center justify-center overflow-hidden bg-gray-100">
-                <img src={room.avatar} alt={room.roomName} className="w-full h-full object-cover" />
-              </div>
-              <div className="flex flex-col items-start">
-                <span className="text-title text-[16px]">
-                  {capitalizeFirstLetter(room.roomName)}
-                </span>
-                <span className="text-gray-600 text-[14px]">{room.message}</span>
-              </div>
-            </button>
-          ))}
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : (
+            chatMsg.map(room => (
+              <button
+                key={room.roomRouteId}
+                onClick={() => handleRoomClick(room.roomRouteId, room.roomName)}
+                className="flex items-center gap-4 w-full h-21 bg-white rounded-lg shadow-[1px_1px_10px_rgba(0,0,0,0.1)] py-3 px-4 active:bg-green-80"
+              >
+                <div className="w-13 h-13 rounded-full flex items-center justify-center overflow-hidden bg-gray-100">
+                  <img
+                    src={room.avatar}
+                    alt={room.roomName}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="text-title text-[16px]">
+                    {capitalizeFirstLetter(room.roomName)}
+                  </span>
+                  <span className="text-gray-600 text-[14px]">{room.message}</span>
+                </div>
+              </button>
+            ))
+          )}
         </div>
 
         <p className="mt-45 text-center text-gray-300 text-[12px]">

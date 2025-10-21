@@ -25,6 +25,7 @@ import { createBookmark } from '../api/archive'
 import useClosenessStore from '../stores/useClosenessStore'
 import { getClosenessAsText } from '../utils/conceptMap'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import showToast from '../components/common/CommonToast'
 
 interface EnrichedMessage extends Message {
   correction?: IntimacyAnalysisData | null // 교정 데이터 저장
@@ -115,6 +116,7 @@ const ChatPage: React.FC = () => {
         // 불러온 기록으로 messages 상태를 초기화
         setMessages(enrichedHistory)
       } catch (error) {
+        navigate('/error', { state: { from: `/chat/${id}` } })
         console.error('Failed to fetch chat history:', error)
       } finally {
         setIsHistoryLoading(false)
@@ -122,7 +124,7 @@ const ChatPage: React.FC = () => {
     }
 
     fetchHistory()
-  }, [chatroomId, userId, room?.avatar]) // chatroomId, userId가 확정되면 한 번만 실행
+  }, [chatroomId, userId, room?.avatar, id, navigate]) // chatroomId, userId가 확정되면 한 번만 실행
 
   // 코치 마크 조회 확인
   useEffect(() => {
@@ -410,6 +412,7 @@ const ChatPage: React.FC = () => {
       const response = await createBookmark(requestBody)
       console.log('북마크 추가 성공', response)
     } catch (error) {
+      showToast({ message: 'Failed to save', iconType: 'error' })
       console.error('북마크 추가 실패', error)
     }
   }
