@@ -39,7 +39,7 @@ const MainPage = () => {
         setStoreId(profile.id)
       } catch (err) {
         console.error('사용자 정보 로드 실패:', err)
-        //        navigate('/error', { state: { from: '/main' } })
+        navigate('/error', { state: { from: '/main' } })
       }
     }
     fetchUser()

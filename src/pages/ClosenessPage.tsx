@@ -76,6 +76,7 @@ const ClosenessPage = () => {
           intimacyLevel: sliderValue,
         })
       } catch (error) {
+        navigate('/error', { state: { from: `/closeness/${id}` } })
         console.error('채팅방 생성 실패:', error)
         return
       }
@@ -89,6 +90,7 @@ const ClosenessPage = () => {
         navigate(`/chat/${id}`)
       }, 550)
     } catch (error) {
+      navigate('/error', { state: { from: `/closeness/${id}` } })
       console.error('알 수 없는 에러 발생:', error)
     }
   }

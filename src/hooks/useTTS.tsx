@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import showToast from '../components/common/CommonToast'
 
 const useTTS = (text: string) => {
   const [playing, setPlaying] = useState(false)
@@ -49,6 +50,7 @@ const useTTS = (text: string) => {
     utterance.onstart = () => setPlaying(true)
     utterance.onend = () => setPlaying(false)
     utterance.onerror = e => {
+      showToast({ message: 'Unable to play audio', iconType: 'error' })
       console.error('TTS 재생 중 오류가 발생했습니다.', e)
       setPlaying(false)
     }
