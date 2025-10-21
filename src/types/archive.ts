@@ -23,6 +23,7 @@ export interface Vocabulary {
   word: string
   pronunciation: string
   explanation: string
+  korExplanation: string
 }
 
 // --- AI 피드백 ---
@@ -53,6 +54,7 @@ export interface BookmarkResponse {
   content: string
   aiResponse: AiResponse
   botType: BotType
+  correctedContent?: string
   createdAt: string
   ttsUrl?: string
   savedAt?: string

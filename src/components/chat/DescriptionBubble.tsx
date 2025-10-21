@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import useTTS from '../../hooks/useTTS'
 import TTSIcon from './VolumeIcon'
+import messageIcon from '../../assets/icon/message_x.svg'
 import useArchiveStore from '../../stores/useArchiveStore'
 
 type VARIANT = 'chat' | 'archive'
@@ -17,6 +18,7 @@ interface DescriptionBubbleProps {
   descriptionByTab: Record<string, string>
   variant?: VARIANT
   isSelected?: boolean
+  correctMsg?: boolean
 }
 
 const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
@@ -26,6 +28,7 @@ const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
   descriptionByTab,
   variant = 'chat',
   isSelected,
+  correctMsg,
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
   const tabs = ['Kor', 'Eng']
@@ -42,10 +45,20 @@ const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
       <div className="flex items-center justify-between text-[12px] mb-1">
         <div className="flex items-center">
           <div className="mr-1 h-5 w-5">
-            <TTSIcon playing={playing} onPlay={playTTS} />
+            {correctMsg ? (
+              <img src={messageIcon} />
+            ) : (
+              <TTSIcon playing={playing} onPlay={playTTS} />
+            )}
           </div>
-          <span className="text-title">{`‘${word}’`}</span>
-          {pronunciation && <span className="ml-2 text-gray-400">[{pronunciation}]</span>}
+          <span
+            className={`text-sm ${correctMsg ? 'text-body text-gray-400' : 'text-title text-gray-800 mx-1'}`}
+          >
+            {word}
+          </span>
+          {pronunciation && (
+            <span className="ml-2 text-body text-xs text-gray-400">[{pronunciation}]</span>
+          )}
         </div>
         <div className="flex p-0.5 bg-gray-80 rounded-[6px]">
           {tabs.map(tab => (
