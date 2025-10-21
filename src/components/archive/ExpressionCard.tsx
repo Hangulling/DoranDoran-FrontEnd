@@ -19,7 +19,11 @@ interface ExpressionCardProps {
 export default function ExpressionCard({ item, open, onToggle }: ExpressionCardProps) {
   const { selectionMode, selectedIds, toggleSelect } = useArchiveStore()
   const isSelected = selectedIds.has(item.id)
-  const { onPlay, playing } = useTTS(item.content)
+  const ttsText =
+    item.correctedContent && item.correctedContent.trim().length > 0
+      ? item.correctedContent
+      : item.content
+  const { onPlay, playing } = useTTS(ttsText)
   const getBadgeVariant = (level: string | undefined): BadgeVariant => {
     switch (level) {
       case 'Polite':
@@ -68,18 +72,27 @@ export default function ExpressionCard({ item, open, onToggle }: ExpressionCardP
           </div>
 
           <div className="flex justify-between w-full px-4 pb-[10px] mt-1">
-            <div className="flex">
+            <div className="flex items-start gap-1 flex-1 min-w-0">
               <img
                 src={playing ? speakerOn : speakerOff}
                 className="w-5 h-5 mr-1"
                 alt={playing ? '읽는 중' : '읽기'}
                 onClick={handleSpeakerClick}
               />
-              <span
-                className={`text-body text-sm text-gray-800 ${open ? 'whitespace-pre-line' : 'truncate'}`}
-              >
-                {item.content}
-              </span>
+              {(() => {
+                const contentToShow =
+                  item.correctedContent && item.correctedContent.trim().length > 0
+                    ? item.correctedContent
+                    : item.content
+
+                return (
+                  <span
+                    className={`text-body text-sm text-gray-800 ${open ? '"whitespace-normal' : 'truncate'}`}
+                  >
+                    {contentToShow}
+                  </span>
+                )
+              })()}
             </div>
             <button onClick={handleToggleClick}>
               <img src={open ? clsoeExpandIcon : expandIcon} />
@@ -89,16 +102,53 @@ export default function ExpressionCard({ item, open, onToggle }: ExpressionCardP
           {open && (
             <div>
               <div className="mx-4 my-2 h-px bg-gray-80 " />
-              <DescriptionBubble
-                isSelected={isSelected}
-                variant="archive"
-                word="치맥"
-                pronunciation="chi-maek"
-                descriptionByTab={{
-                  Kor: '맥주와 치킨을 같이 즐기는 어쩌구',
-                  Eng: 'A Korean slang term for the popular pairing of fried chicken and beer (maekju).',
-                }}
-              />
+              {(() => {
+                const ai = item.aiResponse ?? {}
+                const firstVoca =
+                  ai.vocabulary && ai.vocabulary.length > 0 ? ai.vocabulary[0] : undefined
+
+                const word =
+                  item.correctedContent && item.correctedContent.trim()
+                    ? item.content
+                    : (firstVoca?.word && firstVoca.word.trim()) || '표현'
+
+                const pronunciation =
+                  (firstVoca?.pronunciation && firstVoca.pronunciation.trim()) ||
+                  (ai.translation?.pronunciation && ai.translation.pronunciation.trim()) ||
+                  ''
+
+                const kor =
+                  (firstVoca?.korExplanation && firstVoca.korExplanation.trim()) ||
+                  (ai.description && ai.description.trim()) ||
+                  ''
+
+                const eng =
+                  (firstVoca?.explanation && firstVoca.explanation.trim()) ||
+                  (ai.translation?.english && ai.translation.english.trim()) ||
+                  ''
+
+                const descriptionByTab: Record<string, string> = {}
+                if (kor) descriptionByTab.Kor = kor
+                if (eng) descriptionByTab.Eng = eng
+
+                if (Object.keys(descriptionByTab).length === 0) return null
+
+                const hasCorrection =
+                  !!item.correctedContent?.trim() &&
+                  item.correctedContent.trim() !== item.content.trim()
+
+                return (
+                  <DescriptionBubble
+                    isSelected={isSelected}
+                    variant="archive"
+                    word={word}
+                    pronunciation={pronunciation}
+                    correctMsg={hasCorrection}
+                    descriptionByTab={descriptionByTab}
+                    initialTab={eng ? 'Eng' : 'Kor'}
+                  />
+                )
+              })()}
             </div>
           )}
         </div>
