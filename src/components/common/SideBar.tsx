@@ -73,6 +73,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       try {
         await deleteUser(userId)
         useUserStore.getState().reset()
+        useClosenessStore.getState().reset()
+        useRoomIdStore.getState().reset()
+        useCoachStore.getState().reset()
+        useModalStore.getState().reset()
         onClose()
         navigate('/login')
       } catch (error) {
