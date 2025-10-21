@@ -72,8 +72,8 @@ export async function updateIntimacy(
 }
 
 // 채팅방 나가기 (소프트 딜리트)
-export async function leaveChatroom(chatroomId: string): Promise<void> {
-  await api.post(CHAT_ENDPOINTS.LEAVE_CHATROOM(chatroomId))
+export async function leaveChatroom(chatroomId: string, userId: string): Promise<void> {
+  await api.post(CHAT_ENDPOINTS.LEAVE_CHATROOM(chatroomId, userId))
 }
 
 // SSE(실시간 메시지 스트림)

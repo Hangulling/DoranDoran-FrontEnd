@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState, type FC } from 'react'
 import ChatBubble from './ChatBubble'
-// import DescriptionBubble from './DescriptionBubble'
 import useClosenessStore from '../../stores/useClosenessStore'
 import { useParams } from 'react-router-dom'
 import { greetingMessage } from '../../mocks/db/greetingMessages'
@@ -106,18 +105,6 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
           variant="basic"
         />
       )}
-
-      {/* {step === 3 && <LoadingBubble showAvatar={false} />}
-      {step >= 4 && (
-        <DescriptionBubble
-          word="치맥"
-          pronunciation="chi-maek"
-          descriptionByTab={{
-            Kor: '맥주와 치킨을 같이 즐기는 어쩌구',
-            Eng: 'A Korean slang term for the popular pairing of fried chicken and beer (maekju).',
-          }}
-        />
-      )} */}
 
       {step === 3 && <LoadingBubble showAvatar={false} />}
       {step >= 4 && (

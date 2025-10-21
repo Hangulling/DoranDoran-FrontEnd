@@ -17,7 +17,7 @@ const bubbleVariants = {
   basic: 'bg-white border border-gray-100 rounded-lg rounded-tl-none', // 기본 답장
   second: 'bg-white border border-gray-100 rounded-lg', // 두번째 답장
   sender: 'bg-green-400 text-white rounded-lg rounded-tr-none', // 사용자 채팅
-  error: 'bg-white border border-orange-100 rounded-lg text-orange-200', // 에러 채팅
+  error: 'bg-white border border-orange-100 rounded-lg rounded-tl-none text-orange-200', // 에러 채팅
 }
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({
@@ -53,8 +53,8 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
           : 'chat chat-start gap-x-[8px] relative pt-0 pb-0'
       }
     >
-      {!isSender && avatarUrl && variant === 'basic' && (
-        <div className="chat-image avatar absolute top-1 left-0 w-8 h-8">
+      {!isSender && avatarUrl && (variant === 'basic' || 'error') && (
+        <div className="chat-image avatar absolute top-0 left-0 w-8 h-8">
           <div className="w-8 h-8 rounded-full overflow-hidden">
             <img alt="프로필 사진" src={avatarUrl} />
           </div>
