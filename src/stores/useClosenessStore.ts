@@ -8,7 +8,7 @@ interface ClosenessState {
 }
 
 const useClosenessStore = create(
-  persist<ClosenessState>(
+  persist<ClosenessState & { reset: () => void }>(
     (set, get) => ({
       closenessMap: {},
       setCloseness: (roomId, value) => {
@@ -19,6 +19,7 @@ const useClosenessStore = create(
       getCloseness: roomId => {
         return get().closenessMap[roomId]
       },
+      reset: () => set({ closenessMap: {} }),
     }),
     {
       name: 'closeness-storage',
