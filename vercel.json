@@ -8,7 +8,7 @@
           "value": "www.doran-chat.com"
         }
       ],
-      "destination": "https://doran-chat.com/:1",
+      "destination": "https://doran-chat.com/$1",
       "permanent": true
     }
   ]
