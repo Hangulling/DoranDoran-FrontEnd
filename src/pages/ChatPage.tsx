@@ -31,6 +31,7 @@ interface EnrichedMessage extends Message {
   correction?: IntimacyAnalysisData | null // 교정 데이터 저장
   vocabularyData?: VocabularyExtractedData | null // 어휘 데이터 저장
   isPerfect?: boolean // Perfect 여부 저장
+  analysisState?: 'pending' | 'complete' // 교정 데이터 로딩
 }
 
 interface ApiMessage {
@@ -221,6 +222,7 @@ const ChatPage: React.FC = () => {
         text: response.content,
         isSender: true,
         variant: 'sender',
+        analysisState: 'pending', // 명시적
       }
       setMessages(prevMessages => [...prevMessages, newMessage])
     } catch (error) {
@@ -257,11 +259,15 @@ const ChatPage: React.FC = () => {
               if (msg.id === targetMsgId) {
                 // 교정 버블 표시 조건
                 if (intimacyData && intimacyData.correctedSentence && intimacyData.corrections) {
-                  return { ...msg, correction: intimacyData, isPerfect: false }
+                  return {
+                    ...msg,
+                    correction: intimacyData,
+                    isPerfect: false,
+                    analysisState: 'complete',
+                  }
                 } else {
-                  // 교정할 내용이 없거나(correctedSentence가 없거나),
-                  // 교정 내용(corrections)이 비어있으면 'isPerfect'를 true로 설정
-                  return { ...msg, correction: null, isPerfect: true }
+                  // 교정할 내용이 없음
+                  return { ...msg, correction: null, isPerfect: true, analysisState: 'complete' } // <--- 'analysisState' 추가
                 }
               }
               return msg
@@ -470,17 +476,34 @@ const ChatPage: React.FC = () => {
                       />
                     </div>
                     {msg.isSender &&
-                      (msg.correction && msg.correction.correctedSentence ? (
+                      (msg.analysisState === 'pending' ? (
+                        // 1. PENDING 상태: isLoading={true}로 스켈레톤 렌더링
                         <CorrectionBubble
                           chatRoomId={chatroomId ?? ''}
                           messageId={msg.id}
                           originalContent={msg.text}
-                          correctedContent={msg.correction.correctedSentence}
+                          isSender={true}
+                          isLoading={true} // <--- 스켈레톤 모드 활성화
+                        />
+                      ) : msg.isPerfect ? (
+                        // 2. COMPLETE + PERFECT 상태
+                        <div className="flex flex-row justify-end text-[#54BDB4] text-[12px] mt-1 font-medium">
+                          <img src={Perfect} alt="perfect" />
+                          perfect
+                        </div>
+                      ) : msg.correction && msg.correction.correctedSentence ? (
+                        // 3. COMPLETE + CORRECTION 상태: 실제 데이터 렌더링
+                        <CorrectionBubble
+                          chatRoomId={chatroomId ?? ''}
+                          messageId={msg.id}
+                          originalContent={msg.text}
+                          correctedContent={msg.correction.correctedSentence} // 실제 데이터
                           descriptionByTab={{
                             Kor: msg.correction.feedback.ko,
                             Eng: msg.correction.feedback.en,
                           }}
                           isSender={true}
+                          isLoading={false} // <--- 스켈레톤 모드 비활성화 (명시적)
                           onBookmarkToggle={(messageId, content, correctedContent) =>
                             handleCorrectionBubbleBookmark(
                               messageId,
@@ -491,11 +514,6 @@ const ChatPage: React.FC = () => {
                             )
                           }
                         />
-                      ) : msg.isPerfect ? (
-                        <div className="flex flex-row justify-end text-[#54BDB4] text-[12px] mt-1 font-medium">
-                          <img src={Perfect} alt="perfect" />
-                          perfect
-                        </div>
                       ) : null)}
                     {!msg.isSender &&
                       msg.vocabularyData &&
