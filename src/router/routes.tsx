@@ -49,7 +49,7 @@ export function Routes() {
         }
       />
       <Route path="/policy/:id" element={<PolicyPage />} />
-      <Route path="/error" element={<ErrorPage errorCode={500} />} />
+      <Route path="/error" element={<ErrorPage />} />
       <Route path="*" element={<ErrorPage errorCode={404} />} />
     </RouterRoutes>
   )

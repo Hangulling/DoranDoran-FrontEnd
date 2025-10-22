@@ -37,16 +37,19 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const pathname = location.pathname
 
   // 알 수 없는 페이지 (*)
-  const isUnknownPath = !(
-    pathname === '/' ||
-    pathname.startsWith('/signup') ||
-    pathname.startsWith('/archive') ||
-    pathname.startsWith('/chat') ||
-    pathname.startsWith('/closeness') ||
-    pathname.startsWith('/policy') ||
-    pathname.startsWith('/login') ||
-    pathname.startsWith('/error')
-  )
+  const knownPatterns = [
+    /^\/$/, 
+    /^\/signup(?:\/|$)/, 
+    /^\/login(?:\/|$)/,
+    /^\/archive(?:\/|$)/,
+    /^\/chat(?:\/|$)/,
+    /^\/closeness(?:\/|$)/,
+    /^\/policy(?:\/|$)/,
+    /^\/error(?:\/|$)/,
+  ]
+  const isKnownPath = knownPatterns.some(rx => rx.test(pathname))
+  const isUnknownPath = !isKnownPath
+
   const skipNavPaths = ['/login', '/error']
 
   const isMain = pathname === '/'
@@ -58,7 +61,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const agreementId = agreementMatch?.params.id
 
   const showDelete = onArchive
-  const hideNavBar = skipNavPaths.includes(pathname) || isUnknownPath
+  const state = location.state as { from?: string } | null
+
+  const hideNavBar =
+    skipNavPaths.some(p => pathname.startsWith(p)) ||
+    isUnknownPath ||
+    (pathname.startsWith('/error') && state?.from === 'signup')
 
   // 친밀도 바(채팅에서만)
   const closenessMatch = pathname.match(/^\/chat\/(\d+)$/)
