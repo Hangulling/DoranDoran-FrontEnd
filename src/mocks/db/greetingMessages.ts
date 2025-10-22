@@ -392,7 +392,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '오늘 하루종일 자기 생각나서 너무 보고싶은데 만날까?ㅎㅎ',
     systemMessage:
       'Let’s continue the conversation about what you’d like to do together if you meet today!',
@@ -405,7 +405,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '자기야! 오늘 하루도 즐겁게 보내고 있고, 밥먹었어?',
     systemMessage: 'Let’s continue the conversation about what food you want to eat!',
   },
@@ -418,20 +418,20 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '여보! 오늘 날씨가 진짜 좋네! 오늘 하루 어땠어?ㅎㅎ',
     systemMessage:
       'Let’s continue the conversation about what you did today and how your day went!',
   },
   {
     concept: 'honey',
-    closenessLevel: 1,
+    closenessLevel: 3,
     message: '오늘 시간 괜찮아요? 쇼핑하러 갈래요?',
     systemMessage: 'Let’s continue the conversation about what you’re planning to buy or shop for!',
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '자기야, 오늘 시간 괜찮으면 쇼핑하자!',
     systemMessage: 'Let’s continue the conversation about what you’re planning to buy or shop for!',
   },
@@ -443,7 +443,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '오랜만에 햇살이 따뜻하네! 오늘 날씨 너무 좋지 않아, 자기야?',
     systemMessage: 'Let’s continue the conversation about the weather activities!',
   },
@@ -455,7 +455,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '요즘 영화 꿀잼이더라! 우리 영화보러 갈래?ㅎㅎ',
     systemMessage: 'Let’s continue the conversation about what movie you’d like to watch together!',
   },
@@ -467,7 +467,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '나 음악 추천 받고 싶어! 여보는 자주 듣는 노래가 뭐야?ㅎㅎ',
     systemMessage: 'Let’s continue the conversation about what songs make you feel good!',
   },
@@ -480,7 +480,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '자기야! 날씨도 좋고 기분 전환할 겸, 우리 여행 가자!',
     systemMessage:
       'Let’s continue the conversation about where you’d like to go on a trip together!',
@@ -493,7 +493,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '자기야! 요새 바빴지? 어젠 잘 잤어?ㅎㅎ',
     systemMessage: 'Let’s continue the conversation about what kind of dream you had last night.',
   },
@@ -505,7 +505,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '자기야! 요즘 몸이 좀 찌뿌둥한데, 나랑 같이 운동하자!ㅎㅎ',
     systemMessage: 'Let’s continue the conversation about your workout routine!',
   },
@@ -518,7 +518,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '자기야! 오늘 바빴지? 컨디션 괜찮아?ㅠㅠ',
     systemMessage:
       'Let’s continue the conversation about how you maintain your health and wellness!',
@@ -531,7 +531,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '자기야! 내가 새로운 레시피 배웠는데, 오늘 요리해줄까?',
     systemMessage: 'Let’s continue the conversation about what kind of food you want to eat',
   },
@@ -543,7 +543,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '요즘 힘들어 보이는데, 스트레스 받는 일 있어?ㅠㅠ',
     systemMessage: 'Let’s continue the conversation about what helps you relieve stress!',
   },
@@ -555,7 +555,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '난 얼마 전에 자기계발 책 읽었는데, 요즘 무슨 책 읽어, 자기?ㅎㅎ',
     systemMessage: 'Let’s continue the conversation about the plot!',
   },
@@ -568,7 +568,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '자기야! 오늘 하루 잘 보내고 있어? 뭐해?ㅎㅎ',
     systemMessage:
       'Let’s continue the conversation about what fun or interesting things you’re doing right now!',
@@ -581,7 +581,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '자기야, 요즘 재미있는 게 많더라! 게임 좋아해?',
     systemMessage: 'Let’s continue the conversation about what kind of games you like!',
   },
@@ -594,7 +594,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '오늘 하루 잘 끝냈어? 내일 뭐할거야, 자기야?',
     systemMessage:
       'Let’s continue the conversation about your weekend plans and how you like to spend your free time!',
@@ -608,7 +608,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '자기야! 요즘 어떻게 시간 보내? 취미 있어?ㅎㅎ',
     systemMessage:
       'Let’s continue the conversation about your hobbies and what activities make you feel relaxed or inspired!',
@@ -621,7 +621,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '무슨 일이야? 요즘 고민이 많은 것 같아, 자기ㅠㅠ',
     systemMessage: 'Let’s continue the conversation about what’s been difficult for you.',
   },
@@ -633,7 +633,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 2,
+    closenessLevel: 3,
     message: '자기야! 오늘 날씨 좋다! 기분은 어때?ㅎㅎ',
     systemMessage: 'Let’s continue the conversation about what’s making your mood today!',
   },
