@@ -186,6 +186,9 @@ const ChatPage: React.FC = () => {
     window.history.pushState(null, '', window.location.href)
     const handlePopState = () => {
       if (noShowAgain) {
+        const storageKey = `initChat_${id}`
+        sessionStorage.removeItem(storageKey)
+
         navigate('/')
         return
       }
@@ -196,7 +199,7 @@ const ChatPage: React.FC = () => {
     return () => {
       window.removeEventListener('popstate', handlePopState)
     }
-  }, [navigate, noShowAgain])
+  }, [navigate, noShowAgain, id])
 
   // 메시지 전송
   const handleSendMessage = async (text: string) => {
@@ -337,6 +340,9 @@ const ChatPage: React.FC = () => {
       console.log('채팅방 나가기 성공')
       setMessages([]) // 로컬 메시지 상태 초기화
       useUserMsgStore.getState().clearUserMsgs()
+
+      const storageKey = `initChat_${id}`
+      sessionStorage.removeItem(storageKey) // InitChat 초기화
 
       setIsModalOpen(false)
       navigate('/', { replace: true })
