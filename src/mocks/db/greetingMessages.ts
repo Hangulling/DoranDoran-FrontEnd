@@ -425,7 +425,7 @@ export const greetingMessage = [
   },
   {
     concept: 'honey',
-    closenessLevel: 3,
+    closenessLevel: 1,
     message: '오늘 시간 괜찮아요? 쇼핑하러 갈래요?',
     systemMessage: 'Let’s continue the conversation about what you’re planning to buy or shop for!',
   },
