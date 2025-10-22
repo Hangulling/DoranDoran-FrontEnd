@@ -1,15 +1,3 @@
 {
-  "redirects": [
-    {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.doran-chat.com"
-        }
-      ],
-      "destination": "https://doran-chat.com/$1",
-      "permanent": true
-    }
-  ]
+
 }
