@@ -1,6 +1,6 @@
 // Users endpoints
 export const USER_ENDPOINTS = {
-  CREATE: '/api/users',
+  CREATE: '/api/users/register',
 
   // 사용자 조회
   GET_BY_ID: (userId: string) => `/api/users/${userId}`,
