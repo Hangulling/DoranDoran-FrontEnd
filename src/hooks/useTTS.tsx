@@ -35,10 +35,13 @@ const useTTS = (text: string) => {
       return
     }
 
-    // 중복 재생 방지
+    // 재생 중일 때 중지
     if (playing) {
+      window.speechSynthesis.cancel()
+      setPlaying(false)
       return
     }
+
     // 음성 설정 나중에
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.voice = koreanVoice
