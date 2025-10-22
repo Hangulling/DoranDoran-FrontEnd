@@ -1,3 +1,9 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "https://doran-chat.com/$1",
+      "permanent": true
+    }
+  ]
 }
