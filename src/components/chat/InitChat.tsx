@@ -11,9 +11,27 @@ interface InitChatProps {
 }
 const LoadingDot = () => <span className="loading loading-dots loading-[5px] text-gray-200" />
 
+// 메시지 가져오는 함수 (의존성 안정화)
+function getGreetingMessage(concept: string, closenessLevel: number) {
+  const filtered = greetingMessage.filter(
+    item => item.concept === concept && item.closenessLevel === closenessLevel
+  )
+  if (filtered.length === 0) {
+    return {
+      message: '메시지가 없습니다.',
+      systemMessage: '',
+    }
+  }
+  // 랜덤 선택
+  const randomItem = filtered[Math.floor(Math.random() * filtered.length)]
+  return {
+    message: randomItem.message,
+    systemMessage: randomItem.systemMessage,
+  }
+}
+
 const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
   const { id } = useParams<{ id: string }>()
-  const [step, setStep] = useState(0)
   const lastMessageRef = useRef<HTMLDivElement>(null)
 
   const LOADING_DURATION = 600
@@ -25,28 +43,43 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
   // id에 따른 컨셉 매핑 유틸 사용
   const concept = conceptMap(id)
 
-  function getGreetingMessage(concept: string, closenessLevel: number) {
-    const filtered = greetingMessage.filter(
-      item => item.concept === concept && item.closenessLevel === closenessLevel
-    )
-    if (filtered.length === 0) {
+  const storageKey = useMemo(() => `initChat_${id}`, [id])
+
+  const [initialState] = useState(() => {
+    const storedData = sessionStorage.getItem(storageKey)
+    if (storedData) {
+      // 새로고침: 저장된 데이터로 즉시 4단계 시작
       return {
-        message: '메시지가 없습니다.', // 수정 필요
-        systemMessage: '',
+        step: 4,
+        messages: JSON.parse(storedData) as {
+          message: string
+          systemMessage: string
+        },
       }
     }
-    // 랜덤 선택
-    const randomItem = filtered[Math.floor(Math.random() * filtered.length)]
+    // 첫 방문: 0단계에서 시작
     return {
-      message: randomItem.message,
-      systemMessage: randomItem.systemMessage,
+      step: 0,
+      messages: null,
     }
-  }
+  })
 
-  // concept이나 closenessLevel이 바뀔 때만 함수 실행
-  const { message, systemMessage } = useMemo(() => {
-    return getGreetingMessage(concept, closenessLevel)
-  }, [concept, closenessLevel])
+  // 위에서 계산된 초기값으로 state 설정
+  const [step, setStep] = useState(initialState.step)
+  const [messages, setMessages] = useState(initialState.messages)
+
+  useEffect(() => {
+    // messages가 null일 때만 실행
+    if (!messages && concept && closenessLevel) {
+      const { message, systemMessage } = getGreetingMessage(concept, closenessLevel)
+
+      // sessionStorage에 저장
+      sessionStorage.setItem(storageKey, JSON.stringify({ message, systemMessage }))
+
+      // state에 설정
+      setMessages({ message, systemMessage })
+    }
+  }, [messages, concept, closenessLevel, storageKey])
 
   const LoadingBubble: FC<{ showAvatar?: boolean }> = ({ showAvatar }) => (
     <ChatBubble
@@ -59,6 +92,8 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
   )
 
   useEffect(() => {
+    if (step >= 4) return // 새로고침 시 애니메이션 없음
+
     const timers: NodeJS.Timeout[] = []
 
     const schedule = (callback: () => void, duration: number) => {
@@ -87,19 +122,29 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
 
   useEffect(() => {
     if (step === 4 && lastMessageRef.current) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         console.log('onReady called')
         onReady?.()
       }, 0)
+      return () => clearTimeout(timer)
     }
   }, [step, onReady])
+
+  if (!messages) {
+    // 첫 프레임 깜빡임을 방지하기 위해 첫 번째 로더를 보여줌
+    return (
+      <div className="flex flex-col gap-y-2">
+        <LoadingBubble showAvatar={true} />
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-y-2">
       {step === 1 && <LoadingBubble showAvatar={true} />}
       {step >= 2 && (
         <ChatBubble
-          message={step === 1 ? <LoadingDot /> : message}
+          message={step === 1 ? <LoadingDot /> : messages.message}
           isSender={false}
           avatarUrl={avatar}
           variant="basic"
@@ -109,7 +154,7 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
       {step === 3 && <LoadingBubble showAvatar={false} />}
       {step >= 4 && (
         <div ref={lastMessageRef}>
-          <ChatBubble message={systemMessage} isSender={false} variant="second" />
+          <ChatBubble message={messages.systemMessage} isSender={false} variant="second" />
         </div>
       )}
     </div>
