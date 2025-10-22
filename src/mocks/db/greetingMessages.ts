@@ -272,19 +272,19 @@ export const greetingMessage = [
   {
     concept: 'friend',
     closenessLevel: 1,
-    message: '나는 연애 중인데, 너는 연애 하고 있어?',
+    message: '연애 하고 있어? 애인이랑 사이 괜찮아?',
     systemMessage: 'Let’s continue the conversation about your current relationship status!',
   },
   {
     concept: 'friend',
     closenessLevel: 2,
-    message: '나 애인이랑 사귀고 있는데, 너도?ㅎㅎ',
+    message: '요즘 연애해?ㅎㅎ 애인이랑 잘 지내~?',
     systemMessage: 'Let’s continue the conversation about your current relationship status!',
   },
   {
     concept: 'friend',
     closenessLevel: 3,
-    message: '나는 연애 중인데, 너도? 솔로 탈출 ㅊㅊ',
+    message: '야 연애 하지?ㅋㅋ 애인이랑 잘 지내냐?',
     systemMessage: 'Let’s continue the conversation about your current relationship status!',
   },
   {
