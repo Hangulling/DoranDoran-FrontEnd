@@ -1,21 +1,35 @@
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Button from '../components/common/Button'
 import ServerError from '/public/serverError.svg'
 import ClientError from '/public/clientError.svg'
 import Arrow from '../assets/icon/leftArrow.svg?react'
 
+type FromPage = 'signup' | 'login' | undefined
+
 interface ErrorPageProps {
-  errorCode: number
+  errorCode?: number
 }
 
 const ErrorPage: React.FC<ErrorPageProps> = ({ errorCode }) => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const state = (location.state as { code?: number; from?: FromPage } | undefined) || {}
 
-  const handleClick = () => {
-    navigate('/')
+  const code = errorCode ?? state.code ?? 400
+
+  let from: FromPage = state.from
+  if (!from) {
+    if (location.pathname.startsWith('/signup')) from = 'signup'
+    else if (location.pathname.startsWith('/login')) from = 'login'
   }
 
-  if (errorCode >= 500) {
+  const backTarget = from === 'signup' ? '/signup' : from === 'login' ? '/login' : '/'
+
+  const handleClick = () => {
+    navigate(backTarget, { replace: true })
+  }
+
+  if (code >= 500) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <img src={ServerError} />
@@ -37,7 +51,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({ errorCode }) => {
         </div>
       </div>
     )
-  } else if (errorCode >= 400) {
+  } else if (code >= 400) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <img src={ClientError} />
