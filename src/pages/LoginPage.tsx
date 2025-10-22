@@ -43,8 +43,8 @@ export default function LoginPage() {
       ec === 'INVALID_CREDENTIALS' ||
       /(비밀번호|password)/i.test(msg)
 
-    if (isEmailError && isPasswordError) return { type: 'both' } 
-    if (isEmailError) return { type: 'email' } 
+    if (isEmailError && isPasswordError) return { type: 'both' }
+    if (isEmailError) return { type: 'email' }
     if (isPasswordError) return { type: 'password' }
 
     return { type: 'both', msg: 'Email error + Password error' }
@@ -96,6 +96,14 @@ export default function LoginPage() {
           message?: string
         }
 
+        if (!status || status >= 500) {
+          navigate('/error', {
+            replace: true,
+            state: { code: status ?? 503, from: 'login' },
+          })
+          return
+        }
+
         const mapped = mapAuthError({
           status,
           errorCode: data.errorCode,
@@ -106,10 +114,8 @@ export default function LoginPage() {
         setErrorMsg(mapped.msg ?? '')
         console.error('🚨 로그인 에러:', err.response?.data || err)
       } else {
-        setError('both')
-        setErrorMsg('Email error + Password error')
-        console.error('🚨 로그인 에러(unknown):', err)
-      }
+        navigate('/error', { replace: true, state: { code: 500, from: 'login' } })
+      } 
     }
   }
 

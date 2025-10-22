@@ -218,10 +218,18 @@ export default function SignupPage() {
       resetAgreements()
       navigate('/login', { replace: true })
     } catch (e: unknown) {
-      const msg = axios.isAxiosError(e)
-        ? e.response?.data?.message || 'Sign up failed.'
-        : 'Sign up failed.'
+      const isAxios = axios.isAxiosError(e)
+      const status = isAxios ? e.response?.status : undefined
+      const code = status ?? 503
+
+      const msg = isAxios ? e.response?.data?.message || 'Sign up failed.' : 'Sign up failed.'
       setSubmitError(msg)
+
+      if (status && status >= 400 && status < 500) {
+        return
+      }
+
+      navigate('/error', { replace: true, state: { code, from: 'signup' } })
     }
   }
 
