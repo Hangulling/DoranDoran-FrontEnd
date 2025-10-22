@@ -7,12 +7,13 @@ import useTTS from '../../hooks/useTTS'
 interface CorrectionBubbleProps {
   chatRoomId: string
   initialTab?: string
-  descriptionByTab: Record<string, string>
+  descriptionByTab?: Record<string, string>
   correctedSentence?: string
   isSender?: boolean
   messageId?: string // 북마크
   originalContent?: string
   correctedContent?: string
+  isLoading?: boolean
   onBookmarkToggle?: (messageId: string, content: string, correctedContent: string) => void
 }
 
@@ -27,22 +28,27 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   messageId,
   originalContent,
   correctedContent,
+  isLoading,
   onBookmarkToggle,
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
-  const [currentDescription, setCurrentDescription] = useState(descriptionByTab)
+  const [currentDescription, setCurrentDescription] = useState(descriptionByTab ?? {})
 
   useEffect(() => {
-    setCurrentDescription(descriptionByTab)
+    if (descriptionByTab) {
+      setCurrentDescription(descriptionByTab)
+    }
   }, [descriptionByTab])
 
   const closeness = useClosenessStore(state => state.closenessMap[chatRoomId] ?? 1)
   const closenessText = closeness === 1 ? 'Polite' : closeness === 2 ? 'Casual' : 'Friendly'
 
   const [isBookmarked, setIsBookmarked] = useState(false)
-  const { onPlay: playTTS, playing: isPlaying } = useTTS(correctedContent ?? '')
+  const { onPlay: playTTS, playing: isPlaying } = useTTS(isLoading ? '' : (correctedContent ?? '')) // 로딩 중 비활
 
   const toggleBookmark = () => {
+    if (isLoading) return // 로딩 중 비활
+
     setIsBookmarked(!isBookmarked)
     if (onBookmarkToggle) {
       if (!messageId) return
@@ -58,7 +64,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
             <p className="text-green-500">
               closeness level -<span> {closenessText}</span>
             </p>
-            <p>{correctedContent}</p>
+            {isLoading ? <div className="skeleton h-4"></div> : <p>{correctedContent}</p>}
           </div>
           <div className="flex p-0.5 bg-green-80 rounded-[6px] mt-[26px]">
             {tabs.map(tab => (
@@ -72,6 +78,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
                 style={{ border: 'none' }}
                 onClick={() => setSelectedTab(tab)}
                 type="button"
+                disabled={isLoading} // 로딩 중 탭 비활
               >
                 {tab}
               </button>
@@ -79,7 +86,16 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
           </div>
         </div>
         <div className="h-[1px] bg-green-80 w-full my-2" />
-        <div className="text-[14px] text-gray-700">{currentDescription[selectedTab]}</div>
+        <div className="text-[14px] text-gray-700">
+          {isLoading ? (
+            <div className="space-y-1.5 pt-1">
+              <div className="skeleton h-3 w-full"></div>
+              <div className="skeleton h-3 w-5/6"></div>
+            </div>
+          ) : (
+            currentDescription[selectedTab]
+          )}
+        </div>
         <>
           <div className="h-[1px] bg-green-80 w-full my-1" />
           <div className="flex flex-row justify-between">

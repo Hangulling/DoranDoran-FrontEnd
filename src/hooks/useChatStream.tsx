@@ -63,6 +63,7 @@ export function useChatStream<T = unknown>(
         headers: {
           Authorization: accessToken ? `Bearer ${accessToken}` : '',
         },
+        heartbeatTimeout: 300000, // 대화가 없는 상태 - 5분
       })
 
       // 연결 성공 시 리셋
@@ -107,6 +108,7 @@ export function useChatStream<T = unknown>(
         eventSource.close()
 
         if (retryCount < maxRetries) {
+          // 재접속 제한
           setIsLoading(true)
           retryTimeout = setTimeout(() => {
             retryCount++
