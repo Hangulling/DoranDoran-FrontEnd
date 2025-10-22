@@ -1,4 +1,4 @@
-import type { BookmarkRequest } from '../types/archive'
+import type { BookmarkRequest, BookmarkResponse } from '../types/archive'
 import api from './api'
 import { BOOKMARK_ENDPOINTS } from './endpoints'
 
@@ -16,9 +16,19 @@ export async function getAllBookmarks() {
   return res.data
 }
 
-export async function getBookmarksByCursor(lastId?: string, size = 20) {
-  const res = await api.get(BOOKMARK_ENDPOINTS.LIST_CURSOR(lastId, size))
-  return res.data
+
+export async function getBookmarksByCursor(lastId?: string, size = 15) {
+  const res = await api.get(`/api/store/bookmarks/cursor`, {
+    params: { lastId, size },
+  })
+  return res.data as {
+    content: BookmarkResponse[]
+    totalElements: number
+    numberOfElements: number
+    last: boolean
+    first: boolean
+    empty: boolean
+  }
 }
 
 export async function getBookmarksByBotType(botType: 'friend' | 'honey' | 'coworker' | 'senior') {

@@ -1,3 +1,5 @@
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import { useLocation, useParams } from 'react-router-dom'
 import ArchiveTabs from '../components/archive/ArchiveTabs'
 import ExpressionCard from '../components/archive/ExpressionCard'
 import CommonModal from '../components/common/CommonModal'
@@ -5,42 +7,49 @@ import EmptyCard from '../components/archive/EmptyCard'
 import Button from '../components/common/Button'
 import checkCircle from '../assets/icon/checkRound.svg'
 import useArchiveStore from '../stores/useArchiveStore'
-import { useEffect, useMemo, useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
-import {
-  BOT_TO_ROOM,
-  ROOM_TO_BOT,
-  type BookmarkResponse,
-  type BotType,
-  type Room,
-} from '../types/archive'
-import { deleteManyBookmarks, getBookmarksByBotType } from '../api/archive'
+import { BOT_TO_ROOM, type BookmarkResponse, type BotType, type Room } from '../types/archive'
+import { deleteManyBookmarks, getBookmarksByCursor } from '../api/archive'
+
+const PAGE_SIZE = 15
+const EDGE_NEAR = 16
+const EDGE_RELEASE = 64
+const SAFE_OFFSET = EDGE_RELEASE + 1
+
+type Page = {
+  items: BookmarkResponse[]
+  nextCursorFromServer: string | null
+  isLastOnServer: boolean
+}
 
 export default function ArchivePage() {
-  const {
-    items,
-    activeRoom,
-    setActiveRoom,
-    selectionMode,
-    selectedIds,
-    seedItems,
-    exitSelectionMode,
-  } = useArchiveStore()
+  const { activeRoom, setActiveRoom, selectionMode, selectedIds, seedItems, exitSelectionMode } =
+    useArchiveStore()
+  const scrollElRef = useRef<HTMLElement | null>(null)
+  const edgeLock = useRef<'none' | 'top' | 'bottom'>('none')
+  const roomCursorRef = useRef<Record<Room, string | null>>({
+    Friend: null,
+    Honey: null,
+    Coworker: null,
+    Senior: null,
+  })
+  const prevRef = useRef<() => void>(() => {})
+  const nextRef = useRef<() => void>(() => {})
+  const suppressNextScrollRef = useRef(false)
 
+  const [pages, setPages] = useState<Page[]>([])
+  const [pageIndex, setPageIndex] = useState(0)
   const [openModal, setOpenModal] = useState(false)
   const [deleteCount, setDeleteCount] = useState(0)
   const [showToast, setShowToast] = useState(false)
   const [openId, setOpenId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [roomResolved, setRoomResolved] = useState(false)
-
   const [dataReady, setDataReady] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const list = items.filter(i => BOT_TO_ROOM[i.botType] === activeRoom)
-
+  const list = pages[pageIndex]?.items ?? []
   const location = useLocation()
   const fromChat = (location.state as { from?: string } | null)?.from === 'chat'
-
   const { id } = useParams<{ id?: string }>()
   const idToRoom: Record<string, Room> = useMemo(
     () => ({ '1': 'Friend', '2': 'Honey', '3': 'Coworker', '4': 'Senior' }),
@@ -48,60 +57,196 @@ export default function ArchivePage() {
   )
 
   useEffect(() => {
-    setOpenId(null)
-  }, [activeRoom])
-
-  useEffect(() => {
-    if (id && idToRoom[id]) {
-      setActiveRoom(idToRoom[id])
-      setRoomResolved(true)
-    } else {
-      setRoomResolved(true)
-    }
+    if (id && idToRoom[id]) setActiveRoom(idToRoom[id])
+    setRoomResolved(true)
   }, [id, idToRoom, setActiveRoom])
 
   useEffect(() => {
     if (!roomResolved) return
+    setPages([])
+    setPageIndex(0)
+    setError(null)
+    edgeLock.current = 'none'
+    roomCursorRef.current[activeRoom] = null
+    void loadFirstPage()
+  }, [activeRoom, roomResolved])
 
-    setDataReady(false)
+  const fetchLastWindow15 = useCallback(async (room: Room): Promise<BookmarkResponse[]> => {
+    let all: BookmarkResponse[] = []
+    let cursor: string | undefined = undefined
+    let last = false
+    for (let hop = 0; hop < 10 && !last; hop++) {
+      const raw = await getBookmarksByCursor(cursor, PAGE_SIZE * 3)
+      const content: BookmarkResponse[] = raw?.content ?? []
+      if (content.length === 0) {
+        last = !!raw?.last
+        break
+      }
+      all = all.concat(content)
+      cursor = content[content.length - 1]?.id
+      last = !!raw?.last
+    }
+    const filtered = all.filter(i => BOT_TO_ROOM[i.botType as BotType] === room)
+    const start = Math.max(0, filtered.length - PAGE_SIZE)
+    return filtered.slice(start)
+  }, [])
 
-    const fetchByRoom = async () => {
-      try {
-        const botType: BotType = ROOM_TO_BOT[activeRoom]
-        const res = await getBookmarksByBotType(botType)
-        seedItems(res ?? [])
-        setError(null)
-      } catch (e) {
-        const msg = e instanceof Error ? e.message : String(e)
-        console.error('★ 북마크 조회 실패:', msg)
-        setError('조회 중 인증 오류(401) 또는 게이트웨이 정책 이슈')
-      } finally {
-        setDataReady(true)
+  const fetchPageFill15 = useCallback(
+    async (room: Room, startFromCursor: string | null): Promise<Page> => {
+      let acc: BookmarkResponse[] = []
+      let nextCursor: string | null = startFromCursor ?? null
+      let isLast = false
+      const CHUNK = PAGE_SIZE * 3
+      for (let hop = 0; hop < 5 && acc.length < PAGE_SIZE && !isLast; hop++) {
+        const raw = await getBookmarksByCursor(nextCursor ?? undefined, CHUNK)
+        const content: BookmarkResponse[] = raw?.content ?? []
+        const filtered = content.filter(i => BOT_TO_ROOM[i.botType as BotType] === room)
+        acc = acc.concat(filtered)
+        const lastRaw = content[content.length - 1]
+        nextCursor = lastRaw ? lastRaw.id : nextCursor
+        isLast = !!raw?.last
+        if (content.length === 0 && raw?.last) break
+      }
+      if (isLast && acc.length < PAGE_SIZE) acc = await fetchLastWindow15(room)
+      const items = acc.slice(0, PAGE_SIZE)
+      return { items, nextCursorFromServer: nextCursor, isLastOnServer: isLast }
+    },
+    [fetchLastWindow15]
+  )
+
+  const loadFirstPage = useCallback(async () => {
+    try {
+      setLoading(true)
+      setDataReady(false)
+      const firstPage = await fetchPageFill15(activeRoom, null)
+      roomCursorRef.current[activeRoom] = firstPage.nextCursorFromServer
+      setPages(firstPage.items.length ? [firstPage] : [])
+      setPageIndex(0)
+      setDataReady(true)
+      seedItems(firstPage.items)
+      requestAnimationFrame(() => {
+        const el = scrollElRef.current
+        if (el) {
+          suppressNextScrollRef.current = true
+          el.scrollTop = 0
+        }
+        edgeLock.current = 'none'
+      })
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      console.error('첫 페이지 로딩 실패:', msg)
+      setError('조회 중 오류가 발생했습니다.')
+      setDataReady(true)
+    } finally {
+      setLoading(false)
+    }
+  }, [activeRoom, fetchPageFill15, seedItems])
+
+  const goNextPage = useCallback(async () => {
+    if (loading) return
+    if (pageIndex < pages.length - 1) {
+      const nextIdx = pageIndex + 1
+      setPageIndex(nextIdx)
+      seedItems(pages[nextIdx].items)
+      requestAnimationFrame(() => {
+        const el = scrollElRef.current
+        if (el) el.scrollTop = SAFE_OFFSET
+        edgeLock.current = 'none'
+      })
+      return
+    }
+    const lastPage = pages[pages.length - 1]
+    if (!lastPage) return
+    try {
+      setLoading(true)
+      const currentRoom = activeRoom
+      const page = await fetchPageFill15(currentRoom, roomCursorRef.current[currentRoom] ?? null)
+      roomCursorRef.current[currentRoom] = page.nextCursorFromServer
+      if (page.items.length === 0) return
+      setPages(prev => [...prev, page])
+      const nextIdx = pages.length
+      setPageIndex(nextIdx)
+      seedItems(page.items)
+      requestAnimationFrame(() => {
+        const el = scrollElRef.current
+        if (el) el.scrollTop = SAFE_OFFSET
+        edgeLock.current = 'none'
+      })
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      console.error('다음 페이지 로딩 실패:', msg)
+      setError('다음 페이지 조회 중 오류가 발생했습니다.')
+    } finally {
+      setLoading(false)
+    }
+  }, [activeRoom, fetchPageFill15, loading, pageIndex, pages, seedItems])
+
+  const goPrevPage = useCallback(() => {
+    if (loading) return
+    if (pageIndex <= 0) return
+    const prevIdx = pageIndex - 1
+    setPageIndex(prevIdx)
+    seedItems(pages[prevIdx].items)
+    requestAnimationFrame(() => {
+      const el = scrollElRef.current
+      if (el) el.scrollTop = Math.max(0, el.scrollHeight - el.clientHeight - SAFE_OFFSET)
+      edgeLock.current = 'none'
+    })
+  }, [loading, pageIndex, pages, seedItems])
+
+  useEffect(() => {
+    prevRef.current = goPrevPage
+    nextRef.current = goNextPage
+  }, [goPrevPage, goNextPage])
+
+  useEffect(() => {
+    const el = document.getElementById('app-scroll') as HTMLElement | null
+    if (!el) return
+    scrollElRef.current = el
+
+    const onScroll = () => {
+      const node = scrollElRef.current
+      if (!node || loading) return
+      if (suppressNextScrollRef.current) {
+        suppressNextScrollRef.current = false
+        return
+      }
+      const { scrollTop, scrollHeight, clientHeight } = node
+      const fromBottom = scrollHeight - clientHeight - scrollTop
+      const nearTop = scrollTop <= EDGE_NEAR
+      const nearBottom = fromBottom <= EDGE_NEAR
+      const tallEnough = scrollHeight - clientHeight > EDGE_RELEASE * 2
+      const awayFromEdges = scrollTop > EDGE_RELEASE && fromBottom > EDGE_RELEASE
+      if (awayFromEdges && edgeLock.current !== 'none') edgeLock.current = 'none'
+      if (nearTop && edgeLock.current !== 'top') {
+        edgeLock.current = 'top'
+        prevRef.current()
+        return
+      }
+      if (tallEnough && nearBottom && edgeLock.current !== 'bottom') {
+        edgeLock.current = 'bottom'
+        nextRef.current()
+        return
       }
     }
-    fetchByRoom()
-  }, [activeRoom, seedItems, roomResolved])
+
+    el.addEventListener('scroll', onScroll, { passive: true })
+    return () => el.removeEventListener('scroll', onScroll)
+  }, [loading])
 
   const handleConfirmDelete = async () => {
     const ids = Array.from(selectedIds)
     try {
       setOpenModal(false)
-      if (ids.length > 0) {
-        await deleteManyBookmarks(ids)
-      }
+      if (ids.length > 0) await deleteManyBookmarks(ids)
       setShowToast(true)
       setTimeout(() => setShowToast(false), 4000)
       exitSelectionMode()
-
-      setDataReady(false)
-      const botType: BotType = ROOM_TO_BOT[activeRoom]
-      const data: BookmarkResponse[] = await getBookmarksByBotType(botType)
-      seedItems(data ?? [])
-      setDataReady(true)
+      roomCursorRef.current[activeRoom] = null
+      await loadFirstPage()
     } catch (error) {
       console.log(error)
       setError('삭제 중 오류 발생')
-      setDataReady(true)
     }
   }
 
@@ -110,16 +255,14 @@ export default function ArchivePage() {
       {!fromChat && (
         <ArchiveTabs key={activeRoom} activeTab={activeRoom} onChange={setActiveRoom} />
       )}
-
       {error && (
         <div className="alert alert-error my-2">
           <span>{error}</span>
         </div>
       )}
-
-      {dataReady &&
-        (list.length > 0 ? (
-          <div className="mt-5">
+      {dataReady ? (
+        list.length > 0 ? (
+          <div className="mt-5 pb-6">
             {list.map(item => (
               <ExpressionCard
                 key={item.id}
@@ -131,8 +274,8 @@ export default function ArchivePage() {
           </div>
         ) : (
           <EmptyCard />
-        ))}
-
+        )
+      ) : null}
       {selectionMode && (
         <div className="flex justify-center items-center">
           <Button
@@ -151,7 +294,6 @@ export default function ArchivePage() {
           </Button>
         </div>
       )}
-
       {showToast && (
         <div className="toast toast-center w-[335px] mb-6">
           <div className="alert bg-[#0F1010] opacity-80">
@@ -160,12 +302,13 @@ export default function ArchivePage() {
           </div>
         </div>
       )}
-
       {openModal && (
         <CommonModal
           open
           title="Delete saved phrase"
-          description={`Do you want to delete ${deleteCount} ${deleteCount > 1 ? 'phrases' : 'phrase'}?`}
+          description={`Do you want to delete ${deleteCount} ${
+            deleteCount > 1 ? 'phrases' : 'phrase'
+          }?`}
           cancelText="Keep"
           confirmText="Delete"
           onCancel={() => setOpenModal(false)}

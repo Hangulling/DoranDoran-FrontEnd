@@ -38,8 +38,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   // 알 수 없는 페이지 (*)
   const knownPatterns = [
-    /^\/$/, 
-    /^\/signup(?:\/|$)/, 
+    /^\/$/,
+    /^\/signup(?:\/|$)/,
     /^\/login(?:\/|$)/,
     /^\/archive(?:\/|$)/,
     /^\/chat(?:\/|$)/,
@@ -112,7 +112,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           {closenessId && <ClosenessBar chatRoomId={closenessId} />}
         </header>
       )}
-      <main className="flex-grow min-h-0 overflow-y-auto">{children}</main>
+      <main id="app-scroll" className="flex-grow min-h-0 overflow-y-auto">
+        {children}
+      </main>
     </div>
   )
 }
