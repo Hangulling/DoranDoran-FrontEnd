@@ -8,11 +8,13 @@ import ReactGA from 'react-ga4'
 import AnalyticsTracker from './components/common/AnalyticsTracker.tsx'
 
 const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID
+const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
 
-if (GA_TRACKING_ID) {
+if (import.meta.env.PROD && GA_TRACKING_ID && GA_ENABLED) {
   ReactGA.initialize(GA_TRACKING_ID)
+  console.log('[GA] Production GA Initialized')
 } else {
-  console.warn('[GA] Tracking ID가 .env 파일에 설정되지 않았습니다.')
+  console.warn('[GA] GA not initialized (Disabled, Dev mode, or no Tracking ID)')
 }
 
 const isDev = import.meta.env.DEV
