@@ -14,6 +14,7 @@ interface CorrectionBubbleProps {
   originalContent?: string
   correctedContent?: string
   isLoading?: boolean
+  isBookmarked?: boolean
   onBookmarkToggle?: (messageId: string, content: string, correctedContent: string) => void
 }
 
@@ -29,6 +30,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   originalContent,
   correctedContent,
   isLoading,
+  isBookmarked,
   onBookmarkToggle,
 }) => {
   const [selectedTab, setSelectedTab] = useState(initialTab)
@@ -43,13 +45,11 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   const closeness = useClosenessStore(state => state.closenessMap[chatRoomId] ?? 1)
   const closenessText = closeness === 1 ? 'Polite' : closeness === 2 ? 'Casual' : 'Friendly'
 
-  const [isBookmarked, setIsBookmarked] = useState(false)
   const { onPlay: playTTS, playing: isPlaying } = useTTS(isLoading ? '' : (correctedContent ?? '')) // 로딩 중 비활
 
   const toggleBookmark = () => {
     if (isLoading) return // 로딩 중 비활
 
-    setIsBookmarked(!isBookmarked)
     if (onBookmarkToggle) {
       if (!messageId) return
       onBookmarkToggle(messageId, originalContent ?? '', correctedContent ?? '')
@@ -100,7 +100,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
           <div className="h-[1px] bg-green-80 w-full my-1" />
           <div className="flex flex-row justify-between">
             <TTSIcon playing={isPlaying} onPlay={playTTS} />
-            <BookmarkIcon isBookmarked={isBookmarked} onToggle={toggleBookmark} />
+            <BookmarkIcon isBookmarked={isBookmarked ?? false} onToggle={toggleBookmark} />
           </div>
         </>
       </div>
