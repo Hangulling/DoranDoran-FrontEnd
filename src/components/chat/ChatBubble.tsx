@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import TTSIcon from './VolumeIcon'
 import BookmarkIcon from './BookmarkIcon'
 import useTTS from '../../hooks/useTTS'
@@ -10,6 +10,7 @@ interface ChatBubbleProps {
   variant?: 'basic' | 'second' | 'sender' | 'error'
   showIcon?: boolean
   messageId?: string // 북마크
+  isBookmarked?: boolean
   onBookmarkToggle?: (messageId: string, content: string) => void // 북마크
 }
 
@@ -27,6 +28,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
   variant = 'basic',
   showIcon = false,
   messageId,
+  isBookmarked,
   onBookmarkToggle,
 }) => {
   const baseBubbleClass = 'py-[6px] px-2 text-[14px] max-w-[265px] rounded-lg'
@@ -34,12 +36,10 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
   const marginClass =
     !isSender && (avatarUrl || variant === 'second' || variant === 'error') ? 'ml-10' : ''
 
-  const [isBookmarked, setIsBookmarked] = useState(false)
   const ttsText = typeof message === 'string' ? message : ''
   const { onPlay: playTTS, playing: isPlaying } = useTTS(ttsText)
 
   const toggleBookmark = () => {
-    setIsBookmarked(!isBookmarked)
     if (onBookmarkToggle && messageId && typeof message === 'string') {
       onBookmarkToggle(messageId, message)
     }
@@ -69,7 +69,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
             <div className="h-[1px] bg-gray-80 w-full my-1" />
             <div className="flex flex-row justify-between">
               <TTSIcon playing={isPlaying} onPlay={playTTS} />
-              <BookmarkIcon isBookmarked={isBookmarked} onToggle={toggleBookmark} />
+              <BookmarkIcon isBookmarked={isBookmarked ?? false} onToggle={toggleBookmark} />
             </div>
           </>
         )}
