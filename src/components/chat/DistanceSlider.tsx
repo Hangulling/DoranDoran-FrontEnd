@@ -29,12 +29,12 @@ const ClosenessSlider = styled(Slider)({
     background: 'url(/chat/heart.svg) center/contain no-repeat',
     border: 'none',
     backgroundColor: 'transparent',
-    boxShadow: 'none',
+    boxShadow: '0.4px 1px 2px rgba(0, 0, 0, 0.3)',
     '&:before, &:after': {
       display: 'none',
     },
     '&:hover, &.Mui-focusVisible, &.Mui-active': {
-      boxShadow: 'none',
+      boxShadow: '0.4px 1px 2px rgba(0, 0, 0, 0.3)',
     },
   },
   '& .MuiSlider-track': {
@@ -82,7 +82,7 @@ const DistanceSlider: React.FC<DistanceSliderProps> = ({ value, onChange, roomId
     Math.round(value) === 1 // 왼쪽 끝
       ? { left: 0, transform: 'translateY(-50%)', position: 'absolute' }
       : Math.round(value) === 3 // 오른쪽 끝
-        ? { left: '100%', transform: 'translate(-90%, -50%)', position: 'absolute' }
+        ? { left: '100%', transform: 'translate(-95%, -50%)', position: 'absolute' }
         : { left: '50%', transform: 'translate(-50%, -50%)', position: 'absolute' } // 중앙
 
   return (
