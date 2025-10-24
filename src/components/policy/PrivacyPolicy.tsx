@@ -148,7 +148,7 @@ const PrivacyPolicy: React.FC = () => {
 
       <h2 className="text-2xl font-semibold mt-10 mb-3">10. Updates to This Policy</h2>
       <ul className="list-disc list-inside mb-4">
-        <li>This Privacy Policy takes effect on [Effective Date].</li>
+        <li>This Privacy Policy takes effect on 2025.10.24.</li>
         <li>We will notify users at least 7 days prior to any material changes.</li>
         <li>
           In case of significant changes (e.g., new data use purposes), we may request renewed
