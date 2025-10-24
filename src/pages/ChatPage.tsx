@@ -21,7 +21,7 @@ import type {
 import { getMessages, getUserById, leaveChatroom, sendMessage, updateUser } from '../api'
 import CorrectionBubble from '../components/chat/CorrectionBubble'
 import { useUserMsgStore } from '../stores/useUserMsgStore'
-import { createBookmark } from '../api/archive'
+import { createBookmark, deleteBookmark, getAllBookmarks } from '../api/archive'
 import useClosenessStore from '../stores/useClosenessStore'
 import { getClosenessAsText } from '../utils/conceptMap'
 import LoadingSpinner from '../components/common/LoadingSpinner'
@@ -32,6 +32,7 @@ interface EnrichedMessage extends Message {
   vocabularyData?: VocabularyExtractedData | null // 어휘 데이터 저장
   isPerfect?: boolean // Perfect 여부 저장
   analysisState?: 'pending' | 'complete' // 교정 데이터 로딩
+  bookmarkId?: string | null
 }
 
 interface ApiMessage {
@@ -99,8 +100,20 @@ const ChatPage: React.FC = () => {
         return
       }
       try {
-        const response = await getMessages(chatroomId, { userId })
-        const historyMessages = (response as unknown as PagedMessagesResponse).content
+        const [messagesResponse, bookmarksResponse] = await Promise.all([
+          getMessages(chatroomId, { userId }),
+          getAllBookmarks(),
+        ])
+        const historyMessages = (messagesResponse as unknown as PagedMessagesResponse).content
+        // 북마크 데이터 조회
+        const bookmarkMap = new Map<string, string>()
+        if (Array.isArray(bookmarksResponse)) {
+          bookmarksResponse.forEach(bookmark => {
+            if (bookmark.messageId && bookmark.id) {
+              bookmarkMap.set(bookmark.messageId, bookmark.id)
+            }
+          })
+        }
         // API 응답을 UI에서 사용하는 EnrichedMessage 형태로 변환
         const enrichedHistory: EnrichedMessage[] = Array.isArray(historyMessages)
           ? historyMessages.map(apiMsg => ({
@@ -111,6 +124,7 @@ const ChatPage: React.FC = () => {
               variant: apiMsg.senderType === 'user' ? 'sender' : 'basic',
               showIcon: apiMsg.senderType !== 'user',
               createdAt: apiMsg.createdAt,
+              bookmarkId: bookmarkMap.get(apiMsg.id) || null,
             }))
           : []
 
@@ -382,7 +396,7 @@ const ChatPage: React.FC = () => {
       feedbackEn?: string
       vocabularyData?: VocabularyExtractedData | null
     }
-  ) {
+  ): Promise<string | null> {
     try {
       // aiResponse 객체를 동적으로 구성
       const aiResponse: {
@@ -423,33 +437,74 @@ const ChatPage: React.FC = () => {
       }
       const response = await createBookmark(requestBody)
       console.log('북마크 추가 성공', response)
+
+      return response.id
     } catch (error) {
       showToast({ message: 'Failed to save', iconType: 'error' })
       console.error('북마크 추가 실패', error)
+
+      return null
     }
   }
-
-  const handleChatBubbleBookmark = (
+  // 토글 핸들러
+  const handleChatBubbleBookmark = async (
     messageId: string,
     content: string,
     vocabularyData: VocabularyExtractedData | null | undefined
   ) => {
-    handleAddBookmark(messageId, { content, vocabularyData })
+    const message = messages.find(m => m.id === messageId)
+    if (!message) return
+
+    if (message.bookmarkId) {
+      // 북마크 상태
+      try {
+        await deleteBookmark(message.bookmarkId)
+        setMessages(prev => prev.map(m => (m.id === messageId ? { ...m, bookmarkId: null } : m)))
+        console.log('북마크 성공')
+      } catch (error) {
+        console.error('북마크 삭제 실패', error)
+      }
+    } else {
+      // 북마크 안됨
+      const newBookmarkId = await handleAddBookmark(messageId, { content, vocabularyData })
+      if (newBookmarkId) {
+        setMessages(prev =>
+          prev.map(m => (m.id === messageId ? { ...m, bookmarkId: newBookmarkId } : m))
+        )
+      }
+    }
   }
 
-  const handleCorrectionBubbleBookmark = (
+  const handleCorrectionBubbleBookmark = async (
     messageId: string,
     content: string,
     correctedContent: string,
     feedbackKo: string,
     feedbackEn: string
   ) => {
-    handleAddBookmark(messageId, {
-      content,
-      correctedContent,
-      feedbackKo,
-      feedbackEn,
-    })
+    const message = messages.find(m => m.id === messageId)
+    if (!message) return
+
+    if (message.bookmarkId) {
+      try {
+        await deleteBookmark(message.bookmarkId)
+        setMessages(prev => prev.map(m => (m.id === messageId ? { ...m, bookmarkId: null } : m)))
+      } catch (error) {
+        console.error('북마크 삭제 실패', error)
+      }
+    } else {
+      const newBookmarkId = await handleAddBookmark(messageId, {
+        content,
+        correctedContent,
+        feedbackKo,
+        feedbackEn,
+      })
+      if (newBookmarkId) {
+        setMessages(prev =>
+          prev.map(m => (m.id === messageId ? { ...m, bookmarkId: newBookmarkId } : m))
+        )
+      }
+    }
   }
 
   /* --------------------- 북마크 함수 관련 --------------------- */
@@ -476,6 +531,7 @@ const ChatPage: React.FC = () => {
                         variant={msg.variant ?? 'basic'}
                         showIcon={msg.showIcon}
                         messageId={msg.id}
+                        isBookmarked={!!msg.bookmarkId}
                         onBookmarkToggle={(messageId, content) =>
                           handleChatBubbleBookmark(messageId, content, msg.vocabularyData)
                         }
@@ -483,7 +539,7 @@ const ChatPage: React.FC = () => {
                     </div>
                     {msg.isSender &&
                       (msg.analysisState === 'pending' ? (
-                        // 1. PENDING 상태: isLoading={true}로 스켈레톤 렌더링
+                        // PENDING
                         <CorrectionBubble
                           chatRoomId={chatroomId ?? ''}
                           messageId={msg.id}
@@ -492,24 +548,25 @@ const ChatPage: React.FC = () => {
                           isLoading={true} // <--- 스켈레톤 모드 활성화
                         />
                       ) : msg.isPerfect ? (
-                        // 2. COMPLETE + PERFECT 상태
+                        // COMPLETE + PERFECT
                         <div className="flex flex-row justify-end text-[#54BDB4] text-[12px] mt-1 font-medium">
                           <img src={Perfect} alt="perfect" />
                           perfect
                         </div>
                       ) : msg.correction && msg.correction.correctedSentence ? (
-                        // 3. COMPLETE + CORRECTION 상태: 실제 데이터 렌더링
+                        // COMPLETE + CORRECTION
                         <CorrectionBubble
                           chatRoomId={chatroomId ?? ''}
                           messageId={msg.id}
                           originalContent={msg.text}
-                          correctedContent={msg.correction.correctedSentence} // 실제 데이터
+                          correctedContent={msg.correction.correctedSentence}
                           descriptionByTab={{
                             Kor: msg.correction.feedback.ko,
                             Eng: msg.correction.feedback.en,
                           }}
                           isSender={true}
-                          isLoading={false} // <--- 스켈레톤 모드 비활성화 (명시적)
+                          isLoading={false} // 스켈레톤 모드 비활성화 (명시적)
+                          isBookmarked={!!msg.bookmarkId}
                           onBookmarkToggle={(messageId, content, correctedContent) =>
                             handleCorrectionBubbleBookmark(
                               messageId,
