@@ -91,6 +91,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     setModalOpen(false)
   }
 
+  const openAboutPdf = () => {
+    onClose()
+    const pdfUrl = `${import.meta.env.BASE_URL}docs/${encodeURIComponent('도란도란 서비스 소개서.pdf')}`
+    window.open(pdfUrl, '_blank', 'noopener,noreferrer')
+  }
+
   const goPolicy = (term: 'service' | 'privacy') => {
     onClose()
     navigate(`/policy/${term}`, {
@@ -127,7 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="flex flex-col h-full pb-[env(safe-area-inset-bottom)]">
           {/* 메뉴 리스트 */}
           <div className="flex flex-col gap-y-1 mt-20 py-2 text-[14px] border-t border-b border-gray-80">
-            <button className={menuBtn}>
+            <button className={menuBtn} onClick={openAboutPdf}>
               About the Service
               <img src={RightArrowIcon} />
             </button>
