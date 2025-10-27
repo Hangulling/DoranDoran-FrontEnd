@@ -15,13 +15,15 @@ import { useUserStore } from '../stores/useUserStore'
 import useRoomIdStore from '../stores/useRoomIdStore'
 import type {
   EventDataMap,
+  GreetingBotMessageData,
+  GreetingGuideMessageData,
   IntimacyAnalysisData,
   VocabularyExtractedData,
 } from '../types/sseEvents'
 import { getMessages, getUserById, leaveChatroom, sendMessage, updateUser } from '../api'
 import CorrectionBubble from '../components/chat/CorrectionBubble'
 import { useUserMsgStore } from '../stores/useUserMsgStore'
-import { createBookmark, deleteBookmark, getAllBookmarks } from '../api/archive'
+import { createBookmark, deleteBookmark, getBookmarksByRoomId } from '../api/archive'
 import useClosenessStore from '../stores/useClosenessStore'
 import { getClosenessAsText } from '../utils/conceptMap'
 import LoadingSpinner from '../components/common/LoadingSpinner'
@@ -68,6 +70,10 @@ const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<EnrichedMessage[]>([]) // 확장
   const [isHistoryLoading, setIsHistoryLoading] = useState(true)
   const [isInitChatReady, setIsInitChatReady] = useState(false)
+  const [isNewChat, setIsNewChat] = useState<boolean | null>(null)
+  const [greetingState, setGreetingState] = useState<'pending' | 'loading' | 'complete'>('pending')
+  const [greetingBotMsg, setGreetingBotMsg] = useState<GreetingBotMessageData | null>(null)
+  const [greetingGuideMsg, setGreetingGuideMsg] = useState<GreetingGuideMessageData | null>(null)
   const coachMarkSeen = useCoachStore(s => s.coachMarkSeen)
   const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
   const [showCoachMark, setShowCoachMark] = useState(false)
@@ -102,7 +108,7 @@ const ChatPage: React.FC = () => {
       try {
         const [messagesResponse, bookmarksResponse] = await Promise.all([
           getMessages(chatroomId, { userId }),
-          getAllBookmarks(),
+          getBookmarksByRoomId(chatroomId),
         ])
         const historyMessages = (messagesResponse as unknown as PagedMessagesResponse).content
         // 북마크 데이터 조회
@@ -128,6 +134,16 @@ const ChatPage: React.FC = () => {
             }))
           : []
 
+        if (enrichedHistory.length === 0) {
+          // Case 1: 새 채팅
+          setIsNewChat(true)
+          setGreetingState('loading') // 그리팅 로딩 시작
+        } else {
+          // Case 2: 새로고침 (기존 내역 있음)
+          setIsNewChat(false)
+          setGreetingState('complete') // 그리팅 필요 없음
+        }
+
         // 불러온 기록으로 messages 상태를 초기화
         setMessages(enrichedHistory)
       } catch (error) {
@@ -140,6 +156,28 @@ const ChatPage: React.FC = () => {
 
     fetchHistory()
   }, [chatroomId, userId, room?.avatar, id, navigate]) // chatroomId, userId가 확정되면 한 번만 실행
+
+  // 봇/가이드 메시지 도착
+  useEffect(() => {
+    // 봇 메시지와 가이드 메시지가 모두 도착하면 'complete' 상태로 변경
+    if (greetingBotMsg && greetingGuideMsg) {
+      setGreetingState('complete')
+      return // 타이머 로직 실행 방지
+    }
+
+    // 봇 메시지만 오고 가이드 메시지가 2초간 안와도 'complete'로 변경 (가이드가 없는 경우 대비)
+    let timer: NodeJS.Timeout | null = null
+    if (greetingBotMsg && !greetingGuideMsg) {
+      timer = setTimeout(() => {
+        console.warn('[SSE] Greeting guide message timeout. Rendering with bot message only.')
+        setGreetingState('complete') // 봇 메시지만이라도 렌더링
+      }, 2000) // 2초 타임아웃
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer)
+    }
+  }, [greetingBotMsg, greetingGuideMsg])
 
   // 코치 마크 조회 확인
   useEffect(() => {
@@ -178,7 +216,7 @@ const ChatPage: React.FC = () => {
     }
   }
 
-  /// 다시 보지 않기 설정을 스토어에 동기화
+  // 다시 보지 않기 설정을 스토어에 동기화
   useEffect(() => {
     const fetchUserExitSetting = async () => {
       if (!userId) return
@@ -253,6 +291,18 @@ const ChatPage: React.FC = () => {
       setSseError(null) // 이벤트 수신되면 에러 초기화
 
       switch (eventType) {
+        case 'greeting_bot_message': {
+          if (!isNewChat) break
+          setGreetingBotMsg(data as GreetingBotMessageData)
+          // 봇 메시지가 오면 로딩 상태 확정
+          setGreetingState('loading')
+          break
+        }
+        case 'greeting_guide_message': {
+          if (!isNewChat) break
+          setGreetingGuideMsg(data as GreetingGuideMessageData)
+          break
+        }
         case 'conversation_complete': {
           const conversationData = data as EventDataMap['conversation_complete']
           lastAiMsgIdRef.current = conversationData.messageId
@@ -310,18 +360,11 @@ const ChatPage: React.FC = () => {
           break
         }
         default: // 예상 못한 이벤트 처리
-          setMessages(prev => [
-            ...prev,
-            {
-              id: `unknown-${Date.now()}`,
-              text: `[${eventType}] ${JSON.stringify(data)}`,
-              isSender: false,
-            },
-          ])
+          console.warn(`[SSE] Unhandled event type: ${eventType}`, data)
           break
       }
     },
-    [room]
+    [room, isNewChat]
   )
 
   // useChatStream 호출
@@ -518,7 +561,20 @@ const ChatPage: React.FC = () => {
           </div>
         ) : (
           <>
-            <InitChat avatar={room?.avatar} onReady={() => setIsInitChatReady(true)} />
+            {isNewChat === true && (
+              <>
+                {/* 그리팅 완료/에러 시 InitChat으로 애니메이션 렌더링 */}
+                {greetingState === 'complete' && greetingBotMsg && (
+                  <InitChat
+                    avatar={room?.avatar}
+                    onReady={() => setIsInitChatReady(true)}
+                    message1={greetingBotMsg.content} // 봇 메시지 전달
+                    message2={greetingGuideMsg?.content ?? ''} // 가이드 메시지 전달 (없으면 빈칸)
+                  />
+                )}
+              </>
+            )}
+
             <div className="space-y-4">
               {messages.map(msg => {
                 return (
