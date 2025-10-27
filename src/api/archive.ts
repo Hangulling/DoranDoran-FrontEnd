@@ -1,8 +1,7 @@
-import type { BookmarkRequest, BookmarkResponse } from '../types/archive'
+import type { BookmarkByRoomResponse, BookmarkRequest, BookmarkResponse } from '../types/archive'
 import api from './api'
 import { BOOKMARK_ENDPOINTS } from './endpoints'
 
-// 헤더에 USERID 붙여야 함
 export async function createBookmark(
   data: BookmarkRequest,
   config?: { headers: Record<string, string> }
@@ -15,7 +14,6 @@ export async function getAllBookmarks() {
   const res = await api.get(BOOKMARK_ENDPOINTS.LIST_ALL)
   return res.data
 }
-
 
 export async function getBookmarksByCursor(lastId?: string, size = 15) {
   const res = await api.get(`/api/store/bookmarks/cursor`, {
@@ -46,5 +44,12 @@ export async function deleteManyBookmarks(bookmarkIds: string[]) {
 
 export async function countBookmarks(): Promise<number> {
   const res = await api.get<number>(BOOKMARK_ENDPOINTS.COUNT)
+  return res.data
+}
+
+export async function getBookmarksByRoomId(chatroomId: string): Promise<BookmarkByRoomResponse[]> {
+  const res = await api.get<BookmarkByRoomResponse[]>(
+    BOOKMARK_ENDPOINTS.LIST_BY_CHATROOMID(chatroomId)
+  )
   return res.data
 }
