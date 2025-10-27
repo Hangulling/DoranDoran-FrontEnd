@@ -1,13 +1,11 @@
 import type { User, CreatePayload, UpdatePayload, UserStatus } from '../types/user'
-import api from './api'
+import api, { publicApi } from './api'
 import { USER_ENDPOINTS } from './endpoints'
-
-
 
 export const createUser = async (payload: CreatePayload): Promise<User> => {
   if (import.meta.env.DEV) console.log('📨 createUser payload:', payload)
 
-  const res = await api.post(USER_ENDPOINTS.CREATE, payload)
+  const res = await publicApi.post(USER_ENDPOINTS.CREATE, payload)
   const body = res.data
   if (import.meta.env.DEV) console.log('📩 createUser response:', body)
 
@@ -44,7 +42,7 @@ export const updateStatus = async (userId: string, status: UserStatus): Promise<
 
 // 비밀번호 재설정
 export const passwordReset = async (email: string): Promise<void> => {
-  await api.post(USER_ENDPOINTS.PASSWORD_RESET, { email })
+  await publicApi.post(USER_ENDPOINTS.PASSWORD_RESET, { email })
 }
 
 // 계정 비활성화 (소프트 삭제)
@@ -54,6 +52,6 @@ export const deleteUser = async (userId: string): Promise<void> => {
 
 // 상태
 export const checkHealth = async (): Promise<string> => {
-  const response = await api.get<string>(USER_ENDPOINTS.HEALTH)
+  const response = await publicApi.get<string>(USER_ENDPOINTS.HEALTH)
   return response.data
 }
