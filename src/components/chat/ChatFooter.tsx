@@ -49,14 +49,15 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
   }
 
   const handleCompositionStart = () => setIsComposing(true)
-  const handleCompositionEnd = (e: React.CompositionEvent<HTMLTextAreaElement>) => {
+
+  const handleCompositionEnd = () => {
     setIsComposing(false)
-    const value = e.currentTarget.value
-    const sanitizedValue = value.replace(/[a-zA-Z]/g, '')
-    if (value !== sanitizedValue) {
-      setInputValue(sanitizedValue)
-      showToast('Input is only available in Korean', 'error')
-    }
+    // const value = e.currentTarget.value
+    // const sanitizedValue = value.replace(/[a-zA-Z]/g, '')
+    // if (value !== sanitizedValue) {
+    //   setInputValue(sanitizedValue)
+    //   showToast('Input is only available in Korean', 'error')
+    // }
   }
 
   const handleInputFocus = () => {
@@ -74,13 +75,13 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
       return
     }
 
-    const sanitizedValue = originalValue.replace(/[a-zA-Z]/g, '')
+    // const sanitizedValue = originalValue.replace(/[a-zA-Z]/g, '')
+    // if (originalValue && originalValue !== sanitizedValue) {
+    //   showToast('Input is only available in Korean', 'error')
+    // }
+    // let finalValue = sanitizedValue
 
-    if (originalValue && originalValue !== sanitizedValue) {
-      showToast('Input is only available in Korean', 'error')
-    }
-
-    let finalValue = sanitizedValue
+    let finalValue = originalValue
 
     if (finalValue.length > 50) {
       showToast('Maximum of 50 characters allowed', 'error')
@@ -113,6 +114,14 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
     }
   }
 
+  // 엔터 키 이벤트
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
+      e.preventDefault() // 줄바꿈 방지
+      handleSendClick() // 메시지 전송
+    }
+  }
+
   return (
     <div className="bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
       {toast && (
@@ -131,6 +140,7 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}
+          onKeyDown={handleKeyDown}
           rows={1}
           style={{
             height: textareaHeight,
