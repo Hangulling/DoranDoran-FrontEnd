@@ -132,4 +132,7 @@ export const BOOKMARK_ENDPOINTS = {
 
   // 여러 북마크 일괄 삭제
   DELETE_MANY: '/api/store/bookmarks',
+
+  // 방별 보관함 조회 (새로고침 시 사용)
+  LIST_BY_CHATROOMID: (chatroomId: string) => `/api/store/bookmarks/chatroom/${chatroomId}`,
 }

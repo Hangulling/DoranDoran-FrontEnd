@@ -83,3 +83,24 @@ export const ROOM_TO_BOT: Record<Room, BotType> = {
   Coworker: 'coworker',
   Senior: 'senior',
 }
+
+export interface BookmarkAiResponse {
+  intimacyLevel: string
+  correctedContent: string | null
+  explanation: string
+  koreanPronunciation: string
+  englishTranslation: string
+  situation: string
+}
+
+export interface BookmarkByRoomResponse {
+  id: string
+  messageId: string
+  chatroomId: string
+  chatroomName: string
+  content: string
+  correctedContent: string | null
+  aiResponse: BookmarkAiResponse
+  botType: BotType
+  createdAt: string
+}
