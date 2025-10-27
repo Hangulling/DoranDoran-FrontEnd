@@ -5,7 +5,7 @@ import './styles/index.css'
 import React from 'react'
 
 import ReactGA from 'react-ga4'
-import AnalyticsTracker from './components/common/AnalyticsTracker.tsx'
+import AnalyticsTracker from './components/common/AnalyticsTracker.ts'
 
 const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID
 const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'

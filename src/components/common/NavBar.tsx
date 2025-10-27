@@ -9,6 +9,10 @@ import useArchiveStore from '../../stores/useArchiveStore'
 import Button from './Button'
 import type { NavBarProps } from '../../types/common'
 import { BOT_TO_ROOM } from '../../types/archive'
+import ReactGA from 'react-ga4'
+
+const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
+const IS_PROD = import.meta.env.PROD
 
 const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
   title,
@@ -52,6 +56,18 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
     }
   }
 
+  // GA 포함 핸들러
+  const handleHamburgerClick = () => {
+    // GA 이벤트 전송
+    if (IS_PROD && GA_ENABLED) {
+      ReactGA.event('open_side_menu')
+    }
+    // 사이드바 토글 함수 실행
+    if (onToggleSidebar) {
+      onToggleSidebar()
+    }
+  }
+
   const hasAnyInRoom = items.some(i => BOT_TO_ROOM[i.botType] === activeRoom)
 
   return (
@@ -76,7 +92,7 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
 
           {/* 햄버거 */}
           {isMain && !selectionMode && (
-            <button onClick={onToggleSidebar}>
+            <button onClick={handleHamburgerClick}>
               <Hamburger />
             </button>
           )}
