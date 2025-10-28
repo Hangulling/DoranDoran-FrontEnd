@@ -3,6 +3,7 @@ import useClosenessStore from '../../stores/useClosenessStore'
 import TTSIcon from './VolumeIcon'
 import BookmarkIcon from './BookmarkIcon'
 import useTTS from '../../hooks/useTTS'
+import { useParams } from 'react-router-dom'
 
 interface CorrectionBubbleProps {
   chatRoomId: string
@@ -23,7 +24,6 @@ const wrapperClass = 'chat chat-end gap-0 pt-[10px] pb-0'
 const bubbleClass = 'bg-green-50 rounded-lg px-[10px] py-[10px] w-[265px] mb-0'
 
 const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
-  chatRoomId,
   initialTab = 'Eng',
   descriptionByTab,
   messageId,
@@ -33,6 +33,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   isBookmarked,
   onBookmarkToggle,
 }) => {
+  const { id: routeId } = useParams<{ id: string }>()
   const [selectedTab, setSelectedTab] = useState(initialTab)
   const [currentDescription, setCurrentDescription] = useState(descriptionByTab ?? {})
 
@@ -42,7 +43,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
     }
   }, [descriptionByTab])
 
-  const closeness = useClosenessStore(state => state.closenessMap[chatRoomId] ?? 1)
+  const closeness = useClosenessStore(state => state.getCloseness(routeId ?? '')) ?? 1
   const closenessText = closeness === 1 ? 'Polite' : closeness === 2 ? 'Casual' : 'Friendly'
 
   const { onPlay: playTTS, playing: isPlaying } = useTTS(isLoading ? '' : (correctedContent ?? '')) // 로딩 중 비활
