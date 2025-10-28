@@ -52,12 +52,6 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
 
   const handleCompositionEnd = () => {
     setIsComposing(false)
-    // const value = e.currentTarget.value
-    // const sanitizedValue = value.replace(/[a-zA-Z]/g, '')
-    // if (value !== sanitizedValue) {
-    //   setInputValue(sanitizedValue)
-    //   showToast('Input is only available in Korean', 'error')
-    // }
   }
 
   const handleInputFocus = () => {
@@ -74,12 +68,6 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
       setInputValue(originalValue)
       return
     }
-
-    // const sanitizedValue = originalValue.replace(/[a-zA-Z]/g, '')
-    // if (originalValue && originalValue !== sanitizedValue) {
-    //   showToast('Input is only available in Korean', 'error')
-    // }
-    // let finalValue = sanitizedValue
 
     let finalValue = originalValue
 
@@ -109,8 +97,9 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
       setInputValue('')
       if (inputRef.current) {
         inputRef.current.style.height = `${SINGLE_LINE_HEIGHT}px`
-        setTextareaHeight(SINGLE_LINE_HEIGHT)
+        inputRef.current.blur()
       }
+      // setTextareaHeight(SINGLE_LINE_HEIGHT)
     }
   }
 
