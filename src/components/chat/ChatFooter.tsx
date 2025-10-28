@@ -1,4 +1,4 @@
-import { useState, type JSX, type RefObject } from 'react'
+import { useEffect, useRef, useState, type JSX, type RefObject } from 'react'
 import Send from '../../assets/icon/send.svg'
 import ActiveSend from '../../assets/icon/activeSend.svg'
 import ErrorIcon from '../../assets/icon/error.svg'
@@ -28,7 +28,7 @@ const ToastMessage = ({ message, iconType }: ToastMessageProps) => {
   }
 
   return (
-    <div className="flex items-start w-full mx-[20px] mb-[20px] bg-[rgba(15,16,16,0.8)] px-[14px] py-[16px] rounded-[12px] gap-[8px]">
+    <div className="flex items-start mb-[20px] bg-[rgba(15,16,16,0.8)] px-[14px] py-[16px] rounded-[12px] gap-[8px]">
       {iconType && iconMap[iconType]}
       <span className="text-subtitle text-[14px] text-white">{message}</span>
     </div>
@@ -41,23 +41,39 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
   const [textareaHeight, setTextareaHeight] = useState(SINGLE_LINE_HEIGHT)
   const [isComposing, setIsComposing] = useState(false)
   const [toast, setToast] = useState<ToastMessageProps | null>(null)
+  const [isToastVisible, setIsToastVisible] = useState(false)
+  const toastTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // 컴포넌트 언마운트 시 타이머 클리어
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current)
+      }
+    }
+  }, [])
 
   const showToast = (message: string, iconType: IconType) => {
-    if (toast) return // 중복 방지
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current)
+    }
+
     setToast({ message, iconType })
-    setTimeout(() => setToast(null), 4000)
+    setIsToastVisible(true)
+    toastTimerRef.current = setTimeout(() => {
+      setIsToastVisible(false)
+
+      // 애니메이션이 끝난 후 토스트 데이터 제거
+      setTimeout(() => {
+        setToast(null)
+      }, 400)
+    }, 3600)
   }
 
   const handleCompositionStart = () => setIsComposing(true)
 
   const handleCompositionEnd = () => {
     setIsComposing(false)
-    // const value = e.currentTarget.value
-    // const sanitizedValue = value.replace(/[a-zA-Z]/g, '')
-    // if (value !== sanitizedValue) {
-    //   setInputValue(sanitizedValue)
-    //   showToast('Input is only available in Korean', 'error')
-    // }
   }
 
   const handleInputFocus = () => {
@@ -74,12 +90,6 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
       setInputValue(originalValue)
       return
     }
-
-    // const sanitizedValue = originalValue.replace(/[a-zA-Z]/g, '')
-    // if (originalValue && originalValue !== sanitizedValue) {
-    //   showToast('Input is only available in Korean', 'error')
-    // }
-    // let finalValue = sanitizedValue
 
     let finalValue = originalValue
 
@@ -109,8 +119,9 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
       setInputValue('')
       if (inputRef.current) {
         inputRef.current.style.height = `${SINGLE_LINE_HEIGHT}px`
-        setTextareaHeight(SINGLE_LINE_HEIGHT)
+        inputRef.current.blur()
       }
+      // setTextareaHeight(SINGLE_LINE_HEIGHT)
     }
   }
 
@@ -123,12 +134,16 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
   }
 
   return (
-    <div className="bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
-      {toast && (
-        <div className="relative bottom-full left-0 w-full flex justify-center">
-          <ToastMessage message={toast.message} iconType={toast.iconType} />
-        </div>
-      )}
+    <div className="relative bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
+      <div className="absolute bottom-full w-full left-0 flex justify-center">
+        {toast && (
+          <div
+            className={`mx-[20px] ${isToastVisible ? 'toast-slide-fade-in' : 'toast-slide-fade-out'}`}
+          >
+            <ToastMessage message={toast.message} iconType={toast.iconType} />
+          </div>
+        )}
+      </div>
 
       <div className="flex items-center w-full px-5 py-2.5">
         <textarea

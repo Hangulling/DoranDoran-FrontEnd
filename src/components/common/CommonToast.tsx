@@ -19,19 +19,25 @@ const showToast = ({ message, iconType }: ToastProps) => {
 
   toastActive = true
 
-  const toastId = toast.custom(
-    <div className="flex items-start w-full mx-[20px] mb-[20px] bg-[rgba(15,16,16,0.8)] px-[14px] py-[16px] rounded-[12px] gap-[8px]">
-      {iconType && iconMap[iconType]}
-      <span className="text-subtitle text-[14px] text-white">{message}</span>
-    </div>,
+  toast.custom(
+    t => (
+      <div
+        className={`flex items-start w-full mx-[20px] mb-[20px] bg-[rgba(15,16,16,0.8)] px-[14px] py-[16px] rounded-[12px] gap-[8px]
+          ${t.visible ? 'animate-fade-in-up' : 'toast-slide-fade-out'}
+        `}
+      >
+        {iconType && iconMap[iconType]}
+        <span className="text-subtitle text-[14px] text-white">{message}</span>
+      </div>
+    ),
     {
+      id: `custom-toast-${Date.now()}`, // 중복 방지를 위한 고유 ID
       duration: 4000,
       position: 'bottom-center',
     }
   )
   setTimeout(() => {
     toastActive = false
-    toast.dismiss(toastId)
   }, 4000)
 }
 
