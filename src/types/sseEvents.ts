@@ -56,7 +56,22 @@ export interface ConversationErrorData {
   error: string
 }
 
+export interface GreetingBotMessageData {
+  messageId: string
+  content: string
+  senderType: 'bot'
+  timestamp: string
+}
+
+export interface GreetingGuideMessageData {
+  messageId: string
+  content: string
+  senderType: 'system'
+  timestamp: string
+}
+
 export interface EventDataMap {
+  // 기존 이벤트
   conversation_complete: ConversationCompleteData
   intimacy_analysis: IntimacyAnalysisData | null
   vocabulary_extracted: VocabularyExtractedData | null
@@ -65,4 +80,8 @@ export interface EventDataMap {
   agent_error: AgentErrorData
   conversation_error: ConversationErrorData
   message: unknown // 기본 메시지 이벤트
+
+  // 새로운 그리팅 이벤트
+  greeting_bot_message: GreetingBotMessageData
+  greeting_guide_message: GreetingGuideMessageData
 }

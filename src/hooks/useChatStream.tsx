@@ -6,9 +6,10 @@ const eventNames = [
   'intimacy_analysis',
   'vocabulary_extracted',
   'vocabulary_translated',
-  'conversation_chunk',
   'conversation_complete',
   'aggregated_complete',
+  'greeting_bot_message',
+  'greeting_guide_message',
 ]
 
 export interface UseChatStreamResult {

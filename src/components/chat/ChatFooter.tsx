@@ -147,7 +147,7 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
             lineHeight: `${LINE_HEIGHT}px`,
             resize: 'none',
           }}
-          className="flex-grow px-3 py-2 mr-2 border border-gray-100 bg-gray-50 rounded-full focus:border-gray-100 focus:outline-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex-grow px-3 py-2 mr-2 border border-gray-100 bg-gray-50 rounded-[20px] focus:border-gray-100 focus:outline-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         />
         <button onClick={handleSendClick}>
           {inputActive && inputValue.trim() ? (
