@@ -3,6 +3,7 @@ import type {
   ApiMessage,
   ChatRoomListParams,
   CreateChatroomPayload,
+  PagedApiMessageResponse,
   SendMessagePayload,
   UpdateIntimacyPayload,
 } from '../types/chat'
@@ -48,8 +49,10 @@ export async function getMessages(
     page?: number
     size?: number
   } = {}
-): Promise<ApiMessage[]> {
-  const res = await api.get(CHAT_ENDPOINTS.MESSAGES_LIST(chatroomId), { params })
+): Promise<PagedApiMessageResponse> {
+  const res = await api.get<PagedApiMessageResponse>(CHAT_ENDPOINTS.MESSAGES_LIST(chatroomId), {
+    params,
+  })
   return res.data
 }
 
