@@ -97,7 +97,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="relative mx-auto flex h-full w-full max-w-md flex-col">
+    <div className="relative mx-auto flex h-full w-full max-w-md flex-col overflow-x-hidden">
       <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
 
       {!hideNavBar && (
