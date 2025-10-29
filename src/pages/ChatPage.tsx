@@ -153,7 +153,11 @@ const ChatPage: React.FC = () => {
               nextMsg.metadata?.userMessageAnalysis?.userMessageId === apiMsg.id
             ) {
               const intimacy = nextMsg.metadata.userMessageAnalysis.intimacy
-              if (intimacy && intimacy.correctedSentence) {
+              if (
+                intimacy &&
+                intimacy.correctedSentence &&
+                (intimacy.corrections || intimacy.feedback?.ko)
+              ) {
                 // 교정 데이터가 있음
                 baseMessage.correction = {
                   messageId: nextMsg.metadata.userMessageAnalysis.userMessageId,
