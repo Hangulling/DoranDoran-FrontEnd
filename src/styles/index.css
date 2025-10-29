@@ -47,6 +47,10 @@
   *::after {
     box-sizing: border-box;
   }
+
+  input::-ms-reveal {
+    display: none;
+  }
 }
 
 @layer components {
@@ -59,4 +63,35 @@
   .text-body {
     @apply font-normal;
   }
+}
+
+/* 토스트 애니메이션 */
+@keyframes slideOutFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px); /* 20px 아래로 이동 */
+  }
+}
+
+.toast-slide-fade-out {
+  animation: slideOutFadeOut 0.4s ease-out forwards; /* 0.4초 동안 애니메이션 */
+}
+
+@keyframes slideInFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast-slide-fade-in {
+  animation: slideInFadeIn 0.4s ease-out forwards;
 }

@@ -1,4 +1,4 @@
-import type { IntimacyAnalysisData, VocabularyWord } from './sseEvents'
+import type { IntimacyAnalysisData, VocabularyExtractedData, VocabularyWord } from './sseEvents'
 
 // 컴포넌트용
 export interface ChatRoom {
@@ -93,13 +93,55 @@ export interface SendMessagePayload {
 export interface ApiMessage {
   id: string
   chatroomId: string
-  senderId: string
-  senderType: 'user' | 'ai'
+  senderId: string | null
+  senderType: 'user' | 'bot' | 'system'
   content: string
   contentType: string
+  sequenceNumber: number
+  isEdited: boolean
+  isDeleted: boolean
   createdAt: string
+  metadata: ApiMessageMetadata | null // metadata 필드 추가
+}
+
+export interface PagedApiMessageResponse {
+  content: ApiMessage[]
+  pageable: Pageable
+  totalElements: number
+  totalPages: number
+  last: boolean
+  first: boolean
+  numberOfElements: number
 }
 
 export interface UpdateIntimacyPayload {
   intimacyLevel: number // 1-3
+}
+
+// metadata.userMessageAnalysis.intimacy
+export interface ApiIntimacyData {
+  detectedLevel: number
+  correctedSentence: string
+  feedback: {
+    ko: string
+    en: string
+  }
+  corrections: string
+}
+
+// metadata.userMessageAnalysis
+export interface UserMessageAnalysis {
+  userMessageId: string
+  intimacy: ApiIntimacyData
+}
+
+// metadata.botResponseAnalysis
+export interface BotResponseAnalysis {
+  vocabulary: VocabularyExtractedData
+}
+
+// metadata
+export interface ApiMessageMetadata {
+  userMessageAnalysis: UserMessageAnalysis | null
+  botResponseAnalysis: BotResponseAnalysis | null
 }

@@ -43,7 +43,7 @@ export default function SignupPage() {
   const resetAgreements = useAgreementStore(s => s.reset)
 
   const handleFirstNameChange = (v: string) => {
-    const noSpace = v.replace(/\s+/g, '')
+    const noSpace = v.replace(/[^A-Za-z]/g, '')
     if (noSpace.length > 15) {
       setFirstNameError('Enter 1-15 characters.')
       return
@@ -53,7 +53,7 @@ export default function SignupPage() {
   }
 
   const handleLastNameChange = (v: string) => {
-    const noSpace = v.replace(/\s+/g, '')
+    const noSpace = v.replace(/[^A-Za-z]/g, '')
     if (noSpace.length > 15) {
       setLastNameError('Enter 1-15 characters.')
       return

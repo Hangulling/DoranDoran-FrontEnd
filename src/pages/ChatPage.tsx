@@ -37,17 +37,6 @@ interface EnrichedMessage extends Message {
   bookmarkId?: string | null
 }
 
-interface ApiMessage {
-  id: string
-  senderType: 'user' | 'ai'
-  content: string
-  createdAt: string
-}
-
-interface PagedMessagesResponse {
-  content: ApiMessage[]
-}
-
 const chatBotIdByRoom = (conceptValue: string): string => {
   switch (conceptValue) {
     case '1':
@@ -72,8 +61,8 @@ const ChatPage: React.FC = () => {
   const [isInitChatReady, setIsInitChatReady] = useState(false)
   const [isNewChat, setIsNewChat] = useState<boolean | null>(null)
   const [greetingState, setGreetingState] = useState<'pending' | 'loading' | 'complete'>('pending')
-  const [greetingBotMsg, setGreetingBotMsg] = useState<GreetingBotMessageData | null>(null)
-  const [greetingGuideMsg, setGreetingGuideMsg] = useState<GreetingGuideMessageData | null>(null)
+  const [greetingMsg1, setGreetingMsg1] = useState<string | null>(null)
+  const [greetingMsg2, setGreetingMsg2] = useState<string | null>(null)
   const coachMarkSeen = useCoachStore(s => s.coachMarkSeen)
   const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
   const [showCoachMark, setShowCoachMark] = useState(false)
@@ -110,7 +99,9 @@ const ChatPage: React.FC = () => {
           getMessages(chatroomId, { userId }),
           getBookmarksByRoomId(chatroomId),
         ])
-        const historyMessages = (messagesResponse as unknown as PagedMessagesResponse).content
+
+        const historyMessages = messagesResponse.content
+
         // 북마크 데이터 조회
         const bookmarkMap = new Map<string, string>()
         if (Array.isArray(bookmarksResponse)) {
@@ -120,31 +111,106 @@ const ChatPage: React.FC = () => {
             }
           })
         }
-        // API 응답을 UI에서 사용하는 EnrichedMessage 형태로 변환
-        const enrichedHistory: EnrichedMessage[] = Array.isArray(historyMessages)
-          ? historyMessages.map(apiMsg => ({
-              id: apiMsg.id,
-              text: apiMsg.content,
-              isSender: apiMsg.senderType === 'user',
-              avatarUrl: apiMsg.senderType !== 'user' ? room?.avatar : undefined,
-              variant: apiMsg.senderType === 'user' ? 'sender' : 'basic',
-              showIcon: apiMsg.senderType !== 'user',
-              createdAt: apiMsg.createdAt,
-              bookmarkId: bookmarkMap.get(apiMsg.id) || null,
-            }))
-          : []
 
-        if (enrichedHistory.length === 0) {
-          // Case 1: 새 채팅
-          setIsNewChat(true)
-          setGreetingState('loading') // 그리팅 로딩 시작
-        } else {
-          // Case 2: 새로고침 (기존 내역 있음)
-          setIsNewChat(false)
-          setGreetingState('complete') // 그리팅 필요 없음
+        const botGreeting =
+          historyMessages.length > 0 &&
+          historyMessages[0].senderType === 'bot' &&
+          historyMessages[0].metadata === null
+            ? historyMessages[0]
+            : null
+
+        const guideGreeting = historyMessages.find(msg => msg.senderType === 'system') ?? null
+
+        // 실제 대화내역 필터링
+        const conversationMessages = historyMessages.filter(
+          msg => msg.id !== botGreeting?.id && msg.id !== guideGreeting?.id
+        )
+
+        const enrichedHistory: EnrichedMessage[] = []
+        for (let i = 0; i < conversationMessages.length; i++) {
+          const apiMsg = conversationMessages[i]
+
+          const baseMessage: EnrichedMessage = {
+            id: apiMsg.id,
+            text: apiMsg.content,
+            isSender: apiMsg.senderType === 'user',
+            avatarUrl: apiMsg.senderType !== 'user' ? room?.avatar : undefined,
+            variant: apiMsg.senderType === 'user' ? 'sender' : 'basic',
+            showIcon: apiMsg.senderType !== 'user',
+            bookmarkId: bookmarkMap.get(apiMsg.id) || null,
+            analysisState: 'complete', // 히스토리는 항상 'complete'
+          }
+
+          // 유저 메시지 + metadata가 있으면 교정 정보(correction) 파싱
+          if (apiMsg.senderType === 'user') {
+            // 사용자 메시지: 다음 봇 메시지에서 'userMessageAnalysis'를 찾아야 함
+            const nextMsg = conversationMessages[i + 1]
+            let foundAnalysis = false
+
+            if (
+              nextMsg &&
+              nextMsg.senderType === 'bot' &&
+              nextMsg.metadata?.userMessageAnalysis?.userMessageId === apiMsg.id
+            ) {
+              const intimacy = nextMsg.metadata.userMessageAnalysis.intimacy
+              if (
+                intimacy &&
+                intimacy.correctedSentence &&
+                (intimacy.corrections || intimacy.feedback?.ko)
+              ) {
+                // 교정 데이터가 있음
+                baseMessage.correction = {
+                  messageId: nextMsg.metadata.userMessageAnalysis.userMessageId,
+                  corrections: intimacy.corrections,
+                  feedback: intimacy.feedback,
+                  correctedSentence: intimacy.correctedSentence,
+                  detectedLevel: intimacy.detectedLevel,
+                }
+                baseMessage.isPerfect = false
+                foundAnalysis = true
+              } else if (intimacy) {
+                // 교정 데이터는 있으나 교정 문장이 없음 (Perfect)
+                baseMessage.correction = null
+                baseMessage.isPerfect = true
+                foundAnalysis = true
+              }
+            }
+
+            if (!foundAnalysis) {
+              // 짝이 되는 봇 메시지가 없거나, 분석이 없는 경우
+              baseMessage.correction = null
+              baseMessage.isPerfect = false // 또는 true, 정책에 따라 다름
+            }
+          } else if (apiMsg.senderType === 'bot') {
+            // 봇 메시지: 이 메시지의 metadata에서 'botResponseAnalysis'를 찾음
+            if (apiMsg.metadata?.botResponseAnalysis?.vocabulary) {
+              baseMessage.vocabularyData = apiMsg.metadata.botResponseAnalysis.vocabulary
+            }
+          }
+
+          enrichedHistory.push(baseMessage)
         }
 
-        // 불러온 기록으로 messages 상태를 초기화
+        // 'enrichedHistory' (필터링된) 기준으로 분기 처리
+        if (enrichedHistory.length === 0 && !botGreeting) {
+          // Case 1: 정말 새로운 채팅 (히스토리 0개)
+          setIsNewChat(true)
+          setGreetingState('loading') // SSE 로딩 시작
+        } else {
+          // Case 2: 새로고침 (대화내역이 있거나, 그리팅 메시지만 있음)
+          setIsNewChat(false)
+          // 추출한 그리팅 메시지를 state에 저장
+          if (botGreeting) {
+            setGreetingMsg1(botGreeting.content)
+            setGreetingMsg2(guideGreeting?.content ?? null) // 가이드는 없을 수 있음
+            setGreetingState('complete') // 즉시 '완료'
+          } else {
+            // 대화내역은 있는데 그리팅이 없는 예외 상황
+            setGreetingState('complete')
+          }
+        }
+
+        // 불러온 기록(그리팅 제외)으로 messages 상태를 초기화
         setMessages(enrichedHistory)
       } catch (error) {
         navigate('/error', { state: { from: `/chat/${id}` } })
@@ -159,25 +225,31 @@ const ChatPage: React.FC = () => {
 
   // 봇/가이드 메시지 도착
   useEffect(() => {
-    // 봇 메시지와 가이드 메시지가 모두 도착하면 'complete' 상태로 변경
-    if (greetingBotMsg && greetingGuideMsg) {
+    // 봇 메시지와 가이드 메시지가 모두 도착하면 'complete'
+    if (greetingMsg1 && greetingMsg2) {
       setGreetingState('complete')
-      return // 타이머 로직 실행 방지
+      return
     }
 
-    // 봇 메시지만 오고 가이드 메시지가 2초간 안와도 'complete'로 변경 (가이드가 없는 경우 대비)
+    // 봇 메시지만 오고 가이드 메시지가 2초간 안와도 'complete' (SSE 또는 새로고침)
     let timer: NodeJS.Timeout | null = null
-    if (greetingBotMsg && !greetingGuideMsg) {
-      timer = setTimeout(() => {
-        console.warn('[SSE] Greeting guide message timeout. Rendering with bot message only.')
-        setGreetingState('complete') // 봇 메시지만이라도 렌더링
-      }, 2000) // 2초 타임아웃
+    if (greetingMsg1 && !greetingMsg2) {
+      // 즉시 완료되는 경우(새로고침)가 있으므로 타이머는 SSE 로딩 중에만
+      if (greetingState === 'loading') {
+        timer = setTimeout(() => {
+          console.warn('[SSE] Greeting guide message timeout. Rendering with bot message only.')
+          setGreetingState('complete') // 봇 메시지만이라도 렌더링
+        }, 2000)
+      } else if (greetingState !== 'pending') {
+        // (새로고침 시) 봇 메시지만 있고 가이드가 없는 경우 즉시 완료
+        setGreetingState('complete')
+      }
     }
 
     return () => {
       if (timer) clearTimeout(timer)
     }
-  }, [greetingBotMsg, greetingGuideMsg])
+  }, [greetingMsg1, greetingMsg2, greetingState])
 
   // 코치 마크 조회 확인
   useEffect(() => {
@@ -293,14 +365,13 @@ const ChatPage: React.FC = () => {
       switch (eventType) {
         case 'greeting_bot_message': {
           if (!isNewChat) break
-          setGreetingBotMsg(data as GreetingBotMessageData)
-          // 봇 메시지가 오면 로딩 상태 확정
+          setGreetingMsg1((data as GreetingBotMessageData).content)
           setGreetingState('loading')
           break
         }
         case 'greeting_guide_message': {
           if (!isNewChat) break
-          setGreetingGuideMsg(data as GreetingGuideMessageData)
+          setGreetingMsg2((data as GreetingGuideMessageData).content)
           break
         }
         case 'conversation_complete': {
@@ -561,18 +632,14 @@ const ChatPage: React.FC = () => {
           </div>
         ) : (
           <>
-            {isNewChat === true && (
-              <>
-                {/* 그리팅 완료/에러 시 InitChat으로 애니메이션 렌더링 */}
-                {greetingState === 'complete' && greetingBotMsg && (
-                  <InitChat
-                    avatar={room?.avatar}
-                    onReady={() => setIsInitChatReady(true)}
-                    message1={greetingBotMsg.content} // 봇 메시지 전달
-                    message2={greetingGuideMsg?.content ?? ''} // 가이드 메시지 전달 (없으면 빈칸)
-                  />
-                )}
-              </>
+            {greetingState === 'complete' && greetingMsg1 && (
+              <InitChat
+                avatar={room?.avatar}
+                onReady={() => setIsInitChatReady(true)}
+                message1={greetingMsg1} // 봇 메시지 전달
+                message2={greetingMsg2 ?? ''} // 가이드 메시지 전달 (없으면 빈칸)
+                skipAnimation={isNewChat === false} // 애니메이션 스킵 여부
+              />
             )}
 
             <div className="space-y-4">
@@ -601,7 +668,7 @@ const ChatPage: React.FC = () => {
                           messageId={msg.id}
                           originalContent={msg.text}
                           isSender={true}
-                          isLoading={true} // <--- 스켈레톤 모드 활성화
+                          isLoading={true} // 스켈레톤
                         />
                       ) : msg.isPerfect ? (
                         // COMPLETE + PERFECT

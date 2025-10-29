@@ -17,7 +17,7 @@ export const validateEmail = (email: string): string | null => {
   return null
 }
 
-export const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\S]{8,20}$/
+export const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/
 
 export const validatePassword = (password: string, confirm: string): string | null => {
   const v = password.trim()

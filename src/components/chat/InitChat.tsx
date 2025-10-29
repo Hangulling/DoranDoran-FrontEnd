@@ -5,16 +5,23 @@ interface InitChatProps {
   onReady?: () => void
   message1: string
   message2: string
+  skipAnimation?: boolean
 }
 const LoadingDot = () => <span className="loading loading-dots loading-[5px] text-gray-200" />
 
-const InitChat: React.FC<InitChatProps> = ({ avatar, onReady, message1, message2 }) => {
+const InitChat: React.FC<InitChatProps> = ({
+  avatar,
+  onReady,
+  message1,
+  message2,
+  skipAnimation = false,
+}) => {
   const lastMessageRef = useRef<HTMLDivElement>(null)
 
   const LOADING_DURATION = 600
   const PAUSE_DURATION = 700
 
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(skipAnimation ? 4 : 0)
 
   const LoadingBubble: FC<{ showAvatar?: boolean }> = ({ showAvatar }) => (
     <ChatBubble
