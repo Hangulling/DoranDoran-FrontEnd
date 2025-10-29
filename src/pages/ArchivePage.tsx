@@ -9,6 +9,12 @@ import checkCircle from '../assets/icon/checkRound.svg'
 import useArchiveStore from '../stores/useArchiveStore'
 import { BOT_TO_ROOM, type BookmarkResponse, type BotType, type Room } from '../types/archive'
 import { deleteManyBookmarks, getBookmarksByCursor } from '../api/archive'
+import ReactGA from 'react-ga4'
+import { useUserStore } from '../stores/useUserStore'
+
+// GA 환경 변수
+const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
+const IS_PROD = import.meta.env.PROD
 
 const PAGE_SIZE = 15
 const EDGE_NEAR = 16
@@ -22,6 +28,7 @@ type Page = {
 }
 
 export default function ArchivePage() {
+  const userId = useUserStore(state => state.id)
   const { activeRoom, setActiveRoom, selectionMode, selectedIds, seedItems, exitSelectionMode } =
     useArchiveStore()
   const scrollElRef = useRef<HTMLElement | null>(null)
@@ -60,6 +67,19 @@ export default function ArchivePage() {
     if (id && idToRoom[id]) setActiveRoom(idToRoom[id])
     setRoomResolved(true)
   }, [id, idToRoom, setActiveRoom])
+
+  // GA EVENT: view_store
+  useEffect(() => {
+    // roomResolved가 true가 되고, userId가 확보되면
+    if (IS_PROD && GA_ENABLED && userId && roomResolved) {
+      const entryPoint = fromChat ? 'chatroom_id' : 'chatroom_list'
+      ReactGA.event('view_store', {
+        user_id: userId,
+        entry_point: entryPoint,
+      })
+    }
+    // roomResolved는 처음에만 true가 되므로, 탭 변경 시에는 실행되지 않음
+  }, [roomResolved, userId, fromChat])
 
   useEffect(() => {
     if (!roomResolved) return
@@ -120,6 +140,7 @@ export default function ArchivePage() {
       setDataReady(false)
       const firstPage = await fetchPageFill15(activeRoom, null)
       roomCursorRef.current[activeRoom] = firstPage.nextCursorFromServer
+
       setPages(firstPage.items.length ? [firstPage] : [])
       setPageIndex(0)
       setDataReady(true)
