@@ -5,6 +5,7 @@ import useArchiveStore from '../stores/useArchiveStore'
 import ClosenessBar from '../components/chat/ClosenessBar'
 import { useState } from 'react'
 import Sidebar from '../components/common/SideBar'
+import SessionAutoLogout from '../components/common/SessionAutoLogout'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -112,6 +113,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           {closenessId && <ClosenessBar chatRoomId={closenessId} />}
         </header>
       )}
+      <SessionAutoLogout />
       <main id="app-scroll" className="flex-grow min-h-0 overflow-y-auto">
         {children}
       </main>
