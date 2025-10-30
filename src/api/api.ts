@@ -37,6 +37,10 @@ const tokenService = {
   },
 }
 
+function emitAuthEvent(type: 'auth:expired' | 'auth:logout' | 'auth:inactive', detail?: unknown) {
+  window.dispatchEvent(new CustomEvent(type, { detail }))
+}
+
 function dropHeader(headers: unknown, name: string) {
   if (!headers) return
   const h = headers as Record<string, unknown>
@@ -48,7 +52,6 @@ function dropHeader(headers: unknown, name: string) {
 function attachAuth(instance: AxiosInstance) {
   instance.interceptors.request.use(cfg => {
     const token = tokenService.access
-
     cfg.headers = cfg.headers ?? {}
 
     if (token && !('Authorization' in cfg.headers)) {
@@ -56,7 +59,7 @@ function attachAuth(instance: AxiosInstance) {
     }
 
     const url = cfg.url || ''
-    if (url.includes(AUTH_ENDPOINTS.REFRESH_TOKEN)) {
+    if (url.includes(AUTH_ENDPOINTS.REFRESH_TOKEN) || url.includes(AUTH_ENDPOINTS.LOGOUT)) {
       dropHeader(cfg.headers, 'authorization')
     }
 
@@ -66,7 +69,9 @@ function attachAuth(instance: AxiosInstance) {
     return cfg
   })
 }
+
 attachAuth(api)
+attachAuth(publicApi)
 
 publicApi.interceptors.request.use(c => {
   if (import.meta.env.DEV)
@@ -109,16 +114,22 @@ async function refreshAccessToken(): Promise<string | null> {
   } catch (e) {
     if (import.meta.env.DEV) console.error('❌ 토큰 재발급 실패:', e)
     tokenService.clear()
+    emitAuthEvent('auth:expired', { reason: 'refresh_failed' })
     return null
   }
 }
 
-// Response Interceptor (401 처리)
-// 보호 API들(api, userApi)에만 장착
 function installResponseInterceptor(instance: AxiosInstance) {
   instance.interceptors.response.use(
     res => res,
     async (error: AxiosError) => {
+      if (!error.response) {
+        if (tokenService.access) {
+          emitAuthEvent('auth:inactive', { reason: 'network_or_cors' })
+        }
+        return Promise.reject(error)
+      }
+
       const originalRequest = error.config as
         | (InternalAxiosRequestConfig & { _retry?: boolean })
         | undefined
@@ -126,7 +137,9 @@ function installResponseInterceptor(instance: AxiosInstance) {
       const url = (originalRequest?.url || '') + ''
 
       const isAuthEndpoint =
-        url.includes(AUTH_ENDPOINTS.LOGIN) || url.includes(AUTH_ENDPOINTS.REFRESH_TOKEN)
+        url.includes(AUTH_ENDPOINTS.LOGIN) ||
+        url.includes(AUTH_ENDPOINTS.REFRESH_TOKEN) ||
+        url.includes(AUTH_ENDPOINTS.LOGOUT)
 
       if (status === 401 && originalRequest && !originalRequest._retry && !isAuthEndpoint) {
         originalRequest._retry = true
@@ -139,6 +152,7 @@ function installResponseInterceptor(instance: AxiosInstance) {
                 originalRequest.headers.Authorization = `Bearer ${newToken}`
                 resolve(instance(originalRequest))
               } else {
+                emitAuthEvent('auth:expired', { reason: 'refresh_failed_queue' })
                 resolve(Promise.reject(error))
               }
             })
@@ -156,6 +170,19 @@ function installResponseInterceptor(instance: AxiosInstance) {
           return instance(originalRequest)
         }
 
+        emitAuthEvent('auth:expired', { reason: 'refresh_failed_401' })
+        return Promise.reject(error)
+      }
+
+      if (status === 401 && originalRequest?._retry && !isAuthEndpoint) {
+        tokenService.clear()
+        emitAuthEvent('auth:expired', { reason: 'final_401_after_retry', url })
+        return Promise.reject(error)
+      }
+
+      if (status === 401 && !tokenService.refresh && !isAuthEndpoint) {
+        tokenService.clear()
+        emitAuthEvent('auth:expired', { reason: 'no_refresh_token', url })
         return Promise.reject(error)
       }
 
@@ -163,6 +190,8 @@ function installResponseInterceptor(instance: AxiosInstance) {
     }
   )
 }
+
 installResponseInterceptor(api)
+installResponseInterceptor(publicApi)
 
 export default api

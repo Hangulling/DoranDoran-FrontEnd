@@ -1,5 +1,5 @@
 import type { LoginRequest, LoginResponse } from '../types/auth'
-import api from './api'
+import api, { publicApi } from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
 
 let currentUserId: string | null = null
@@ -16,7 +16,7 @@ export async function login(data: LoginRequest) {
 
 export async function logout() {
   try {
-    const res = await api.post(AUTH_ENDPOINTS.LOGOUT)
+    const res = await publicApi.post(AUTH_ENDPOINTS.LOGOUT)
     if (import.meta.env.DEV) {
       console.log('🔒 로그아웃 성공:', res.data.message)
     }
@@ -57,7 +57,7 @@ export async function getCurrentUser() {
     return res.data
   } catch (e) {
     console.error('현재 사용자 정보 조회 실패:', e)
-    currentUserId = null  
+    currentUserId = null
     throw e
   }
 }
