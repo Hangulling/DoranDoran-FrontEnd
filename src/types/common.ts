@@ -19,7 +19,7 @@ export interface CommonModalProps {
   open: boolean
   title: string
   variant?: 'common' | 'signup'
-  description?: string | string[] // 상수 지정시 배열
+  description: string | React.ReactNode | Array<string | React.ReactNode> // 상수 지정시 배열
   confirmText?: string
   cancelText?: string
   onConfirm: () => void
