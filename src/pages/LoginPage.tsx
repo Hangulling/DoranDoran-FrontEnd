@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import axios from 'axios'
-import loginCharacter from '../assets/auth/loginCharacter.svg'
+import bubble1 from '../assets/auth/bubble1.svg'
+import bubble2 from '../assets/auth/bubble2.svg'
+import bubble3 from '../assets/auth/bubble3.svg'
+import character from '../assets/auth/character.svg'
 import doran from '../assets/auth/doranText.svg'
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
@@ -165,8 +168,35 @@ export default function LoginPage() {
           </span>
         </div>
 
-        <div className="flex justify-center">
-          <img src={loginCharacter} alt="login character" />
+        <div className="flex justify-center items-center">
+          <div className="relative w-[335px] h-[200px] flex justify-center items-end">
+            <img
+              src={bubble1}
+              alt="bubble1"
+              className="absolute top-[80px] left-[2px] object-contain w-[112px] h-[33px]
+                 z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
+            />
+
+            <img
+              src={bubble2}
+              alt="bubble2"
+              className="absolute top-[22px] left-1/2 -translate-x-1/3 object-contain w-[120px] h-[33px]
+                 z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
+            />
+
+            <img
+              src={bubble3}
+              alt="bubble3"
+              className="absolute top-[80px] right-[10px] object-contain w-[102px] h-[33px]
+                 z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
+            />
+
+            <img
+              src={character}
+              alt="characters"
+              className="object-contain z-20 translate-y-[10px]"
+            />
+          </div>
         </div>
 
         <div className="flex justify-center items-center">
