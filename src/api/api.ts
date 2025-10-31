@@ -6,12 +6,6 @@ const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://3.21.177.186
   ''
 )
 
-export const publicApi = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 15000,
-  headers: { 'Content-Type': 'application/json' },
-})
-
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15000,
@@ -38,6 +32,10 @@ const tokenService = {
 }
 
 function emitAuthEvent(type: 'auth:expired' | 'auth:logout' | 'auth:inactive', detail?: unknown) {
+  const manualLogout = localStorage.getItem('session:manualLogout') === '1'
+  if (manualLogout && (type === 'auth:expired' || type === 'auth:inactive')) {
+    return
+  }
   window.dispatchEvent(new CustomEvent(type, { detail }))
 }
 
@@ -59,7 +57,7 @@ function attachAuth(instance: AxiosInstance) {
     }
 
     const url = cfg.url || ''
-    if (url.includes(AUTH_ENDPOINTS.REFRESH_TOKEN) || url.includes(AUTH_ENDPOINTS.LOGOUT)) {
+    if (url.includes(AUTH_ENDPOINTS.REFRESH_TOKEN)) {
       dropHeader(cfg.headers, 'authorization')
     }
 
@@ -71,17 +69,6 @@ function attachAuth(instance: AxiosInstance) {
 }
 
 attachAuth(api)
-attachAuth(publicApi)
-
-publicApi.interceptors.request.use(c => {
-  if (import.meta.env.DEV)
-    console.log(
-      '🌐 PUBLIC →',
-      c.method?.toUpperCase(),
-      publicApi.getUri({ ...c, url: c.url || '' })
-    )
-  return c
-})
 
 let isRefreshing = false
 let requestQueue: Array<(token: string | null) => void> = []
@@ -192,6 +179,5 @@ function installResponseInterceptor(instance: AxiosInstance) {
 }
 
 installResponseInterceptor(api)
-installResponseInterceptor(publicApi)
 
 export default api
