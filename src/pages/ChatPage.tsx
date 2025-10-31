@@ -83,6 +83,7 @@ const ChatPage: React.FC = () => {
   const closenessText = getClosenessAsText(closenessLevel)
   const accessToken = localStorage.getItem('accessToken') ?? ''
   const [sseError, setSseError] = useState<string | null>(null)
+  const hasLeftRef = useRef(false)
 
   const lastUserMsgIdRef = useRef<string | null>(null) // 마지막 사용자 메시지 ID
   const lastAiMsgIdRef = useRef<string | null>(null) // 마지막 AI 메시지 ID
@@ -157,7 +158,11 @@ const ChatPage: React.FC = () => {
               nextMsg.metadata?.userMessageAnalysis?.userMessageId === apiMsg.id
             ) {
               const intimacy = nextMsg.metadata.userMessageAnalysis.intimacy
-              if (intimacy && intimacy.correctedSentence) {
+              if (
+                intimacy &&
+                intimacy.correctedSentence &&
+                (intimacy.corrections || intimacy.feedback?.ko)
+              ) {
                 // 교정 데이터가 있음
                 baseMessage.correction = {
                   messageId: nextMsg.metadata.userMessageAnalysis.userMessageId,
@@ -509,6 +514,9 @@ const ChatPage: React.FC = () => {
       return
     }
 
+    if (hasLeftRef.current) return // 중복 방지
+    hasLeftRef.current = true
+
     const noShowAgain = useModalStore.getState().noShowAgain
 
     if (noShowAgain) {
@@ -533,6 +541,7 @@ const ChatPage: React.FC = () => {
       navigate('/', { replace: true })
     } catch (error) {
       console.error('채팅방 나가기 실패:', error)
+      hasLeftRef.current = false
       setIsModalOpen(false)
     }
   }
@@ -540,6 +549,62 @@ const ChatPage: React.FC = () => {
   const handleCancel = () => {
     setIsModalOpen(false)
   }
+
+  // 나가기 처리
+  useEffect(() => {
+    // 뒤로가기(popstate)
+    const handlePopState = async () => {
+      if (hasLeftRef.current) return
+
+      if (noShowAgain) {
+        // 다시 보지 않기 상태
+        hasLeftRef.current = true
+        sessionStorage.removeItem(`initChat_${id}`)
+        if (chatroomId && userId) {
+          try {
+            await leaveChatroom(chatroomId, userId)
+            console.log('채팅방 나가기 성공 (noShowAgain)')
+          } catch (e) {
+            console.error('Failed to leave chatroom (noShowAgain):', e)
+          }
+        }
+        navigate('/')
+      } else {
+        setIsModalOpen(true)
+        window.history.pushState(null, '', window.location.href)
+      }
+    }
+    window.addEventListener('popstate', handlePopState)
+
+    // 새로고침 / 탭 닫기 (beforeunload)
+    const handleUnload = () => {
+      if (hasLeftRef.current) return
+
+      // 새로고침인지 확인
+      const navigationEntries = performance.getEntriesByType('navigation')
+      if (navigationEntries.length > 0) {
+        const navEntry = navigationEntries[0] as PerformanceNavigationTiming
+        if (navEntry.type === 'reload') {
+          console.log('[ChatPage] Refresh detected. NOT leaving chatroom.')
+          return
+        }
+      }
+
+      // 탭 닫기
+      console.log('[ChatPage] beforeunload (Tab Close / Multi-Back). Leaving chatroom.')
+
+      if (chatroomId && userId) {
+        leaveChatroom(chatroomId, userId)
+      }
+    }
+    window.addEventListener('beforeunload', handleUnload)
+
+    // 클린업 함수
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+      window.removeEventListener('beforeunload', handleUnload)
+    }
+  }, [chatroomId, userId, navigate, noShowAgain, id])
 
   useEffect(() => {
     if (chatMainRef.current) {

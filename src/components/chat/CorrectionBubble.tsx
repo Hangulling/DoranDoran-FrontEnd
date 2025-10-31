@@ -65,7 +65,11 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
             <p className="text-green-500">
               closeness level -<span> {closenessText}</span>
             </p>
-            {isLoading ? <div className="skeleton h-4"></div> : <p>{correctedContent}</p>}
+            {isLoading ? (
+              <div className="bg-green-80 animate-pulse rounded-[4px] h-4 w-3/4"></div>
+            ) : (
+              <p>{correctedContent}</p>
+            )}
           </div>
           <div className="flex p-0.5 bg-green-80 rounded-[6px] mt-[26px]">
             {tabs.map(tab => (
@@ -90,8 +94,8 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
         <div className="text-[14px] text-gray-700">
           {isLoading ? (
             <div className="space-y-1.5 pt-1">
-              <div className="skeleton h-3 w-full"></div>
-              <div className="skeleton h-3 w-5/6"></div>
+              <div className="bg-green-80 animate-pulse rounded-[4px] h-[14px] w-full"></div>
+              <div className="bg-green-80 animate-pulse rounded-[4px] h-[14px] w-5/6"></div>
             </div>
           ) : (
             currentDescription[selectedTab]

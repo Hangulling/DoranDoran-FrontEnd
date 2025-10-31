@@ -15,22 +15,28 @@ export async function login(data: LoginRequest) {
 }
 
 export async function logout() {
+  localStorage.setItem('session:manualLogout', '1')
+
   try {
     const res = await api.post(AUTH_ENDPOINTS.LOGOUT)
     if (import.meta.env.DEV) {
       console.log('🔒 로그아웃 성공:', res.data.message)
     }
-
-    // 로컬 스토리지 토큰 제거 및 currentUserId 초기화
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
-    localStorage.removeItem('currentUserId')
-    currentUserId = null
-
     return res.data
   } catch (error) {
     console.error('🚨 로그아웃 요청 중 오류 발생:', error)
     throw error
+  } finally {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('currentUserId')
+    currentUserId = null
+    try {
+      localStorage.setItem('session:logout', String(Date.now()))
+    } catch {
+      console.warn('Failed to set logout flag')
+    }
+    setTimeout(() => localStorage.removeItem('session:manualLogout'), 1500)
   }
 }
 
