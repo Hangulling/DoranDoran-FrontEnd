@@ -21,6 +21,66 @@ const EDGE_NEAR = 16
 const EDGE_RELEASE = 64
 const SAFE_OFFSET = EDGE_RELEASE + 1
 
+// 문자열 → 숫자 매핑(대소문자/공백 허용)
+const mapIntimacyToNum = (s?: string | null) => {
+  if (!s) return undefined
+  const v = s.trim().toLowerCase()
+  if (v === 'polite') return 1
+  if (v === 'casual') return 2
+  if (v === 'friendly') return 3
+  return undefined
+}
+
+// 친밀도 안전 추출 헬퍼 (any 없이)
+function readIntimacyLevel(item: unknown): string | undefined {
+  if (typeof item !== 'object' || item === null) return undefined
+  const obj = item as Record<string, unknown>
+
+  const nested = obj['aiResponse']
+  if (nested && typeof nested === 'object') {
+    const lvl = (nested as Record<string, unknown>)['intimacyLevel']
+    if (typeof lvl === 'string') return lvl
+  }
+  const flat = obj['intimacyLevel']
+  if (typeof flat === 'string') return flat
+  return undefined
+}
+
+// ====== 삭제 이벤트용 안전 접근 헬퍼 ======
+type ContentType = 'bot_message' | 'word_explanation' | 'ment_explanation'
+
+function readChatroomId(item: unknown): string | undefined {
+  if (typeof item !== 'object' || item === null) return undefined
+  const v = (item as Record<string, unknown>)['chatroomId']
+  return typeof v === 'string' ? v : undefined
+}
+
+function readCreatedAt(item: unknown): string | undefined {
+  if (typeof item !== 'object' || item === null) return undefined
+  const v = (item as Record<string, unknown>)['createdAt']
+  return typeof v === 'string' ? v : undefined
+}
+
+function readContentType(item: unknown): ContentType {
+  if (typeof item !== 'object' || item === null) return 'bot_message'
+  const obj = item as Record<string, unknown>
+  const raw = obj['type'] ?? obj['contentType']
+  if (raw === 'word_explanation') return 'word_explanation'
+  if (raw === 'ment_explanation') return 'ment_explanation'
+  return 'bot_message'
+}
+
+// "hh.mm" 형태 문자열(요구사항 그대로)로 경과시간 생성
+function timeSavedHHDotMM(createdAt?: string): string | undefined {
+  if (!createdAt) return undefined
+  const ms = Date.now() - new Date(createdAt).getTime()
+  if (!Number.isFinite(ms)) return undefined
+  const totalMin = Math.max(0, Math.round(ms / 60000))
+  const hh = Math.floor(totalMin / 60)
+  const mm = totalMin % 60
+  return `${hh}.${mm.toString().padStart(2, '0')}` // 예: "2.05"
+}
+
 type Page = {
   items: BookmarkResponse[]
   nextCursorFromServer: string | null
@@ -31,6 +91,7 @@ export default function ArchivePage() {
   const userId = useUserStore(state => state.id)
   const { activeRoom, setActiveRoom, selectionMode, selectedIds, seedItems, exitSelectionMode } =
     useArchiveStore()
+
   const scrollElRef = useRef<HTMLElement | null>(null)
   const edgeLock = useRef<'none' | 'top' | 'bottom'>('none')
   const roomCursorRef = useRef<Record<Room, string | null>>({
@@ -39,6 +100,10 @@ export default function ArchivePage() {
     Coworker: null,
     Senior: null,
   })
+
+  // 탭 클릭으로 전환되었는지 표시 (초기 진입과 구분)
+  const pendingClickRoomRef = useRef<Room | null>(null)
+
   const prevRef = useRef<() => void>(() => {})
   const nextRef = useRef<() => void>(() => {})
   const suppressNextScrollRef = useRef(false)
@@ -58,19 +123,20 @@ export default function ArchivePage() {
   const location = useLocation()
   const fromChat = (location.state as { from?: string } | null)?.from === 'chat'
   const { id } = useParams<{ id?: string }>()
+
   const idToRoom: Record<string, Room> = useMemo(
     () => ({ '1': 'Friend', '2': 'Honey', '3': 'Coworker', '4': 'Senior' }),
     []
   )
 
+  // 라우팅으로 들어온 경우 방 지정
   useEffect(() => {
     if (id && idToRoom[id]) setActiveRoom(idToRoom[id])
     setRoomResolved(true)
   }, [id, idToRoom, setActiveRoom])
 
-  // GA EVENT: view_store
+  // GA: view_store (페이지 진입 1회)
   useEffect(() => {
-    // roomResolved가 true가 되고, userId가 확보되면
     if (IS_PROD && GA_ENABLED && userId && roomResolved) {
       const entryPoint = fromChat ? 'chatroom_id' : 'chatroom_list'
       ReactGA.event('view_store', {
@@ -78,18 +144,7 @@ export default function ArchivePage() {
         entry_point: entryPoint,
       })
     }
-    // roomResolved는 처음에만 true가 되므로, 탭 변경 시에는 실행되지 않음
   }, [roomResolved, userId, fromChat])
-
-  useEffect(() => {
-    if (!roomResolved) return
-    setPages([])
-    setPageIndex(0)
-    setError(null)
-    edgeLock.current = 'none'
-    roomCursorRef.current[activeRoom] = null
-    void loadFirstPage()
-  }, [activeRoom, roomResolved])
 
   const fetchLastWindow15 = useCallback(async (room: Room): Promise<BookmarkResponse[]> => {
     let all: BookmarkResponse[] = []
@@ -134,6 +189,15 @@ export default function ArchivePage() {
     [fetchLastWindow15]
   )
 
+  // 탭 클릭 시: 플래l그만 설정 (GA 전송은 로드 완료 후)
+  const handleTabChange = useCallback(
+    (tab: Room) => {
+      pendingClickRoomRef.current = tab
+      setActiveRoom(tab)
+    },
+    [setActiveRoom]
+  )
+
   const loadFirstPage = useCallback(async () => {
     try {
       setLoading(true)
@@ -145,6 +209,25 @@ export default function ArchivePage() {
       setPageIndex(0)
       setDataReady(true)
       seedItems(firstPage.items)
+
+      if (
+        IS_PROD &&
+        GA_ENABLED &&
+        userId &&
+        pendingClickRoomRef.current === activeRoom &&
+        firstPage.items.length > 0
+      ) {
+        const latest = firstPage.items[0]
+        const strLevel = readIntimacyLevel(latest) ?? null
+
+        ReactGA.event('click_home_store', {
+          user_id: userId,
+          concept: activeRoom.toLowerCase(),
+          intimacy_level: mapIntimacyToNum(strLevel),
+        })
+      }
+      pendingClickRoomRef.current = null
+
       requestAnimationFrame(() => {
         const el = scrollElRef.current
         if (el) {
@@ -161,7 +244,17 @@ export default function ArchivePage() {
     } finally {
       setLoading(false)
     }
-  }, [activeRoom, fetchPageFill15, seedItems])
+  }, [activeRoom, fetchPageFill15, seedItems, userId])
+
+  useEffect(() => {
+    if (!roomResolved) return
+    setPages([])
+    setPageIndex(0)
+    setError(null)
+    edgeLock.current = 'none'
+    roomCursorRef.current[activeRoom] = null
+    void loadFirstPage()
+  }, [activeRoom, roomResolved])
 
   const goNextPage = useCallback(async () => {
     if (loading) return
@@ -176,6 +269,7 @@ export default function ArchivePage() {
       })
       return
     }
+
     const lastPage = pages[pages.length - 1]
     if (!lastPage) return
     try {
@@ -193,10 +287,6 @@ export default function ArchivePage() {
         if (el) el.scrollTop = SAFE_OFFSET
         edgeLock.current = 'none'
       })
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e)
-      console.error('다음 페이지 로딩 실패:', msg)
-      setError('다음 페이지 조회 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
     }
@@ -259,7 +349,22 @@ export default function ArchivePage() {
     const ids = Array.from(selectedIds)
     try {
       setOpenModal(false)
+
+      const itemsToDelete = pages.flatMap(p => p.items).filter(it => ids.includes(it.id))
+
       if (ids.length > 0) await deleteManyBookmarks(ids)
+
+      if (IS_PROD && GA_ENABLED && userId) {
+        itemsToDelete.forEach(item => {
+          ReactGA.event('click_store_delete', {
+            user_id: userId,
+            chatroom_id: readChatroomId(item),
+            content_type: readContentType(item),
+            time_saved: timeSavedHHDotMM(readCreatedAt(item)),
+          })
+        })
+      }
+
       setShowToast(true)
       setTimeout(() => setShowToast(false), 4000)
       exitSelectionMode()
@@ -274,13 +379,15 @@ export default function ArchivePage() {
   return (
     <div className="min-h-full bg-gray-50 flex flex-col">
       {!fromChat && (
-        <ArchiveTabs key={activeRoom} activeTab={activeRoom} onChange={setActiveRoom} />
+        <ArchiveTabs key={activeRoom} activeTab={activeRoom} onChange={handleTabChange} />
       )}
+
       {error && (
         <div className="alert alert-error my-2">
           <span>{error}</span>
         </div>
       )}
+
       {dataReady ? (
         list.length > 0 ? (
           <div className="mt-5 pb-6">
@@ -297,6 +404,7 @@ export default function ArchivePage() {
           <EmptyCard />
         )
       ) : null}
+
       {selectionMode && (
         <div className="flex justify-center items-center">
           <Button
@@ -315,6 +423,7 @@ export default function ArchivePage() {
           </Button>
         </div>
       )}
+
       {showToast && (
         <div className="toast toast-center w-[335px] mb-6">
           <div className="alert bg-[#0F1010] opacity-80">
@@ -323,6 +432,7 @@ export default function ArchivePage() {
           </div>
         </div>
       )}
+
       {openModal && (
         <CommonModal
           open
