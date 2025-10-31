@@ -22,6 +22,7 @@ export default function SessionAutoLogout() {
 
   useEffect(() => {
     const openModal = () => {
+      if (localStorage.getItem('session:manualLogout') === '1') return
       if (openedRef.current) return
       console.log('세션 만료/비활성 감지됨')
       openedRef.current = true
