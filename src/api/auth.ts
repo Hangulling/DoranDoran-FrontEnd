@@ -1,11 +1,11 @@
 import type { LoginRequest, LoginResponse } from '../types/auth'
-import api, { publicApi } from './api'
+import api from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
 
 let currentUserId: string | null = null
 
 export async function login(data: LoginRequest) {
-  const res = await publicApi.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, data)
+  const res = await api.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, data)
   const { data: resData } = res.data
 
   if (resData.accessToken) localStorage.setItem('accessToken', resData.accessToken)
@@ -43,7 +43,7 @@ export async function logout() {
 export async function checkEmailExists(email: string): Promise<boolean> {
   const encoded = encodeURIComponent(email)
   const url = USER_ENDPOINTS.CHECK_EMAIL(encoded)
-  const res = await publicApi.get(url, { timeout: 15000 })
+  const res = await api.get(url, { timeout: 15000 })
   const payload = res.data
   const value = typeof payload === 'boolean' ? payload : (payload?.data ?? payload)
   return value === true
