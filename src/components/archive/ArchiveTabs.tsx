@@ -12,8 +12,8 @@ export default function ArchiveTabs({ activeTab, onChange }: ArchiveTabsProps) {
   const tabs: Room[] = ['Friend', 'Honey', 'Coworker', 'Senior']
 
   return (
-    <div className="flex justify-center">
-      <div className="flex justify-between w-[335px]">
+    <div className="flex justify-center md:justify-start md:px-8">
+      <div className="flex justify-between gap-2 md:gap-6">
         {tabs.map(tab => {
           const isActive = activeTab === tab
           const disabled = selectionMode && !isActive
