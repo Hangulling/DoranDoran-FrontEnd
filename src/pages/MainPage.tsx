@@ -8,6 +8,7 @@ import { getChatRoomListLimited, getCurrentUser } from '../api'
 import { getDaysDiff } from '../utils/getDaysDiff'
 import { capitalizeFirstLetter } from '../utils/capitalizeFirstLetter'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import ReactGA from 'react-ga4'
 
 interface ChatRoomWithMessage {
   roomRouteId: number
@@ -16,6 +17,9 @@ interface ChatRoomWithMessage {
   avatar: string
   message: string
 }
+
+const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
+const IS_PROD = import.meta.env.PROD
 
 const MainPage = () => {
   const navigate = useNavigate()
@@ -39,6 +43,11 @@ const MainPage = () => {
         setStoreName(profile.name)
         setUserId(profile.id)
         setStoreId(profile.id)
+
+        // 로그인 후 메인페이지 진입 시, User-ID 재설정 (세션 유지를 위해)
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.set({ userId: profile.id })
+        }
       } catch (err) {
         console.error('사용자 정보 로드 실패:', err)
         navigate('/error', { state: { from: '/main' } })
@@ -87,6 +96,14 @@ const MainPage = () => {
   }, [userId, navigate])
 
   const handleRoomClick = (id: number, roomName: string) => {
+    if (IS_PROD && GA_ENABLED) {
+      ReactGA.event('enter_chatroom', {
+        user_id: userId,
+        // chatroom_id: id.toString(), // 얻을 수 없는 정보
+        concept: roomName, // 'friend', 'honey' 등
+      })
+    }
+
     console.log('클릭된 방 concept:', roomName)
     navigate(`/closeness/${id}`, {
       state: { roomRouteId: id, concept: roomName },

@@ -12,6 +12,10 @@ import showToast from './CommonToast'
 import useClosenessStore from '../../stores/useClosenessStore'
 import useRoomIdStore from '../../stores/useRoomIdStore'
 import { useCoachStore, useModalStore } from '../../stores/useUiStateStore'
+import ReactGA from 'react-ga4'
+
+const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
+const IS_PROD = import.meta.env.PROD
 
 const LOGOUT_DESC = ['You can log in again anytime.']
 const SIGNOUT_DESC = ['This action cannot be undone.', 'Are you sure you want to continue?']
@@ -45,11 +49,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   // 로그아웃 버튼 클릭 시
   const openLogoutModal = () => {
+    if (IS_PROD && GA_ENABLED) {
+      ReactGA.event('click_logout')
+    }
+
     setModalType('logout')
     setModalOpen(true)
   }
   // 회원탈퇴 버튼 클릭 시
   const openSignupModal = () => {
+    if (IS_PROD && GA_ENABLED) {
+      ReactGA.event('click_delete_account')
+    }
+
     setModalType('signup')
     setModalOpen(true)
   }
@@ -58,6 +70,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     if (modalType === 'logout') {
       try {
         await logout()
+
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.event('confirm_logout')
+          ReactGA.set({ userId: null }) // GA User-ID 초기화
+        }
+
         useUserStore.getState().reset() // 상태 초기화
         useClosenessStore.getState().reset()
         useRoomIdStore.getState().reset()
@@ -72,6 +90,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     } else if (modalType === 'signup') {
       try {
         await deleteUser(userId)
+
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.event('confirm_delete_account')
+          ReactGA.set({ userId: null }) // GA User-ID 초기화
+        }
+
         useUserStore.getState().reset()
         useClosenessStore.getState().reset()
         useRoomIdStore.getState().reset()
@@ -105,6 +129,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   }
 
   const goForm = () => {
+    if (IS_PROD && GA_ENABLED) {
+      ReactGA.event('click_contact_us', {
+        destination_url: 'https://forms.gle/dRBuvgKjwK7enscy6',
+      })
+    }
     onClose()
     window.open('https://forms.gle/dRBuvgKjwK7enscy6', '_blank')
   }
