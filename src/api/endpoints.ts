@@ -98,6 +98,10 @@ export const CHAT_ENDPOINTS = {
   // SSE
   MESSAGE_STREAM: (chatroomId: string, userId?: string) =>
     `/api/chat/stream/${chatroomId}${userId ? `?userId=${userId}` : ''}`,
+
+  // 마지막 채팅 시간
+  LAST_INTERACTIONS: (userId: string) =>
+    `/api/chat/chatrooms/last-interactions?userId=${userId}&limit=4`,
 }
 
 // Bookmark Endpoints

@@ -145,3 +145,10 @@ export interface ApiMessageMetadata {
   userMessageAnalysis: UserMessageAnalysis | null
   botResponseAnalysis: BotResponseAnalysis | null
 }
+
+export interface LastInteraction {
+  chatbotId: string
+  lastRoomId: string
+  lastInteractionAt: string
+  chatbotName: string
+}

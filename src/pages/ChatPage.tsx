@@ -29,6 +29,8 @@ import { getClosenessAsText } from '../utils/conceptMap'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import showToast from '../components/common/CommonToast'
 
+const LoadingDot = () => <span className="loading loading-dots loading-[5px] text-gray-200" />
+
 interface EnrichedMessage extends Message {
   correction?: IntimacyAnalysisData | null // 교정 데이터 저장
   vocabularyData?: VocabularyExtractedData | null // 어휘 데이터 저장
@@ -81,8 +83,10 @@ const ChatPage: React.FC = () => {
   const [sseError, setSseError] = useState<string | null>(null)
   const hasLeftRef = useRef(false)
 
+  const [isAiResponding, setIsAiResponding] = useState(false)
+  const pendingVocabularyRef = useRef<VocabularyExtractedData | null>(null)
+
   const lastUserMsgIdRef = useRef<string | null>(null) // 마지막 사용자 메시지 ID
-  const lastAiMsgIdRef = useRef<string | null>(null) // 마지막 AI 메시지 ID
 
   const room = useMemo(() => {
     return chatRooms.find(r => String(r.roomRouteId) === String(id))
@@ -353,8 +357,11 @@ const ChatPage: React.FC = () => {
         analysisState: 'pending', // 명시적
       }
       setMessages(prevMessages => [...prevMessages, newMessage])
+
+      setIsAiResponding(true)
     } catch (error) {
       console.error('메시지 전송 실패:', error)
+      setIsAiResponding(false)
     }
   }
 
@@ -377,7 +384,12 @@ const ChatPage: React.FC = () => {
         }
         case 'conversation_complete': {
           const conversationData = data as EventDataMap['conversation_complete']
-          lastAiMsgIdRef.current = conversationData.messageId
+          // Ref에 저장된 어휘 데이터
+          const vocabData = pendingVocabularyRef.current
+
+          // AI 답장 + 어휘 동시 렌더링
+          setIsAiResponding(false) // 로딩 종료
+
           const newAiMessage: EnrichedMessage = {
             id: conversationData.messageId,
             text: conversationData.content,
@@ -385,8 +397,11 @@ const ChatPage: React.FC = () => {
             avatarUrl: room?.avatar ?? '',
             variant: 'basic',
             showIcon: true,
+            vocabularyData: vocabData,
           }
           setMessages(prev => [...prev, newAiMessage])
+
+          pendingVocabularyRef.current = null // 대기 데이터 비우기
           break
         }
         case 'intimacy_analysis': {
@@ -418,17 +433,8 @@ const ChatPage: React.FC = () => {
         }
         case 'vocabulary_extracted': {
           const vocabData = data as VocabularyExtractedData
-          const targetMsgId = lastAiMsgIdRef.current
-          if (!targetMsgId) break
-          setMessages(prev =>
-            prev.map(msg => {
-              if (msg.id === targetMsgId) {
-                return { ...msg, vocabularyData: vocabData }
-              }
-              return msg
-            })
-          )
-          lastAiMsgIdRef.current = null
+          // 데이터를 임시 Ref에 저장
+          pendingVocabularyRef.current = vocabData
           break
         }
         default: // 예상 못한 이벤트 처리
@@ -780,6 +786,19 @@ const ChatPage: React.FC = () => {
                   </div>
                 )
               })}
+              {/* AI 응답 로딩 버블 */}
+              {isAiResponding && (
+                <div className="mt-5">
+                  <ChatBubble
+                    message={<LoadingDot />}
+                    isSender={false}
+                    avatarUrl={room?.avatar}
+                    variant={'basic'}
+                    showIcon={false}
+                  />
+                </div>
+              )}
+
               <div className="mt-5">
                 {sseError && (
                   <ChatBubble
