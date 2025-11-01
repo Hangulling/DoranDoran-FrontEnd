@@ -3,6 +3,7 @@ import type {
   ApiMessage,
   ChatRoomListParams,
   CreateChatroomPayload,
+  LastInteraction,
   PagedApiMessageResponse,
   SendMessagePayload,
   UpdateIntimacyPayload,
@@ -89,4 +90,11 @@ export function getSseUrl(chatroomId: string, userId?: string): string {
   }
 
   return url.toString()
+}
+
+// 마지막 채팅 시간
+export async function getLastInteractions(userId: string): Promise<LastInteraction[]> {
+  const url = CHAT_ENDPOINTS.LAST_INTERACTIONS(userId)
+  const res = await api.get<LastInteraction[]>(url)
+  return res.data
 }
