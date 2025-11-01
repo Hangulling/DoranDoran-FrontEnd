@@ -11,8 +11,21 @@ const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID
 const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
 
 if (import.meta.env.PROD && GA_TRACKING_ID && GA_ENABLED) {
-  ReactGA.initialize(GA_TRACKING_ID)
-  console.log('[GA] Production GA Initialized')
+  const urlParams = new URLSearchParams(window.location.search)
+  const isInternal = urlParams.get('internal') === 'true'
+
+  // 내부 트래픽일 경우 gtagOptions에 'traffic_type': 'internal'을 추가
+  const gaConfigOptions = isInternal ? { traffic_type: 'internal' } : {}
+
+  ReactGA.initialize(GA_TRACKING_ID, {
+    gtagOptions: gaConfigOptions,
+  })
+
+  console.log(
+    isInternal
+      ? '[GA] Production GA Initialized (Internal Traffic)'
+      : '[GA] Production GA Initialized'
+  )
 } else {
   console.warn('[GA] GA not initialized (Disabled, Dev mode, or no Tracking ID)')
 }
