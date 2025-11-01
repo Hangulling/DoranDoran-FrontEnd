@@ -4,10 +4,11 @@ import { chatRooms } from '../mocks/db/chat'
 import { useEffect, useState } from 'react'
 import { useUserStore } from '../stores/useUserStore'
 import { useGoBack } from '../hooks/useGoBack'
-import { getChatRoomListLimited, getCurrentUser } from '../api'
+import { getCurrentUser, getLastInteractions } from '../api'
 import { getDaysDiff } from '../utils/getDaysDiff'
 import { capitalizeFirstLetter } from '../utils/capitalizeFirstLetter'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import { getChatbotValueById } from '../utils/chatbotMap'
 
 interface ChatRoomWithMessage {
   roomRouteId: number
@@ -59,14 +60,19 @@ const MainPage = () => {
       return 'It’s been a while! Let’s chat again'
     }
 
-    getChatRoomListLimited(userId)
+    getLastInteractions(userId)
       .then(response => {
-        // response는 ApiChatRoom[] 타입 (배열)
         const mergedRooms = chatRooms.map(mockRoom => {
-          const serverRoom = response.find(r => r.concept === mockRoom.roomName)
-          const diffDays = serverRoom?.lastMessageAt
-            ? getDaysDiff(serverRoom.lastMessageAt)
+          const serverRoom = response.find(r => {
+            const serverValue = getChatbotValueById(r.chatbotId)
+            const mockValue = String(mockRoom.roomRouteId)
+            return serverValue === mockValue
+          })
+
+          const diffDays = serverRoom?.lastInteractionAt
+            ? getDaysDiff(serverRoom.lastInteractionAt)
             : undefined
+
           const message = statusMessage(diffDays)
 
           return {
