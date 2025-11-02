@@ -106,7 +106,7 @@ const ChatPage: React.FC = () => {
     setInactivityError(false)
 
     inactivityTimerRef.current = setTimeout(() => {
-      console.warn('[ChatPage] 5분간 활동이 없어 비활성 에러를 표시합니다.')
+      console.warn('5분간 활동이 없어 비활성 에러 표시')
       setInactivityError(true)
     }, 300000)
   }, [])
