@@ -64,7 +64,7 @@ export function useChatStream<T = unknown>(
         headers: {
           Authorization: accessToken ? `Bearer ${accessToken}` : '',
         },
-        heartbeatTimeout: 300000, // 대화가 없는 상태 - 5분
+        heartbeatTimeout: 3600000, // 1시간
       })
 
       // 연결 성공 시 리셋

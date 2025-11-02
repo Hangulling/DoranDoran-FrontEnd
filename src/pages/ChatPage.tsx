@@ -88,9 +88,39 @@ const ChatPage: React.FC = () => {
 
   const lastUserMsgIdRef = useRef<string | null>(null) // 마지막 사용자 메시지 ID
 
+  // 비활성 에러
+  const [inactivityError, setInactivityError] = useState(false)
+  // 비활성 타이머
+  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null)
+
   const room = useMemo(() => {
     return chatRooms.find(r => String(r.roomRouteId) === String(id))
   }, [id])
+
+  // 비활성 타이머
+  const resetInactivityTimer = useCallback(() => {
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current)
+    }
+
+    setInactivityError(false)
+
+    inactivityTimerRef.current = setTimeout(() => {
+      console.warn('[ChatPage] 5분간 활동이 없어 비활성 에러를 표시합니다.')
+      setInactivityError(true)
+    }, 300000)
+  }, [])
+
+  useEffect(() => {
+    resetInactivityTimer() // 마운트 시 타이머 시작
+
+    return () => {
+      // 언마운트 시 타이머 완전 제거
+      if (inactivityTimerRef.current) {
+        clearTimeout(inactivityTimerRef.current)
+      }
+    }
+  }, [resetInactivityTimer])
 
   // 채팅방 진입 시(새로고침 포함) 이전 대화 기록을 불러오는 useEffect
   useEffect(() => {
@@ -332,6 +362,8 @@ const ChatPage: React.FC = () => {
 
   // 메시지 전송
   const handleSendMessage = async (text: string) => {
+    resetInactivityTimer() // 타이머 리셋
+
     if (!chatroomId) {
       console.error('채팅방 ID가 없습니다.')
       return
@@ -368,6 +400,7 @@ const ChatPage: React.FC = () => {
   // SSE 이벤트
   const handleSseEvent = useCallback(
     (eventType: string, data: unknown) => {
+      resetInactivityTimer() // 타이머 리셋
       setSseError(null) // 이벤트 수신되면 에러 초기화
 
       switch (eventType) {
@@ -442,13 +475,18 @@ const ChatPage: React.FC = () => {
           break
       }
     },
-    [room, isNewChat]
+    [room, isNewChat, resetInactivityTimer]
   )
 
   // useChatStream 호출
   useChatStream<EventDataMap>(chatroomId ?? '', userId, accessToken, handleSseEvent, e => {
-    console.error('SSE Error', e)
+    console.error('SSE Error (Network/Server)', e)
     setSseError('SSE 연결 중 오류가 발생했습니다.')
+
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current)
+    }
+    setInactivityError(false) // 비활성 에러 숨김
   })
 
   // 채팅방 나가기
@@ -804,6 +842,17 @@ const ChatPage: React.FC = () => {
                   <ChatBubble
                     avatarUrl={room?.avatar}
                     message={'Failed to load AI response'}
+                    isSender={false}
+                    variant={'error'}
+                    showIcon={false}
+                  />
+                )}
+
+                {/* 5분 비활성 에러 */}
+                {inactivityError && (
+                  <ChatBubble
+                    avatarUrl={room?.avatar}
+                    message={'Knock knock'}
                     isSender={false}
                     variant={'error'}
                     showIcon={false}
