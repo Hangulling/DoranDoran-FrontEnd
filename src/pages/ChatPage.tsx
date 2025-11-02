@@ -33,6 +33,8 @@ import ReactGA from 'react-ga4'
 const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
 const IS_PROD = import.meta.env.PROD
 
+const LoadingDot = () => <span className="loading loading-dots loading-[5px] text-gray-200" />
+
 interface EnrichedMessage extends Message {
   correction?: IntimacyAnalysisData | null // 교정 데이터 저장
   vocabularyData?: VocabularyExtractedData | null // 어휘 데이터 저장
@@ -85,12 +87,44 @@ const ChatPage: React.FC = () => {
   const [sseError, setSseError] = useState<string | null>(null)
   const hasLeftRef = useRef(false)
 
+  const [isAiResponding, setIsAiResponding] = useState(false)
+  const pendingVocabularyRef = useRef<VocabularyExtractedData | null>(null)
+
   const lastUserMsgIdRef = useRef<string | null>(null) // 마지막 사용자 메시지 ID
-  const lastAiMsgIdRef = useRef<string | null>(null) // 마지막 AI 메시지 ID
+
+  // 비활성 에러
+  const [inactivityError, setInactivityError] = useState(false)
+  // 비활성 타이머
+  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const room = useMemo(() => {
     return chatRooms.find(r => String(r.roomRouteId) === String(id))
   }, [id])
+
+  // 비활성 타이머
+  const resetInactivityTimer = useCallback(() => {
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current)
+    }
+
+    setInactivityError(false)
+
+    inactivityTimerRef.current = setTimeout(() => {
+      console.warn('5분간 활동이 없어 비활성 에러 표시')
+      setInactivityError(true)
+    }, 300000)
+  }, [])
+
+  useEffect(() => {
+    resetInactivityTimer() // 마운트 시 타이머 시작
+
+    return () => {
+      // 언마운트 시 타이머 완전 제거
+      if (inactivityTimerRef.current) {
+        clearTimeout(inactivityTimerRef.current)
+      }
+    }
+  }, [resetInactivityTimer])
 
   // 채팅방 진입 시(새로고침 포함) 이전 대화 기록을 불러오는 useEffect
   useEffect(() => {
@@ -366,6 +400,8 @@ const ChatPage: React.FC = () => {
 
   // 메시지 전송
   const handleSendMessage = async (text: string) => {
+    resetInactivityTimer() // 타이머 리셋
+
     if (!chatroomId) {
       console.error('채팅방 ID가 없습니다.')
       return
@@ -398,14 +434,18 @@ const ChatPage: React.FC = () => {
         analysisState: 'pending', // 명시적
       }
       setMessages(prevMessages => [...prevMessages, newMessage])
+
+      setIsAiResponding(true)
     } catch (error) {
       console.error('메시지 전송 실패:', error)
+      setIsAiResponding(false)
     }
   }
 
   // SSE 이벤트
   const handleSseEvent = useCallback(
     (eventType: string, data: unknown) => {
+      resetInactivityTimer() // 타이머 리셋
       setSseError(null) // 이벤트 수신되면 에러 초기화
 
       switch (eventType) {
@@ -422,6 +462,11 @@ const ChatPage: React.FC = () => {
         }
         case 'conversation_complete': {
           const conversationData = data as EventDataMap['conversation_complete']
+          // Ref에 저장된 어휘 데이터
+          const vocabData = pendingVocabularyRef.current
+
+          // AI 답장 + 어휘 동시 렌더링
+          setIsAiResponding(false) // 로딩 종료
 
           if (IS_PROD && GA_ENABLED && chatroomId) {
             ReactGA.event('send_ai_reply', {
@@ -438,8 +483,11 @@ const ChatPage: React.FC = () => {
             avatarUrl: room?.avatar ?? '',
             variant: 'basic',
             showIcon: true,
+            vocabularyData: vocabData,
           }
           setMessages(prev => [...prev, newAiMessage])
+
+          pendingVocabularyRef.current = null // 대기 데이터 비우기
           break
         }
         case 'intimacy_analysis': {
@@ -479,17 +527,8 @@ const ChatPage: React.FC = () => {
         }
         case 'vocabulary_extracted': {
           const vocabData = data as VocabularyExtractedData
-          const targetMsgId = lastAiMsgIdRef.current
-          if (!targetMsgId) break
-          setMessages(prev =>
-            prev.map(msg => {
-              if (msg.id === targetMsgId) {
-                return { ...msg, vocabularyData: vocabData }
-              }
-              return msg
-            })
-          )
-          lastAiMsgIdRef.current = null
+          // 데이터를 임시 Ref에 저장
+          pendingVocabularyRef.current = vocabData
           break
         }
         default: // 예상 못한 이벤트 처리
@@ -497,13 +536,18 @@ const ChatPage: React.FC = () => {
           break
       }
     },
-    [room, isNewChat, chatroomId]
+  [room, isNewChat, resetInactivityTimer, chatroomId]
   )
 
   // useChatStream 호출
   useChatStream<EventDataMap>(chatroomId ?? '', userId, accessToken, handleSseEvent, e => {
-    console.error('SSE Error', e)
+    console.error('SSE Error (Network/Server)', e)
     setSseError('SSE 연결 중 오류가 발생했습니다.')
+
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current)
+    }
+    setInactivityError(false) // 비활성 에러 숨김
   })
 
   // 채팅방 나가기
@@ -841,11 +885,35 @@ const ChatPage: React.FC = () => {
                   </div>
                 )
               })}
+              {/* AI 응답 로딩 버블 */}
+              {isAiResponding && (
+                <div className="mt-5">
+                  <ChatBubble
+                    message={<LoadingDot />}
+                    isSender={false}
+                    avatarUrl={room?.avatar}
+                    variant={'basic'}
+                    showIcon={false}
+                  />
+                </div>
+              )}
+
               <div className="mt-5">
                 {sseError && (
                   <ChatBubble
                     avatarUrl={room?.avatar}
                     message={'Failed to load AI response'}
+                    isSender={false}
+                    variant={'error'}
+                    showIcon={false}
+                  />
+                )}
+
+                {/* 5분 비활성 에러 */}
+                {inactivityError && (
+                  <ChatBubble
+                    avatarUrl={room?.avatar}
+                    message={'Knock knock'}
                     isSender={false}
                     variant={'error'}
                     showIcon={false}
@@ -859,7 +927,11 @@ const ChatPage: React.FC = () => {
       </div>
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
       <footer className="shrink-0">
-        <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
+        <ChatFooter
+          inputRef={inputRef}
+          onSendMessage={handleSendMessage}
+          isAiResponding={isAiResponding}
+        />
       </footer>
       <ExitModal open={isModalOpen} onConfirm={handleConfirm} onCancel={handleCancel} />
     </div>

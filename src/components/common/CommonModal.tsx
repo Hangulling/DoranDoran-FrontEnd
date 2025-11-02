@@ -32,9 +32,13 @@ const CommonModal: React.FC<CommonModalProps> = ({
         <h3 className="text-title text-[18px] mb-1">{title}</h3>
         {Array.isArray(description) ? (
           <div className="text-[14px] text-center">
-            {description.map((line, idx) => (
-              <p key={idx}>{line}</p>
-            ))}
+            {description.map((line, idx) =>
+              typeof line === 'string' ? (
+                <p key={idx}>{line}</p>
+              ) : React.isValidElement(line) ? (
+                React.cloneElement(line, { key: idx })
+              ) : null
+            )}
           </div>
         ) : (
           <p className="text-[14px] text-center">{description}</p>

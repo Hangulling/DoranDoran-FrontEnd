@@ -18,7 +18,13 @@ const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
 const IS_PROD = import.meta.env.PROD
 
 const LOGOUT_DESC = ['You can log in again anytime.']
-const SIGNOUT_DESC = ['This action cannot be undone.', 'Are you sure you want to continue?']
+const SIGNOUT_DESC_JSX = [
+  '1. This action cannot be undone.',
+  '2. It is not possible to sign up again with a withdrawn email.',
+  <span key="confirm" className="text-orange-400">
+    Are you sure you want to continue?
+  </span>,
+]
 
 const menuBtn =
   'flex items-center justify-between px-5 py-4 w-full focus:bg-green-80 hover:bg-green-80'
@@ -198,7 +204,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       <CommonModal
         open={modalOpen}
         title={modalType === 'logout' ? 'Logout' : 'Delete Account'}
-        description={modalType === 'logout' ? LOGOUT_DESC : SIGNOUT_DESC}
+        description={modalType === 'logout' ? LOGOUT_DESC : SIGNOUT_DESC_JSX}
         confirmText={modalType === 'logout' ? 'Log out' : 'Delete'}
         cancelText="keep"
         onConfirm={handleConfirm}
