@@ -28,6 +28,10 @@ import useClosenessStore from '../stores/useClosenessStore'
 import { getClosenessAsText } from '../utils/conceptMap'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import showToast from '../components/common/CommonToast'
+import ReactGA from 'react-ga4'
+
+const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
+const IS_PROD = import.meta.env.PROD
 
 const LoadingDot = () => <span className="loading loading-dots loading-[5px] text-gray-200" />
 
@@ -258,11 +262,36 @@ const ChatPage: React.FC = () => {
     fetchHistory()
   }, [chatroomId, userId, room?.avatar, id, navigate]) // chatroomId, userId가 확정되면 한 번만 실행
 
+  useEffect(() => {
+    if (IS_PROD && GA_ENABLED && chatroomId && userId) {
+      const yyyyMmDd = new Date().toISOString().slice(0, 10)
+      ReactGA.event('view_chatroom', {
+        chatroom_id: chatroomId,
+        user_id: userId,
+        date: yyyyMmDd,
+      })
+    }
+  }, [chatroomId, userId]) // chatroomId와 userId가 확정되면 1회 실행
+
   // 봇/가이드 메시지 도착
   useEffect(() => {
     // 봇 메시지와 가이드 메시지가 모두 도착하면 'complete'
-    if (greetingMsg1 && greetingMsg2) {
+    const checkCompletion = (botMsg: string, guideMsg: string | null) => {
+      // 'loading' 상태는 isNewChat == true일 때만 설정됨
+      if (greetingState !== 'loading') return // 중복 실행 방지
+
+      if (IS_PROD && GA_ENABLED && chatroomId) {
+        ReactGA.event('send_greeting_message', {
+          chatroom_id: chatroomId,
+          bot_message: botMsg,
+          guide_message: guideMsg ?? '', // 가이드 메시지는 없을 수 있음
+        })
+      }
       setGreetingState('complete')
+    }
+
+    if (greetingMsg1 && greetingMsg2) {
+      checkCompletion(greetingMsg1, greetingMsg2)
       return
     }
 
@@ -284,7 +313,7 @@ const ChatPage: React.FC = () => {
     return () => {
       if (timer) clearTimeout(timer)
     }
-  }, [greetingMsg1, greetingMsg2, greetingState])
+  }, [greetingMsg1, greetingMsg2, greetingState, chatroomId])
 
   // 코치 마크 조회 확인
   useEffect(() => {
@@ -323,7 +352,7 @@ const ChatPage: React.FC = () => {
     }
   }
 
-  // 다시 보지 않기 설정을 스토어에 동기화
+  // 다시 보지 않기 설정을 스토어에 동기화 -> 수정해야함
   useEffect(() => {
     const fetchUserExitSetting = async () => {
       if (!userId) return
@@ -341,9 +370,18 @@ const ChatPage: React.FC = () => {
     fetchUserExitSetting()
   }, [userId, setNoShowAgain])
 
+  // OS 뒤로가기
   useEffect(() => {
     window.history.pushState(null, '', window.location.href)
     const handlePopState = () => {
+      if (IS_PROD && GA_ENABLED && chatroomId) {
+        ReactGA.event('click_previous', {
+          chatroom_id: chatroomId,
+          user_id: userId,
+          previous_button: 'browser_os_back', // "브라우저/OS 뒤로가기"로 기록
+        })
+      }
+
       if (noShowAgain) {
         const storageKey = `initChat_${id}`
         sessionStorage.removeItem(storageKey)
@@ -358,7 +396,7 @@ const ChatPage: React.FC = () => {
     return () => {
       window.removeEventListener('popstate', handlePopState)
     }
-  }, [navigate, noShowAgain, id])
+  }, [navigate, noShowAgain, id, chatroomId, userId])
 
   // 메시지 전송
   const handleSendMessage = async (text: string) => {
@@ -374,6 +412,13 @@ const ChatPage: React.FC = () => {
         content: text,
         contentType: 'text',
       })
+
+      if (IS_PROD && GA_ENABLED) {
+        ReactGA.event('send_user_message', {
+          chatroom_id: chatroomId,
+          user_message: text,
+        })
+      }
 
       useUserMsgStore.getState().addUserMsg({
         id: response.id,
@@ -423,6 +468,14 @@ const ChatPage: React.FC = () => {
           // AI 답장 + 어휘 동시 렌더링
           setIsAiResponding(false) // 로딩 종료
 
+          if (IS_PROD && GA_ENABLED && chatroomId) {
+            ReactGA.event('send_ai_reply', {
+              chatroom_id: chatroomId,
+              ai_message: conversationData.content,
+            })
+          }
+
+          lastAiMsgIdRef.current = conversationData.messageId
           const newAiMessage: EnrichedMessage = {
             id: conversationData.messageId,
             text: conversationData.content,
@@ -439,6 +492,14 @@ const ChatPage: React.FC = () => {
         }
         case 'intimacy_analysis': {
           const intimacyData = data as IntimacyAnalysisData
+
+          if (IS_PROD && GA_ENABLED && chatroomId && intimacyData.correctedSentence) {
+            ReactGA.event('send_ai_intimacy', {
+              chatroom_id: chatroomId,
+              intimacy_message: intimacyData.correctedSentence,
+            })
+          }
+
           const targetMsgId = lastUserMsgIdRef.current // ref에서 마지막 사용자 ID 가져오기
           if (!targetMsgId) break
           setMessages(prev =>
@@ -475,7 +536,7 @@ const ChatPage: React.FC = () => {
           break
       }
     },
-    [room, isNewChat, resetInactivityTimer]
+  [room, isNewChat, resetInactivityTimer, chatroomId]
   )
 
   // useChatStream 호출
