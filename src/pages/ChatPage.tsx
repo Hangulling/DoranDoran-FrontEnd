@@ -817,7 +817,11 @@ const ChatPage: React.FC = () => {
       </div>
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
       <footer className="shrink-0">
-        <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
+        <ChatFooter
+          inputRef={inputRef}
+          onSendMessage={handleSendMessage}
+          isAiResponding={isAiResponding}
+        />
       </footer>
       <ExitModal open={isModalOpen} onConfirm={handleConfirm} onCancel={handleCancel} />
     </div>
