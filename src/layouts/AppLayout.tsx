@@ -142,9 +142,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </header>
       )}
       {!isPublicPage && <SessionAutoLogout />}
-      <main id="app-scroll" className="flex-grow min-h-0 h-full overflow-y-auto">
-        {children}
-      </main>
+      <main className="flex-grow min-h-0 h-full overflow-y-auto">{children}</main>
     </div>
   )
 }
