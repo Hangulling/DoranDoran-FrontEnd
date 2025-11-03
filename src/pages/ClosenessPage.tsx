@@ -1,30 +1,47 @@
 import { useEffect, useState } from 'react'
 import DistanceSlider from '../components/chat/DistanceSlider'
 import Button from '../components/common/Button'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import useClosenessStore from '../stores/useClosenessStore'
 import { chatRooms } from '../mocks/db/chat'
+import { createChatRoom } from '../api'
+import { useUserStore } from '../stores/useUserStore'
+import useRoomIdStore from '../stores/useRoomIdStore'
+import ReactGA from 'react-ga4'
 
-const bubbleBase = 'py-[6px] px-2 text-[14px] text-gray-700 rounded-lg flex flex-col'
+const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
+const IS_PROD = import.meta.env.PROD
+
+const bubbleBase = 'py-[6px] px-2 text-[14px] text-gray-700 rounded-lg'
 const bubbleBasic =
   bubbleBase + ' bg-white border border-gray-100 max-w-[265px] rounded-tl-none relative'
-const bubbleSecond = bubbleBase + ' bg-white border border-gray-100 relative ml-10 w-[186px]'
+const bubbleSecond =
+  bubbleBase + ' bg-white border border-gray-100 relative ml-10 inline-block max-w-[210px]'
+const bubbleThird =
+  bubbleBase + ' bg-white border border-gray-100 relative ml-10 inline-block max-w-[186px]'
 
 const ClosenessPage = () => {
   const { id } = useParams()
+  const location = useLocation()
   const navigate = useNavigate()
+
+  const concept = location.state?.concept || ''
+
+  const userId = useUserStore(state => state.id)
   const closeness = useClosenessStore(state => state.closenessMap[id ?? ''] ?? 1)
   const setCloseness = useClosenessStore(state => state.setCloseness)
+
   const [sliderValue, setSliderValue] = useState(closeness)
   const [touched, setTouched] = useState(false)
   const [isExiting, setIsExiting] = useState(false)
-  const room = chatRooms.find(r => String(r.roomId) === String(id))
+
+  const room = chatRooms.find(r => String(r.roomRouteId) === String(id))
 
   // 슬라이더값 initial
   useEffect(() => {
-    setSliderValue(closeness)
+    setSliderValue(1)
     setTouched(false)
-  }, [id, closeness])
+  }, [id])
 
   // 슬라이더 변경 전 버튼 비활성화
   const handleSliderChange = (val: number) => {
@@ -32,14 +49,64 @@ const ClosenessPage = () => {
     if (!touched) setTouched(true)
   }
 
+  const chatBotIdByConcept = (conceptValue: string): string => {
+    switch (conceptValue) {
+      case 'friend':
+        return '22222222-2222-2222-2222-222222222221'
+      case 'honey':
+        return '22222222-2222-2222-2222-222222222222'
+      case 'coworker':
+        return '22222222-2222-2222-2222-222222222223'
+      case 'senior':
+        return '22222222-2222-2222-2222-222222222224'
+    }
+    return ''
+  }
+
   // 확인 버튼
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!id) return
-    setCloseness(id, sliderValue)
-    setIsExiting(true) // 애니메이션 시작
-    setTimeout(() => {
-      navigate(`/chat/${id}`)
-    }, 550)
+
+    try {
+      const chatbotId = chatBotIdByConcept(concept)
+
+      let newRoom
+      try {
+        // 채팅방 생성
+        newRoom = await createChatRoom({
+          userId,
+          concept: concept,
+          chatbotId: chatbotId,
+          intimacyLevel: sliderValue,
+        })
+      } catch (error) {
+        navigate('/error', { state: { from: `/closeness/${id}` } })
+        console.error('채팅방 생성 실패:', error)
+        return
+      }
+
+      if (IS_PROD && GA_ENABLED) {
+        ReactGA.event('set_intimacy_level', {
+          chatroom_id: newRoom.id, // API에서 반환된 실제 chatroom UUID
+          user_id: userId,
+          concept: concept,
+          intimacy_level: sliderValue,
+        })
+      }
+
+      useRoomIdStore.getState().addRoomMapping(id, newRoom.id)
+      useRoomIdStore.getState().setChatbotId(id, chatbotId)
+
+      setCloseness(id, sliderValue) // store
+      setIsExiting(true) // 모션
+
+      setTimeout(() => {
+        navigate(`/chat/${id}`)
+      }, 550)
+    } catch (error) {
+      navigate('/error', { state: { from: `/closeness/${id}` } })
+      console.error('알 수 없는 에러 발생:', error)
+    }
   }
 
   return (
@@ -63,13 +130,13 @@ const ClosenessPage = () => {
             </span>
             <div className="h-[1px] bg-gray-80 w-full mb-[1px]" />
 
-            <DistanceSlider value={sliderValue} onChange={handleSliderChange} />
+            <DistanceSlider value={sliderValue} onChange={handleSliderChange} roomId={Number(id)} />
 
             <Button
               variant="primary"
               size="confirm"
               className="bg-gray-800 w-full text-subtitle mb-2"
-              disabled={!touched}
+              disabled={false}
               onClick={handleConfirm}
             >
               Confirm
@@ -78,7 +145,14 @@ const ClosenessPage = () => {
         </div>
 
         {/* 안내2 */}
-        <div className={bubbleSecond}>Leave and return to reset your closeness settings.</div>
+        <div className="flex flex-col gap-2">
+          <div className={bubbleSecond}>Slide to adjust the closeness.</div>
+          <div className={bubbleThird}>
+            Leave and return to reset
+            <br />
+            your closeness settings.
+          </div>
+        </div>
       </div>
     </div>
   )

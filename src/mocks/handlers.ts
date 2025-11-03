@@ -1,6 +1,7 @@
 import { http, passthrough } from 'msw'
 import { chatHandlers } from './handler/chatHandlers'
 import { userHandlers } from './handler/userHandlers'
+import { authHandlers } from './handler/authHandlers'
 
 // handler 추가
 export const handlers = [
@@ -10,4 +11,5 @@ export const handlers = [
   }),
   ...chatHandlers,
   ...userHandlers,
+  ...authHandlers,
 ]

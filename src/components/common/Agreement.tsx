@@ -79,7 +79,11 @@ export default function Agreement({ value, onChange }: AgreementProps) {
               aria-checked={isChecked}
             >
               <img src={getIconSrc(id, isChecked)} alt="check" className="w-5 h-5" />
-              <span className="text-gray-500 text-xs text-body">{t.label}</span>
+              <span
+                className={`${isChecked ? 'text-green-400' : 'text-gray-500'} text-xs text-body`}
+              >
+                {t.label}
+              </span>
             </button>
 
             {t.required && (

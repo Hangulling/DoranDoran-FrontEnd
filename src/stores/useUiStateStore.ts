@@ -11,21 +11,23 @@ interface ModalState {
   setNoShowAgain: (val: boolean) => void
 }
 
-export const useCoachStore = create<CoachMarkState>()(
+export const useCoachStore = create<CoachMarkState & { reset: () => void }>()(
   persist(
     set => ({
       coachMarkSeen: false,
       setCoachMarkSeen: val => set({ coachMarkSeen: val }),
+      reset: () => set({ coachMarkSeen: false }),
     }),
     { name: 'coachMark-state' }
   )
 )
 
-export const useModalStore = create<ModalState>()(
+export const useModalStore = create<ModalState & { reset: () => void }>()(
   persist(
     set => ({
       noShowAgain: false,
       setNoShowAgain: val => set({ noShowAgain: val }),
+      reset: () => set({ noShowAgain: false }),
     }),
     { name: 'modal-state' }
   )

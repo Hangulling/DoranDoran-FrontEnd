@@ -1,19 +1,27 @@
 import React, { useEffect, useRef, useState, type FC } from 'react'
 import ChatBubble from './ChatBubble'
-import DescriptionBubble from './DescriptionBubble'
-
 interface InitChatProps {
   avatar?: string
   onReady?: () => void
+  message1: string
+  message2: string
+  skipAnimation?: boolean
 }
 const LoadingDot = () => <span className="loading loading-dots loading-[5px] text-gray-200" />
 
-const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
-  const [step, setStep] = useState(0)
+const InitChat: React.FC<InitChatProps> = ({
+  avatar,
+  onReady,
+  message1,
+  message2,
+  skipAnimation = false,
+}) => {
   const lastMessageRef = useRef<HTMLDivElement>(null)
 
   const LOADING_DURATION = 600
   const PAUSE_DURATION = 700
+
+  const [step, setStep] = useState(skipAnimation ? 4 : 0)
 
   const LoadingBubble: FC<{ showAvatar?: boolean }> = ({ showAvatar }) => (
     <ChatBubble
@@ -32,6 +40,8 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
       timers.push(setTimeout(callback, duration))
     }
 
+    if (step >= 4) return
+
     switch (step) {
       case 0:
         schedule(() => setStep(1), 100)
@@ -45,61 +55,37 @@ const InitChat: React.FC<InitChatProps> = ({ avatar, onReady }) => {
       case 3: // 두 번째 버블 로딩 중
         schedule(() => setStep(4), LOADING_DURATION)
         break
-      case 4: // 두 번째 버블 완료
-        schedule(() => setStep(5), PAUSE_DURATION)
-        break
-      case 5: // 세 번째 버블 로딩 중
-        schedule(() => setStep(6), LOADING_DURATION)
-        break
-      case 6: // 렌더링 완료
-        break
     }
 
     return () => timers.forEach(clearTimeout)
   }, [step])
 
   useEffect(() => {
-    if (step === 6 && lastMessageRef.current) {
-      setTimeout(() => {
+    if (step === 4 && lastMessageRef.current) {
+      const timer = setTimeout(() => {
         console.log('onReady called')
         onReady?.()
       }, 0)
+      return () => clearTimeout(timer)
     }
   }, [step, onReady])
 
   return (
-    <div>
+    <div className="flex flex-col gap-y-2">
       {step === 1 && <LoadingBubble showAvatar={true} />}
       {step >= 2 && (
         <ChatBubble
-          message={step === 1 ? <LoadingDot /> : '배고파~ 치맥 먹으러 갈래?'}
+          message={step === 1 ? <LoadingDot /> : message1}
           isSender={false}
           avatarUrl={avatar}
           variant="basic"
-          showIcon={true}
         />
       )}
 
       {step === 3 && <LoadingBubble showAvatar={false} />}
       {step >= 4 && (
-        <DescriptionBubble
-          word="치맥"
-          pronunciation="chi-maek"
-          descriptionByTab={{
-            Kor: '맥주와 치킨을 같이 즐기는 어쩌구',
-            Eng: 'A Korean slang term for the popular pairing of fried chicken and beer (maekju).',
-          }}
-        />
-      )}
-
-      {step === 5 && <LoadingBubble showAvatar={false} />}
-      {step >= 6 && (
         <div ref={lastMessageRef}>
-          <ChatBubble
-            message={'Let’s continue the conversation about what kind of chicken you want to eat!'}
-            isSender={false}
-            variant="second"
-          />
+          {message2 && <ChatBubble message={message2} isSender={false} variant="second" />}
         </div>
       )}
     </div>

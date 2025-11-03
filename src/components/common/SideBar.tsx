@@ -5,9 +5,26 @@ import LogoutIcon from '../../assets/icon/logout.svg?react'
 import SignupIcon from '../../assets/icon/signup.svg?react'
 import type { SidebarProps } from '../../types/common'
 import CommonModal from './CommonModal'
+import { useNavigate } from 'react-router-dom'
+import { deleteUser, logout } from '../../api'
+import { useUserStore } from '../../stores/useUserStore'
+import showToast from './CommonToast'
+import useClosenessStore from '../../stores/useClosenessStore'
+import useRoomIdStore from '../../stores/useRoomIdStore'
+import { useCoachStore, useModalStore } from '../../stores/useUiStateStore'
+import ReactGA from 'react-ga4'
+
+const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
+const IS_PROD = import.meta.env.PROD
 
 const LOGOUT_DESC = ['You can log in again anytime.']
-const SIGNOUT_DESC = ['This action cannot be undone.', 'Are you sure you want to continue?']
+const SIGNOUT_DESC_JSX = [
+  '1. This action cannot be undone.',
+  '2. It is not possible to sign up again with a withdrawn email.',
+  <span key="confirm" className="text-orange-400">
+    Are you sure you want to continue?
+  </span>,
+]
 
 const menuBtn =
   'flex items-center justify-between px-5 py-4 w-full focus:bg-green-80 hover:bg-green-80'
@@ -19,6 +36,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const [modalType, setModalType] = useState<'logout' | 'signup' | null>(null)
   const [visible, setVisible] = useState(isOpen)
   const [isActive, setIsActive] = useState(false)
+  const userId = useUserStore(state => state.id)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (isOpen) {
@@ -36,26 +55,93 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   // 로그아웃 버튼 클릭 시
   const openLogoutModal = () => {
+    if (IS_PROD && GA_ENABLED) {
+      ReactGA.event('click_logout')
+    }
+
     setModalType('logout')
     setModalOpen(true)
   }
   // 회원탈퇴 버튼 클릭 시
   const openSignupModal = () => {
+    if (IS_PROD && GA_ENABLED) {
+      ReactGA.event('click_delete_account')
+    }
+
     setModalType('signup')
     setModalOpen(true)
   }
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (modalType === 'logout') {
-      console.log('로그아웃')
+      try {
+        await logout()
+
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.event('confirm_logout')
+          ReactGA.set({ userId: null }) // GA User-ID 초기화
+        }
+
+        useUserStore.getState().reset() // 상태 초기화
+        useClosenessStore.getState().reset()
+        useRoomIdStore.getState().reset()
+        useCoachStore.getState().reset()
+        useModalStore.getState().reset()
+        onClose()
+        navigate('/login')
+      } catch (error) {
+        showToast({ message: 'Failed to log out. Please try again', iconType: 'error' })
+        console.error('로그아웃 실패:', error)
+      }
     } else if (modalType === 'signup') {
-      console.log('회원탈퇴')
+      try {
+        await deleteUser(userId)
+
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.event('confirm_delete_account')
+          ReactGA.set({ userId: null }) // GA User-ID 초기화
+        }
+
+        useUserStore.getState().reset()
+        useClosenessStore.getState().reset()
+        useRoomIdStore.getState().reset()
+        useCoachStore.getState().reset()
+        useModalStore.getState().reset()
+        onClose()
+        navigate('/login')
+      } catch (error) {
+        showToast({ message: 'Failed to delete account. Please try again', iconType: 'error' })
+        console.error('회원 탈퇴 실패:', error)
+      }
     }
     setModalOpen(false)
   }
 
   const handleCancel = () => {
     setModalOpen(false)
+  }
+
+  const openAboutPdf = () => {
+    onClose()
+    const pdfUrl = `${import.meta.env.BASE_URL}docs/${encodeURIComponent('도란도란 서비스 소개서.pdf')}`
+    window.open(pdfUrl, '_blank', 'noopener,noreferrer')
+  }
+
+  const goPolicy = (term: 'service' | 'privacy') => {
+    onClose()
+    navigate(`/policy/${term}`, {
+      state: { hideConfirm: true, from: 'sidebar' },
+    })
+  }
+
+  const goForm = () => {
+    if (IS_PROD && GA_ENABLED) {
+      ReactGA.event('click_contact_us', {
+        destination_url: 'https://forms.gle/dRBuvgKjwK7enscy6',
+      })
+    }
+    onClose()
+    window.open('https://forms.gle/dRBuvgKjwK7enscy6', '_blank')
   }
 
   return (
@@ -70,7 +156,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       />
       {/* 사이드바 */}
       <div
-        className={`absolute top-0 left-0 z-60 bg-[#fafafa] h-screen w-[303px] transform transition-transform duration-300 ease-in-out ${
+        className={`absolute top-0 left-0 z-60 bg-[#fafafa] h-full w-[303px] transform transition-transform duration-300 ease-in-out ${
           isActive ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -82,16 +168,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="flex flex-col h-full pb-[env(safe-area-inset-bottom)]">
           {/* 메뉴 리스트 */}
           <div className="flex flex-col gap-y-1 mt-20 py-2 text-[14px] border-t border-b border-gray-80">
-            <button className={menuBtn}>
+            <button className={menuBtn} onClick={openAboutPdf}>
               About the Service
               <img src={RightArrowIcon} />
             </button>
-            <button className={menuBtn}>
+            <button className={menuBtn} onClick={() => goPolicy('service')}>
               Terms of Service
               <img src={RightArrowIcon} />
             </button>
-            <button className={menuBtn}>
+            <button className={menuBtn} onClick={() => goPolicy('privacy')}>
               Privacy Policy
+              <img src={RightArrowIcon} />
+            </button>
+            <button className={menuBtn} onClick={() => goForm()}>
+              Contact Us
               <img src={RightArrowIcon} />
             </button>
           </div>
@@ -109,11 +199,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
       </div>
+
       {/* 모달 */}
       <CommonModal
         open={modalOpen}
         title={modalType === 'logout' ? 'Logout' : 'Delete Account'}
-        description={modalType === 'logout' ? LOGOUT_DESC : SIGNOUT_DESC}
+        description={modalType === 'logout' ? LOGOUT_DESC : SIGNOUT_DESC_JSX}
         confirmText={modalType === 'logout' ? 'Log out' : 'Delete'}
         cancelText="keep"
         onConfirm={handleConfirm}

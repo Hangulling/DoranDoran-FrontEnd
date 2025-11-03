@@ -7,12 +7,11 @@ export const userHandlers = [
   //내 프로필 조회
   http.get(`${BODY}/me`, () => {
     return HttpResponse.json({
+      id: userProfile.id,
       email: userProfile.email,
       name: userProfile.name,
-      password: userProfile.password,
       firstName: userProfile.firstName,
       lastName: userProfile.lastName,
-      preferences: userProfile.preferences,
       createdAt: userProfile.createdAt.toISOString(),
       updatedAt: userProfile.updatedAt.toISOString(),
     })
@@ -20,14 +19,12 @@ export const userHandlers = [
 
   // 이름 및 설정 수정 (추가 기능)
   http.put(`${BODY}/me`, async ({ request }) => {
-    const { name, preferences } = (await request.json()) as {
+    const { name } = (await request.json()) as {
       name: string
-      preferences: string
     }
 
     // 사용자 프로필 데이터 업데이트
     userProfile.name = name
-    userProfile.preferences = preferences
     userProfile.updatedAt = new Date()
 
     return HttpResponse.json({ message: '업데이트 완료' })

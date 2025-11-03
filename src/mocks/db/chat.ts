@@ -1,31 +1,31 @@
 // 채팅방
 export const chatRooms = [
   {
-    roomId: 1,
-    roomName: 'Senior',
+    roomRouteId: 1,
+    roomName: 'friend',
     avatar: '/chat/school.svg',
-    message: '족보 필요하면 연락해~!',
+    message: '반가워요! 우리 대화를 시작해 볼까요?',
     intimacy: 1,
   },
   {
-    roomId: 2,
-    roomName: 'Honey',
+    roomRouteId: 2,
+    roomName: 'honey',
     avatar: '/chat/lover.svg',
-    message: '자기 어디야?',
+    message: '반가워요! 우리 대화를 시작해 볼까요?',
     intimacy: 1,
   },
   {
-    roomId: 3,
-    roomName: 'Coworker',
+    roomRouteId: 3,
+    roomName: 'coworker',
     avatar: '/chat/company.svg',
-    message: '수정 사항 완료 되었나요?',
+    message: '반가워요! 우리 대화를 시작해 볼까요?',
     intimacy: 1,
   },
   {
-    roomId: 4,
-    roomName: 'Client',
+    roomRouteId: 4,
+    roomName: 'senior',
     avatar: '/chat/client.svg',
-    message: '내일 미팅 10시 괜찮으세요?',
+    message: '반가워요! 우리 대화를 시작해 볼까요?',
     intimacy: 1,
   },
 ]
