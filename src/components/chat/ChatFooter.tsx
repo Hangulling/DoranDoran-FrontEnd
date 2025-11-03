@@ -139,8 +139,8 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabl
   const isButtonDisabled = disabled || !inputValue.trim()
 
   return (
-    <div className="relative bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
-      <div className="absolute bottom-full w-full left-0 flex justify-center">
+    <div className="sticky bottom-0 bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
+      <div className="relative bottom-full left-0 w-full flex justify-center">
         {toast && (
           <div
             className={`mx-[20px] ${isToastVisible ? 'toast-slide-fade-in' : 'toast-slide-fade-out'}`}
