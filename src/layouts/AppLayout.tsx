@@ -131,10 +131,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   return (
     <div
-      className="relative mx-auto flex w-full max-w-md flex-col"
-      style={{
-        height: isOpen ? `${viewportHeight}px` : '100dvh',
-      }}
+      className="relative mx-auto flex w-full max-w-md flex-col h-full"
     >
       <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
 
