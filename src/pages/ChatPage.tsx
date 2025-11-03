@@ -29,6 +29,7 @@ import { getClosenessAsText } from '../utils/conceptMap'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import showToast from '../components/common/CommonToast'
 import ReactGA from 'react-ga4'
+import { useIsOpenKeyboard } from '../hooks/useIsOpenKeyboard'
 
 const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
 const IS_PROD = import.meta.env.PROD
@@ -62,6 +63,9 @@ const ChatPage: React.FC = () => {
   const navigate = useNavigate()
   const { id } = useParams()
   const chatbotId = chatBotIdByRoom(id ?? '')
+  const { isOpen } = useIsOpenKeyboard()
+  const noShowAgain = useModalStore(state => state.noShowAgain)
+  const setNoShowAgain = useModalStore(state => state.setNoShowAgain)
   const [messages, setMessages] = useState<EnrichedMessage[]>([]) // 확장
   const [isHistoryLoading, setIsHistoryLoading] = useState(true)
   const [isInitChatReady, setIsInitChatReady] = useState(false)
@@ -73,8 +77,6 @@ const ChatPage: React.FC = () => {
   const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
   const [showCoachMark, setShowCoachMark] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const noShowAgain = useModalStore(state => state.noShowAgain)
-  const setNoShowAgain = useModalStore(state => state.setNoShowAgain)
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
@@ -91,6 +93,7 @@ const ChatPage: React.FC = () => {
   const pendingVocabularyRef = useRef<VocabularyExtractedData | null>(null)
 
   const lastUserMsgIdRef = useRef<string | null>(null) // 마지막 사용자 메시지 ID
+  const lastAiMsgIdRef = useRef<string | null>(null)
 
   // 비활성 에러
   const [inactivityError, setInactivityError] = useState(false)
@@ -441,6 +444,17 @@ const ChatPage: React.FC = () => {
       setIsAiResponding(false)
     }
   }
+
+  // 아래로 스크롤
+  const scrollToBottom = useCallback(() => {
+    if (chatMainRef.current) {
+      chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
+    }
+  }, [])
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages, scrollToBottom, isOpen])
 
   // SSE 이벤트
   const handleSseEvent = useCallback(
