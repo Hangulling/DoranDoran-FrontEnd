@@ -105,7 +105,6 @@ const MainPage = () => {
     if (IS_PROD && GA_ENABLED) {
       ReactGA.event('enter_chatroom', {
         user_id: userId,
-        // chatroom_id: id.toString(), // 얻을 수 없는 정보
         concept: roomName, // 'friend', 'honey' 등
       })
     }

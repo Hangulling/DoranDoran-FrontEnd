@@ -36,7 +36,7 @@ if (import.meta.env.PROD && GA_TRACKING_ID && GA_ENABLED) {
 }
 
 const isDev = import.meta.env.DEV
-const USE_MSW = import.meta.env.VITE_USE_MSW === 'false'
+const USE_MSW = import.meta.env.VITE_USE_MSW === 'true' // 환경변수에 false 변경
 
 const prepare = async () => {
   if (isDev && USE_MSW) {
