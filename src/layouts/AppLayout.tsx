@@ -6,7 +6,6 @@ import ClosenessBar from '../components/chat/ClosenessBar'
 import { useEffect, useState } from 'react'
 import Sidebar from '../components/common/SideBar'
 import SessionAutoLogout from '../components/common/SessionAutoLogout'
-import { useIsOpenKeyboard } from '../hooks/useIsOpenKeyboard'
 import { startIdleTimer, stopIdleTimer } from '../utils/idleTimer'
 
 interface AppLayoutProps {
@@ -35,7 +34,6 @@ const showBookmarkPaths = ['/']
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { isOpen, viewportHeight } = useIsOpenKeyboard()
   const toggleSidebar = () => setSidebarOpen(open => !open)
   const location = useLocation()
   const pathname = location.pathname
@@ -130,9 +128,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   ].join(' ')
 
   return (
-    <div
-      className="relative mx-auto flex w-full max-w-md flex-col h-full"
-    >
+    <div className="relative mx-auto flex h-full w-full max-w-md flex-col overflow-x-hidden">
       <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
 
       {!hideNavBar && (
@@ -148,7 +144,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </header>
       )}
       {!isPublicPage && <SessionAutoLogout />}
-      <main className={mainClasses}>{children}</main>
+      <main className="flex-grow min-h-0 overflow-y-auto">{children}</main>
     </div>
   )
 }
