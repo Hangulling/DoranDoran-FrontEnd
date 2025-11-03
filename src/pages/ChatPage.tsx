@@ -91,7 +91,8 @@ const ChatPage: React.FC = () => {
   const pendingVocabularyRef = useRef<VocabularyExtractedData | null>(null)
 
   const lastUserMsgIdRef = useRef<string | null>(null) // 마지막 사용자 메시지 ID
-
+  const lastAiMsgIdRef = useRef<string | null>(null)
+  
   // 비활성 에러
   const [inactivityError, setInactivityError] = useState(false)
   // 비활성 타이머
