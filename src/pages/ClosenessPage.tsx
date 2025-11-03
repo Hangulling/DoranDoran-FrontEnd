@@ -7,6 +7,10 @@ import { chatRooms } from '../mocks/db/chat'
 import { createChatRoom } from '../api'
 import { useUserStore } from '../stores/useUserStore'
 import useRoomIdStore from '../stores/useRoomIdStore'
+import ReactGA from 'react-ga4'
+
+const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
+const IS_PROD = import.meta.env.PROD
 
 const bubbleBase = 'py-[6px] px-2 text-[14px] text-gray-700 rounded-lg'
 const bubbleBasic =
@@ -80,6 +84,16 @@ const ClosenessPage = () => {
         console.error('채팅방 생성 실패:', error)
         return
       }
+
+      if (IS_PROD && GA_ENABLED) {
+        ReactGA.event('set_intimacy_level', {
+          chatroom_id: newRoom.id, // API에서 반환된 실제 chatroom UUID
+          user_id: userId,
+          concept: concept,
+          intimacy_level: sliderValue,
+        })
+      }
+
       useRoomIdStore.getState().addRoomMapping(id, newRoom.id)
       useRoomIdStore.getState().setChatbotId(id, chatbotId)
 
