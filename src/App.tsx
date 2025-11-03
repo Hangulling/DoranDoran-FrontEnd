@@ -8,7 +8,7 @@ import { Toaster } from 'react-hot-toast'
 function App() {
   // const { isOpen, viewportHeight } = useIsOpenKeyboard()
 
-  //  useEffect(() => {
+  // useEffect(() => {
   //   if (isOpen) {
   //     document.body.style.height = `${viewportHeight}px`
   //   } else {
