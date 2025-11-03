@@ -1,4 +1,5 @@
 import type { LoginRequest, LoginResponse } from '../types/auth'
+import { clearExpirationTimer, scheduleExpiration } from '../utils/authTimer'
 import api from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
 
@@ -7,14 +8,24 @@ let currentUserId: string | null = null
 export async function login(data: LoginRequest) {
   const res = await api.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, data)
   const { data: resData } = res.data
+  const { accessToken, refreshToken } = resData
 
-  if (resData.accessToken) localStorage.setItem('accessToken', resData.accessToken)
-  if (resData.refreshToken) localStorage.setItem('refreshToken', resData.refreshToken)
+  if (accessToken) {
+    localStorage.setItem('accessToken', accessToken)
+    // 로그인 성공 시, 1분 전 타이머 설정
+    scheduleExpiration(accessToken)
+  }
 
+  if (refreshToken) {
+    localStorage.setItem('refreshToken', refreshToken)
+  }
   return res.data
 }
 
 export async function logout() {
+  // 로그아웃 시 만료 타이머 제거
+  clearExpirationTimer()
+
   localStorage.setItem('session:manualLogout', '1')
 
   try {
