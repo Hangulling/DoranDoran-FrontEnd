@@ -1,5 +1,4 @@
 import type { LoginRequest, LoginResponse } from '../types/auth'
-import { clearExpirationTimer } from '../utils/authTimer'
 import api from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
 
@@ -22,9 +21,6 @@ export async function login(data: LoginRequest) {
 }
 
 export async function logout() {
-  // 로그아웃 시 만료 타이머 제거
-  clearExpirationTimer()
-
   localStorage.setItem('session:manualLogout', '1')
 
   try {

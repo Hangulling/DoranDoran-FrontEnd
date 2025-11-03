@@ -2,7 +2,6 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './styles/index.css'
-import { setupIdleTimer } from './utils/idleTimer.ts'
 import React from 'react'
 
 import ReactGA from 'react-ga4'
@@ -45,8 +44,6 @@ const prepare = async () => {
     await worker.start()
   }
 }
-
-setupIdleTimer() // 비활성 타이머
 
 prepare().then(() => {
   const container = document.getElementById('root')!

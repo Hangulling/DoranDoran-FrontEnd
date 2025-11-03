@@ -3,9 +3,10 @@ import { useLocation, useMatch } from 'react-router-dom'
 import NavBar from '../components/common/NavBar'
 import useArchiveStore from '../stores/useArchiveStore'
 import ClosenessBar from '../components/chat/ClosenessBar'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Sidebar from '../components/common/SideBar'
 import SessionAutoLogout from '../components/common/SessionAutoLogout'
+import { startIdleTimer, stopIdleTimer } from '../utils/idleTimer'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -52,6 +53,26 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const isUnknownPath = !isKnownPath
 
   const skipNavPaths = ['/login', '/error']
+
+  // 로그인 필요없는 페이지
+  const isPublicPage =
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/signup') ||
+    pathname.startsWith('/policy') ||
+    pathname.startsWith('/error') ||
+    isUnknownPath
+
+  // 비활성 타이머 로직
+  useEffect(() => {
+    if (isPublicPage) {
+      stopIdleTimer()
+    } else {
+      startIdleTimer()
+    }
+    return () => {
+      stopIdleTimer()
+    }
+  }, [isPublicPage]) // 경로가 바뀔 때마다 실행
 
   const isMain = pathname === '/'
 
@@ -113,7 +134,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           {closenessId && <ClosenessBar chatRoomId={closenessId} />}
         </header>
       )}
-      <SessionAutoLogout />
+      {!isPublicPage && <SessionAutoLogout />}
       <main id="app-scroll" className="flex-grow min-h-0 overflow-y-auto">
         {children}
       </main>

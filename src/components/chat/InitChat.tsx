@@ -3,7 +3,7 @@ import ChatBubble from './ChatBubble'
 interface InitChatProps {
   avatar?: string
   onReady?: () => void
-  message1: string
+  message1: string | null
   message2: string
   skipAnimation?: boolean
 }
@@ -19,9 +19,9 @@ const InitChat: React.FC<InitChatProps> = ({
   const lastMessageRef = useRef<HTMLDivElement>(null)
 
   const LOADING_DURATION = 600
-  const PAUSE_DURATION = 700
 
-  const [step, setStep] = useState(skipAnimation ? 4 : 0)
+  // skipAnimation이 true이면 4, 아니면 1에서 즉시 시작
+  const [step, setStep] = useState(skipAnimation || (message1 && message2) ? 4 : 1)
 
   const LoadingBubble: FC<{ showAvatar?: boolean }> = ({ showAvatar }) => (
     <ChatBubble
@@ -34,34 +34,31 @@ const InitChat: React.FC<InitChatProps> = ({
   )
 
   useEffect(() => {
-    const timers: NodeJS.Timeout[] = []
-
-    const schedule = (callback: () => void, duration: number) => {
-      timers.push(setTimeout(callback, duration))
+    if (skipAnimation) {
+      setStep(4)
+      return
     }
 
     if (step >= 4) return
 
     switch (step) {
-      case 0:
-        schedule(() => setStep(1), 100)
-        break
       case 1: // 첫 번째 버블 로딩 중
-        schedule(() => setStep(2), LOADING_DURATION)
+        if (message1) {
+          setStep(2) // message1이 도착하면 step 2로 이동
+        }
         break
-      case 2: // 첫 번째 버블 완료
-        schedule(() => setStep(3), PAUSE_DURATION)
+
+      case 2: // 첫 번째 버블 완료 (message1 렌더링됨)
+        setStep(3)
         break
-      case 3: // 두 번째 버블 로딩 중
-        schedule(() => setStep(4), LOADING_DURATION)
+
+      case 3: // 두 번째 버블 로딩
         break
     }
-
-    return () => timers.forEach(clearTimeout)
-  }, [step])
+  }, [step, message1, skipAnimation])
 
   useEffect(() => {
-    if (step === 4 && lastMessageRef.current) {
+    if (step === 4) {
       const timer = setTimeout(() => {
         console.log('onReady called')
         onReady?.()
@@ -70,19 +67,34 @@ const InitChat: React.FC<InitChatProps> = ({
     }
   }, [step, onReady])
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null
+    // step 3일 때만 타이머 작동
+    if (step === 3) {
+      // 600ms 후에 step 4로 이동
+      timer = setTimeout(() => {
+        setStep(4)
+      }, LOADING_DURATION)
+    }
+    return () => {
+      if (timer) clearTimeout(timer)
+    }
+  }, [step])
+
   return (
     <div className="flex flex-col gap-y-2">
-      {step === 1 && <LoadingBubble showAvatar={true} />}
-      {step >= 2 && (
+      {step >= 1 && (
         <ChatBubble
-          message={step === 1 ? <LoadingDot /> : message1}
+          // 로딩 단계일 때는 로딩닷 표시
+          message={step === 1 || !message1 ? <LoadingDot /> : message1}
           isSender={false}
           avatarUrl={avatar}
           variant="basic"
         />
       )}
 
-      {step === 3 && <LoadingBubble showAvatar={false} />}
+      {step === 3 && message2 && <LoadingBubble showAvatar={false} />}
+
       {step >= 4 && (
         <div ref={lastMessageRef}>
           {message2 && <ChatBubble message={message2} isSender={false} variant="second" />}
