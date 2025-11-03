@@ -1,4 +1,4 @@
-const IDLE_TIMEOUT_MS = 3600 * 1000
+const IDLE_TIMEOUT_MS = 59 * 60 * 1000 // 59분
 
 let idleTimer: NodeJS.Timeout | null = null
 
