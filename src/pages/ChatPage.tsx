@@ -298,24 +298,19 @@ const ChatPage: React.FC = () => {
       setGreetingState('complete')
       return
     }
-
-    // 봇 메시지만 오고 가이드 메시지가 2초간 안와도 'complete' (SSE 또는 새로고침)
-    let timer: NodeJS.Timeout | null = null
-    if (greetingMsg1 && !greetingMsg2) {
-      // 즉시 완료되는 경우(새로고침)가 있으므로 타이머는 SSE 로딩 중에만
-      if (greetingState === 'loading') {
-        timer = setTimeout(() => {
-          console.warn('[SSE] Greeting guide message timeout. Rendering with bot message only.')
-          setGreetingState('complete') // 봇 메시지만이라도 렌더링
-        }, 2000)
-      } else if (greetingState !== 'pending') {
-        // (새로고침 시) 봇 메시지만 있고 가이드가 없는 경우 즉시 완료
-        setGreetingState('complete')
-      }
+    // InitChat 렌더링 시작
+    if (greetingMsg1 && greetingState === 'loading') {
+      setGreetingState('complete')
+      return
     }
-
-    return () => {
-      if (timer) clearTimeout(timer)
+    // (새로고침 시) 봇 메시지만 있고 가이드가 없는 경우 즉시 완료
+    if (
+      greetingMsg1 &&
+      !greetingMsg2 &&
+      greetingState !== 'pending' &&
+      greetingState !== 'loading'
+    ) {
+      setGreetingState('complete')
     }
   }, [greetingMsg1, greetingMsg2, greetingState])
 
@@ -790,13 +785,13 @@ const ChatPage: React.FC = () => {
           </div>
         ) : (
           <>
-            {greetingState === 'complete' && greetingMsg1 && (
+            {(greetingState === 'loading' || greetingState === 'complete') && (
               <InitChat
                 avatar={room?.avatar}
                 onReady={() => setIsInitChatReady(true)}
-                message1={greetingMsg1} // 봇 메시지 전달
-                message2={greetingMsg2 ?? ''} // 가이드 메시지 전달 (없으면 빈칸)
-                skipAnimation={isNewChat === false} // 애니메이션 스킵 여부
+                message1={greetingMsg1}
+                message2={greetingMsg2 ?? ''}
+                skipAnimation={isNewChat === false}
               />
             )}
 
