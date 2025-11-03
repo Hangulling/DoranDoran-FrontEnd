@@ -17,7 +17,7 @@ function App() {
   // }, [isOpen, viewportHeight])
 
   return (
-    <div className="h-full w-full bg-white">
+     <div className="relative flex flex-col h-screen mx-auto w-full max-w-md bg-white">
       <Toaster position="bottom-center" />
       <AppLayout>
         <Suspense fallback={<LoadingSpinner />}>
