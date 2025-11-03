@@ -10,10 +10,6 @@ import { useAgreementStore } from '../stores/useAgreementStore'
 import { useSignupFormStore } from '../stores/useSignupStore'
 import { checkEmailExists } from '../api/auth'
 import { createUser } from '../api/user'
-import ReactGA from 'react-ga4'
-
-const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
-const IS_PROD = import.meta.env.PROD
 
 export default function SignupPage() {
   const {
@@ -217,13 +213,6 @@ export default function SignupPage() {
 
       const res = await createUser(payload)
       if (import.meta.env.DEV) console.log('🎉 회원가입 성공:', res)
-
-      // GA
-      if (IS_PROD && GA_ENABLED) {
-        ReactGA.event('sign_up', {
-          method: 'Email', // 가입 방식
-        })
-      }
 
       resetForm()
       resetAgreements()

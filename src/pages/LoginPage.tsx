@@ -10,11 +10,6 @@ import Input from '../components/common/Input'
 import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../api/auth'
 import { useUserStore } from '../stores/useUserStore'
-import ReactGA from 'react-ga4'
-
-// GA 환경 변수
-const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
-const IS_PROD = import.meta.env.PROD
 
 type ErrorKind = 'email' | 'password' | 'both' | 'general' | null
 
@@ -85,14 +80,6 @@ export default function LoginPage() {
         })
         setError(mapped.type)
         setErrorMsg(mapped.msg ?? '')
-
-        if (IS_PROD && GA_ENABLED) {
-          ReactGA.event('fail_login', {
-            user_id: email, // '시도한' user_id (이메일)
-            error_type: mapped.type ?? 'unknown_api_error', // 'email', 'password', 'both'
-          })
-        }
-
         return
       }
 
@@ -100,18 +87,6 @@ export default function LoginPage() {
       if (user) {
         setStoreId(user.id)
         setStoreName(user.name)
-
-        if (IS_PROD && GA_ENABLED) {
-          // 1. 세션의 User-ID 설정 (이후 모든 이벤트에 이 ID가 포함됨)
-          ReactGA.set({ userId: user.id })
-
-          // 2. 로그인 성공 이벤트 전송
-          const yyyyMmDd = new Date().toISOString().slice(0, 10)
-          ReactGA.event('success_login', {
-            user_id: user.id, // 파라미터로도 user_id 전송
-            date: yyyyMmDd,
-          })
-        }
       }
 
       navigate('/')
@@ -141,13 +116,6 @@ export default function LoginPage() {
         setError(mapped.type)
         setErrorMsg(mapped.msg ?? '')
         console.error('🚨 로그인 에러:', err.response?.data || err)
-
-        if (IS_PROD && GA_ENABLED) {
-          ReactGA.event('fail_login', {
-            user_id: email, // '시도한' user_id (이메일)
-            error_type: mapped.type ?? 'unknown_catch_error', // 'email', 'password', 'both'
-          })
-        }
       } else {
         navigate('/error', { replace: true, state: { code: 500, from: 'login' } })
       }

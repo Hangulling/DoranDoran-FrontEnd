@@ -7,13 +7,7 @@ interface DistanceSliderProps {
   roomId: number
 }
 
-const marksAll = [
-  { value: 1, label: 'Polite' },
-  { value: 2, label: 'Casual' },
-  { value: 3, label: 'Friendly' },
-]
-
-const marksHoney = [
+const marks = [
   { value: 1, label: 'Polite' },
   { value: 3, label: 'Friendly' },
 ]
@@ -57,33 +51,24 @@ const ClosenessSlider = styled(Slider)({
   },
 })
 
-const DistanceSlider: React.FC<DistanceSliderProps> = ({ value, onChange, roomId }) => {
-  const isHoney = roomId === 2
-  const marks = isHoney ? marksHoney : marksAll
-  const step = isHoney ? 2 : 0.01
+const DistanceSlider: React.FC<DistanceSliderProps> = ({ value, onChange }) => {
+  const step = 2
 
   const handleChange = (_: Event, newValue: number | number[]) => {
-    if (isHoney) {
-      onChange((newValue as number) < 2 ? 1 : 3)
-    } else {
-      onChange(newValue as number)
-    }
+    const val = (newValue as number) < 2 ? 1 : 3
+    onChange(val)
   }
+
   const handleChangeCommitted = (_: React.SyntheticEvent | Event, newValue: number | number[]) => {
-    if (isHoney) {
-      onChange((newValue as number) < 2 ? 1 : 3)
-    } else {
-      onChange(Math.round(newValue as number))
-    }
+    const val = (newValue as number) < 2 ? 1 : 3
+    onChange(val)
   }
 
   // 각 위치별 thumb 정렬 방식
   const thumbSX =
-    Math.round(value) === 1 // 왼쪽 끝
+    Math.round(value) === 1
       ? { left: 0, transform: 'translateY(-50%)', position: 'absolute' }
-      : Math.round(value) === 3 // 오른쪽 끝
-        ? { left: '100%', transform: 'translate(-95%, -50%)', position: 'absolute' }
-        : { left: '50%', transform: 'translate(-50%, -50%)', position: 'absolute' } // 중앙
+      : { left: '100%', transform: 'translate(-95%, -50%)', position: 'absolute' }
 
   return (
     <div
@@ -106,18 +91,8 @@ const DistanceSlider: React.FC<DistanceSliderProps> = ({ value, onChange, roomId
           '& .MuiSlider-thumb': thumbSX,
           '& .MuiSlider-markLabel': {
             color: '#A6ABAA',
-            // 기존 모든 마크 라벨에 기본 transform 덮어쓰기 방지
-            // marks가 2개면 data-index별 맞춤 transform 적용
-            ...(marks.length === 2
-              ? {
-                  '&[data-index="0"]': { transform: 'translateX(0%)' },
-                  '&[data-index="1"]': { transform: 'translateX(-100%)' }, // 3 라벨 위치
-                }
-              : {
-                  '&[data-index="0"]': { transform: 'translateX(0%)' },
-                  '&[data-index="1"]': { transform: 'translateX(-50%)' },
-                  '&[data-index="2"]': { transform: 'translateX(-100%)' },
-                }),
+            '&[data-index="0"]': { transform: 'translateX(0%)' },
+            '&[data-index="1"]': { transform: 'translateX(-100%)' },
           },
           [`& .MuiSlider-markLabel[data-index="${Math.round(value) - 1}"]`]: {
             color: '#282A2A',
