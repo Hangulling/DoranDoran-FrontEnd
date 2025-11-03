@@ -148,7 +148,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     <>
       {/* 배경 오버레이 */}
       <div
-        className={`absolute inset-0 z-50 h-screen bg-black transition-opacity duration-300 ${
+        className={`absolute inset-0 z-50 h-full bg-black transition-opacity duration-300 ${
           isActive ? 'opacity-80' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
