@@ -7,7 +7,7 @@ import CheckIcon from '../../assets/icon/checkRound.svg'
 interface ChatFooterProps {
   inputRef: RefObject<HTMLTextAreaElement | null>
   onSendMessage: (message: string) => void
-  isAiResponding: boolean
+  disabled?: boolean
 }
 
 type IconType = 'error' | 'checkRound'
@@ -36,7 +36,7 @@ const ToastMessage = ({ message, iconType }: ToastMessageProps) => {
   )
 }
 
-const ChatFooter = ({ inputRef, onSendMessage, isAiResponding }: ChatFooterProps) => {
+const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabled }) => {
   const [inputActive, setInputActive] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [textareaHeight, setTextareaHeight] = useState(SINGLE_LINE_HEIGHT)
@@ -116,7 +116,7 @@ const ChatFooter = ({ inputRef, onSendMessage, isAiResponding }: ChatFooterProps
 
   const handleSendClick = () => {
     // AI가 응답 중이거나 입력값이 없으면 전송 방지
-    if (isAiResponding || !inputValue.trim()) {
+    if (disabled || !inputValue.trim()) {
       return
     }
 
@@ -130,13 +130,13 @@ const ChatFooter = ({ inputRef, onSendMessage, isAiResponding }: ChatFooterProps
 
   // 엔터 키 이벤트
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey && !isComposing && !isAiResponding) {
+    if (e.key === 'Enter' && !e.shiftKey && !isComposing && !disabled) {
       e.preventDefault() // 줄바꿈 방지
       handleSendClick() // 메시지 전송
     }
   }
 
-  const isDisabled = !inputValue.trim() || isAiResponding
+  const isButtonDisabled = disabled || !inputValue.trim()
 
   return (
     <div className="relative bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
@@ -169,8 +169,8 @@ const ChatFooter = ({ inputRef, onSendMessage, isAiResponding }: ChatFooterProps
           }}
           className="flex-grow px-3 py-2 mr-2 border border-gray-100 bg-gray-50 rounded-[20px] focus:border-gray-100 focus:outline-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         />
-        <button onClick={handleSendClick} disabled={isDisabled}>
-          {inputActive && inputValue.trim() && !isAiResponding ? (
+        <button onClick={handleSendClick} disabled={isButtonDisabled}>
+          {!disabled && inputActive && inputValue.trim() ? (
             <img src={ActiveSend} alt="활성화된 보내기" />
           ) : (
             <img src={Send} alt="보내기" />

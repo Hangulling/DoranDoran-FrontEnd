@@ -922,7 +922,7 @@ const ChatPage: React.FC = () => {
         <ChatFooter
           inputRef={inputRef}
           onSendMessage={handleSendMessage}
-          isAiResponding={isAiResponding}
+          disabled={isHistoryLoading || !isInitChatReady || isAiResponding}
         />
       </footer>
       <ExitModal open={isModalOpen} onConfirm={handleConfirm} onCancel={handleCancel} />
