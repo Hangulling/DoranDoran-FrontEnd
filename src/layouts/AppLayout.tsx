@@ -94,9 +94,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const closenessMatch = pathname.match(/^\/chat\/(\d+)$/)
   const closenessId = closenessMatch ? closenessMatch[1] : null
 
-  const chatMatch = useMatch('/chat/:id')
-  const isChatPage = Boolean(chatMatch)
-
   // 북마크(채팅/친밀)
   const chatRoomMatch = pathname.match(/^\/(chat|closeness)\/(\d+)$/)
   const chatRoomId = chatRoomMatch ? chatRoomMatch[2] : null
@@ -121,12 +118,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     title = pageTitles[pathname] || '페이지'
   }
 
-  const mainClasses = [
-    'flex-grow',
-    'min-h-0',
-    isChatPage ? 'overflow-hidden' : 'h-full overflow-y-auto',
-  ].join(' ')
-
   return (
     <div className="relative mx-auto flex h-full w-full max-w-md flex-col overflow-x-hidden">
       <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
@@ -144,7 +135,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </header>
       )}
       {!isPublicPage && <SessionAutoLogout />}
-      <main className="flex-grow min-h-0 overflow-y-auto">{children}</main>
+      <main id="app-scroll" className="flex-grow min-h-0 overflow-y-auto">
+        {children}
+      </main>
     </div>
   )
 }
