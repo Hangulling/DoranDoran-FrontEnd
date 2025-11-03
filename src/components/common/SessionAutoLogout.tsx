@@ -36,7 +36,6 @@ export default function SessionAutoLogout() {
     useCoachStore.getState().reset()
     useModalStore.getState().reset()
 
-    // 로그인 페이지로 이동
     setOpen(false)
     openedRef.current = false
     navigate('/login', { replace: true })
