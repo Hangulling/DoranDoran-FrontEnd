@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance, type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import { AUTH_ENDPOINTS } from './endpoints'
-import { clearExpirationTimer, scheduleExpiration } from '../utils/authTimer'
+import { clearExpirationTimer } from '../utils/authTimer'
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://3.21.177.186:8080').replace(
   /\/+$/,
@@ -96,9 +96,6 @@ async function refreshAccessToken(): Promise<string | null> {
 
     tokenService.access = newAccess
     if (newRefresh) tokenService.refresh = newRefresh
-
-    // 만료 타이머 재설정
-    scheduleExpiration(newAccess)
 
     if (import.meta.env.DEV) console.log('♻️ AccessToken 재발급 완료')
     return newAccess

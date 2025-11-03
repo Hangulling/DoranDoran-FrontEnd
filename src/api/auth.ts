@@ -1,5 +1,5 @@
 import type { LoginRequest, LoginResponse } from '../types/auth'
-import { clearExpirationTimer, scheduleExpiration } from '../utils/authTimer'
+import { clearExpirationTimer } from '../utils/authTimer'
 import api from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
 
@@ -13,7 +13,6 @@ export async function login(data: LoginRequest) {
   if (accessToken) {
     localStorage.setItem('accessToken', accessToken)
     // 로그인 성공 시, 1분 전 타이머 설정
-    scheduleExpiration(accessToken)
   }
 
   if (refreshToken) {

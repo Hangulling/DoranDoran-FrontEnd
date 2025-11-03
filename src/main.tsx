@@ -2,41 +2,11 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './styles/index.css'
+import { setupIdleTimer } from './utils/idleTimer.ts'
 import React from 'react'
 
-import ReactGA from 'react-ga4'
-import AnalyticsTracker from './components/common/AnalyticsTracker.ts'
-
-const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID
-const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
-
-const urlParams = new URLSearchParams(window.location.search)
-const paramInternal = urlParams.get('internal') === 'true'
-
-if (paramInternal) {
-  sessionStorage.setItem('isInternalTraffic', 'true')
-}
-
-if (import.meta.env.PROD && GA_TRACKING_ID && GA_ENABLED) {
-  const isInternal = sessionStorage.getItem('isInternalTraffic') === 'true'
-
-  const gaConfigOptions = isInternal ? { traffic_type: 'internal' } : {}
-
-  ReactGA.initialize(GA_TRACKING_ID, {
-    gtagOptions: gaConfigOptions,
-  })
-
-  console.log(
-    isInternal
-      ? '[GA] Production GA Initialized (Internal Traffic)'
-      : '[GA] Production GA Initialized'
-  )
-} else {
-  console.warn('[GA] GA not initialized (Disabled, Dev mode, or no Tracking ID)')
-}
-
 const isDev = import.meta.env.DEV
-const USE_MSW = import.meta.env.VITE_USE_MSW === 'false'
+const USE_MSW = import.meta.env.VITE_USE_MSW === 'true' // 환경변수에 false 변경
 
 const prepare = async () => {
   if (isDev && USE_MSW) {
@@ -45,13 +15,14 @@ const prepare = async () => {
   }
 }
 
+setupIdleTimer() // 비활성 타이머
+
 prepare().then(() => {
   const container = document.getElementById('root')!
   const root = ReactDOM.createRoot(container)
   root.render(
     <React.StrictMode>
       <BrowserRouter>
-        <AnalyticsTracker />
         <App />
       </BrowserRouter>
     </React.StrictMode>
