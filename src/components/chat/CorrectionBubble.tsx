@@ -60,18 +60,13 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   return (
     <div className={wrapperClass}>
       <div className={bubbleClass}>
-        <div className="flex items-center justify-between text-[12px] mb-1">
-          <div className="flex flex-col space-y-2 items-left text-title">
-            <p className="text-green-500">
-              closeness level -<span> {closenessText}</span>
+        <div className="flex items-center justify-between text-[12px] text-title text-green-500">
+          <div>
+            <p>
+              closeness level - <span>{closenessText}</span>
             </p>
-            {isLoading ? (
-              <div className="bg-green-80 animate-pulse rounded-[4px] h-4 w-3/4"></div>
-            ) : (
-              <p>{correctedContent}</p>
-            )}
           </div>
-          <div className="flex p-0.5 bg-green-80 rounded-[6px] mt-[26px]">
+          <div className="flex p-0.5 bg-green-80 rounded-[6px]">
             {tabs.map(tab => (
               <button
                 key={tab}
@@ -83,13 +78,22 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
                 style={{ border: 'none' }}
                 onClick={() => setSelectedTab(tab)}
                 type="button"
-                disabled={isLoading} // 로딩 중 탭 비활
+                disabled={isLoading}
               >
                 {tab}
               </button>
             ))}
           </div>
         </div>
+
+        <div className="mt-2">
+          {isLoading ? (
+            <div className="bg-green-80 animate-pulse rounded-[4px] h-4 w-3/4"></div>
+          ) : (
+            <p className="text-title text-[12px]">{correctedContent}</p>
+          )}
+        </div>
+
         <div className="h-[1px] bg-green-80 w-full my-2" />
         <div className="text-[14px] text-gray-700">
           {isLoading ? (
@@ -101,13 +105,11 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
             currentDescription[selectedTab]
           )}
         </div>
-        <>
-          <div className="h-[1px] bg-green-80 w-full my-1" />
-          <div className="flex flex-row justify-between">
-            <TTSIcon playing={isPlaying} onPlay={playTTS} />
-            <BookmarkIcon isBookmarked={isBookmarked ?? false} onToggle={toggleBookmark} />
-          </div>
-        </>
+        <div className="h-[1.5px] bg-green-80 w-full my-2" />
+        <div className="flex flex-row justify-between">
+          <TTSIcon playing={isPlaying} onPlay={playTTS} />
+          <BookmarkIcon isBookmarked={isBookmarked ?? false} onToggle={toggleBookmark} />
+        </div>
       </div>
     </div>
   )

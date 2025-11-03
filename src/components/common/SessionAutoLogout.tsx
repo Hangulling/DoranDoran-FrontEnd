@@ -2,13 +2,30 @@ import { useEffect, useRef, useState } from 'react'
 import CommonModal from './CommonModal'
 import { useNavigate } from 'react-router-dom'
 import { logout } from '../../api'
+import { useAuthCleanupStore } from '../../stores/useAuthCleanupStore'
 
 export default function SessionAutoLogout() {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const openedRef = useRef(false)
 
+  // 정리해야 할 작업
+  const preLogoutTask = useAuthCleanupStore(state => state.preLogoutTask)
+  const setPreLogoutTask = useAuthCleanupStore(state => state.setPreLogoutTask)
+
   const handleConfirm = async () => {
+    if (preLogoutTask) {
+      console.log('페이지별 정리 작업을 실행')
+      try {
+        await preLogoutTask()
+      } catch (e) {
+        console.error('정리 작업 실행 중 오류:', e)
+      } finally {
+        // 한 번 실행했으면, 작업을 스토어에서 제거
+        setPreLogoutTask(null)
+      }
+    }
+
     try {
       await logout()
     } catch (e) {
