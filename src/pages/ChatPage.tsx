@@ -29,6 +29,7 @@ import { getClosenessAsText } from '../utils/conceptMap'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import showToast from '../components/common/CommonToast'
 import { useAuthCleanupStore } from '../stores/useAuthCleanupStore'
+import { useIsOpenKeyboard } from '../hooks/useIsOpenKeyboard'
 
 const LoadingDot = () => <span className="loading loading-dots loading-[5px] text-gray-200" />
 
@@ -59,6 +60,9 @@ const ChatPage: React.FC = () => {
   const navigate = useNavigate()
   const { id } = useParams()
   const chatbotId = chatBotIdByRoom(id ?? '')
+  const { isOpen } = useIsOpenKeyboard()
+  const noShowAgain = useModalStore(state => state.noShowAgain)
+  const setNoShowAgain = useModalStore(state => state.setNoShowAgain)
   const [messages, setMessages] = useState<EnrichedMessage[]>([]) // 확장
   const [isHistoryLoading, setIsHistoryLoading] = useState(true)
   const [isInitChatReady, setIsInitChatReady] = useState(false)
@@ -70,8 +74,6 @@ const ChatPage: React.FC = () => {
   const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
   const [showCoachMark, setShowCoachMark] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const noShowAgain = useModalStore(state => state.noShowAgain)
-  const setNoShowAgain = useModalStore(state => state.setNoShowAgain)
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
@@ -424,6 +426,17 @@ const ChatPage: React.FC = () => {
       setIsAiResponding(false)
     }
   }
+
+  // 아래로 스크롤
+  const scrollToBottom = useCallback(() => {
+    if (chatMainRef.current) {
+      chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
+    }
+  }, [])
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages, scrollToBottom, isOpen])
 
   // SSE 이벤트
   const handleSseEvent = useCallback(
