@@ -1,4 +1,6 @@
 const IDLE_TIMEOUT_MS = 59 * 60 * 1000 // 59분
+// 사용자의 활동을 감지하는 이벤트 목록
+const events = ['keydown', 'click', 'scroll', 'touchstart']
 
 let idleTimer: NodeJS.Timeout | null = null
 
@@ -19,15 +21,26 @@ function resetIdleTimer() {
   }, IDLE_TIMEOUT_MS)
 }
 
-export function setupIdleTimer() {
-  // 사용자의 활동을 감지하는 이벤트 목록
-  const events = ['keydown', 'click', 'scroll', 'touchstart']
+export function stopIdleTimer() {
+  if (idleTimer) {
+    clearTimeout(idleTimer)
+    idleTimer = null
+  }
+  events.forEach(event => {
+    window.removeEventListener(event, resetIdleTimer, { capture: true })
+  })
+  console.log('비활성 타이머 중지')
+}
 
-  // 사용자가 어떤 활동이든 하면, 타이머 리셋
+export function startIdleTimer() {
+  stopIdleTimer()
+
+  // 사용자가 어떤 활동이든 하면, 타이머를 리셋
   events.forEach(event => {
     window.addEventListener(event, resetIdleTimer, { capture: true, passive: true })
   })
 
-  // 페이지 로드 시 타이머 최초 실행
+  // 타이머 최초 실행
   resetIdleTimer()
+  console.log('비활성 타이머 시작')
 }

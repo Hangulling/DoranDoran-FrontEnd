@@ -1,6 +1,5 @@
 import axios, { type AxiosInstance, type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import { AUTH_ENDPOINTS } from './endpoints'
-import { clearExpirationTimer } from '../utils/authTimer'
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://3.21.177.186:8080').replace(
   /\/+$/,
@@ -101,8 +100,6 @@ async function refreshAccessToken(): Promise<string | null> {
     return newAccess
   } catch (e) {
     if (import.meta.env.DEV) console.error('❌ 토큰 재발급 실패:', e)
-    // 타이머 제거
-    clearExpirationTimer()
     tokenService.clear()
     emitAuthEvent('auth:expired', { reason: 'refresh_failed' })
     return null
@@ -142,7 +139,6 @@ function installResponseInterceptor(instance: AxiosInstance) {
                 originalRequest.headers.Authorization = `Bearer ${newToken}`
                 resolve(instance(originalRequest))
               } else {
-                clearExpirationTimer()
                 emitAuthEvent('auth:expired', { reason: 'refresh_failed_queue' })
                 resolve(Promise.reject(error))
               }
@@ -161,20 +157,17 @@ function installResponseInterceptor(instance: AxiosInstance) {
           return instance(originalRequest)
         }
 
-        clearExpirationTimer()
         emitAuthEvent('auth:expired', { reason: 'refresh_failed_401' })
         return Promise.reject(error)
       }
 
       if (status === 401 && originalRequest?._retry && !isAuthEndpoint) {
-        clearExpirationTimer()
         tokenService.clear()
         emitAuthEvent('auth:expired', { reason: 'final_401_after_retry', url })
         return Promise.reject(error)
       }
 
       if (status === 401 && !tokenService.refresh && !isAuthEndpoint) {
-        clearExpirationTimer()
         tokenService.clear()
         emitAuthEvent('auth:expired', { reason: 'no_refresh_token', url })
         return Promise.reject(error)
