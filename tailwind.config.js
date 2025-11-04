@@ -1,5 +1,6 @@
 module.exports = {
   mode: 'jit',
+  darkMode: false,
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     screens: {
@@ -19,6 +20,6 @@ module.exports = {
 
   daisyui: {
     themes: ['light'], // 'light' 테마만 사용
-    darkTheme: false, // 다크 모드 자동 감지 비활성화
+    darkTheme: light,
   },
 }
