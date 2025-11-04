@@ -15,4 +15,10 @@ module.exports = {
       },
     },
   },
+  plugins: [require('daisyui')],
+
+  daisyui: {
+    themes: ['light'], // 'light' 테마만 사용
+    darkTheme: false, // 다크 모드 자동 감지 비활성화
+  },
 }
