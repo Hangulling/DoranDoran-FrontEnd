@@ -52,7 +52,9 @@ const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
             )}
           </div>
           <span
-            className={`text-[12px] ${correctMsg ? 'text-body text-gray-400' : 'text-title text-gray-800'}`}
+            className={`${
+              variant === 'archive' ? 'text-sm' : 'text-[12px]'
+            } ${correctMsg ? 'text-body text-gray-400' : 'text-title text-gray-800'}`}
           >
             {word}
           </span>
