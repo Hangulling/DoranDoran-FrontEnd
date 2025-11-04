@@ -37,7 +37,6 @@ const ToastMessage = ({ message, iconType }: ToastMessageProps) => {
 }
 
 const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabled }) => {
-  const [inputActive, setInputActive] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [textareaHeight, setTextareaHeight] = useState(SINGLE_LINE_HEIGHT)
   const [isComposing, setIsComposing] = useState(false)
@@ -77,21 +76,8 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabl
     setIsComposing(false)
   }
 
-  const handleInputFocus = () => {
-    setInputActive(true)
-  }
-  const handleInputBlur = () => {
-    setInputActive(false)
-  }
-
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const originalValue = e.target.value
-
-    if (isComposing) {
-      setInputValue(originalValue)
-      return
-    }
-
     let finalValue = originalValue
 
     if (finalValue.length > 50) {
@@ -104,12 +90,14 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabl
     const textarea = inputRef.current
     if (textarea) {
       textarea.style.height = 'auto'
+
       const scrollHeight = textarea.scrollHeight
       const maxHeight = LINE_HEIGHT * MAX_ROWS + (SINGLE_LINE_HEIGHT - LINE_HEIGHT)
       const newHeight = Math.min(scrollHeight, maxHeight)
 
       textarea.style.height = `${newHeight}px`
       textarea.style.overflowY = scrollHeight > maxHeight ? 'auto' : 'hidden'
+
       setTextareaHeight(newHeight)
     }
   }
@@ -158,8 +146,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabl
           onCompositionStart={handleCompositionStart}
           onCompositionEnd={handleCompositionEnd}
           onChange={handleInputChange}
-          onFocus={handleInputFocus}
-          onBlur={handleInputBlur}
           onKeyDown={handleKeyDown}
           rows={1}
           style={{
@@ -170,7 +156,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabl
           className="flex-grow px-3 py-2 mr-2 border border-gray-100 bg-gray-50 rounded-[20px] focus:border-gray-100 focus:outline-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         />
         <button onClick={handleSendClick} disabled={isButtonDisabled}>
-          {!disabled && inputActive && inputValue.trim() ? (
+          {!disabled && inputValue.trim() ? (
             <img src={ActiveSend} alt="활성화된 보내기" />
           ) : (
             <img src={Send} alt="보내기" />
