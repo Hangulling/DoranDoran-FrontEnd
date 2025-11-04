@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 interface ClosenessState {
   closenessMap: Record<string, number>
@@ -19,10 +19,14 @@ const useClosenessStore = create(
       getCloseness: roomId => {
         return get().closenessMap[roomId]
       },
-      reset: () => set({ closenessMap: {} }),
+      reset: () => {
+        set({ closenessMap: {} })
+        sessionStorage.removeItem('closeness-storage')
+      },
     }),
     {
       name: 'closeness-storage',
+      storage: createJSONStorage(() => sessionStorage),
     }
   )
 )

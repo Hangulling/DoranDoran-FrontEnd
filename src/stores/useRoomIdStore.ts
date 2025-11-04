@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 interface RoomIdState {
   roomsMap: Record<string, string>
@@ -46,10 +46,14 @@ const useRoomIdStore = create<RoomIdState & { reset: () => void }>()(
           return { chatbotMap: copy }
         }),
 
-      reset: () => set({ roomsMap: {}, chatbotMap: {} }),
+      reset: () => {
+        set({ roomsMap: {}, chatbotMap: {} })
+        sessionStorage.removeItem('room-id-storage')
+      },
     }),
     {
       name: 'room-id-storage',
+      storage: createJSONStorage(() => sessionStorage),
     }
   )
 )
