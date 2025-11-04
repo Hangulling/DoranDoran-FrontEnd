@@ -2,6 +2,10 @@
 
 @import 'tailwindcss';
 @plugin "daisyui" {
+  @config {
+    themes: ["light"],
+    darkTheme: false
+  }
 }
 
 @theme {
