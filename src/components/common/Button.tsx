@@ -8,7 +8,7 @@ const VARIANTS: Record<Variant, string> = {
   cancel: 'bg-gray-80 text-gray-600 rounded-lg',
   text: 'bg-transparent',
   confirm: 'bg-green-400 text-white rounded-lg',
-  tab: 'rounded-[18px] max-w-[91px] text-body text-sm',
+  tab: 'rounded-[18px] px-[14px] py-2 text-body text-sm',
   archive: 'text-gray-500 text-sm text-body',
   home: 'bg-green-400 text-white rounded-[18px] border border-green-400',
 }

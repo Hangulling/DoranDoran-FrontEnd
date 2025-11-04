@@ -401,7 +401,9 @@ export default function ArchivePage() {
             ))}
           </div>
         ) : (
-          <EmptyCard />
+          <div className="flex flex-grow justify-center items-center">
+            <EmptyCard />
+          </div>
         )
       ) : null}
 
