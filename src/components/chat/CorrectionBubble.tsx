@@ -73,7 +73,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
                 className={
                   selectedTab === tab
                     ? 'px-1 py-0.5 rounded-[4px] bg-white text-green-400 text-subtitle shadow-none'
-                    : 'px-1 py-0.5 rounded-[4px] bg-green-80 text-gray-300 text-subtitle shadow-none'
+                    : 'px-1 py-0.5 rounded-[4px] bg-green-80 text-green-300 text-subtitle shadow-none'
                 }
                 style={{ border: 'none' }}
                 onClick={() => setSelectedTab(tab)}
