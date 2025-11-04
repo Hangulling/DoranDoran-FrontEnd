@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 interface UserState {
   id: string
@@ -18,11 +18,12 @@ export const useUserStore = create<UserState>()(
       setName: name => set({ name }),
       reset: () => {
         set({ id: '', name: '' })
-        localStorage.removeItem('user-storage') // persist된 데이터 삭제
+        sessionStorage.removeItem('user-storage') // persist된 데이터 삭제
       },
     }),
     {
       name: 'user-storage',
+      storage: createJSONStorage(() => sessionStorage),
     }
   )
 )

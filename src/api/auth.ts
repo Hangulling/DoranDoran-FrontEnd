@@ -10,18 +10,17 @@ export async function login(data: LoginRequest) {
   const { accessToken, refreshToken } = resData
 
   if (accessToken) {
-    localStorage.setItem('accessToken', accessToken)
-    // 로그인 성공 시, 1분 전 타이머 설정
+    sessionStorage.setItem('accessToken', accessToken)
   }
 
   if (refreshToken) {
-    localStorage.setItem('refreshToken', refreshToken)
+    sessionStorage.setItem('refreshToken', refreshToken)
   }
   return res.data
 }
 
 export async function logout() {
-  localStorage.setItem('session:manualLogout', '1')
+  sessionStorage.setItem('session:manualLogout', '1')
 
   try {
     const res = await api.post(AUTH_ENDPOINTS.LOGOUT)
@@ -33,12 +32,12 @@ export async function logout() {
     console.error('🚨 로그아웃 요청 중 오류 발생:', error)
     throw error
   } finally {
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
-    localStorage.removeItem('currentUserId')
+    sessionStorage.removeItem('accessToken')
+    sessionStorage.removeItem('refreshToken')
+    sessionStorage.removeItem('currentUserId')
     currentUserId = null
     try {
-      localStorage.setItem('session:logout', String(Date.now()))
+      sessionStorage.setItem('session:logout', String(Date.now()))
     } catch {
       console.warn('Failed to set logout flag')
     }
@@ -64,7 +63,7 @@ export async function getCurrentUser() {
     }
     currentUserId = res.data.data.id
     if (currentUserId) {
-      localStorage.setItem('currentUserId', currentUserId)
+      sessionStorage.setItem('currentUserId', currentUserId)
     }
     return res.data
   } catch (e) {

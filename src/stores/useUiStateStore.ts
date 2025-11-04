@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 interface CoachMarkState {
   coachMarkSeen: boolean
@@ -16,9 +16,12 @@ export const useCoachStore = create<CoachMarkState & { reset: () => void }>()(
     set => ({
       coachMarkSeen: false,
       setCoachMarkSeen: val => set({ coachMarkSeen: val }),
-      reset: () => set({ coachMarkSeen: false }),
+      reset: () => {
+        set({ coachMarkSeen: false })
+        sessionStorage.removeItem('coachMark-state')
+      },
     }),
-    { name: 'coachMark-state' }
+    { name: 'coachMark-state', storage: createJSONStorage(() => sessionStorage) }
   )
 )
 
@@ -27,8 +30,11 @@ export const useModalStore = create<ModalState & { reset: () => void }>()(
     set => ({
       noShowAgain: false,
       setNoShowAgain: val => set({ noShowAgain: val }),
-      reset: () => set({ noShowAgain: false }),
+      reset: () => {
+        set({ noShowAgain: false })
+        sessionStorage.removeItem('modal-state')
+      },
     }),
-    { name: 'modal-state' }
+    { name: 'modal-state', storage: createJSONStorage(() => sessionStorage) }
   )
 )
