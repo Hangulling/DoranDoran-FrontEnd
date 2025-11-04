@@ -84,7 +84,7 @@ const ChatPage: React.FC = () => {
   const chatroomId = id ? roomsMap[id] : undefined
   const closenessLevel = useClosenessStore.getState().getCloseness(id ?? '') ?? 1
   const closenessText = getClosenessAsText(closenessLevel)
-  const accessToken = localStorage.getItem('accessToken') ?? ''
+  const accessToken = sessionStorage.getItem('accessToken') ?? ''
   const [sseError, setSseError] = useState<string | null>(null)
   const hasLeftRef = useRef(false)
 
