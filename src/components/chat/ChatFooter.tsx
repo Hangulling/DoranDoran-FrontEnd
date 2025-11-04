@@ -37,7 +37,6 @@ const ToastMessage = ({ message, iconType }: ToastMessageProps) => {
 }
 
 const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabled }) => {
-  const [inputActive, setInputActive] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [textareaHeight, setTextareaHeight] = useState(SINGLE_LINE_HEIGHT)
   const [isComposing, setIsComposing] = useState(false)
@@ -75,13 +74,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabl
 
   const handleCompositionEnd = () => {
     setIsComposing(false)
-  }
-
-  const handleInputFocus = () => {
-    setInputActive(true)
-  }
-  const handleInputBlur = () => {
-    setInputActive(false)
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -154,8 +146,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabl
           onCompositionStart={handleCompositionStart}
           onCompositionEnd={handleCompositionEnd}
           onChange={handleInputChange}
-          onFocus={handleInputFocus}
-          onBlur={handleInputBlur}
           onKeyDown={handleKeyDown}
           rows={1}
           style={{
@@ -166,7 +156,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabl
           className="flex-grow px-3 py-2 mr-2 border border-gray-100 bg-gray-50 rounded-[20px] focus:border-gray-100 focus:outline-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         />
         <button onClick={handleSendClick} disabled={isButtonDisabled}>
-          {!disabled && inputActive && inputValue.trim() ? (
+          {!disabled && inputValue.trim() ? (
             <img src={ActiveSend} alt="활성화된 보내기" />
           ) : (
             <img src={Send} alt="보내기" />
