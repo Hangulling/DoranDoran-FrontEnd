@@ -86,12 +86,6 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabl
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const originalValue = e.target.value
-
-    if (isComposing) {
-      setInputValue(originalValue)
-      return
-    }
-
     let finalValue = originalValue
 
     if (finalValue.length > 50) {
@@ -104,12 +98,14 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabl
     const textarea = inputRef.current
     if (textarea) {
       textarea.style.height = 'auto'
+
       const scrollHeight = textarea.scrollHeight
       const maxHeight = LINE_HEIGHT * MAX_ROWS + (SINGLE_LINE_HEIGHT - LINE_HEIGHT)
       const newHeight = Math.min(scrollHeight, maxHeight)
 
       textarea.style.height = `${newHeight}px`
       textarea.style.overflowY = scrollHeight > maxHeight ? 'auto' : 'hidden'
+
       setTextareaHeight(newHeight)
     }
   }
