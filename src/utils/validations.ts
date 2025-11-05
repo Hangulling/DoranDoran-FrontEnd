@@ -5,15 +5,27 @@ export const validateName = (name: string): string | null => {
 }
 
 export const EMAIL_REGEX_ASCII = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$/
-export const EMAIL_REGEX_UNICODE =
-  /^[\p{L}\p{N}\p{M}\p{Pc}%+~](?:\.?[\p{L}\p{N}\p{M}\p{Pc}%+~])*@(?:[\p{L}\p{N}](?:[\p{L}\p{N}\p{M}\p{Pc}\p{Pd}]{0,61}[\p{L}\p{N}])?\.)+[\p{L}\p{N}]{2,63}$/u
 
 export const validateEmail = (email: string): string | null => {
   const v = email.trim()
   if (v.length === 0) return null
-  if (!(EMAIL_REGEX_ASCII.test(v) || EMAIL_REGEX_UNICODE.test(v))) {
+
+  if (/[^\u0020-\u007E]/.test(v)) {
     return 'Please enter a valid email address.'
   }
+
+  const at = v.indexOf('@')
+  if (at <= 0 || at === v.length - 1) return 'Please enter a valid email address.'
+
+  const local = v.slice(0, at)
+  if (local.startsWith('.') || local.endsWith('.') || local.includes('..')) {
+    return 'Please enter a valid email address.'
+  }
+
+  if (!EMAIL_REGEX_ASCII.test(v)) {
+    return 'Please enter a valid email address.'
+  }
+
   return null
 }
 
