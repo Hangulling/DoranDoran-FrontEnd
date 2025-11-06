@@ -12,6 +12,12 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+export const publicApi = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15000,
+  headers: { 'Content-Type': 'application/json' },
+})
+
 const tokenService = {
   get access() {
     return sessionStorage.getItem('accessToken') || ''
@@ -67,6 +73,20 @@ function attachAuth(instance: AxiosInstance) {
     return cfg
   })
 }
+
+publicApi.interceptors.request.use(cfg => {
+  if (cfg.headers && 'Authorization' in cfg.headers) {
+    delete cfg.headers.Authorization
+  }
+  if (import.meta.env.DEV) {
+    console.log('publicApi request', {
+      url: (cfg.baseURL || '') + (cfg.url || ''),
+      headers: cfg.headers,
+      data: cfg.data,
+    })
+  }
+  return cfg
+})
 
 attachAuth(api)
 
