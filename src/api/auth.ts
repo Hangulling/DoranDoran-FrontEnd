@@ -1,5 +1,6 @@
+import axios from 'axios'
 import type { LoginRequest, LoginResponse } from '../types/auth'
-import api from './api'
+import api, { publicApi } from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
 
 let currentUserId: string | null = null
@@ -71,4 +72,20 @@ export async function getCurrentUser() {
 // 현재 저장된 사용자 아이디 동기 반환 함수
 export function getCurrentUserId() {
   return currentUserId
+}
+
+export async function requestEmailVerification(email: string) {
+  try {
+    const res = await publicApi.post(USER_ENDPOINTS.EMAIL_VERIFICATION, { email })
+    return res.data
+  } catch (e) {
+    if (axios.isAxiosError(e)) {
+      console.error('📮 request-verification error', {
+        status: e.response?.status,
+        url: e.config?.url,
+        data: e.response?.data,
+      })
+    }
+    throw e
+  }
 }
