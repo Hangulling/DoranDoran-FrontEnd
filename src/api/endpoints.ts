@@ -9,6 +9,9 @@ export const USER_ENDPOINTS = {
   // 이메일 중복 확인
   CHECK_EMAIL: (email: string) => `/api/users/check-email/${email}`,
 
+  // 이메일 인증
+  EMAIL_VERIFICATION: '/api/auth/email/request-verification',
+
   // 사용자 정보 업데이트
   UPDATE: (userId: string) => `/api/users/${userId}`,
 
