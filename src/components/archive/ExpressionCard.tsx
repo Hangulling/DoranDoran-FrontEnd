@@ -3,7 +3,7 @@ import checkOff from '../../assets/icon/disabledCheckAll.svg'
 import speakerOn from '../../assets/icon/activeVolume.svg'
 import speakerOff from '../../assets/icon/defaultVolume.svg'
 import expandIcon from '../../assets/icon/expandArrow.svg'
-import clsoeExpandIcon from '../../assets/icon/arrowUp.svg'
+import closeExpandIcon from '../../assets/icon/arrowUp.svg'
 import useArchiveStore from '../../stores/useArchiveStore'
 import useTTS from '../../hooks/useTTS'
 import Badge, { type BadgeVariant } from '../common/Badge'
@@ -37,8 +37,12 @@ export default function ExpressionCard({ item, open, onToggle }: ExpressionCardP
     }
   }
 
-  const handleClick = () => {
-    if (selectionMode) toggleSelect(item.id)
+  // 체크박스 클릭
+  const handleCheckboxClick = (e: React.MouseEvent<HTMLImageElement>) => {
+    e.stopPropagation()
+    if (selectionMode) {
+      toggleSelect(item.id)
+    }
   }
 
   const handleSpeakerClick = (e: React.MouseEvent<HTMLImageElement>) => {
@@ -52,7 +56,7 @@ export default function ExpressionCard({ item, open, onToggle }: ExpressionCardP
   }
 
   return (
-    <div className="flex flex-col justify-center items-center mb-3" onClick={handleClick}>
+    <div className="flex flex-col justify-center items-center mb-3">
       <div>
         <div
           className={`flex flex-col justify-center items-center border ${
@@ -67,11 +71,14 @@ export default function ExpressionCard({ item, open, onToggle }: ExpressionCardP
                 src={isSelected ? check : checkOff}
                 className="w-5 h-5"
                 alt={isSelected ? '선택됨' : '선택 안 됨'}
+                onClick={handleCheckboxClick}
               />
             )}
           </div>
 
-          <div className="flex justify-between w-full px-4 pb-[10px] mt-1">
+          <div
+            className={`flex justify-between w-full px-4 mt-1 items-end ${open ? 'pb-0' : 'pb-3'}`}
+          >
             <div className="flex items-start gap-1 flex-1 min-w-0">
               <img
                 src={playing ? speakerOn : speakerOff}
@@ -87,7 +94,9 @@ export default function ExpressionCard({ item, open, onToggle }: ExpressionCardP
 
                 return (
                   <span
-                    className={`text-body text-sm text-gray-800 ${open ? '"whitespace-normal' : 'truncate'}`}
+                    className={`text-body text-sm text-gray-800 ${
+                      open ? 'whitespace-normal' : 'truncate'
+                    }`}
                   >
                     {contentToShow}
                   </span>
@@ -95,13 +104,13 @@ export default function ExpressionCard({ item, open, onToggle }: ExpressionCardP
               })()}
             </div>
             <button onClick={handleToggleClick}>
-              <img src={open ? clsoeExpandIcon : expandIcon} />
+              <img src={open ? closeExpandIcon : expandIcon} />
             </button>
           </div>
 
           {open && (
             <div>
-              <div className="mx-4 my-2 h-px bg-gray-80 " />
+              <div className="mx-4 my-[6px] h-px bg-gray-80 " />
               {(() => {
                 const ai = item.aiResponse ?? {}
                 const firstVoca =
