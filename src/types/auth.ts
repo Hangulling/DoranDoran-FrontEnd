@@ -45,3 +45,9 @@ export interface LogoutResponse {
   data: null
   errorCode: string | null
 }
+
+export interface VerificationRequest {
+  email: string
+  firstName?: string
+  lastName?: string
+}
