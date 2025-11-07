@@ -10,6 +10,7 @@ const ChatPage = lazy(() => import('../pages/ChatPage'))
 const ArchivePage = lazy(() => import('../pages/ArchivePage'))
 const PolicyPage = lazy(() => import('../pages/PolicyPage'))
 const ErrorPage = lazy(() => import('../pages/ErrorPage'))
+const MaintenancePage = lazy(() => import('../pages/MaintenancePage'))
 
 export function Routes() {
   return (
@@ -49,6 +50,7 @@ export function Routes() {
         }
       />
       <Route path="/policy/:id" element={<PolicyPage />} />
+      <Route path="/maintenance" element={<MaintenancePage />} />
       <Route path="/error" element={<ErrorPage />} />
       <Route path="*" element={<ErrorPage errorCode={404} />} />
     </RouterRoutes>
