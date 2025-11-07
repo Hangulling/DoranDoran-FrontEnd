@@ -669,7 +669,7 @@ const ChatPage: React.FC = () => {
       console.log('beforeunload (Tab Close / Multi-Back). Leaving chatroom.')
 
       if (chatroomId && userId) {
-        const accessToken = localStorage.getItem('accessToken')
+        const accessToken = sessionStorage.getItem('accessToken')
         if (!accessToken) {
           console.warn('Unload: No access token. Cannot leave room.')
           return

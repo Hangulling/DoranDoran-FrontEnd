@@ -5,7 +5,7 @@ import Input from '../components/common/Input'
 import Agreement from '../components/common/Agreement'
 import { PASSWORD_REGEX, validateEmail, validateName } from '../utils/validations'
 import CommonModal from '../components/common/CommonModal'
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAgreementStore } from '../stores/useAgreementStore'
 import { useSignupFormStore } from '../stores/useSignupStore'
 import { checkEmailExists, requestEmailVerification } from '../api/auth'
@@ -40,7 +40,6 @@ export default function SignupPage() {
   const [, setPwdCheckError] = useState<string | null>(null)
 
   const navigate = useNavigate()
-  const location = useLocation() as { state?: { fromPolicy?: boolean; fromVerify?: boolean } }
 
   const agreements = useAgreementStore(s => s.value)
   const setManyAgreements = useAgreementStore(s => s.setMany)
@@ -144,7 +143,7 @@ export default function SignupPage() {
         return
       }
 
-      const res = await requestEmailVerification(email)
+      const res = await requestEmailVerification({ email, firstName, lastName })
       if (import.meta.env.DEV) console.log('request-verification ok:', res)
       setEmailSuccess('Verification email sent. Please verify through your inbox.')
       setMany({ emailVerified: false, verifiedEmail: email })
@@ -259,27 +258,52 @@ export default function SignupPage() {
   }
 
   useEffect(() => {
-    const hasQuery = searchParams.has('verified') || searchParams.has('email')
-    if (!location.state?.fromPolicy && !location.state?.fromVerify && !hasQuery && !emailVerified) {
+    if (searchParams.get('clear') === '1') {
       resetForm()
       resetAgreements()
-      navigate('.', { replace: true, state: null })
+      navigate('/signup', { replace: true })
     }
   }, [])
 
   useEffect(() => {
     const verifiedParam = searchParams.get('verified')
     const emailParam = searchParams.get('email')
+    const errorParam = searchParams.get('error')
 
-    if (verifiedParam === 'true' && emailParam) {
-      setMany({
-        email: emailParam,
-        verifiedEmail: emailParam,
-        emailVerified: true,
-      })
+    const firstNameParam = searchParams.get('firstName') || searchParams.get('fn')
+    const lastNameParam = searchParams.get('lastName') || searchParams.get('ln')
+
+    let touched = false
+    const patch: Partial<ReturnType<typeof useSignupFormStore.getState>> = {}
+
+    if (emailParam) {
+      patch.email = emailParam
+      touched = true
+    }
+    if (firstNameParam) {
+      patch.firstName = firstNameParam
+      touched = true
+    }
+    if (lastNameParam) {
+      patch.lastName = lastNameParam
+      touched = true
+    }
+
+    if (verifiedParam === 'true') {
+      patch.verifiedEmail = emailParam ?? null
+      patch.emailVerified = true
       setEmailSuccess('Email verified successfully!')
       setEmailError(null)
+      touched = true
+    } else if (verifiedParam === 'false') {
+      setEmailError(errorParam || 'Email verification failed.')
+      setEmailSuccess(null)
+      patch.emailVerified = false
+      touched = true
+    }
 
+    if (touched) {
+      setMany(patch)
       navigate('/signup', { replace: true, state: { fromVerify: true } })
     }
   }, [searchParams, navigate, setMany])

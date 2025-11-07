@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { LoginRequest, LoginResponse } from '../types/auth'
+import type { LoginRequest, LoginResponse, VerificationRequest } from '../types/auth'
 import api, { publicApi } from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
 
@@ -79,9 +79,9 @@ export function getCurrentUserId() {
   return currentUserId
 }
 
-export async function requestEmailVerification(email: string) {
+export async function requestEmailVerification(data: VerificationRequest) {
   try {
-    const res = await publicApi.post(USER_ENDPOINTS.EMAIL_VERIFICATION, { email })
+    const res = await publicApi.post(USER_ENDPOINTS.EMAIL_VERIFICATION, data)
     return res.data
   } catch (e) {
     if (axios.isAxiosError(e)) {
