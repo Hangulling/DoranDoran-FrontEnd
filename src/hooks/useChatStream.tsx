@@ -105,27 +105,31 @@ export function useChatStream<T = unknown>(
           onErrorRef.current(event)
         }
         console.error('[SSE Error]', event)
+        // 완전히 닫힌 상태일 때만 수동 재연결
+        if (eventSource.readyState === EventSource.CLOSED) {
+          console.log('[SSE] Connection fully closed. Starting manual retry')
 
-        eventSource.close()
+          if (retryCount < maxRetries) {
+            setIsLoading(true)
+            retryTimeout = setTimeout(() => {
+              retryCount++
+              const jitter = Math.random() * 1000
+              const nextDelay = Math.min(retryDelay * 2, 30000)
+              retryDelay = nextDelay + jitter
 
-        if (retryCount < maxRetries) {
-          // 재접속 제한
-          setIsLoading(true)
-          retryTimeout = setTimeout(() => {
-            retryCount++
-            const jitter = Math.random() * 1000
-            const nextDelay = Math.min(retryDelay * 2, 30000) // 최대 30초
-            retryDelay = nextDelay + jitter
-
-            console.log(
-              `[SSE] Retrying connection... (Attempt ${retryCount}, Delay: ${Math.round(retryDelay)}ms)`
-            )
-            connect()
-          }, retryDelay) // 직전 계산된 딜레이 사용
+              console.log(
+                `[SSE] 재접속 시도 중 (Attempt ${retryCount}, Delay: ${Math.round(retryDelay)}ms)`
+              )
+              connect()
+            }, retryDelay)
+          } else {
+            console.error('[SSE] 재접속 시도 최대 횟수 초과')
+            setError(new Error('SSE connection failed after max retries'))
+            setIsLoading(false)
+          }
         } else {
-          console.error('[SSE] 재접속 시도 최대 횟수 초과')
-          setError(new Error('SSE connection failed after max retries'))
-          setIsLoading(false)
+          console.log('[SSE] EventSource is attempting to reconnect automatically.')
+          setIsLoading(true)
         }
       }
 
