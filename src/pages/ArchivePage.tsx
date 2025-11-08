@@ -7,8 +7,18 @@ import EmptyCard from '../components/archive/EmptyCard'
 import Button from '../components/common/Button'
 import checkCircle from '../assets/icon/checkRound.svg'
 import useArchiveStore from '../stores/useArchiveStore'
-import { BOT_TO_ROOM, type BookmarkResponse, type BotType, type Room } from '../types/archive'
-import { deleteManyBookmarks, getBookmarksByCursor } from '../api/archive'
+import {
+  BOT_TO_ROOM,
+  ROOM_TO_BOT,
+  type BookmarkResponse,
+  type BotType,
+  type Room,
+} from '../types/archive'
+import {
+  deleteManyBookmarks,
+  getBookmarksByCursor,
+  getBookmarksCursorByBotType,
+} from '../api/archive'
 import ReactGA from 'react-ga4'
 import { useUserStore } from '../stores/useUserStore'
 
@@ -17,9 +27,7 @@ const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
 const IS_PROD = import.meta.env.PROD
 
 const PAGE_SIZE = 15
-const EDGE_NEAR = 16
-const EDGE_RELEASE = 64
-const SAFE_OFFSET = EDGE_RELEASE + 1
+const EDGE_NEAR = 64
 
 // 문자열 → 숫자 매핑(대소문자/공백 허용)
 const mapIntimacyToNum = (s?: string | null) => {
@@ -93,7 +101,6 @@ export default function ArchivePage() {
     useArchiveStore()
 
   const scrollElRef = useRef<HTMLElement | null>(null)
-  const edgeLock = useRef<'none' | 'top' | 'bottom'>('none')
   const roomCursorRef = useRef<Record<Room, string | null>>({
     Friend: null,
     Honey: null,
@@ -104,12 +111,9 @@ export default function ArchivePage() {
   // 탭 클릭으로 전환되었는지 표시 (초기 진입과 구분)
   const pendingClickRoomRef = useRef<Room | null>(null)
 
-  const prevRef = useRef<() => void>(() => {})
-  const nextRef = useRef<() => void>(() => {})
   const suppressNextScrollRef = useRef(false)
 
   const [pages, setPages] = useState<Page[]>([])
-  const [pageIndex, setPageIndex] = useState(0)
   const [openModal, setOpenModal] = useState(false)
   const [deleteCount, setDeleteCount] = useState(0)
   const [showToast, setShowToast] = useState(false)
@@ -119,7 +123,6 @@ export default function ArchivePage() {
   const [dataReady, setDataReady] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const list = pages[pageIndex]?.items ?? []
   const location = useLocation()
   const fromChat = (location.state as { from?: string } | null)?.from === 'chat'
   const { id } = useParams<{ id?: string }>()
@@ -128,6 +131,9 @@ export default function ArchivePage() {
     () => ({ '1': 'Friend', '2': 'Honey', '3': 'Coworker', '4': 'Senior' }),
     []
   )
+
+  // 지금까지 로딩된 전체 아이템
+  const list = useMemo(() => pages.flatMap(p => p.items), [pages])
 
   // 라우팅으로 들어온 경우 방 지정
   useEffect(() => {
@@ -171,10 +177,11 @@ export default function ArchivePage() {
       let acc: BookmarkResponse[] = []
       let nextCursor: string | null = startFromCursor ?? null
       let isLast = false
-      const CHUNK = PAGE_SIZE * 3
+      const botType = ROOM_TO_BOT[room]
       for (let hop = 0; hop < 5 && acc.length < PAGE_SIZE && !isLast; hop++) {
-        const raw = await getBookmarksByCursor(nextCursor ?? undefined, CHUNK)
+        const raw = await getBookmarksCursorByBotType(botType, nextCursor ?? undefined, PAGE_SIZE)
         const content: BookmarkResponse[] = raw?.content ?? []
+
         const filtered = content.filter(i => BOT_TO_ROOM[i.botType as BotType] === room)
         acc = acc.concat(filtered)
         const lastRaw = content[content.length - 1]
@@ -189,7 +196,7 @@ export default function ArchivePage() {
     [fetchLastWindow15]
   )
 
-  // 탭 클릭 시: 플래l그만 설정 (GA 전송은 로드 완료 후)
+  // 탭 클릭 시: 플래그만 설정 (GA 전송은 로드 완료 후)
   const handleTabChange = useCallback(
     (tab: Room) => {
       pendingClickRoomRef.current = tab
@@ -206,9 +213,7 @@ export default function ArchivePage() {
       roomCursorRef.current[activeRoom] = firstPage.nextCursorFromServer
 
       setPages(firstPage.items.length ? [firstPage] : [])
-      setPageIndex(0)
       setDataReady(true)
-      seedItems(firstPage.items)
 
       if (
         IS_PROD &&
@@ -234,7 +239,6 @@ export default function ArchivePage() {
           suppressNextScrollRef.current = true
           el.scrollTop = 0
         }
-        edgeLock.current = 'none'
       })
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e)
@@ -244,34 +248,29 @@ export default function ArchivePage() {
     } finally {
       setLoading(false)
     }
-  }, [activeRoom, fetchPageFill15, seedItems, userId])
+  }, [activeRoom, fetchPageFill15, userId])
 
+  // 방 변경 시 첫 페이지 로드
   useEffect(() => {
     if (!roomResolved) return
     setPages([])
-    setPageIndex(0)
     setError(null)
-    edgeLock.current = 'none'
     roomCursorRef.current[activeRoom] = null
     void loadFirstPage()
-  }, [activeRoom, roomResolved])
+  }, [activeRoom, roomResolved, loadFirstPage])
 
-  const goNextPage = useCallback(async () => {
+  // 지금 보이는 전체 아이템을 store에 넣기 (선택/삭제용)
+  useEffect(() => {
+    seedItems(list)
+  }, [list, seedItems])
+
+  const loadNextPage = useCallback(async () => {
     if (loading) return
-    if (pageIndex < pages.length - 1) {
-      const nextIdx = pageIndex + 1
-      setPageIndex(nextIdx)
-      seedItems(pages[nextIdx].items)
-      requestAnimationFrame(() => {
-        const el = scrollElRef.current
-        if (el) el.scrollTop = SAFE_OFFSET
-        edgeLock.current = 'none'
-      })
-      return
-    }
+    if (pages.length === 0) return
 
     const lastPage = pages[pages.length - 1]
-    if (!lastPage) return
+    if (lastPage?.isLastOnServer) return
+
     try {
       setLoading(true)
       const currentRoom = activeRoom
@@ -279,36 +278,10 @@ export default function ArchivePage() {
       roomCursorRef.current[currentRoom] = page.nextCursorFromServer
       if (page.items.length === 0) return
       setPages(prev => [...prev, page])
-      const nextIdx = pages.length
-      setPageIndex(nextIdx)
-      seedItems(page.items)
-      requestAnimationFrame(() => {
-        const el = scrollElRef.current
-        if (el) el.scrollTop = SAFE_OFFSET
-        edgeLock.current = 'none'
-      })
     } finally {
       setLoading(false)
     }
-  }, [activeRoom, fetchPageFill15, loading, pageIndex, pages, seedItems])
-
-  const goPrevPage = useCallback(() => {
-    if (loading) return
-    if (pageIndex <= 0) return
-    const prevIdx = pageIndex - 1
-    setPageIndex(prevIdx)
-    seedItems(pages[prevIdx].items)
-    requestAnimationFrame(() => {
-      const el = scrollElRef.current
-      if (el) el.scrollTop = Math.max(0, el.scrollHeight - el.clientHeight - SAFE_OFFSET)
-      edgeLock.current = 'none'
-    })
-  }, [loading, pageIndex, pages, seedItems])
-
-  useEffect(() => {
-    prevRef.current = goPrevPage
-    nextRef.current = goNextPage
-  }, [goPrevPage, goNextPage])
+  }, [activeRoom, fetchPageFill15, loading, pages])
 
   useEffect(() => {
     const el = document.getElementById('app-scroll') as HTMLElement | null
@@ -317,40 +290,30 @@ export default function ArchivePage() {
 
     const onScroll = () => {
       const node = scrollElRef.current
-      if (!node || loading) return
+      if (!node) return
       if (suppressNextScrollRef.current) {
         suppressNextScrollRef.current = false
         return
       }
+
       const { scrollTop, scrollHeight, clientHeight } = node
       const fromBottom = scrollHeight - clientHeight - scrollTop
-      const nearTop = scrollTop <= EDGE_NEAR
-      const nearBottom = fromBottom <= EDGE_NEAR
-      const tallEnough = scrollHeight - clientHeight > EDGE_RELEASE * 2
-      const awayFromEdges = scrollTop > EDGE_RELEASE && fromBottom > EDGE_RELEASE
-      if (awayFromEdges && edgeLock.current !== 'none') edgeLock.current = 'none'
-      if (nearTop && edgeLock.current !== 'top') {
-        edgeLock.current = 'top'
-        prevRef.current()
-        return
-      }
-      if (tallEnough && nearBottom && edgeLock.current !== 'bottom') {
-        edgeLock.current = 'bottom'
-        nextRef.current()
-        return
+
+      if (fromBottom <= EDGE_NEAR) {
+        void loadNextPage()
       }
     }
 
     el.addEventListener('scroll', onScroll, { passive: true })
     return () => el.removeEventListener('scroll', onScroll)
-  }, [loading])
+  }, [loadNextPage])
 
   const handleConfirmDelete = async () => {
     const ids = Array.from(selectedIds)
     try {
       setOpenModal(false)
 
-      const itemsToDelete = pages.flatMap(p => p.items).filter(it => ids.includes(it.id))
+      const itemsToDelete = list.filter(it => ids.includes(it.id))
 
       if (ids.length > 0) await deleteManyBookmarks(ids)
 
