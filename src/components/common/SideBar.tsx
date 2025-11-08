@@ -8,7 +8,7 @@ import CommonModal from './CommonModal'
 import ReactGA from 'react-ga4'
 import { GA_ENABLED, IS_PROD } from '../../constants/env'
 import { useSidebarAnimation } from '../../hooks/useSidebarAnimation'
-import { useSidebar } from '../../hooks/useSideBar'
+import { useSidebar } from '../../hooks/useSidebarAction'
 
 const LOGOUT_DESC = ['You can log in again anytime.']
 const SIGNOUT_DESC_JSX = [
