@@ -37,3 +37,13 @@ export interface ToastProps {
 export interface LoadingSpinnerProps {
   message?: string
 }
+
+export type FromPage = 'signup' | 'login' | undefined
+
+export interface ErrorPageProps {
+  errorCode?: number
+}
+
+export interface ClientErrorViewProps {
+  onClickBack: () => void
+}
