@@ -20,13 +20,9 @@ export function useErrorPage({ errorCode }: ErrorPageProps) {
   }, [location.state, navigate, code])
 
   // Go Back
-  let from: FromPage = state.from
-  if (!from) {
-    if (location.pathname.startsWith('/signup')) from = 'signup'
-    else if (location.pathname.startsWith('/login')) from = 'login'
-  }
+  const from = state.from || (location.pathname.startsWith('/signup') ? 'signup' : undefined)
 
-  const backTarget = from === 'signup' ? '/signup' : from === 'login' ? '/login' : '/'
+  const backTarget = from === 'signup' ? '/signup' : '/login'
 
   const handleClickBack = () => {
     navigate(backTarget, { replace: true })
