@@ -8,7 +8,7 @@ import useArchiveStore from '../../stores/useArchiveStore'
 import Button from './Button'
 import type { NavBarProps } from '../../types/common'
 import { BOT_TO_ROOM } from '../../types/archive'
-import { useNavBar } from '../../hooks/useNavBar'
+import { useNavBar } from '../../hooks/useNavBarAction'
 
 const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
   title,
