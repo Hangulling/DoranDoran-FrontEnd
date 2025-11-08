@@ -7,7 +7,7 @@ export function useSidebarAnimation(isOpen: boolean, delay = 300) {
   useEffect(() => {
     if (isOpen) {
       setVisible(true)
-      const timer = setTimeout(() => setIsActive(true), 10)
+      const timer = setTimeout(() => setIsActive(true), 150)
       return () => clearTimeout(timer)
     } else {
       setIsActive(false)
