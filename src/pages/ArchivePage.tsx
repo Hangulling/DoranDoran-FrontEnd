@@ -104,6 +104,7 @@ export default function ArchivePage() {
   const [openId, setOpenId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [roomResolved, setRoomResolved] = useState(false)
+  const [deleteCount, setDeleteCount] = useState(0)
 
   const list = useMemo(
     () => items.filter(i => BOT_TO_ROOM[i.botType as BotType] === activeRoom),
@@ -299,7 +300,10 @@ export default function ArchivePage() {
               selectedIds.size > 0 ? 'text-orange-300' : 'text-orange-100'
             } active:text-orange-600 hover:text-orange-600`}
             size="xl"
-            onClick={() => setOpenModal(true)}
+            onClick={() => {
+              setDeleteCount(selectedIds.size)
+              setOpenModal(true)
+            }}
             disabled={selectedIds.size < 1}
           >
             Delete {selectedIds.size > 0 ? `${selectedIds.size}` : ''}
@@ -320,8 +324,8 @@ export default function ArchivePage() {
         <CommonModal
           open
           title="Delete saved phrase"
-          description={`Do you want to delete ${selectedIds.size} ${
-            selectedIds.size > 1 ? 'phrases' : 'phrase'
+          description={`Do you want to delete ${deleteCount} ${
+            deleteCount > 1 ? 'phrases' : 'phrase'
           }?`}
           cancelText="Keep"
           confirmText="Delete"
