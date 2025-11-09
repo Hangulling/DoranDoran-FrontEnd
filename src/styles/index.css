@@ -1,8 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 @import 'tailwindcss';
-@plugin "daisyui" {
-}
+@plugin "daisyui";
 
 @theme {
   --font-family-sans: 'Noto Sans', 'Noto Sans KR', sans-serif;
@@ -17,6 +16,7 @@
   --color-orange-100: #ffb8ad;
   --color-orange-200: #ff8c7a;
   --color-orange-300: #ff6149;
+  --color-orange-400: #ff3314;
   --color-blue-500: #546eff;
   --color-gray-50: #f4f5f5;
   --color-gray-80: #eaebeb;

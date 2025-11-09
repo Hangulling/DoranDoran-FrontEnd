@@ -7,6 +7,7 @@ import CheckIcon from '../../assets/icon/checkRound.svg'
 interface ChatFooterProps {
   inputRef: RefObject<HTMLTextAreaElement | null>
   onSendMessage: (message: string) => void
+  disabled?: boolean
 }
 
 type IconType = 'error' | 'checkRound'
@@ -35,8 +36,7 @@ const ToastMessage = ({ message, iconType }: ToastMessageProps) => {
   )
 }
 
-const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
-  const [inputActive, setInputActive] = useState(false)
+const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabled }) => {
   const [inputValue, setInputValue] = useState('')
   const [textareaHeight, setTextareaHeight] = useState(SINGLE_LINE_HEIGHT)
   const [isComposing, setIsComposing] = useState(false)
@@ -76,21 +76,8 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
     setIsComposing(false)
   }
 
-  const handleInputFocus = () => {
-    setInputActive(true)
-  }
-  const handleInputBlur = () => {
-    setInputActive(false)
-  }
-
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const originalValue = e.target.value
-
-    if (isComposing) {
-      setInputValue(originalValue)
-      return
-    }
-
     let finalValue = originalValue
 
     if (finalValue.length > 50) {
@@ -103,35 +90,41 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
     const textarea = inputRef.current
     if (textarea) {
       textarea.style.height = 'auto'
+
       const scrollHeight = textarea.scrollHeight
       const maxHeight = LINE_HEIGHT * MAX_ROWS + (SINGLE_LINE_HEIGHT - LINE_HEIGHT)
       const newHeight = Math.min(scrollHeight, maxHeight)
 
       textarea.style.height = `${newHeight}px`
       textarea.style.overflowY = scrollHeight > maxHeight ? 'auto' : 'hidden'
+
       setTextareaHeight(newHeight)
     }
   }
 
   const handleSendClick = () => {
-    if (inputValue.trim()) {
-      onSendMessage(inputValue.trim())
-      setInputValue('')
-      if (inputRef.current) {
-        inputRef.current.style.height = `${SINGLE_LINE_HEIGHT}px`
-        inputRef.current.blur()
-      }
-      // setTextareaHeight(SINGLE_LINE_HEIGHT)
+    // AI가 응답 중이거나 입력값이 없으면 전송 방지
+    if (disabled || !inputValue.trim()) {
+      return
+    }
+
+    onSendMessage(inputValue.trim())
+    setInputValue('')
+    if (inputRef.current) {
+      inputRef.current.style.height = `${SINGLE_LINE_HEIGHT}px`
+      inputRef.current.blur()
     }
   }
 
   // 엔터 키 이벤트
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
+    if (e.key === 'Enter' && !e.shiftKey && !isComposing && !disabled) {
       e.preventDefault() // 줄바꿈 방지
       handleSendClick() // 메시지 전송
     }
   }
+
+  const isButtonDisabled = disabled || !inputValue.trim()
 
   return (
     <div className="relative bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
@@ -153,8 +146,6 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
           onCompositionStart={handleCompositionStart}
           onCompositionEnd={handleCompositionEnd}
           onChange={handleInputChange}
-          onFocus={handleInputFocus}
-          onBlur={handleInputBlur}
           onKeyDown={handleKeyDown}
           rows={1}
           style={{
@@ -164,8 +155,8 @@ const ChatFooter = ({ inputRef, onSendMessage }: ChatFooterProps) => {
           }}
           className="flex-grow px-3 py-2 mr-2 border border-gray-100 bg-gray-50 rounded-[20px] focus:border-gray-100 focus:outline-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         />
-        <button onClick={handleSendClick}>
-          {inputActive && inputValue.trim() ? (
+        <button onClick={handleSendClick} disabled={isButtonDisabled}>
+          {!disabled && inputValue.trim() ? (
             <img src={ActiveSend} alt="활성화된 보내기" />
           ) : (
             <img src={Send} alt="보내기" />

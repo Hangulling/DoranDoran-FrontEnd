@@ -12,27 +12,33 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+export const publicApi = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15000,
+  headers: { 'Content-Type': 'application/json' },
+})
+
 const tokenService = {
   get access() {
-    return localStorage.getItem('accessToken') || ''
+    return sessionStorage.getItem('accessToken') || ''
   },
   set access(v: string) {
-    localStorage.setItem('accessToken', v)
+    sessionStorage.setItem('accessToken', v)
   },
   get refresh() {
-    return localStorage.getItem('refreshToken') || ''
+    return sessionStorage.getItem('refreshToken') || ''
   },
   set refresh(v: string) {
-    localStorage.setItem('refreshToken', v)
+    sessionStorage.setItem('refreshToken', v)
   },
   clear() {
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
+    sessionStorage.removeItem('accessToken')
+    sessionStorage.removeItem('refreshToken')
   },
 }
 
 function emitAuthEvent(type: 'auth:expired' | 'auth:logout' | 'auth:inactive', detail?: unknown) {
-  const manualLogout = localStorage.getItem('session:manualLogout') === '1'
+  const manualLogout = sessionStorage.getItem('session:manualLogout') === '1'
   if (manualLogout && (type === 'auth:expired' || type === 'auth:inactive')) {
     return
   }
@@ -67,6 +73,20 @@ function attachAuth(instance: AxiosInstance) {
     return cfg
   })
 }
+
+publicApi.interceptors.request.use(cfg => {
+  if (cfg.headers && 'Authorization' in cfg.headers) {
+    delete cfg.headers.Authorization
+  }
+  if (import.meta.env.DEV) {
+    console.log('publicApi request', {
+      url: (cfg.baseURL || '') + (cfg.url || ''),
+      headers: cfg.headers,
+      data: cfg.data,
+    })
+  }
+  return cfg
+})
 
 attachAuth(api)
 

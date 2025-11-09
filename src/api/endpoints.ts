@@ -1,3 +1,5 @@
+import type { BotType } from '../types/archive'
+
 // Users endpoints
 export const USER_ENDPOINTS = {
   CREATE: '/api/users',
@@ -8,6 +10,9 @@ export const USER_ENDPOINTS = {
 
   // 이메일 중복 확인
   CHECK_EMAIL: (email: string) => `/api/users/check-email/${email}`,
+
+  // 이메일 인증
+  EMAIL_VERIFICATION: '/api/auth/email/request-verification',
 
   // 사용자 정보 업데이트
   UPDATE: (userId: string) => `/api/users/${userId}`,
@@ -98,6 +103,10 @@ export const CHAT_ENDPOINTS = {
   // SSE
   MESSAGE_STREAM: (chatroomId: string, userId?: string) =>
     `/api/chat/stream/${chatroomId}${userId ? `?userId=${userId}` : ''}`,
+
+  // 마지막 채팅 시간
+  LAST_INTERACTIONS: (userId: string) =>
+    `/api/chat/chatrooms/last-interactions?userId=${userId}&limit=4`,
 }
 
 // Bookmark Endpoints
@@ -109,11 +118,29 @@ export const BOOKMARK_ENDPOINTS = {
   LIST_ALL: '/api/store/bookmarks',
 
   // 커서 기반 조회 (무한 스크롤)
-  LIST_CURSOR: (lastId?: string, size: number = 20) => {
+  LIST_CURSOR: (lastId?: string, size: number = 15) => {
     const params = new URLSearchParams()
     if (lastId) params.append('lastId', lastId)
     params.append('size', size.toString())
     return `/api/store/bookmarks/cursor?${params.toString()}`
+  },
+
+  // 봇타입 별 커서기반 조회
+  LIST_CURSOR_BY_BOTTYPE: (botType: BotType, lastId?: string, size: number = 15) => {
+    const params = new URLSearchParams()
+    if (lastId) params.append('lastId', lastId)
+    if (size) params.append('size', String(size))
+    const q = params.toString()
+    return `/api/store/bookmarks/bot-type/${botType}/cursor${q ? `?${q}` : ''}`
+  },
+
+  // 방별 커서기반 조회
+  LIST_CURSOR_BY_CHATROOM: (chatroomId: string, lastId?: string, size: number = 15) => {
+    const params = new URLSearchParams()
+    if (lastId) params.append('lastId', lastId)
+    params.append('size', String(size))
+    const q = params.toString()
+    return `/api/store/bookmarks/chatroom/${chatroomId}/cursor${q ? `?${q}` : ''}`
   },
 
   // 페이지 기반 조회 (Offset Pagination)
@@ -121,8 +148,7 @@ export const BOOKMARK_ENDPOINTS = {
     `/api/store/bookmarks/page?page=${page}&size=${size}&sort=${sort}`,
 
   // 챗봇 타입별 북마크 조회
-  LIST_BY_BOT_TYPE: (botType: 'friend' | 'honey' | 'coworker' | 'senior') =>
-    `/api/store/bookmarks/bot-type/${botType}`,
+  LIST_BY_BOT_TYPE: (botType: BotType) => `/api/store/bookmarks/bot-type/${botType}`,
 
   // 북마크 개수 조회
   COUNT: '/api/store/bookmarks/count',

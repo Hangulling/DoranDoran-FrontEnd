@@ -1,12 +1,13 @@
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App.tsx'
 import './styles/index.css'
 import React from 'react'
-
 import ReactGA from 'react-ga4'
 import AnalyticsTracker from './components/common/AnalyticsTracker.ts'
+import MaintenancePage from './pages/MaintenancePage.tsx'
 
+const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID
 const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
 
@@ -36,7 +37,7 @@ if (import.meta.env.PROD && GA_TRACKING_ID && GA_ENABLED) {
 }
 
 const isDev = import.meta.env.DEV
-const USE_MSW = import.meta.env.VITE_USE_MSW === 'false'
+const USE_MSW = import.meta.env.VITE_USE_MSW === 'true' // 환경변수에 false 변경
 
 const prepare = async () => {
   if (isDev && USE_MSW) {
@@ -51,8 +52,16 @@ prepare().then(() => {
   root.render(
     <React.StrictMode>
       <BrowserRouter>
-        <AnalyticsTracker />
-        <App />
+        {IS_MAINTENANCE_MODE ? (
+          <Routes>
+            <Route path="*" element={<MaintenancePage />} />
+          </Routes>
+        ) : (
+          <>
+            <AnalyticsTracker />
+            <App />
+          </>
+        )}
       </BrowserRouter>
     </React.StrictMode>
   )

@@ -1,5 +1,6 @@
-import type { LoginRequest, LoginResponse } from '../types/auth'
-import api from './api'
+import axios from 'axios'
+import type { LoginRequest, LoginResponse, VerificationRequest } from '../types/auth'
+import api, { publicApi } from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
 
 let currentUserId: string | null = null
@@ -7,15 +8,20 @@ let currentUserId: string | null = null
 export async function login(data: LoginRequest) {
   const res = await api.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, data)
   const { data: resData } = res.data
+  const { accessToken, refreshToken } = resData
 
-  if (resData.accessToken) localStorage.setItem('accessToken', resData.accessToken)
-  if (resData.refreshToken) localStorage.setItem('refreshToken', resData.refreshToken)
+  if (accessToken) {
+    sessionStorage.setItem('accessToken', accessToken)
+  }
 
+  if (refreshToken) {
+    sessionStorage.setItem('refreshToken', refreshToken)
+  }
   return res.data
 }
 
 export async function logout() {
-  localStorage.setItem('session:manualLogout', '1')
+  sessionStorage.setItem('session:manualLogout', '1')
 
   try {
     const res = await api.post(AUTH_ENDPOINTS.LOGOUT)
@@ -27,12 +33,12 @@ export async function logout() {
     console.error('🚨 로그아웃 요청 중 오류 발생:', error)
     throw error
   } finally {
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
-    localStorage.removeItem('currentUserId')
+    sessionStorage.removeItem('accessToken')
+    sessionStorage.removeItem('refreshToken')
+    sessionStorage.removeItem('currentUserId')
     currentUserId = null
     try {
-      localStorage.setItem('session:logout', String(Date.now()))
+      sessionStorage.setItem('session:logout', String(Date.now()))
     } catch {
       console.warn('Failed to set logout flag')
     }
@@ -58,7 +64,7 @@ export async function getCurrentUser() {
     }
     currentUserId = res.data.data.id
     if (currentUserId) {
-      localStorage.setItem('currentUserId', currentUserId)
+      sessionStorage.setItem('currentUserId', currentUserId)
     }
     return res.data
   } catch (e) {
@@ -71,4 +77,20 @@ export async function getCurrentUser() {
 // 현재 저장된 사용자 아이디 동기 반환 함수
 export function getCurrentUserId() {
   return currentUserId
+}
+
+export async function requestEmailVerification(data: VerificationRequest) {
+  try {
+    const res = await publicApi.post(USER_ENDPOINTS.EMAIL_VERIFICATION, data)
+    return res.data
+  } catch (e) {
+    if (axios.isAxiosError(e)) {
+      console.error('📮 request-verification error', {
+        status: e.response?.status,
+        url: e.config?.url,
+        data: e.response?.data,
+      })
+    }
+    throw e
+  }
 }

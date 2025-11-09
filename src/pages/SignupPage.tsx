@@ -5,10 +5,10 @@ import Input from '../components/common/Input'
 import Agreement from '../components/common/Agreement'
 import { PASSWORD_REGEX, validateEmail, validateName } from '../utils/validations'
 import CommonModal from '../components/common/CommonModal'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAgreementStore } from '../stores/useAgreementStore'
 import { useSignupFormStore } from '../stores/useSignupStore'
-import { checkEmailExists } from '../api/auth'
+import { checkEmailExists, requestEmailVerification } from '../api/auth'
 import { createUser } from '../api/user'
 import ReactGA from 'react-ga4'
 
@@ -40,11 +40,11 @@ export default function SignupPage() {
   const [, setPwdCheckError] = useState<string | null>(null)
 
   const navigate = useNavigate()
-  const location = useLocation() as { state?: { fromPolicy?: boolean } }
 
   const agreements = useAgreementStore(s => s.value)
   const setManyAgreements = useAgreementStore(s => s.setMany)
   const resetAgreements = useAgreementStore(s => s.reset)
+  const [searchParams] = useSearchParams()
 
   const handleFirstNameChange = (v: string) => {
     const noSpace = v.replace(/[^A-Za-z]/g, '')
@@ -89,9 +89,7 @@ export default function SignupPage() {
 
   const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === ' ') e.preventDefault()
-
     if (e.nativeEvent.isComposing) return
-
     if (e.key === 'Enter') {
       e.preventDefault()
       if (isEmailFormatValid) handleVerify()
@@ -142,23 +140,35 @@ export default function SignupPage() {
       if (isDuplicate) {
         setEmailError('This email is already registered.')
         setMany({ emailVerified: false, verifiedEmail: null })
-      } else {
-        setEmailSuccess('Verified successfully.')
-        setMany({ emailVerified: true, verifiedEmail: email })
+        return
       }
+
+      const res = await requestEmailVerification({ email, firstName, lastName })
+      if (import.meta.env.DEV) console.log('request-verification ok:', res)
+      setEmailSuccess('Verification email sent. Please verify through your inbox.')
+      setMany({ emailVerified: false, verifiedEmail: email })
     } catch (e: unknown) {
-      const msg = axios.isAxiosError(e)
-        ? e.response?.data?.message || 'Email verification failed.'
-        : 'Email verification failed.'
-      setEmailError(msg)
+      const parsed = axios.isAxiosError(e)
+        ? {
+            status: e.response?.status,
+            url: e.config?.url,
+            message:
+              e.response?.data?.message ??
+              e.response?.data?.error ??
+              (typeof e.response?.data === 'string' ? e.response?.data : undefined) ??
+              e.message,
+            data: e.response?.data,
+          }
+        : { message: String(e) }
+
+      console.error('request-verification failed', parsed)
+      setEmailError(parsed.message || 'Email verification failed.')
       setMany({ emailVerified: false, verifiedEmail: null })
     }
   }
 
   const isEmailFormatValid = email.trim() !== '' && validateEmail(email) === null
-
   const alreadyVerified = emailVerified && verifiedEmail === email
-
   const pwdFormatError = pwdTouched && password.length > 0 && !PASSWORD_REGEX.test(password)
   const pwdMatchError =
     pwdCheckTouched && passwordCheck.length > 0 && !pwdFormatError && password !== passwordCheck
@@ -232,14 +242,12 @@ export default function SignupPage() {
       const isAxios = axios.isAxiosError(e)
       const status = isAxios ? e.response?.status : undefined
       const code = status ?? 503
-
       const msg = isAxios ? e.response?.data?.message || 'Sign up failed.' : 'Sign up failed.'
       setSubmitError(msg)
 
       if (status && status >= 400 && status < 500) {
         return
       }
-
       navigate('/error', { replace: true, state: { code, from: 'signup' } })
     }
   }
@@ -250,12 +258,55 @@ export default function SignupPage() {
   }
 
   useEffect(() => {
-    if (!location.state?.fromPolicy) {
+    if (searchParams.get('clear') === '1') {
       resetForm()
       resetAgreements()
+      navigate('/signup', { replace: true })
     }
-    navigate('.', { replace: true, state: null })
   }, [])
+
+  useEffect(() => {
+    const verifiedParam = searchParams.get('verified')
+    const emailParam = searchParams.get('email')
+    const errorParam = searchParams.get('error')
+
+    const firstNameParam = searchParams.get('firstName') || searchParams.get('fn')
+    const lastNameParam = searchParams.get('lastName') || searchParams.get('ln')
+
+    let touched = false
+    const patch: Partial<ReturnType<typeof useSignupFormStore.getState>> = {}
+
+    if (emailParam) {
+      patch.email = emailParam
+      touched = true
+    }
+    if (firstNameParam) {
+      patch.firstName = firstNameParam
+      touched = true
+    }
+    if (lastNameParam) {
+      patch.lastName = lastNameParam
+      touched = true
+    }
+
+    if (verifiedParam === 'true') {
+      patch.verifiedEmail = emailParam ?? null
+      patch.emailVerified = true
+      setEmailSuccess('Email verified successfully!')
+      setEmailError(null)
+      touched = true
+    } else if (verifiedParam === 'false') {
+      setEmailError(errorParam || 'Email verification failed.')
+      setEmailSuccess(null)
+      patch.emailVerified = false
+      touched = true
+    }
+
+    if (touched) {
+      setMany(patch)
+      navigate('/signup', { replace: true, state: { fromVerify: true } })
+    }
+  }, [searchParams, navigate, setMany])
 
   return (
     <div className="mt-4 max-w-md">

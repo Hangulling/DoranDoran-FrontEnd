@@ -1,4 +1,9 @@
-import type { BookmarkByRoomResponse, BookmarkRequest, BookmarkResponse } from '../types/archive'
+import type {
+  BookmarkByRoomResponse,
+  BookmarkRequest,
+  BookmarkResponse,
+  BotType,
+} from '../types/archive'
 import api from './api'
 import { BOOKMARK_ENDPOINTS } from './endpoints'
 
@@ -19,6 +24,31 @@ export async function getBookmarksByCursor(lastId?: string, size = 15) {
   const res = await api.get(`/api/store/bookmarks/cursor`, {
     params: { lastId, size },
   })
+  return res.data as {
+    content: BookmarkResponse[]
+    totalElements: number
+    numberOfElements: number
+    last: boolean
+    first: boolean
+    empty: boolean
+  }
+}
+
+export async function getBookmarksCursorByBotType(botType: BotType, lastId?: string, size = 15) {
+  const res = await api.get(BOOKMARK_ENDPOINTS.LIST_CURSOR_BY_BOTTYPE(botType, lastId, size))
+  return res.data as {
+    content: BookmarkResponse[]
+    totalElements: number
+    numberOfElements: number
+    last: boolean
+    first: boolean
+    empty: boolean
+  }
+}
+
+export async function getBookmarksCursorByChatroom(chatroomId: string, lastId?: string, size = 15) {
+  const url = BOOKMARK_ENDPOINTS.LIST_CURSOR_BY_CHATROOM(chatroomId, lastId, size)
+  const res = await api.get(url)
   return res.data as {
     content: BookmarkResponse[]
     totalElements: number

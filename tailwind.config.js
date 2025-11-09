@@ -1,5 +1,6 @@
 module.exports = {
   mode: 'jit',
+  darkMode: false,
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     screens: {
@@ -14,5 +15,11 @@ module.exports = {
         150: '1.5', // 150% 행간 추가
       },
     },
+  },
+  plugins: [require('daisyui')],
+
+  daisyui: {
+    themes: ['light'], // 'light' 테마만 사용
+    darkTheme: light,
   },
 }

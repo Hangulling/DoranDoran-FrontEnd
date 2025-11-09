@@ -42,7 +42,7 @@ const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
 
   return (
     <div className={containerClass}>
-      <div className="flex items-start justify-between text-[12px] mb-1">
+      <div className="flex items-center justify-between text-[12px] mb-[2px]">
         <div className="flex items-center flex-wrap">
           <div className="mr-1 h-5 w-5">
             {correctMsg ? (
@@ -52,13 +52,12 @@ const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
             )}
           </div>
           <span
-            className={`text-[12px] ${correctMsg ? 'text-body text-gray-400' : 'text-title text-gray-800 mr-2'}`}
+            className={`${
+              variant === 'archive' ? 'text-sm' : 'text-[12px]'
+            } ${correctMsg ? 'text-body text-gray-400' : 'text-title text-gray-800'}`}
           >
             {word}
           </span>
-          {pronunciation && (
-            <span className="text-body text-[12px] text-gray-400">[{pronunciation}]</span>
-          )}
         </div>
         <div className="flex p-0.5 bg-gray-80 rounded-[6px]">
           {tabs.map(tab => (
@@ -78,6 +77,7 @@ const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
           ))}
         </div>
       </div>
+      {pronunciation && <span className="text-[12px] text-gray-400 mt-0">[{pronunciation}]</span>}
       {variant === 'chat' && <div className="h-[1px] bg-gray-80 w-full my-2" />}
       <div className="text-[14px] text-gray-700">{descriptionByTab[selectedTab]}</div>
     </div>

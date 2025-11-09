@@ -28,10 +28,13 @@ import useClosenessStore from '../stores/useClosenessStore'
 import { getClosenessAsText } from '../utils/conceptMap'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import showToast from '../components/common/CommonToast'
+import { useAuthCleanupStore } from '../stores/useAuthCleanupStore'
 import ReactGA from 'react-ga4'
 
 const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
 const IS_PROD = import.meta.env.PROD
+
+const LoadingDot = () => <span className="loading loading-dots loading-[5px] text-gray-200" />
 
 interface EnrichedMessage extends Message {
   correction?: IntimacyAnalysisData | null // 교정 데이터 저장
@@ -60,6 +63,8 @@ const ChatPage: React.FC = () => {
   const navigate = useNavigate()
   const { id } = useParams()
   const chatbotId = chatBotIdByRoom(id ?? '')
+  const noShowAgain = useModalStore(state => state.noShowAgain)
+  const setNoShowAgain = useModalStore(state => state.setNoShowAgain)
   const [messages, setMessages] = useState<EnrichedMessage[]>([]) // 확장
   const [isHistoryLoading, setIsHistoryLoading] = useState(true)
   const [isInitChatReady, setIsInitChatReady] = useState(false)
@@ -71,8 +76,6 @@ const ChatPage: React.FC = () => {
   const setCoachMarkSeen = useCoachStore(s => s.setCoachMarkSeen)
   const [showCoachMark, setShowCoachMark] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const noShowAgain = useModalStore(state => state.noShowAgain)
-  const setNoShowAgain = useModalStore(state => state.setNoShowAgain)
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const coachTimerRef = useRef<number | null>(null)
@@ -81,18 +84,83 @@ const ChatPage: React.FC = () => {
   const chatroomId = id ? roomsMap[id] : undefined
   const closenessLevel = useClosenessStore.getState().getCloseness(id ?? '') ?? 1
   const closenessText = getClosenessAsText(closenessLevel)
-  const accessToken = localStorage.getItem('accessToken') ?? ''
+  const accessToken = sessionStorage.getItem('accessToken') ?? ''
   const [sseError, setSseError] = useState<string | null>(null)
   const hasLeftRef = useRef(false)
 
+  const [isAiResponding, setIsAiResponding] = useState(false)
+  const pendingVocabularyRef = useRef<VocabularyExtractedData | null>(null)
+
   const lastUserMsgIdRef = useRef<string | null>(null) // 마지막 사용자 메시지 ID
-  const lastAiMsgIdRef = useRef<string | null>(null) // 마지막 AI 메시지 ID
+  const lastAiMsgIdRef = useRef<string | null>(null)
+
+  // 비활성 에러
+  const [inactivityError, setInactivityError] = useState(false)
+  // 비활성 타이머
+  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // 자동 로그아웃 시 방 나가기
+  const setPreLogoutTask = useAuthCleanupStore(state => state.setPreLogoutTask)
 
   const room = useMemo(() => {
     return chatRooms.find(r => String(r.roomRouteId) === String(id))
   }, [id])
 
-  // 채팅방 진입 시(새로고침 포함) 이전 대화 기록을 불러오는 useEffect
+  useEffect(() => {
+    if (chatroomId && userId) {
+      // 자동 로그아웃 시 실행될 함수를 정의
+      const cleanupTask = async () => {
+        // 이미 나간 경우 중복 호출 방지
+        if (hasLeftRef.current) return
+
+        hasLeftRef.current = true // 나감 처리 시작
+        try {
+          console.log('[AuthCleanup] 자동 로그아웃으로 인한 채팅방 나갑니다...')
+          await leaveChatroom(chatroomId, userId)
+
+          // ChatPage가 하던 다른 정리 작업
+          const storageKey = `initChat_${id}`
+          sessionStorage.removeItem(storageKey)
+        } catch (error) {
+          console.error('[AuthCleanup] 자동 로그아웃 중 채팅방 나가기 실패:', error)
+        }
+      }
+      setPreLogoutTask(cleanupTask)
+    } else {
+      setPreLogoutTask(null)
+    }
+
+    return () => {
+      setPreLogoutTask(null)
+    }
+  }, [chatroomId, userId, setPreLogoutTask, id, hasLeftRef])
+
+  // 비활성 타이머
+  const resetInactivityTimer = useCallback(() => {
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current)
+    }
+
+    setInactivityError(false)
+
+    inactivityTimerRef.current = setTimeout(() => {
+      console.warn('5분간 활동이 없어 비활성 에러 표시')
+      setInactivityError(true)
+    }, 300000)
+  }, [])
+
+  useEffect(() => {
+    resetInactivityTimer() // 마운트 시 타이머 시작
+
+    return () => {
+      // 언마운트 시 타이머 완전 제거
+      if (inactivityTimerRef.current) {
+        clearTimeout(inactivityTimerRef.current)
+      }
+    }
+  }, [resetInactivityTimer])
+
+  // 채팅방 진입 시(새로고침 포함) 이전 대화 기록 조회
   useEffect(() => {
     const fetchHistory = async () => {
       if (!chatroomId || !userId) {
@@ -241,7 +309,6 @@ const ChatPage: React.FC = () => {
 
   // 봇/가이드 메시지 도착
   useEffect(() => {
-    // 봇 메시지와 가이드 메시지가 모두 도착하면 'complete'
     const checkCompletion = (botMsg: string, guideMsg: string | null) => {
       // 'loading' 상태는 isNewChat == true일 때만 설정됨
       if (greetingState !== 'loading') return // 중복 실행 방지
@@ -256,28 +323,25 @@ const ChatPage: React.FC = () => {
       setGreetingState('complete')
     }
 
+    // 봇 메시지와 가이드 메시지가 모두 도착하면 'complete'
     if (greetingMsg1 && greetingMsg2) {
       checkCompletion(greetingMsg1, greetingMsg2)
+      setGreetingState('complete')
       return
     }
-
-    // 봇 메시지만 오고 가이드 메시지가 2초간 안와도 'complete' (SSE 또는 새로고침)
-    let timer: NodeJS.Timeout | null = null
-    if (greetingMsg1 && !greetingMsg2) {
-      // 즉시 완료되는 경우(새로고침)가 있으므로 타이머는 SSE 로딩 중에만
-      if (greetingState === 'loading') {
-        timer = setTimeout(() => {
-          console.warn('[SSE] Greeting guide message timeout. Rendering with bot message only.')
-          setGreetingState('complete') // 봇 메시지만이라도 렌더링
-        }, 2000)
-      } else if (greetingState !== 'pending') {
-        // (새로고침 시) 봇 메시지만 있고 가이드가 없는 경우 즉시 완료
-        setGreetingState('complete')
-      }
+    // InitChat 렌더링 시작
+    if (greetingMsg1 && greetingState === 'loading') {
+      setGreetingState('complete')
+      return
     }
-
-    return () => {
-      if (timer) clearTimeout(timer)
+    // (새로고침 시) 봇 메시지만 있고 가이드가 없는 경우 즉시 완료
+    if (
+      greetingMsg1 &&
+      !greetingMsg2 &&
+      greetingState !== 'pending' &&
+      greetingState !== 'loading'
+    ) {
+      setGreetingState('complete')
     }
   }, [greetingMsg1, greetingMsg2, greetingState, chatroomId])
 
@@ -318,7 +382,7 @@ const ChatPage: React.FC = () => {
     }
   }
 
-  // 다시 보지 않기 설정을 스토어에 동기화 -> 수정해야함
+  // 다시 보지 않기 설정을 스토어에 동기화
   useEffect(() => {
     const fetchUserExitSetting = async () => {
       if (!userId) return
@@ -366,6 +430,8 @@ const ChatPage: React.FC = () => {
 
   // 메시지 전송
   const handleSendMessage = async (text: string) => {
+    resetInactivityTimer() // 타이머 리셋
+
     if (!chatroomId) {
       console.error('채팅방 ID가 없습니다.')
       return
@@ -398,14 +464,18 @@ const ChatPage: React.FC = () => {
         analysisState: 'pending', // 명시적
       }
       setMessages(prevMessages => [...prevMessages, newMessage])
+
+      setIsAiResponding(true)
     } catch (error) {
       console.error('메시지 전송 실패:', error)
+      setIsAiResponding(false)
     }
   }
 
   // SSE 이벤트
   const handleSseEvent = useCallback(
     (eventType: string, data: unknown) => {
+      resetInactivityTimer() // 타이머 리셋
       setSseError(null) // 이벤트 수신되면 에러 초기화
 
       switch (eventType) {
@@ -422,6 +492,11 @@ const ChatPage: React.FC = () => {
         }
         case 'conversation_complete': {
           const conversationData = data as EventDataMap['conversation_complete']
+          // Ref에 저장된 어휘 데이터
+          const vocabData = pendingVocabularyRef.current
+
+          // AI 답장 + 어휘 동시 렌더링
+          setIsAiResponding(false) // 로딩 종료
 
           if (IS_PROD && GA_ENABLED && chatroomId) {
             ReactGA.event('send_ai_reply', {
@@ -431,6 +506,7 @@ const ChatPage: React.FC = () => {
           }
 
           lastAiMsgIdRef.current = conversationData.messageId
+
           const newAiMessage: EnrichedMessage = {
             id: conversationData.messageId,
             text: conversationData.content,
@@ -438,8 +514,11 @@ const ChatPage: React.FC = () => {
             avatarUrl: room?.avatar ?? '',
             variant: 'basic',
             showIcon: true,
+            vocabularyData: vocabData,
           }
           setMessages(prev => [...prev, newAiMessage])
+
+          pendingVocabularyRef.current = null // 대기 데이터 비우기
           break
         }
         case 'intimacy_analysis': {
@@ -479,17 +558,8 @@ const ChatPage: React.FC = () => {
         }
         case 'vocabulary_extracted': {
           const vocabData = data as VocabularyExtractedData
-          const targetMsgId = lastAiMsgIdRef.current
-          if (!targetMsgId) break
-          setMessages(prev =>
-            prev.map(msg => {
-              if (msg.id === targetMsgId) {
-                return { ...msg, vocabularyData: vocabData }
-              }
-              return msg
-            })
-          )
-          lastAiMsgIdRef.current = null
+          // 데이터를 임시 Ref에 저장
+          pendingVocabularyRef.current = vocabData
           break
         }
         default: // 예상 못한 이벤트 처리
@@ -497,13 +567,18 @@ const ChatPage: React.FC = () => {
           break
       }
     },
-    [room, isNewChat, chatroomId]
+    [room, isNewChat, resetInactivityTimer, chatroomId]
   )
 
   // useChatStream 호출
   useChatStream<EventDataMap>(chatroomId ?? '', userId, accessToken, handleSseEvent, e => {
-    console.error('SSE Error', e)
+    console.error('SSE Error (Network/Server)', e)
     setSseError('SSE 연결 중 오류가 발생했습니다.')
+
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current)
+    }
+    setInactivityError(false) // 비활성 에러 숨김
   })
 
   // 채팅방 나가기
@@ -591,10 +666,30 @@ const ChatPage: React.FC = () => {
       }
 
       // 탭 닫기
-      console.log('[ChatPage] beforeunload (Tab Close / Multi-Back). Leaving chatroom.')
+      console.log('beforeunload (Tab Close / Multi-Back). Leaving chatroom.')
 
       if (chatroomId && userId) {
-        leaveChatroom(chatroomId, userId)
+        const accessToken = sessionStorage.getItem('accessToken')
+        if (!accessToken) {
+          console.warn('Unload: No access token. Cannot leave room.')
+          return
+        }
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://3.21.177.186:8080'
+
+        const url = `${API_BASE_URL}/api/chat/chatrooms/${chatroomId}/leave?userId=${userId}`
+
+        try {
+          fetch(url, {
+            method: 'POST', // 명세서 기준
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            keepalive: true, // 페이지가 닫혀도 요청
+          })
+          console.log(`Keepalive POST sent to: ${url}`)
+        } catch (e) {
+          console.error('Failed to send keepalive fetch:', e)
+        }
       }
     }
     window.addEventListener('beforeunload', handleUnload)
@@ -754,13 +849,13 @@ const ChatPage: React.FC = () => {
           </div>
         ) : (
           <>
-            {greetingState === 'complete' && greetingMsg1 && (
+            {(greetingState === 'loading' || greetingState === 'complete') && (
               <InitChat
                 avatar={room?.avatar}
                 onReady={() => setIsInitChatReady(true)}
-                message1={greetingMsg1} // 봇 메시지 전달
-                message2={greetingMsg2 ?? ''} // 가이드 메시지 전달 (없으면 빈칸)
-                skipAnimation={isNewChat === false} // 애니메이션 스킵 여부
+                message1={greetingMsg1}
+                message2={greetingMsg2 ?? ''}
+                skipAnimation={isNewChat === false}
               />
             )}
 
@@ -841,11 +936,35 @@ const ChatPage: React.FC = () => {
                   </div>
                 )
               })}
+              {/* AI 응답 로딩 버블 */}
+              {isAiResponding && (
+                <div className="mt-5">
+                  <ChatBubble
+                    message={<LoadingDot />}
+                    isSender={false}
+                    avatarUrl={room?.avatar}
+                    variant={'basic'}
+                    showIcon={false}
+                  />
+                </div>
+              )}
+
               <div className="mt-5">
                 {sseError && (
                   <ChatBubble
                     avatarUrl={room?.avatar}
                     message={'Failed to load AI response'}
+                    isSender={false}
+                    variant={'error'}
+                    showIcon={false}
+                  />
+                )}
+
+                {/* 5분 비활성 에러 */}
+                {inactivityError && (
+                  <ChatBubble
+                    avatarUrl={room?.avatar}
+                    message={'Knock knock'}
                     isSender={false}
                     variant={'error'}
                     showIcon={false}
@@ -859,7 +978,11 @@ const ChatPage: React.FC = () => {
       </div>
       <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
       <footer className="shrink-0">
-        <ChatFooter inputRef={inputRef} onSendMessage={handleSendMessage} />
+        <ChatFooter
+          inputRef={inputRef}
+          onSendMessage={handleSendMessage}
+          disabled={isHistoryLoading || !isInitChatReady || isAiResponding}
+        />
       </footer>
       <ExitModal open={isModalOpen} onConfirm={handleConfirm} onCancel={handleCancel} />
     </div>
