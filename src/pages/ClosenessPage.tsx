@@ -86,7 +86,6 @@ const ClosenessPage = () => {
       if (IS_PROD && GA_ENABLED) {
         ReactGA.event('set_intimacy_level', {
           chatroom_id: newRoom.id, // API에서 반환된 실제 chatroom UUID
-          user_id: userId,
           concept: concept,
           intimacy_level: sliderValue,
         })

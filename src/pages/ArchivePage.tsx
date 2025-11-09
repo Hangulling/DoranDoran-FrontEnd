@@ -143,7 +143,6 @@ export default function ArchivePage() {
     const entryPoint = fromChat ? 'chatroom_id' : 'chatroom_list'
     const entryTimestamp = Math.floor(Date.now() / 1000)
     ReactGA.event('view_store', {
-      user_id: userId,
       entry_point: entryPoint,
       entry_timestamp: entryTimestamp,
     })
@@ -176,7 +175,6 @@ export default function ArchivePage() {
           const strLevel = readIntimacyLevel(latest) ?? null
 
           ReactGA.event('click_home_store', {
-            user_id: userId,
             concept: activeRoom.toLowerCase(),
             intimacy_level: mapIntimacyToNum(strLevel),
           })
@@ -232,7 +230,6 @@ export default function ArchivePage() {
         const concept = activeRoom.toLowerCase()
         itemsToDelete.forEach(item => {
           ReactGA.event('click_store_delete', {
-            user_id: userId,
             chatroom_id: readChatroomId(item),
             content_type: readContentType(item),
             time_saved: timeSavedHHDotMM(readCreatedAt(item)),

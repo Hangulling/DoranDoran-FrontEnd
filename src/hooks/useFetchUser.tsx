@@ -24,7 +24,7 @@ export const useFetchUser = () => {
 
         // 로그인 후 메인페이지 진입 시, User-ID 재설정
         if (IS_PROD && GA_ENABLED) {
-          ReactGA.set({ userId: profile.id })
+          ReactGA.set({ user_id: profile.id })
         }
       } catch (err) {
         console.error('사용자 정보 로드 실패:', err)

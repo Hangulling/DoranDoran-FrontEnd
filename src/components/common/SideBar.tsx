@@ -9,7 +9,6 @@ import ReactGA from 'react-ga4'
 import { GA_ENABLED, IS_PROD } from '../../constants/env'
 import { useSidebarAnimation } from '../../hooks/useSidebarAnimation'
 import { useSidebar } from '../../hooks/useSidebarAction'
-import { useUserStore } from '../../stores/useUserStore'
 
 const LOGOUT_DESC = ['You can log in again anytime.']
 const SIGNOUT_DESC_JSX = [
@@ -28,7 +27,6 @@ const iconBtn =
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { visible, isActive } = useSidebarAnimation(isOpen, 300)
   const { handleLogout, handleDeleteAccount, openAboutPdf, goPolicy, goForm } = useSidebar(onClose)
-  const userId = useUserStore(state => state.id)
 
   const [modalOpen, setModalOpen] = useState(false)
   const [modalType, setModalType] = useState<'logout' | 'signup' | null>(null)
@@ -51,17 +49,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     if (modalType === 'logout') {
       // click_logout
       if (IS_PROD && GA_ENABLED) {
-        ReactGA.event('click_logout', {
-          user_id: userId,
-        })
+        ReactGA.event('click_logout', {})
       }
       await handleLogout()
     } else if (modalType === 'signup') {
       // click_delete_account
       if (IS_PROD && GA_ENABLED) {
-        ReactGA.event('click_delete_account', {
-          user_id: userId,
-        })
+        ReactGA.event('click_delete_account', {})
       }
       await handleDeleteAccount()
     }
