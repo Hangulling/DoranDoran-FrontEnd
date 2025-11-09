@@ -305,7 +305,6 @@ const ChatPage: React.FC = () => {
         const yyyyMmDd = new Date().toISOString().slice(0, 10)
         ReactGA.event('view_chatroom', {
           chatroom_id: chatroomId,
-          user_id: userId,
           date: yyyyMmDd,
         })
         // 이벤트 전송 후 sessionStorage에 플래그 설정
@@ -322,7 +321,6 @@ const ChatPage: React.FC = () => {
 
       if (IS_PROD && GA_ENABLED && chatroomId) {
         ReactGA.event('send_greeting_message', {
-          user_id: userId,
           chatroom_id: chatroomId,
           bot_message: botMsg,
           guide_message: guideMsg ?? '', // 가이드 메시지는 없을 수 있음
@@ -445,7 +443,6 @@ const ChatPage: React.FC = () => {
 
       if (IS_PROD && GA_ENABLED) {
         ReactGA.event('send_user_message', {
-          user_id: userId,
           chatroom_id: chatroomId,
           user_message: text,
         })
@@ -501,7 +498,6 @@ const ChatPage: React.FC = () => {
 
           if (IS_PROD && GA_ENABLED && chatroomId) {
             ReactGA.event('send_ai_reply', {
-              user_id: userId,
               chatroom_id: chatroomId,
               intimacy_message: conversationData.content,
             })
@@ -528,7 +524,6 @@ const ChatPage: React.FC = () => {
 
           if (IS_PROD && GA_ENABLED && chatroomId && intimacyData.correctedSentence) {
             ReactGA.event('send_ai_intimacy', {
-              user_id: userId,
               chatroom_id: chatroomId,
               ai_message: intimacyData.correctedSentence,
             })
@@ -600,7 +595,6 @@ const ChatPage: React.FC = () => {
       const leaveTimestamp = Math.floor(Date.now() / 1000) // UNIX 타임스탬프
       ReactGA.event('leave_chatroom', {
         chatroom_id: chatroomId,
-        user_id: userId,
         leave_timestamp: leaveTimestamp,
       })
     }

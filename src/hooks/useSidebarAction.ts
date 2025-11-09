@@ -35,7 +35,6 @@ export function useSidebar(onClose: () => void) {
         // confirm_logout
         const completeTimestamp = Math.floor(Date.now() / 1000) // UNIX 타임스탬프
         ReactGA.event('confirm_logout', {
-          user_id: userId,
           complete_timestamp: completeTimestamp,
         })
         ReactGA.set({ userId: null })
@@ -55,7 +54,6 @@ export function useSidebar(onClose: () => void) {
         // confirm_delete_account
         const completeTimestamp = Math.floor(Date.now() / 1000) // UNIX 타임스탬프
         ReactGA.event('confirm_delete_account', {
-          user_id: userId,
           complete_timestamp: completeTimestamp,
         })
         ReactGA.set({ userId: null })
