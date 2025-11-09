@@ -109,12 +109,11 @@ export default function LoginPage() {
         setStoreName(user.name)
 
         if (IS_PROD && GA_ENABLED) {
-          ReactGA.set({ userId: user.id })
+          ReactGA.set({ user_id: user.id })
 
           // 2. 로그인 성공 이벤트
           const yyyyMmDd = new Date().toISOString().slice(0, 10)
           ReactGA.event('login', {
-            user_id: user.id,
             date: yyyyMmDd,
             method: email, // 추후 확장?
           })
