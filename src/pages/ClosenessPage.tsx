@@ -4,11 +4,9 @@ import Button from '../components/common/Button'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import useClosenessStore from '../stores/useClosenessStore'
 import { chatRooms } from '../mocks/db/chat'
-import { createChatRoom } from '../api'
 import { useUserStore } from '../stores/useUserStore'
-import useRoomIdStore from '../stores/useRoomIdStore'
-import ReactGA from 'react-ga4'
-import { GA_ENABLED, IS_PROD } from '../constants/env'
+import { getChatBotIdByConcept } from '../utils/chatbotMap'
+import { useCreateChatRoom } from '../hooks/useCreateChatRoom'
 
 const bubbleBase = 'py-[6px] px-2 text-[14px] text-gray-700 rounded-lg'
 const bubbleBasic =
@@ -27,82 +25,49 @@ const ClosenessPage = () => {
 
   const userId = useUserStore(state => state.id)
   const closeness = useClosenessStore(state => state.closenessMap[id ?? ''] ?? 1)
-  const setCloseness = useClosenessStore(state => state.setCloseness)
 
   const [sliderValue, setSliderValue] = useState(closeness)
-  const [touched, setTouched] = useState(false)
   const [isExiting, setIsExiting] = useState(false)
+
+  const { mutate: createRoom, isPending } = useCreateChatRoom(id ?? '')
 
   const room = chatRooms.find(r => String(r.roomRouteId) === String(id))
 
-  // 슬라이더값 initial
   useEffect(() => {
-    setSliderValue(1)
-    setTouched(false)
-  }, [id])
+    setSliderValue(closeness)
+  }, [id, closeness])
 
-  // 슬라이더 변경 전 버튼 비활성화
+  // 슬라이더 변경
   const handleSliderChange = (val: number) => {
     setSliderValue(val)
-    if (!touched) setTouched(true)
-  }
-
-  const chatBotIdByConcept = (conceptValue: string): string => {
-    switch (conceptValue) {
-      case 'friend':
-        return '22222222-2222-2222-2222-222222222221'
-      case 'honey':
-        return '22222222-2222-2222-2222-222222222222'
-      case 'coworker':
-        return '22222222-2222-2222-2222-222222222223'
-      case 'senior':
-        return '22222222-2222-2222-2222-222222222224'
-    }
-    return ''
   }
 
   // 확인 버튼
   const handleConfirm = async () => {
-    if (!id) return
-
+    if (!id || isPending) return
     try {
-      const chatbotId = chatBotIdByConcept(concept)
+      const chatbotId = getChatBotIdByConcept(concept)
 
-      let newRoom
-      try {
-        // 채팅방 생성
-        newRoom = await createChatRoom({
+      // 뮤테이션 실행
+      createRoom(
+        {
           userId,
           concept: concept,
           chatbotId: chatbotId,
           intimacyLevel: sliderValue,
-        })
-      } catch (error) {
-        navigate('/error', { state: { from: `/closeness/${id}` } })
-        console.error('채팅방 생성 실패:', error)
-        return
-      }
-
-      if (IS_PROD && GA_ENABLED) {
-        ReactGA.event('set_intimacy_level', {
-          chatroom_id: newRoom.id, // API에서 반환된 실제 chatroom UUID
-          concept: concept,
-          intimacy_level: sliderValue,
-        })
-      }
-
-      useRoomIdStore.getState().addRoomMapping(id, newRoom.id)
-      useRoomIdStore.getState().setChatbotId(id, chatbotId)
-
-      setCloseness(id, sliderValue) // store
-      setIsExiting(true) // 모션
-
-      setTimeout(() => {
-        navigate(`/chat/${id}`)
-      }, 550)
+        },
+        {
+          onSuccess: () => {
+            setIsExiting(true) // 모션
+            setTimeout(() => {
+              navigate(`/chat/${id}`)
+            }, 550)
+          },
+        }
+      )
     } catch (error) {
-      navigate('/error', { state: { from: `/closeness/${id}` } })
       console.error('알 수 없는 에러 발생:', error)
+      navigate('/error', { state: { from: `/closeness/${id}` } })
     }
   }
 
@@ -133,7 +98,7 @@ const ClosenessPage = () => {
               variant="primary"
               size="confirm"
               className="bg-gray-800 w-full text-subtitle mb-2"
-              disabled={false}
+              disabled={isPending}
               onClick={handleConfirm}
             >
               Confirm
