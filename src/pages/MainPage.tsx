@@ -6,6 +6,7 @@ import ReactGA from 'react-ga4'
 import Banner from '../components/main/Banner'
 import ChatRoomList from '../components/main/ChatRoomList'
 import { GA_ENABLED, IS_PROD } from '../constants/env'
+import { useEffect } from 'react'
 
 const MainPage = () => {
   const navigate = useNavigate()
@@ -15,11 +16,25 @@ const MainPage = () => {
   // 뒤로 가기 방지
   useGoBack()
 
+  // view_main GA
+  useEffect(() => {
+    if (IS_PROD && GA_ENABLED && userId) {
+      const entryTimestamp = Math.floor(Date.now() / 1000) // UNIX 타임스탬프
+      ReactGA.event('view_main', {
+        user_id: userId,
+        entry_timestamp: entryTimestamp,
+      })
+    }
+  }, [userId])
+
   const handleRoomClick = (id: number, roomName: string) => {
     if (IS_PROD && GA_ENABLED) {
+      // enter_chatroom GA
+      const entryTimestamp = Math.floor(Date.now() / 1000) // UNIX 타임스탬프
       ReactGA.event('enter_chatroom', {
         user_id: userId,
         concept: roomName, // 'friend', 'honey' 등
+        entry_timestamp: entryTimestamp,
       })
     }
 

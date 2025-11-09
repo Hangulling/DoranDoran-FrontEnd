@@ -19,12 +19,9 @@ import {
   type Room,
 } from '../types/archive'
 import { deleteManyBookmarks, getBookmarksByBotType } from '../api/archive'
+import { GA_ENABLED, IS_PROD } from '../constants/env'
 
 const PAGE_SIZE = 15
-
-// GA 환경 변수
-const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
-const IS_PROD = import.meta.env.PROD
 
 // 문자열 → 숫자 매핑(대소문자/공백 허용)
 const mapIntimacyToNum = (s?: string | null) => {
@@ -144,9 +141,11 @@ export default function ArchivePage() {
     if (!userId) return
 
     const entryPoint = fromChat ? 'chatroom_id' : 'chatroom_list'
+    const entryTimestamp = Math.floor(Date.now() / 1000)
     ReactGA.event('view_store', {
       user_id: userId,
       entry_point: entryPoint,
+      entry_timestamp: entryTimestamp,
     })
   }, [roomResolved, fromChat, userId])
 
@@ -230,12 +229,14 @@ export default function ArchivePage() {
       }
 
       if (IS_PROD && GA_ENABLED && userId) {
+        const concept = activeRoom.toLowerCase()
         itemsToDelete.forEach(item => {
           ReactGA.event('click_store_delete', {
             user_id: userId,
             chatroom_id: readChatroomId(item),
             content_type: readContentType(item),
             time_saved: timeSavedHHDotMM(readCreatedAt(item)),
+            concept: concept,
           })
         })
       }

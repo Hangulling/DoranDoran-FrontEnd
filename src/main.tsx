@@ -4,7 +4,6 @@ import App from './App.tsx'
 import './styles/index.css'
 import React from 'react'
 import ReactGA from 'react-ga4'
-import AnalyticsTracker from './components/common/AnalyticsTracker.ts'
 import MaintenancePage from './pages/MaintenancePage.tsx'
 
 const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
@@ -18,10 +17,17 @@ if (paramInternal) {
   sessionStorage.setItem('isInternalTraffic', 'true')
 }
 
+// 페이지뷰 자동 수집 제거
 if (import.meta.env.PROD && GA_TRACKING_ID && GA_ENABLED) {
   const isInternal = sessionStorage.getItem('isInternalTraffic') === 'true'
 
-  const gaConfigOptions = isInternal ? { traffic_type: 'internal' } : {}
+  const gaConfigOptions: { traffic_type?: string; send_page_view: boolean } = {
+    send_page_view: false,
+  }
+
+  if (isInternal) {
+    gaConfigOptions.traffic_type = 'internal'
+  }
 
   ReactGA.initialize(GA_TRACKING_ID, {
     gtagOptions: gaConfigOptions,
@@ -58,7 +64,6 @@ prepare().then(() => {
           </Routes>
         ) : (
           <>
-            <AnalyticsTracker />
             <App />
           </>
         )}
