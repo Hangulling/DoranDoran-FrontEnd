@@ -11,9 +11,7 @@ import { useSignupFormStore } from '../stores/useSignupStore'
 import { checkEmailExists, requestEmailVerification } from '../api/auth'
 import { createUser } from '../api/user'
 import ReactGA from 'react-ga4'
-
-const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
-const IS_PROD = import.meta.env.PROD
+import { GA_ENABLED, IS_PROD } from '../constants/env'
 
 export default function SignupPage() {
   const {
@@ -228,10 +226,13 @@ export default function SignupPage() {
       const res = await createUser(payload)
       if (import.meta.env.DEV) console.log('🎉 회원가입 성공:', res)
 
-      // GA
+      // sign_up GA
       if (IS_PROD && GA_ENABLED) {
+        const completeTimestamp = Math.floor(Date.now() / 1000) // UNIX 타임스탬프
         ReactGA.event('sign_up', {
-          method: 'Email', // 가입 방식
+          method: 'email', // 추후 확장
+          user_id: res.id,
+          complete_timestamp: completeTimestamp,
         })
       }
 
@@ -257,7 +258,15 @@ export default function SignupPage() {
     setOpenModal(true)
   }
 
+  // 페이지 뷰 추가
   useEffect(() => {
+    if (IS_PROD && GA_ENABLED) {
+      const entryTimestamp = Math.floor(Date.now() / 1000) // UNIX 타임스탬프
+      ReactGA.event('view_sign_in', {
+        entry_timestamp: entryTimestamp,
+      })
+    }
+
     if (searchParams.get('clear') === '1') {
       resetForm()
       resetAgreements()

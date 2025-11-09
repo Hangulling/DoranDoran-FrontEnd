@@ -8,9 +8,7 @@ import { createChatRoom } from '../api'
 import { useUserStore } from '../stores/useUserStore'
 import useRoomIdStore from '../stores/useRoomIdStore'
 import ReactGA from 'react-ga4'
-
-const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
-const IS_PROD = import.meta.env.PROD
+import { GA_ENABLED, IS_PROD } from '../constants/env'
 
 const bubbleBase = 'py-[6px] px-2 text-[14px] text-gray-700 rounded-lg'
 const bubbleBasic =

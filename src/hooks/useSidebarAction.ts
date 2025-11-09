@@ -32,7 +32,12 @@ export function useSidebar(onClose: () => void) {
     try {
       await logout()
       if (IS_PROD && GA_ENABLED) {
-        ReactGA.event('confirm_logout')
+        // confirm_logout
+        const completeTimestamp = Math.floor(Date.now() / 1000) // UNIX 타임스탬프
+        ReactGA.event('confirm_logout', {
+          user_id: userId,
+          complete_timestamp: completeTimestamp,
+        })
         ReactGA.set({ userId: null })
       }
       handleAppReset()
@@ -47,7 +52,12 @@ export function useSidebar(onClose: () => void) {
     try {
       await deleteUser(userId)
       if (IS_PROD && GA_ENABLED) {
-        ReactGA.event('confirm_delete_account')
+        // confirm_delete_account
+        const completeTimestamp = Math.floor(Date.now() / 1000) // UNIX 타임스탬프
+        ReactGA.event('confirm_delete_account', {
+          user_id: userId,
+          complete_timestamp: completeTimestamp,
+        })
         ReactGA.set({ userId: null })
       }
       handleAppReset()
@@ -73,11 +83,6 @@ export function useSidebar(onClose: () => void) {
 
   // 구글 폼
   const goForm = () => {
-    if (IS_PROD && GA_ENABLED) {
-      ReactGA.event('click_contact_us', {
-        destination_url: 'https://forms.gle/dRBuvgKjwK7enscy6',
-      })
-    }
     onClose()
     window.open('https://forms.gle/dRBuvgKjwK7enscy6', '_blank')
   }
