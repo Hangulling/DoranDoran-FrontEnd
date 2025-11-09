@@ -1,5 +1,4 @@
-import type React from 'react'
-import { useMatch, useNavigate } from 'react-router-dom'
+import React from 'react'
 import LeftArrowIcon from '../../assets/icon/leftArrow.svg?react'
 import CloseIcon from '../../assets/icon/close.svg'
 import BookmarkIcon from '../../assets/icon/bookmark.svg?react'
@@ -9,12 +8,7 @@ import useArchiveStore from '../../stores/useArchiveStore'
 import Button from './Button'
 import type { NavBarProps } from '../../types/common'
 import { BOT_TO_ROOM } from '../../types/archive'
-import ReactGA from 'react-ga4'
-import { useUserStore } from '../../stores/useUserStore'
-import useRoomIdStore from '../../stores/useRoomIdStore'
-
-const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
-const IS_PROD = import.meta.env.PROD
+import { useNavBar } from '../../hooks/useNavBarAction'
 
 const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
   title,
@@ -23,7 +17,8 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
   showDelete,
   onToggleSidebar,
 }) => {
-  const navigate = useNavigate()
+  const { goBack, handleBookmarkClick, handleHamburgerClick, isChatPage } =
+    useNavBar(onToggleSidebar)
 
   const {
     items,
@@ -35,51 +30,6 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
     selectAll,
     deselectAll,
   } = useArchiveStore()
-
-  const userId = useUserStore(state => state.id)
-  const roomsMap = useRoomIdStore(state => state.roomsMap)
-  const chatMatch = useMatch('/chat/:id')
-  const isChatPage = Boolean(chatMatch)
-  const closenessMatch = useMatch('/closeness/:id')
-  const archiveMatch = useMatch('/archive/:id')
-  const currentId = chatMatch?.params.id ?? closenessMatch?.params.id ?? archiveMatch?.params.id
-  const chatroomId = currentId ? roomsMap[currentId] : undefined
-
-  // 뒤로가기
-  const goBack = () => {
-    if (IS_PROD && GA_ENABLED && isChatPage && chatroomId) {
-      ReactGA.event('click_previous', {
-        chatroom_id: chatroomId,
-        user_id: userId,
-        previous_button: 'in_app_arrow', // "앱 내부 화살표"로 기록
-      })
-    }
-
-    navigate(-1)
-  }
-
-  // 북마크 바로가기
-  const handleBookmarkClick = () => {
-    if (!currentId) {
-      navigate('/archive/1')
-      return
-    }
-    if (chatMatch || closenessMatch) {
-      navigate(`/archive/${currentId}`, { state: { from: 'chat' } })
-    }
-  }
-
-  // GA 포함 핸들러
-  const handleHamburgerClick = () => {
-    // GA 이벤트 전송
-    if (IS_PROD && GA_ENABLED) {
-      ReactGA.event('open_side_menu')
-    }
-    // 사이드바 토글 함수 실행
-    if (onToggleSidebar) {
-      onToggleSidebar()
-    }
-  }
 
   const hasAnyInRoom = items.some(i => BOT_TO_ROOM[i.botType] === activeRoom)
 
@@ -97,6 +47,7 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
             </button>
           )}
 
+          {/* 선택 모드 */}
           {selectionMode && (
             <Button onClick={exitSelectionMode}>
               <img src={CloseIcon} />

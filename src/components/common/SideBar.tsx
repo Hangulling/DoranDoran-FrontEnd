@@ -1,21 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import CloseIcon from '../../assets/icon/blackClose.svg?react'
 import RightArrowIcon from '../../assets/icon/blackArrowRight.svg'
 import LogoutIcon from '../../assets/icon/logout.svg?react'
 import SignupIcon from '../../assets/icon/signup.svg?react'
 import type { SidebarProps } from '../../types/common'
 import CommonModal from './CommonModal'
-import { useNavigate } from 'react-router-dom'
-import { deleteUser, logout } from '../../api'
-import { useUserStore } from '../../stores/useUserStore'
-import showToast from './CommonToast'
-import useClosenessStore from '../../stores/useClosenessStore'
-import useRoomIdStore from '../../stores/useRoomIdStore'
-import { useCoachStore, useModalStore } from '../../stores/useUiStateStore'
 import ReactGA from 'react-ga4'
-
-const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
-const IS_PROD = import.meta.env.PROD
+import { GA_ENABLED, IS_PROD } from '../../constants/env'
+import { useSidebarAnimation } from '../../hooks/useSidebarAnimation'
+import { useSidebar } from '../../hooks/useSidebarAction'
 
 const LOGOUT_DESC = ['You can log in again anytime.']
 const SIGNOUT_DESC_JSX = [
@@ -32,116 +25,43 @@ const iconBtn =
   'flex items-center gap-x-[6px] text-gray-400 text-[14px] hover:text-gray-800 focus:text-gray-800'
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+  const { visible, isActive } = useSidebarAnimation(isOpen, 300)
+  const { handleLogout, handleDeleteAccount, openAboutPdf, goPolicy, goForm } = useSidebar(onClose)
+
   const [modalOpen, setModalOpen] = useState(false)
   const [modalType, setModalType] = useState<'logout' | 'signup' | null>(null)
-  const [visible, setVisible] = useState(isOpen)
-  const [isActive, setIsActive] = useState(false)
-  const userId = useUserStore(state => state.id)
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    if (isOpen) {
-      setVisible(true)
-      // 마운트 후 약간 딜레이 후 애니메이션 시작
-      setTimeout(() => setIsActive(true), 150)
-    } else {
-      setIsActive(false)
-      const timer = setTimeout(() => setVisible(false), 300)
-      return () => clearTimeout(timer)
-    }
-  }, [isOpen])
 
   if (!visible) return null
 
-  // 로그아웃 버튼 클릭 시
+  // 로그아웃 버튼
   const openLogoutModal = () => {
     if (IS_PROD && GA_ENABLED) {
       ReactGA.event('click_logout')
     }
-
     setModalType('logout')
     setModalOpen(true)
   }
-  // 회원탈퇴 버튼 클릭 시
+
+  // 회원탈퇴 버튼
   const openSignupModal = () => {
     if (IS_PROD && GA_ENABLED) {
       ReactGA.event('click_delete_account')
     }
-
     setModalType('signup')
     setModalOpen(true)
   }
 
   const handleConfirm = async () => {
     if (modalType === 'logout') {
-      try {
-        await logout()
-
-        if (IS_PROD && GA_ENABLED) {
-          ReactGA.event('confirm_logout')
-          ReactGA.set({ userId: null }) // GA User-ID 초기화
-        }
-
-        useUserStore.getState().reset() // 상태 초기화
-        useClosenessStore.getState().reset()
-        useRoomIdStore.getState().reset()
-        useCoachStore.getState().reset()
-        useModalStore.getState().reset()
-        onClose()
-        navigate('/login')
-      } catch (error) {
-        showToast({ message: 'Failed to log out. Please try again', iconType: 'error' })
-        console.error('로그아웃 실패:', error)
-      }
+      await handleLogout()
     } else if (modalType === 'signup') {
-      try {
-        await deleteUser(userId)
-
-        if (IS_PROD && GA_ENABLED) {
-          ReactGA.event('confirm_delete_account')
-          ReactGA.set({ userId: null }) // GA User-ID 초기화
-        }
-
-        useUserStore.getState().reset()
-        useClosenessStore.getState().reset()
-        useRoomIdStore.getState().reset()
-        useCoachStore.getState().reset()
-        useModalStore.getState().reset()
-        onClose()
-        navigate('/login')
-      } catch (error) {
-        showToast({ message: 'Failed to delete account. Please try again', iconType: 'error' })
-        console.error('회원 탈퇴 실패:', error)
-      }
+      await handleDeleteAccount()
     }
     setModalOpen(false)
   }
 
   const handleCancel = () => {
     setModalOpen(false)
-  }
-
-  const openAboutPdf = () => {
-    onClose()
-    const pdfUrl = `${import.meta.env.BASE_URL}docs/${encodeURIComponent('도란도란 서비스 소개서.pdf')}`
-    window.open(pdfUrl, '_blank', 'noopener,noreferrer')
-  }
-
-  const goPolicy = (term: 'service' | 'privacy') => {
-    onClose()
-    navigate(`/policy/${term}`, {
-      state: { hideConfirm: true, from: 'sidebar' },
-    })
-  }
-
-  const goForm = () => {
-    if (IS_PROD && GA_ENABLED) {
-      ReactGA.event('click_contact_us', {
-        destination_url: 'https://forms.gle/dRBuvgKjwK7enscy6',
-      })
-    }
-    onClose()
-    window.open('https://forms.gle/dRBuvgKjwK7enscy6', '_blank')
   }
 
   return (
@@ -180,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               Privacy Policy
               <img src={RightArrowIcon} />
             </button>
-            <button className={menuBtn} onClick={() => goForm()}>
+            <button className={menuBtn} onClick={goForm}>
               Contact Us
               <img src={RightArrowIcon} />
             </button>

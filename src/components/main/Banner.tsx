@@ -1,4 +1,5 @@
-import Character from '../../assets/main/mainCharacter.svg' // 경로 수정 필요
+import Character from '../../assets/main/mainCharacter.svg'
+import { capitalizeName } from '../../utils/capitalizeFirstLetter'
 
 interface BannerProps {
   userName: string
@@ -10,7 +11,7 @@ const Banner = ({ userName }: BannerProps) => {
       <div className="absolute top-[14px] left-[20px]">
         <div className="text-[14px]">Welcome,</div>
         <div className="text-[16px]">
-          <span className="text-title">{userName}</span>
+          <span className="text-title">{capitalizeName(userName)}</span>
           <span> :)</span>
         </div>
         <p className="mt-[8px] text-[12px] text-gray-600">Learn Korean expressions by chat!</p>
