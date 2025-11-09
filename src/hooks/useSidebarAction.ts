@@ -29,13 +29,19 @@ export function useSidebar(onClose: () => void) {
 
   // 로그아웃 핸들러
   const handleLogout = async () => {
+    const userIdToLog = useUserStore.getState().id
+
+    if (!userIdToLog) {
+      console.warn('Logout GA Event: User ID is missing at click time.')
+    }
+
     try {
       await logout()
       if (IS_PROD && GA_ENABLED) {
         // confirm_logout
         const completeTimestamp = Math.floor(Date.now() / 1000) // UNIX 타임스탬프
         ReactGA.event('confirm_logout', {
-          user_id: userId,
+          user_id: userIdToLog,
           complete_timestamp: completeTimestamp,
         })
         ReactGA.set({ userId: null })
@@ -49,13 +55,19 @@ export function useSidebar(onClose: () => void) {
 
   // 회원탈퇴 핸들러
   const handleDeleteAccount = async () => {
+    const userIdToDelete = useUserStore.getState().id
+
+    if (!userIdToDelete) {
+      console.warn('Delete Account GA Event: User ID is missing at click time.')
+    }
+
     try {
       await deleteUser(userId)
       if (IS_PROD && GA_ENABLED) {
         // confirm_delete_account
         const completeTimestamp = Math.floor(Date.now() / 1000) // UNIX 타임스탬프
         ReactGA.event('confirm_delete_account', {
-          user_id: userId,
+          user_id: userIdToDelete,
           complete_timestamp: completeTimestamp,
         })
         ReactGA.set({ userId: null })
