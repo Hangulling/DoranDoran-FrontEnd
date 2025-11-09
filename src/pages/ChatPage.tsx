@@ -30,9 +30,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner'
 import showToast from '../components/common/CommonToast'
 import { useAuthCleanupStore } from '../stores/useAuthCleanupStore'
 import ReactGA from 'react-ga4'
-
-const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
-const IS_PROD = import.meta.env.PROD
+import { GA_ENABLED, IS_PROD } from '../constants/env'
 
 const LoadingDot = () => <span className="loading loading-dots loading-[5px] text-gray-200" />
 
@@ -121,6 +119,7 @@ const ChatPage: React.FC = () => {
           // ChatPage가 하던 다른 정리 작업
           const storageKey = `initChat_${id}`
           sessionStorage.removeItem(storageKey)
+          sessionStorage.removeItem(`viewed_chatroom_${chatroomId}`)
         } catch (error) {
           console.error('[AuthCleanup] 자동 로그아웃 중 채팅방 나가기 실패:', error)
         }
@@ -294,16 +293,24 @@ const ChatPage: React.FC = () => {
     }
 
     fetchHistory()
-  }, [chatroomId, userId, room?.avatar, id, navigate]) // chatroomId, userId가 확정되면 한 번만 실행
+  }, [chatroomId, userId, room?.avatar, id, navigate])
 
   useEffect(() => {
     if (IS_PROD && GA_ENABLED && chatroomId && userId) {
-      const yyyyMmDd = new Date().toISOString().slice(0, 10)
-      ReactGA.event('view_chatroom', {
-        chatroom_id: chatroomId,
-        user_id: userId,
-        date: yyyyMmDd,
-      })
+      const sessionKey = `viewed_chatroom_${chatroomId}`
+      const alreadyViewed = sessionStorage.getItem(sessionKey)
+
+      // alreadyViewed가 'true'가 아닐 때만 이벤트 전송
+      if (alreadyViewed !== 'true') {
+        const yyyyMmDd = new Date().toISOString().slice(0, 10)
+        ReactGA.event('view_chatroom', {
+          chatroom_id: chatroomId,
+          user_id: userId,
+          date: yyyyMmDd,
+        })
+        // 이벤트 전송 후 sessionStorage에 플래그 설정
+        sessionStorage.setItem(sessionKey, 'true')
+      }
     }
   }, [chatroomId, userId]) // chatroomId와 userId가 확정되면 1회 실행
 
@@ -315,6 +322,7 @@ const ChatPage: React.FC = () => {
 
       if (IS_PROD && GA_ENABLED && chatroomId) {
         ReactGA.event('send_greeting_message', {
+          user_id: userId,
           chatroom_id: chatroomId,
           bot_message: botMsg,
           guide_message: guideMsg ?? '', // 가이드 메시지는 없을 수 있음
@@ -343,7 +351,7 @@ const ChatPage: React.FC = () => {
     ) {
       setGreetingState('complete')
     }
-  }, [greetingMsg1, greetingMsg2, greetingState, chatroomId])
+  }, [userId, greetingMsg1, greetingMsg2, greetingState, chatroomId])
 
   // 코치 마크 조회 확인
   useEffect(() => {
@@ -404,14 +412,6 @@ const ChatPage: React.FC = () => {
   useEffect(() => {
     window.history.pushState(null, '', window.location.href)
     const handlePopState = () => {
-      if (IS_PROD && GA_ENABLED && chatroomId) {
-        ReactGA.event('click_previous', {
-          chatroom_id: chatroomId,
-          user_id: userId,
-          previous_button: 'browser_os_back', // "브라우저/OS 뒤로가기"로 기록
-        })
-      }
-
       if (noShowAgain) {
         const storageKey = `initChat_${id}`
         sessionStorage.removeItem(storageKey)
@@ -445,6 +445,7 @@ const ChatPage: React.FC = () => {
 
       if (IS_PROD && GA_ENABLED) {
         ReactGA.event('send_user_message', {
+          user_id: userId,
           chatroom_id: chatroomId,
           user_message: text,
         })
@@ -500,8 +501,9 @@ const ChatPage: React.FC = () => {
 
           if (IS_PROD && GA_ENABLED && chatroomId) {
             ReactGA.event('send_ai_reply', {
+              user_id: userId,
               chatroom_id: chatroomId,
-              ai_message: conversationData.content,
+              intimacy_message: conversationData.content,
             })
           }
 
@@ -526,8 +528,9 @@ const ChatPage: React.FC = () => {
 
           if (IS_PROD && GA_ENABLED && chatroomId && intimacyData.correctedSentence) {
             ReactGA.event('send_ai_intimacy', {
+              user_id: userId,
               chatroom_id: chatroomId,
-              intimacy_message: intimacyData.correctedSentence,
+              ai_message: intimacyData.correctedSentence,
             })
           }
 
@@ -567,7 +570,7 @@ const ChatPage: React.FC = () => {
           break
       }
     },
-    [room, isNewChat, resetInactivityTimer, chatroomId]
+    [room, isNewChat, resetInactivityTimer, chatroomId, userId]
   )
 
   // useChatStream 호출
@@ -592,6 +595,16 @@ const ChatPage: React.FC = () => {
     if (hasLeftRef.current) return // 중복 방지
     hasLeftRef.current = true
 
+    // leave_chatroom
+    if (IS_PROD && GA_ENABLED && userId) {
+      const leaveTimestamp = Math.floor(Date.now() / 1000) // UNIX 타임스탬프
+      ReactGA.event('leave_chatroom', {
+        chatroom_id: chatroomId,
+        user_id: userId,
+        leave_timestamp: leaveTimestamp,
+      })
+    }
+
     const noShowAgain = useModalStore.getState().noShowAgain
 
     if (noShowAgain) {
@@ -611,6 +624,7 @@ const ChatPage: React.FC = () => {
 
       const storageKey = `initChat_${id}`
       sessionStorage.removeItem(storageKey) // InitChat 초기화
+      sessionStorage.removeItem(`viewed_chatroom_${chatroomId}`)
 
       setIsModalOpen(false)
       navigate('/', { replace: true })

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import bubble1 from '../assets/auth/bubble1.svg'
 import bubble2 from '../assets/auth/bubble2.svg'
@@ -11,12 +11,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../api/auth'
 import { useUserStore } from '../stores/useUserStore'
 import ReactGA from 'react-ga4'
+import { GA_ENABLED, IS_PROD } from '../constants/env'
 
-// GA 환경 변수
-const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
-const IS_PROD = import.meta.env.PROD
-
-type ErrorKind = 'email' | 'password' | 'both' | 'general' | null
+type ErrorKind = 'wrong_email' | 'wrong_password' | 'both' | 'general' | null
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -27,6 +24,16 @@ export default function LoginPage() {
 
   const setStoreId = useUserStore(s => s.setId)
   const setStoreName = useUserStore(s => s.setName)
+
+  // 페이지 뷰
+  useEffect(() => {
+    if (IS_PROD && GA_ENABLED) {
+      const yyyyMmDd = new Date().toISOString().slice(0, 10)
+      ReactGA.event('view_login', {
+        date: yyyyMmDd,
+      })
+    }
+  }, []) // 1회 실행
 
   const mapAuthError = ({
     status,
@@ -52,8 +59,8 @@ export default function LoginPage() {
       /(비밀번호|password)/i.test(msg)
 
     if (isEmailError && isPasswordError) return { type: 'both' }
-    if (isEmailError) return { type: 'email' }
-    if (isPasswordError) return { type: 'password' }
+    if (isEmailError) return { type: 'wrong_email' }
+    if (isPasswordError) return { type: 'wrong_password' }
 
     return { type: 'both', msg: 'Email error + Password error' }
   }
@@ -67,11 +74,11 @@ export default function LoginPage() {
       return
     }
     if (!email) {
-      setError('email')
+      setError('wrong_email')
       return
     }
     if (!password) {
-      setError('password')
+      setError('wrong_password')
       return
     }
 
@@ -88,8 +95,8 @@ export default function LoginPage() {
 
         if (IS_PROD && GA_ENABLED) {
           ReactGA.event('fail_login', {
-            user_id: email, // '시도한' user_id (이메일)
-            error_type: mapped.type ?? 'unknown_api_error', // 'email', 'password', 'both'
+            user_id: email, // 확인 필요
+            error_type: mapped.type ?? 'unknown_api_error',
           })
         }
 
@@ -102,14 +109,14 @@ export default function LoginPage() {
         setStoreName(user.name)
 
         if (IS_PROD && GA_ENABLED) {
-          // 1. 세션의 User-ID 설정 (이후 모든 이벤트에 이 ID가 포함됨)
           ReactGA.set({ userId: user.id })
 
-          // 2. 로그인 성공 이벤트 전송
+          // 2. 로그인 성공 이벤트
           const yyyyMmDd = new Date().toISOString().slice(0, 10)
-          ReactGA.event('success_login', {
-            user_id: user.id, // 파라미터로도 user_id 전송
+          ReactGA.event('login', {
+            user_id: user.id,
             date: yyyyMmDd,
+            method: email, // 추후 확장?
           })
         }
       }
@@ -144,8 +151,8 @@ export default function LoginPage() {
 
         if (IS_PROD && GA_ENABLED) {
           ReactGA.event('fail_login', {
-            user_id: email, // '시도한' user_id (이메일)
-            error_type: mapped.type ?? 'unknown_catch_error', // 'email', 'password', 'both'
+            user_id: email, // 확인 필요
+            error_type: mapped.type ?? 'unknown_catch_error',
           })
         }
       } else {
@@ -203,7 +210,7 @@ export default function LoginPage() {
           <div className="mt-4">
             <Input
               type="email"
-              variant={error === 'email' || error === 'both' ? 'error' : 'primary'}
+              variant={error === 'wrong_email' || error === 'both' ? 'error' : 'primary'}
               placeholder="E-mail"
               value={email}
               onChange={e => setEmail(e.target.value)}
@@ -211,7 +218,7 @@ export default function LoginPage() {
             />
             <Input
               type="password"
-              variant={error === 'password' || error === 'both' ? 'error' : 'primary'}
+              variant={error === 'wrong_password' || error === 'both' ? 'error' : 'primary'}
               placeholder="Password"
               value={password}
               onChange={e => setPassword(e.target.value)}
@@ -220,8 +227,8 @@ export default function LoginPage() {
 
             {(error || errorMsg) && (
               <span className="mt-1 block text-xs text-orange-500 text-body">
-                {error === 'email' && 'Email error'}
-                {error === 'password' && 'Password error'}
+                {error === 'wrong_email' && 'Email error'}
+                {error === 'wrong_password' && 'Password error'}
                 {error === 'both' && 'Email error + Password error'}
               </span>
             )}
