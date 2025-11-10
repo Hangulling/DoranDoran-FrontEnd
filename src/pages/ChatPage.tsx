@@ -522,10 +522,10 @@ const ChatPage: React.FC = () => {
         case 'intimacy_analysis': {
           const intimacyData = data as IntimacyAnalysisData
 
-          if (IS_PROD && GA_ENABLED && chatroomId && intimacyData.correctedSentence) {
+           if (IS_PROD && GA_ENABLED && chatroomId) {
             ReactGA.event('send_ai_intimacy', {
               chatroom_id: chatroomId,
-              ai_message: intimacyData.correctedSentence,
+              ai_message: intimacyData.corrections ? intimacyData.correctedSentence : '',
             })
           }
 
