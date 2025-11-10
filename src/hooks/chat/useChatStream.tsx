@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { getSseUrl } from '../api'
+import { getSseUrl } from '../../api'
 import { EventSourcePolyfill } from 'event-source-polyfill'
 
 const eventNames = [
