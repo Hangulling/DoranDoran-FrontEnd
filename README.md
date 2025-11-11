@@ -20,17 +20,17 @@ It helps you go beyond memorizing grammar and learn the true rhythm of conversat
 
 ## 시작 가이드
 
-#Requirements
-node: >=22.0.0
-vite: ^7.1.12
-react: ^19.1.1
-typescript: ~5.8.3
+Requirements  
+node: >=22.0.0  
+vite: ^7.1.12  
+react: ^19.1.1  
+typescript: ~5.8.3  
 
-#Installation
-git clone https://github.com/Hangulling/DoranDoran-FrontEnd.git
-cd DoranDoran-FrontEnd
-npm install
-npm run dev
+Installation  
+git clone https://github.com/Hangulling/DoranDoran-FrontEnd.git  
+cd DoranDoran-FrontEnd  
+npm install  
+npm run dev  
 
 ## 🔧 화면 구성
 
