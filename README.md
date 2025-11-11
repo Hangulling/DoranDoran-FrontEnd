@@ -34,10 +34,9 @@ npm run dev
 
 ## 🔧 화면 구성
 
-| 로그인   | 회원가입 |
-| :------: | :------: |
-| <img src="https://github.com/user-attachments/assets/bc0f28ed-4a0f-4f79-821f-21d4cef5eb5d" width="300" alt="로그인" />
-|   <img src="https://github.com/user-attachments/assets/6bcaf311-12a0-4007-8d76-7ac7144ba412" width="300" alt="회원가입" /> |
+|                                                        로그인                                                          |                                                         회원가입                                                         |
+| :--------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------: |
+| <img src="https://github.com/user-attachments/assets/bc0f28ed-4a0f-4f79-821f-21d4cef5eb5d" width="300" alt="로그인" /> | <img src="https://github.com/user-attachments/assets/6bcaf311-12a0-4007-8d76-7ac7144ba412" width="300" alt="회원가입" /> |
 
 | 메인   |  친밀도 설정  |   채팅     |
 | :----: | :-----------: | :--------: |
