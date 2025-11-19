@@ -2,9 +2,12 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App.tsx'
 import './styles/index.css'
-import React from 'react'
+//import React from 'react'
 import ReactGA from 'react-ga4'
 import MaintenancePage from './pages/MaintenancePage.tsx'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { GoogleOAuthProvider } from '@react-oauth/google'
+import { GOOGLE_CLIENT_ID } from './constants/env'
 
 const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID
@@ -52,22 +55,27 @@ const prepare = async () => {
   }
 }
 
+const queryClient = new QueryClient()
+console.log('✅ GOOGLE_CLIENT_ID from env:', GOOGLE_CLIENT_ID)
+
 prepare().then(() => {
   const container = document.getElementById('root')!
   const root = ReactDOM.createRoot(container)
   root.render(
-    <React.StrictMode>
-      <BrowserRouter>
-        {IS_MAINTENANCE_MODE ? (
-          <Routes>
-            <Route path="*" element={<MaintenancePage />} />
-          </Routes>
-        ) : (
-          <>
+    //<React.StrictMode>
+    <BrowserRouter>
+      {IS_MAINTENANCE_MODE ? (
+        <Routes>
+          <Route path="*" element={<MaintenancePage />} />
+        </Routes>
+      ) : (
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+          <QueryClientProvider client={queryClient}>
             <App />
-          </>
-        )}
-      </BrowserRouter>
-    </React.StrictMode>
+          </QueryClientProvider>
+        </GoogleOAuthProvider>
+      )}
+    </BrowserRouter>
+    //</React.StrictMode>
   )
 })

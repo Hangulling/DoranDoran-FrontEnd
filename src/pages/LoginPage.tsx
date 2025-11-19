@@ -8,10 +8,11 @@ import doran from '../assets/auth/doranText.svg'
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
 import { Link, useNavigate } from 'react-router-dom'
-import { login } from '../api/auth'
+import { login, oauthLogin } from '../api/auth'
 import { useUserStore } from '../stores/useUserStore'
 import ReactGA from 'react-ga4'
 import { GA_ENABLED, IS_PROD } from '../constants/env'
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 
 type ErrorKind = 'wrong_email' | 'wrong_password' | 'both' | 'general' | null
 
@@ -164,6 +165,108 @@ export default function LoginPage() {
     if (e.key === 'Enter') handleLogin()
   }
 
+  const handleOAuthSuccess = async (credentialResponse: CredentialResponse) => {
+    try {
+      const idToken = credentialResponse.credential
+      if (!idToken) {
+        setError('general')
+        setErrorMsg('Google 로그인에 실패했습니다.')
+        return
+      }
+
+      // Google ID Token을 받아서 백엔드로 전송
+      console.log(typeof idToken)
+      const res = await oauthLogin({
+        provider: 'google',
+        idToken,
+      })
+
+      if (!res?.success) {
+        const mapped = mapAuthError({
+          errorCode: (res as { errorCode?: string }).errorCode,
+          message: (res as { message?: string }).message,
+        })
+        setError(mapped.type)
+        setErrorMsg(mapped.msg ?? '')
+
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.event('fail_login', {
+            error_type: mapped.type ?? 'unknown_oauth_error',
+            method: 'oauth_google',
+          })
+        }
+        return
+      }
+
+      const user = res?.data?.user
+      if (user) {
+        setStoreId(user.id)
+        setStoreName(user.name)
+
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.set({ user_id: user.id })
+
+          const yyyyMmDd = new Date().toISOString().slice(0, 10)
+          ReactGA.event('login', {
+            date: yyyyMmDd,
+            method: 'oauth_google',
+          })
+        }
+      }
+
+      navigate('/')
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status
+        const data = (err.response?.data ?? {}) as {
+          errorCode?: string
+          code?: string
+          message?: string
+        }
+
+        if (!status || status >= 500) {
+          navigate('/error', {
+            replace: true,
+            state: { code: status ?? 503, from: 'oauth_login' },
+          })
+          return
+        }
+
+        const mapped = mapAuthError({
+          status,
+          errorCode: data.errorCode,
+          code: data.code,
+          message: data.message,
+        })
+        setError(mapped.type)
+        setErrorMsg(mapped.msg ?? '')
+        console.error('🚨 OAuth 로그인 에러:', err.response?.data || err)
+
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.event('fail_login', {
+            error_type: mapped.type ?? 'unknown_oauth_catch_error',
+            method: 'oauth_google',
+          })
+        }
+      } else {
+        navigate('/error', { replace: true, state: { code: 500, from: 'oauth_login' } })
+      }
+    }
+  }
+
+  const handleOAuthError = () => {
+    console.error('🚨 Google OAuth 로그인 실패')
+    setError('general')
+    setErrorMsg('Google 로그인에 실패했습니다.')
+
+    if (IS_PROD && GA_ENABLED) {
+      ReactGA.event('fail_login', {
+        error_type: 'oauth_google_error',
+        method: 'oauth_google',
+      })
+    }
+  }
+
   return (
     <div className="flex justify-center items-center h-screen overflow-y-hidden">
       <div className="w-full bg-white rounded-lg">
@@ -240,6 +343,29 @@ export default function LoginPage() {
             >
               Login
             </Button>
+
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-100"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-300 text-body">You can connect with</span>
+              </div>
+            </div>
+
+            <div className="my-4 w-full">
+              <GoogleLogin
+                onSuccess={handleOAuthSuccess}
+                onError={handleOAuthError}
+                useOneTap={false}
+                theme="outline"
+                size="large"
+                text="signup_with"
+                shape="rectangular"
+                width="100%"
+                locale="en"
+              />
+            </div>
           </div>
         </div>
 

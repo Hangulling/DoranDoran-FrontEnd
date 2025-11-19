@@ -1,5 +1,11 @@
 import axios from 'axios'
-import type { LoginRequest, LoginResponse, VerificationRequest } from '../types/auth'
+import type {
+  LoginRequest,
+  LoginResponse,
+  OAuthLoginRequest,
+  OAuthLoginResponse,
+  VerificationRequest,
+} from '../types/auth'
 import api, { publicApi } from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
 
@@ -7,6 +13,21 @@ let currentUserId: string | null = null
 
 export async function login(data: LoginRequest) {
   const res = await api.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, data)
+  const { data: resData } = res.data
+  const { accessToken, refreshToken } = resData
+
+  if (accessToken) {
+    sessionStorage.setItem('accessToken', accessToken)
+  }
+
+  if (refreshToken) {
+    sessionStorage.setItem('refreshToken', refreshToken)
+  }
+  return res.data
+}
+
+export async function oauthLogin(data: OAuthLoginRequest) {
+  const res = await publicApi.post<OAuthLoginResponse>(AUTH_ENDPOINTS.OAUTH_LOGIN, data)
   const { data: resData } = res.data
   const { accessToken, refreshToken } = resData
 
