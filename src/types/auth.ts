@@ -51,3 +51,10 @@ export interface VerificationRequest {
   firstName?: string
   lastName?: string
 }
+
+export interface OAuthLoginRequest {
+  provider: string
+  idToken: string
+}
+
+export type OAuthLoginResponse = LoginResponse
