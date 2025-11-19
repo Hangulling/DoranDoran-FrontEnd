@@ -35,6 +35,9 @@ export const AUTH_ENDPOINTS = {
   // 로그인
   LOGIN: '/api/auth/login',
 
+  // 소셜 로그인
+  OAUTH_LOGIN: '/api/auth/oauth/login',
+
   // 로그아웃
   LOGOUT: '/api/auth/logout',
 
