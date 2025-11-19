@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import bubble1 from '../assets/auth/bubble1.svg'
 import bubble2 from '../assets/auth/bubble2.svg'
@@ -13,6 +13,7 @@ import { useUserStore } from '../stores/useUserStore'
 import ReactGA from 'react-ga4'
 import { GA_ENABLED, IS_PROD } from '../constants/env'
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
+import GoogleLoginButton from '../components/common/GoogleLoginButton'
 
 type ErrorKind = 'wrong_email' | 'wrong_password' | 'both' | 'general' | null
 
@@ -25,6 +26,8 @@ export default function LoginPage() {
 
   const setStoreId = useUserStore(s => s.setId)
   const setStoreName = useUserStore(s => s.setName)
+
+  const googleLoginContainerRef = useRef<HTMLDivElement | null>(null)
 
   // 페이지 뷰
   useEffect(() => {
@@ -96,7 +99,7 @@ export default function LoginPage() {
 
         if (IS_PROD && GA_ENABLED) {
           ReactGA.event('fail_login', {
-            user_id: email, // 확인 필요
+            user_id: email,
             error_type: mapped.type ?? 'unknown_api_error',
           })
         }
@@ -112,11 +115,10 @@ export default function LoginPage() {
         if (IS_PROD && GA_ENABLED) {
           ReactGA.set({ user_id: user.id })
 
-          // 2. 로그인 성공 이벤트
           const yyyyMmDd = new Date().toISOString().slice(0, 10)
           ReactGA.event('login', {
             date: yyyyMmDd,
-            method: email, // 추후 확장?
+            method: email,
           })
         }
       }
@@ -151,7 +153,7 @@ export default function LoginPage() {
 
         if (IS_PROD && GA_ENABLED) {
           ReactGA.event('fail_login', {
-            user_id: email, // 확인 필요
+            user_id: email,
             error_type: mapped.type ?? 'unknown_catch_error',
           })
         }
@@ -159,10 +161,6 @@ export default function LoginPage() {
         navigate('/error', { replace: true, state: { code: 500, from: 'login' } })
       }
     }
-  }
-
-  const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = e => {
-    if (e.key === 'Enter') handleLogin()
   }
 
   const handleOAuthSuccess = async (credentialResponse: CredentialResponse) => {
@@ -174,12 +172,14 @@ export default function LoginPage() {
         return
       }
 
-      // Google ID Token을 받아서 백엔드로 전송
-      console.log(typeof idToken)
+      console.log('[Google] idToken typeof:', typeof idToken)
+
       const res = await oauthLogin({
         provider: 'google',
         idToken,
       })
+
+      console.log('[OAuthLogin] res:', res)
 
       if (!res?.success) {
         const mapped = mapAuthError({
@@ -267,8 +267,28 @@ export default function LoginPage() {
     }
   }
 
+  const handleCustomGoogleClick = () => {
+    const container = googleLoginContainerRef.current
+    if (!container) {
+      console.error('Google 로그인 컨테이너를 찾을 수 없습니다.')
+      return
+    }
+
+    const googleButton = container.querySelector('div[role="button"]') as HTMLElement | null
+    if (!googleButton) {
+      console.error('Google 로그인 버튼을 찾을 수 없습니다.')
+      return
+    }
+
+    googleButton.click()
+  }
+
+  const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = e => {
+    if (e.key === 'Enter') handleLogin()
+  }
+
   return (
-    <div className="flex justify-center items-center h-screen overflow-y-hidden">
+    <div className="flex justify-center items-center min-h-screen overflow-y-hidden">
       <div className="w-full bg-white rounded-lg">
         <div className="flex flex-col justify-center items-center mb-12">
           <img src={doran} alt="DoranDoran" className="mb-4" />
@@ -332,6 +352,7 @@ export default function LoginPage() {
                 {error === 'wrong_email' && 'Email error'}
                 {error === 'wrong_password' && 'Password error'}
                 {error === 'both' && 'Email error + Password error'}
+                {!error && errorMsg && errorMsg}
               </span>
             )}
 
@@ -344,7 +365,7 @@ export default function LoginPage() {
               Login
             </Button>
 
-            <div className="relative my-4">
+            <div className="relative my-5">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-100"></div>
               </div>
@@ -353,7 +374,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="my-4 w-full">
+            <div ref={googleLoginContainerRef} className="hidden">
               <GoogleLogin
                 onSuccess={handleOAuthSuccess}
                 onError={handleOAuthError}
@@ -366,10 +387,14 @@ export default function LoginPage() {
                 locale="en"
               />
             </div>
+
+            <div className="my-4 w-full">
+              <GoogleLoginButton onClick={handleCustomGoogleClick} />
+            </div>
           </div>
         </div>
 
-        <div className="flex justify-center items-center gap-2 my-4 text-sm">
+        <div className="flex justify-center items-center gap-2 mb-4 text-sm">
           <span className="text-gray-700 text-body">Don't have an account yet?</span>
           <Link to="/signup" className="underline underline-offset-4 text-title text-gray-800">
             Sign up
