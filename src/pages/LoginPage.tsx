@@ -288,7 +288,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen overflow-y-hidden">
+    <div className="flex justify-center items-center min-h-screen overflow-y-hidden pt-[38px] pb-[65px]">
       <div className="w-full bg-white rounded-lg">
         <div className="flex flex-col justify-center items-center mb-12">
           <img src={doran} alt="DoranDoran" className="mb-4" />
