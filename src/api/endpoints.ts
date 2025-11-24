@@ -110,6 +110,10 @@ export const CHAT_ENDPOINTS = {
   // 마지막 채팅 시간
   LAST_INTERACTIONS: (userId: string) =>
     `/api/chat/chatrooms/last-interactions?userId=${userId}&limit=4`,
+
+  // 테스트
+  LAST_INTERACTIONS_TEST: (userId: string, testModel: 'a' | 'b' | 'c') =>
+    `/api/chat/chatrooms/last-interactions?userId=${userId}&limit=4&testModel=${testModel}`,
 }
 
 // Bookmark Endpoints

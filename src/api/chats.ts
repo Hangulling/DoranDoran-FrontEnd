@@ -98,3 +98,22 @@ export async function getLastInteractions(userId: string): Promise<LastInteracti
   const res = await api.get<LastInteraction[]>(url)
   return res.data
 }
+
+// 테스트
+// 마지막 채팅 시간 (테스트 모델 필터)
+export async function getLastTestInteractions(
+  userId: string,
+  testModel: 'a' | 'b' | 'c'
+): Promise<LastInteraction[]> {
+  const url = CHAT_ENDPOINTS.LAST_INTERACTIONS_TEST(userId, testModel)
+  const res = await api.get<LastInteraction[]>(url)
+  return res.data
+}
+
+// 테스트 채팅방 생성(또는 기존 채팅방 조회)
+export async function createTestChatRoom(
+  data: CreateChatroomPayload & { testModel: 'a' | 'b' | 'c' }
+): Promise<ApiChatRoom> {
+  const res = await api.post(CHAT_ENDPOINTS.CREATE, data)
+  return res.data
+}
