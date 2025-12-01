@@ -5,24 +5,47 @@ import { slideVariants } from '../constants/landingData'
 import { useSlider } from '../hooks/useSlider'
 import ArrowLeft from '../assets/icon/leftArrow.svg?react'
 import ArrowRight from '../assets/icon/arrowRight.svg?react'
+import { updateOnboarding } from '../api'
+import { useUserStore } from '../stores/useUserStore'
+import OnboardingContent from '../components/onboarding/OnboardingContent'
 
 export default function OnboardingPage() {
   const navigate = useNavigate()
+  const userId = useUserStore(state => state.id)
+
   const { page, direction, paginate, handleDragEnd, handleScreenClick } = useSlider(
     ONBOARDING_SLIDES.length
   )
 
   const isLastPage = page === ONBOARDING_SLIDES.length - 1
 
+  // 완료 처리
+  const handleCompleteOnboarding = async () => {
+    if (!userId) {
+      console.error('User ID를 찾을 수 없습니다.')
+      navigate('/', { replace: true })
+      return
+    }
+
+    try {
+      await updateOnboarding(userId, true)
+      console.log('온보딩 완료 처리 성공')
+      navigate('/', { replace: true })
+    } catch (error) {
+      console.error('온보딩 완료 처리 실패', error)
+      navigate('/', { replace: true })
+    }
+  }
+
   const handleSkip = () => {
-    navigate('/', { replace: true })
+    handleCompleteOnboarding()
   }
 
   const handleNextClick = () => {
     if (page < ONBOARDING_SLIDES.length - 1) {
       paginate(1)
     } else {
-      handleSkip()
+      handleCompleteOnboarding()
     }
   }
 
@@ -71,22 +94,7 @@ export default function OnboardingPage() {
             dragElastic={0.2}
             onDragEnd={handleDragEnd}
           >
-            {/* 텍스트 */}
-            <div className="text-center mb-4 px-5 shrink-0">
-              <h2 className="text-[36px] font-extrabold text-green-500 tracking-[-2px] mb-1">
-                {ONBOARDING_SLIDES[page].title}
-              </h2>
-              <p className="text-gray-600 text-[14px]">{ONBOARDING_SLIDES[page].desc}</p>
-            </div>
-
-            {/* 이미지 */}
-            <div className="flex-1 w-full flex items-end justify-center overflow-hidden pb-4">
-              <img
-                src={ONBOARDING_SLIDES[page].image}
-                alt="Onboarding Screen"
-                className="w-full h-full object-contain"
-              />
-            </div>
+            <OnboardingContent slide={ONBOARDING_SLIDES[page]} />
           </motion.div>
         </AnimatePresence>
       </div>

@@ -40,6 +40,13 @@ export const updateStatus = async (userId: string, status: UserStatus): Promise<
   })
 }
 
+// 온보딩 상태 업데이트
+export const updateOnboarding = async (userId: string, isOnboard: boolean): Promise<void> => {
+  await api.patch(USER_ENDPOINTS.UPDATE_ONBOARDING(userId), {
+    isOnboard,
+  })
+}
+
 // 비밀번호 재설정
 export const passwordReset = async (email: string): Promise<void> => {
   await api.post(USER_ENDPOINTS.PASSWORD_RESET, { email })
