@@ -121,9 +121,13 @@ export default function LoginPage() {
             method: email,
           })
         }
+        // 온보딩 확인 여부에 따라 라우팅
+        if (user.isOnboard) {
+          navigate('/')
+        } else {
+          navigate('/onboarding')
+        }
       }
-
-      navigate('/')
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status
@@ -212,9 +216,12 @@ export default function LoginPage() {
             method: 'oauth_google',
           })
         }
+        if (user.isOnboard) {
+          navigate('/')
+        } else {
+          navigate('/onboarding')
+        }
       }
-
-      navigate('/')
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status

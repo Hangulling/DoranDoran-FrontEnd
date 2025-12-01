@@ -56,9 +56,12 @@ const GoogleAuth = () => {
             method: 'oauth_google',
           })
         }
+        if (user.isOnboard) {
+          navigate('/')
+        } else {
+          navigate('/onboarding')
+        }
       }
-
-      navigate('/')
     } catch (err: unknown) {
       console.error('OAuth Error:', err)
       alert('구글 로그인 중 오류가 발생했습니다.')
