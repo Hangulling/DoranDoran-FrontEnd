@@ -48,11 +48,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     /^\/closeness(?:\/|$)/,
     /^\/policy(?:\/|$)/,
     /^\/error(?:\/|$)/,
+    /^\/insta(?:\/|$)/,
+    /^\/onboarding(?:\/|$)/,
   ]
   const isKnownPath = knownPatterns.some(rx => rx.test(pathname))
   const isUnknownPath = !isKnownPath
 
-  const skipNavPaths = ['/login', '/error']
+  const skipNavPaths = ['/login', '/error', '/insta', '/onboarding']
 
   // 로그인 필요없는 페이지
   const isPublicPage =
@@ -60,6 +62,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     pathname.startsWith('/signup') ||
     pathname.startsWith('/policy') ||
     pathname.startsWith('/error') ||
+    pathname.startsWith('/insta') ||
     isUnknownPath
 
   // 비활성 타이머 로직

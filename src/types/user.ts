@@ -24,6 +24,7 @@ export interface User {
   role: UserRole
   coachCheck: boolean
   exitModalDoNotShowAgain: boolean
+  isOnboard: boolean // 온보딩 확인 여부
   createdAt: string
   updatedAt: string
 }
@@ -39,6 +40,7 @@ export interface UpdatePayload {
   status?: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED'
   coachCheck?: boolean
   exitModalDoNotShowAgain?: boolean
+  isOnboard?: boolean
 }
 
 // 사용자 상태
