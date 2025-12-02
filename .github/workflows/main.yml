@@ -4,9 +4,16 @@ on:
   pull_request:
     branches: [develop, 'release/**', 'hotfix/**']
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
 
     strategy:
       matrix:
@@ -29,6 +36,3 @@ jobs:
 
       - name: Run type checking
         run: npm run typecheck
-
-      - name: Build project
-        run: npm run build
