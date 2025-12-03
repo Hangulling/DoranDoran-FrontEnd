@@ -13,6 +13,7 @@
 ## Checklist
 <!-- PR 제출 전 확인사항 -->
 - [ ] CI 통과를 확인했습니다
+- [ ] 라벨을 추가했습니다
 - [ ] **⭐ 최종 머지 지침 확인:**
   - **Feature → Develop** 머지 시: **Squash and Merge**를 사용합니다.
   - **Develop → Main** 릴리즈 시: **Create Merge Commit**를 사용합니다.
