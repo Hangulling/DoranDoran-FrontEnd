@@ -3,7 +3,7 @@
 ## Purpose 🎯
 <!-- 이 PR의 목적을 간단히 설명해주세요 -->
 
-## Changes 📎
+## Changes 🛠️
 <!-- 주요 변경사항을 나열해주세요 -->
 -
 
@@ -13,6 +13,7 @@
 ## Checklist
 <!-- PR 제출 전 확인사항 -->
 - [ ] CI 통과를 확인했습니다
+- [ ] 라벨을 추가했습니다
 - [ ] **⭐ 최종 머지 지침 확인:**
   - **Feature → Develop** 머지 시: **Squash and Merge**를 사용합니다.
   - **Develop → Main** 릴리즈 시: **Create Merge Commit**를 사용합니다.
