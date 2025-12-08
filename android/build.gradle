@@ -6,6 +6,12 @@ buildscript {
         google()
         mavenCentral()
     }
+    configurations.all {
+        resolutionStrategy {
+            force 'androidx.browser:browser:1.9.0'
+        }
+    }
+
     dependencies {
         classpath 'com.android.tools.build:gradle:8.7.2'
         classpath 'com.google.gms:google-services:4.4.2'
@@ -23,7 +29,13 @@ allprojects {
         mavenCentral()
     }
 }
-
+subprojects {
+    project.configurations.all {
+        resolutionStrategy {
+            force 'androidx.browser:browser:1.8.0'
+        }
+    }
+}
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
