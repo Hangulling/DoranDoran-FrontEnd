@@ -14,6 +14,9 @@ import ReactGA from 'react-ga4'
 import { GA_ENABLED, IS_PROD } from '../constants/env'
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import GoogleLoginButton from '../components/common/GoogleLoginButton'
+import { isNativeApp } from '../utils/isNativeApp'
+import { type SocialLoginResponse } from '@capgo/capacitor-social-login'
+import { SocialLogin } from '@capgo/capacitor-social-login'
 
 type ErrorKind = 'wrong_email' | 'wrong_password' | 'both' | 'general' | null
 
@@ -69,6 +72,38 @@ export default function LoginPage() {
     return { type: 'both', msg: 'Email error + Password error' }
   }
 
+  const handleGoogleNativeLogin = async () => {
+    if (!isNativeApp()) return
+
+    try {
+      const r = (await SocialLogin.login({
+        provider: 'google',
+        options: { scopes: ['profile', 'email'] },
+      })) as SocialLoginResponse
+
+      const idToken = r.result?.idToken
+
+      if (!idToken) {
+        alert('Google 로그인 실패 (앱)')
+        return
+      }
+
+      const res = await oauthLogin({
+        provider: 'google',
+        idToken,
+      })
+
+      if (res.success) {
+        const user = res.data.user
+        setStoreId(user.id)
+        setStoreName(user.name)
+        navigate(user.isOnboard ? '/' : '/onboarding')
+      }
+    } catch (err) {
+      console.error('네이티브 로그인 실패', err)
+      alert('네이티브 Google 로그인 실패')
+    }
+  }
   const handleLogin = async () => {
     setError(null)
     setErrorMsg('')
@@ -310,21 +345,21 @@ export default function LoginPage() {
               src={bubble1}
               alt="bubble1"
               className="absolute top-[80px] left-[2px] object-contain w-[112px] h-[33px]
-                 z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
+                  z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
             />
 
             <img
               src={bubble2}
               alt="bubble2"
               className="absolute top-[22px] left-1/2 -translate-x-1/3 object-contain w-[120px] h-[33px]
-                 z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
+                  z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
             />
 
             <img
               src={bubble3}
               alt="bubble3"
               className="absolute top-[80px] right-[10px] object-contain w-[102px] h-[33px]
-                 z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
+                  z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
             />
 
             <img
@@ -396,7 +431,15 @@ export default function LoginPage() {
             </div>
 
             <div className="my-4 w-full">
-              <GoogleLoginButton onClick={handleCustomGoogleClick} />
+              <GoogleLoginButton
+                onClick={() => {
+                  if (isNativeApp()) {
+                    handleGoogleNativeLogin()
+                  } else {
+                    handleCustomGoogleClick()
+                  }
+                }}
+              />
             </div>
           </div>
         </div>
