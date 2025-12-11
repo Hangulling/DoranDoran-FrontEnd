@@ -1,82 +1,65 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import showToast from '../components/common/CommonToast'
 
 const useTTS = (text: string) => {
   const [playing, setPlaying] = useState(false)
-  const [koreanVoice, setKoreanVoice] = useState<SpeechSynthesisVoice | null>(null)
+  const playingRef = useRef(false)
 
-  // 사용자 재생 중지 확인
-  const userCanceledRef = useRef(false)
-
-  const loadVoices = () => {
-    const voices = window.speechSynthesis.getVoices()
-    if (voices.length > 0) {
-      // 'Google 한국의' 음성 우선 로드
-      let selectedVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('ko'))
-      if (!selectedVoice) {
-        selectedVoice = voices.find(v => v.lang.startsWith('ko'))
-      }
-      setKoreanVoice(selectedVoice || null)
-    }
-  }
-
+  // 컴포넌트가 사라질 때(뒤로가기 등) 말하기 중단
   useEffect(() => {
-    loadVoices()
-    window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
-
     return () => {
-      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices)
-      if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel()
-      }
+      stopSpeaking()
     }
   }, [])
 
-  const play = useCallback(() => {
-    if (!text || !koreanVoice) {
-      showToast({ message: 'Unable to play audio', iconType: 'error' })
-      console.error('사용 가능한 한국어 음성을 찾지 못했습니다.')
-      return
-    }
-
-    // 재생 중일 때 중지
-    if (playing) {
-      userCanceledRef.current = true
-      window.speechSynthesis.cancel()
+  const stopSpeaking = async () => {
+    try {
+      await TextToSpeech.stop()
       setPlaying(false)
+      playingRef.current = false
+    } catch {
+      // 정지 중 에러 무시
+    }
+  }
+
+  const play = useCallback(async () => {
+    if (!text) {
+      showToast({ message: 'Unable to play audio', iconType: 'error' })
       return
     }
 
-    userCanceledRef.current = false
+    // 이미 재생 중이면 멈춤
+    if (playingRef.current) {
+      await stopSpeaking()
+      return
+    }
 
-    // 음성 설정 나중에
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.voice = koreanVoice
-    utterance.lang = 'ko-KR'
-    utterance.pitch = 1
-    utterance.rate = 1
-    utterance.volume = 1
-
-    utterance.onstart = () => {
-      userCanceledRef.current = false
+    try {
       setPlaying(true)
-    }
-    utterance.onend = () => setPlaying(false)
-    utterance.onerror = e => {
-      // 사용자가 중지 의도한거면 error 처리 x
-      if (userCanceledRef.current) {
-        userCanceledRef.current = false
-        setPlaying(false)
-        return
-      }
+      playingRef.current = true
 
-      showToast({ message: 'Unable to play audio', iconType: 'error' })
-      console.error('TTS 재생 중 오류가 발생했습니다.', e)
+      // TTS 실행
+      await TextToSpeech.speak({
+        text: text,
+        lang: 'ko-KR', // 한국어 설정
+        rate: 1.0, // 속도
+        pitch: 1.0, // 톤
+        volume: 1.0, // 볼륨
+      })
+
+      // 말이 다 끝나면 실행됨
       setPlaying(false)
-    }
+      playingRef.current = false
+    } catch (error) {
+      console.error('TTS Error:', error)
+      setPlaying(false)
+      playingRef.current = false
 
-    window.speechSynthesis.speak(utterance)
-  }, [text, koreanVoice, playing])
+      // 에러 발생
+      showToast({ message: 'Unable to play audio', iconType: 'error' })
+    }
+  }, [text])
 
   return { onPlay: play, playing }
 }
