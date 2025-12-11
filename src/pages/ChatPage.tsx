@@ -67,6 +67,7 @@ const ChatPage: React.FC = () => {
   const closenessLevel = useClosenessStore.getState().getCloseness(id ?? '') ?? 1
   const closenessText = getClosenessAsText(closenessLevel)
   const accessToken = sessionStorage.getItem('accessToken') ?? ''
+  const isAtBottomRef = useRef(true) // 스크롤 감지
 
   const room = useMemo(() => {
     return chatRooms.find(r => String(r.roomRouteId) === String(id))
@@ -118,6 +119,44 @@ const ChatPage: React.FC = () => {
     setGreetingMsg2,
     setGreetingState,
   })
+
+  // 스크롤 위치 감지 함수
+  const handleScroll = () => {
+    if (!chatMainRef.current) return
+    const { scrollTop, scrollHeight, clientHeight } = chatMainRef.current
+    const isBottom = scrollHeight - scrollTop - clientHeight < 50
+    isAtBottomRef.current = isBottom
+  }
+
+  // 키보드 올라올 때 스크롤 보정
+  useEffect(() => {
+    const scrollToBottom = () => {
+      if (chatMainRef.current) {
+        chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
+      }
+    }
+
+    const handleResize = () => {
+      if (isAtBottomRef.current) {
+        scrollToBottom()
+        setTimeout(scrollToBottom, 100)
+      }
+    }
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize)
+    } else {
+      window.addEventListener('resize', handleResize)
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize)
+      } else {
+        window.removeEventListener('resize', handleResize)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     if (IS_PROD && GA_ENABLED && chatroomId && userId) {
@@ -201,7 +240,11 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div ref={chatMainRef} className="flex-grow overflow-y-auto px-5 pt-10">
+      <div
+        ref={chatMainRef}
+        onScroll={handleScroll}
+        className="flex-grow overflow-y-auto px-5 pt-10"
+      >
         <ChatBody
           isHistoryLoading={isHistoryLoading}
           greetingState={greetingState}
