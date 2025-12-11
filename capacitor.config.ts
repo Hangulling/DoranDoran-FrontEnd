@@ -1,9 +1,13 @@
 import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
-  appId: 'com.doranchat.app',
-  appName: '도란도란',
+  appId: 'com.koach.app',
+  appName: 'K-oach',
   webDir: 'dist',
+  server: {
+    url: 'http://localhost:3000', // adb reverse tcp:3000 tcp:3000
+    cleartext: true,
+  },
   plugins: {
     SocialLogin: {
       providers: {

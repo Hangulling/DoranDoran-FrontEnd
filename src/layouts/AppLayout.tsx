@@ -122,7 +122,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="relative mx-auto flex h-full w-full max-w-md flex-col overflow-x-hidden">
+    <div className="relative mx-auto flex h-full w-full max-w-md flex-col overflow-x-hidden pt-[env(safe-area-inset-top)]">
       <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
 
       {!hideNavBar && (
@@ -138,7 +138,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </header>
       )}
       {!isPublicPage && <SessionAutoLogout />}
-      <main id="app-scroll" className="flex-grow min-h-0 overflow-y-auto">
+
+      <main
+        id="app-scroll"
+        className="flex-grow min-h-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]"
+      >
         {children}
       </main>
     </div>
