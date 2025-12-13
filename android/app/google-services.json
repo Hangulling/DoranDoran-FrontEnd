@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "29324186506",
+    "project_id": "dorandoran-firebase",
+    "storage_bucket": "dorandoran-firebase.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29324186506:android:8e30b1767fb4527d22ee73",
+        "android_client_info": {
+          "package_name": "com.koach.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "29324186506-rgf6ao18fd3vps2ncobcfoo858p02na3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.koach.app",
+            "certificate_hash": "41f8bcdb9e4c78b75739fd9ec26456f43206ad48"
+          }
+        },
+        {
+          "client_id": "29324186506-rlhbe7jj826ssk17j429rvj06clp86v8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.koach.app",
+            "certificate_hash": "90210e369971123af1b69ae10b8e279ed9ae61f6"
+          }
+        },
+        {
+          "client_id": "29324186506-c971u3g05h8meusc6133888052r642r0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNrgjTfipMnHSXXT1S9PijotTsFHylHlc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "29324186506-c971u3g05h8meusc6133888052r642r0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
