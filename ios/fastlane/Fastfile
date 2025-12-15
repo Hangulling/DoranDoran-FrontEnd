@@ -1,0 +1,67 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new release build to the App Store"
+  lane :release do
+    # CI 환경 설정
+    setup_ci
+
+    # App Store Connect API Key 설정 (GitHub Secrets에서 가져옴)
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
+      key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"], # .p8 파일 내용
+      is_key_content_base64: true, # base64로 인코딩해서 넣을 예정
+      in_house: false
+    )
+
+    # 인증서 동기화 (Match) - 읽기 전용 (배포 시에는 생성하지 않음)
+    match(
+      type: "appstore",
+      readonly: true,
+      api_key: api_key
+    )
+
+    # 앱 빌드 (Gym)
+    gym(
+      scheme: "App", # Capacitor 기본 스킴은 보통 'App'
+      workspace: "App.xcworkspace",
+      configuration: "Release",
+      clean: true,
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: { 
+          "com.koach.app" => "match AppStore com.koach.app"
+        }
+      }
+    )
+
+    # TestFlight 업로드 (Pilot)
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true
+    )
+  end
+  
+  # === 인증서 최초 생성용 Lane ===
+  desc "Generate Certificates on CI"
+  lane :generate_certs do
+    setup_ci
+    
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
+      key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"],
+      is_key_content_base64: true,
+      in_house: false
+    )
+
+    # 인증서 생성 및 git repo에 push (readonly: false)
+    match(
+      type: "appstore",
+      readonly: false,
+      api_key: api_key,
+      app_identifier: ["com.koach.app"]
+    )
+  end
+end
