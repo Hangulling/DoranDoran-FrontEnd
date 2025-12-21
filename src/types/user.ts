@@ -3,6 +3,9 @@ export interface CreatePayload {
   email: string // 이메일 형식
   firstName: string // 1-50자
   lastName: string // 1-50자
+  birthDate: string // yyyy-MM-dd
+  signupQuestion: string
+  signupAnswer: string // 최대 30자
   name: string // 미제공 시 `firstName + lastName` 사용
   password: string // 8-100자
   picture?: string
@@ -48,3 +51,11 @@ export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'SUSPENDED'
 
 // 사용자 역할?
 export type UserRole = 'ROLE_USER' | 'ROLE_ADMIN'
+
+export interface EmailPayload {
+  firstName: string
+  lastName: string
+  birthDate: string
+  signupQuestion: string
+  signupAnswer: string
+}
