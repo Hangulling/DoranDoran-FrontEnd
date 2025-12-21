@@ -50,6 +50,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     /^\/error(?:\/|$)/,
     /^\/insta(?:\/|$)/,
     /^\/onboarding(?:\/|$)/,
+    /^\/find-email(?:\/|$)/,
+    /^\/find-password(?:\/|$)/,
   ]
   const isKnownPath = knownPatterns.some(rx => rx.test(pathname))
   const isUnknownPath = !isKnownPath
@@ -63,6 +65,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     pathname.startsWith('/policy') ||
     pathname.startsWith('/error') ||
     pathname.startsWith('/insta') ||
+    pathname.startsWith('/find-email') ||
+    pathname.startsWith('/find-password') ||
     isUnknownPath
 
   // 비활성 타이머 로직
@@ -117,6 +121,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     title = chatRoomNames[chatRoomId] || `채팅방 ${chatRoomId}`
   } else if (agreementId) {
     title = agreementTitles[agreementId]
+  } else if (pathname.startsWith('/find-email')) {
+    title = 'Find your Email'
+  } else if (pathname.startsWith('/find-password')) {
+    title = 'Reset Password'
   } else {
     title = pageTitles[pathname] || '페이지'
   }
