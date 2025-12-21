@@ -1,6 +1,12 @@
 import { lazy } from 'react'
-import { Route, Routes as RouterRoutes } from 'react-router-dom'
+import { Navigate, Route, Routes as RouterRoutes } from 'react-router-dom'
 import PrivateRoute from './PrivateRoute'
+import FindEmailForm from '../pages/find-email/FindEmailForm'
+import FindEmailNotFound from '../pages/find-email/FindEmailNotFound'
+import FindEmailSuccess from '../pages/find-email/FindEmailSuccess'
+import FindPasswordEmail from '../pages/find-passoword/FindPasswordEmail'
+import FindPasswordVerify from '../pages/find-passoword/FindPasswordVerify'
+import FindPasswordReset from '../pages/find-passoword/FindPasswordReset'
 
 const MainPage = lazy(() => import('../pages/MainPage'))
 const SignupPage = lazy(() => import('../pages/SignupPage'))
@@ -15,6 +21,8 @@ const TestClosenessPage = lazy(() => import('../test/TestClosenessPage'))
 const TestChatPage = lazy(() => import('../test/TestChatPage'))
 const LandingPage = lazy(() => import('../pages/LandingPage'))
 const OnboardingPage = lazy(() => import('../pages/OnboardingPage'))
+const FindEmailPage = lazy(() => import('../pages/find-email/FindEmailPage'))
+const FindPasswordPage = lazy(() => import('../pages/find-passoword/FindPasswordPage'))
 
 export function Routes() {
   return (
@@ -89,6 +97,18 @@ export function Routes() {
         }
       />
       <Route path="/policy/:id" element={<PolicyPage />} />
+      <Route path="/find-email" element={<FindEmailPage />}>
+        <Route index element={<Navigate to="form" replace />} />
+        <Route path="form" element={<FindEmailForm />} />
+        <Route path="not-found" element={<FindEmailNotFound />} />
+        <Route path="success" element={<FindEmailSuccess />} />
+      </Route>
+      <Route path="/find-password" element={<FindPasswordPage />}>
+        <Route index element={<Navigate to="email" replace />} />
+        <Route path="email" element={<FindPasswordEmail />} />
+        <Route path="verify" element={<FindPasswordVerify />} />
+        <Route path="reset" element={<FindPasswordReset />} />
+      </Route>
       <Route path="/error" element={<ErrorPage />} />
       <Route path="*" element={<ErrorPage errorCode={404} />} />
     </RouterRoutes>
