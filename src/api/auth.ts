@@ -4,7 +4,9 @@ import type {
   LoginResponse,
   OAuthLoginRequest,
   OAuthLoginResponse,
+  ResetPasswordRequest,
   VerificationRequest,
+  VerifyCodeRequest,
 } from '../types/auth'
 import api, { publicApi } from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
@@ -114,4 +116,19 @@ export async function requestEmailVerification(data: VerificationRequest) {
     }
     throw e
   }
+}
+
+export async function resetPasswordRequest(email: string) {
+  const res = await publicApi.post(AUTH_ENDPOINTS.PASSWORD_RESET_REQUEST, { email })
+  return res.data
+}
+
+export async function resetPasswordVerify(data: VerifyCodeRequest) {
+  const res = await publicApi.post(AUTH_ENDPOINTS.PASSWORD_RESET_VERIFY, data)
+  return res.data
+}
+
+export async function resetPassword(data: ResetPasswordRequest) {
+  const res = await publicApi.post(AUTH_ENDPOINTS.PASSWORD_RESET_EXECUTE, data)
+  return res.data
 }

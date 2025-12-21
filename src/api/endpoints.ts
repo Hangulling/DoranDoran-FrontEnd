@@ -3,6 +3,10 @@ import type { BotType } from '../types/archive'
 // Users endpoints
 export const USER_ENDPOINTS = {
   CREATE: '/api/users',
+  RESIGTER: '/api/users/register',
+
+  // 이메일 찾기
+  FIND_EMAIL: '/api/users/find-email',
 
   // 사용자 조회
   GET_BY_ID: (userId: string) => `/api/users/${userId}`,
@@ -50,8 +54,11 @@ export const AUTH_ENDPOINTS = {
   // 토큰 갱신
   REFRESH_TOKEN: '/api/auth/refresh',
 
-  // 비밀번호 재설정 요청
-  PASSWORD_RESET_REQUEST: '/api/auth/password/reset/request',
+  // 비밀번호 재설정 코드 요청
+  PASSWORD_RESET_REQUEST: '/api/auth/password/reset/request-code',
+
+  // 비밀번호 재설정 코드 검증
+  PASSWORD_RESET_VERIFY: '/api/auth/password/reset/verify-code',
 
   // 비밀번호 재설정 실행
   PASSWORD_RESET_EXECUTE: '/api/auth/password/reset/execute',
