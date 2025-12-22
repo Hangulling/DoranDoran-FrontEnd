@@ -3,20 +3,32 @@ import axios from 'axios'
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
 import Agreement from '../components/common/Agreement'
-import { PASSWORD_REGEX, validateEmail, validateName } from '../utils/validations'
+import {
+  ANSWER_REGEX,
+  isPastDate,
+  isValidCalendarDate,
+  PASSWORD_REGEX,
+  validateEmail,
+  validateName,
+} from '../utils/validations'
 import CommonModal from '../components/common/CommonModal'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAgreementStore } from '../stores/useAgreementStore'
 import { useSignupFormStore } from '../stores/useSignupStore'
 import { checkEmailExists, requestEmailVerification } from '../api/auth'
 import { createUser } from '../api/user'
 import ReactGA from 'react-ga4'
 import { GA_ENABLED, IS_PROD } from '../constants/env'
+import Dropdown from '../components/common/Dropdown'
+import { Identity_Questions } from '../constants/IdentityQuestionData'
 
 export default function SignupPage() {
   const {
     firstName,
     lastName,
+    birthDate,
+    identityQuestion,
+    answer,
     email,
     password,
     passwordCheck,
@@ -28,6 +40,8 @@ export default function SignupPage() {
 
   const [firstNameError, setFirstNameError] = useState<string | null>(null)
   const [lastNameError, setLastNameError] = useState<string | null>(null)
+  const [birthDateError, setBirthDateError] = useState<string | null>(null)
+  const [answerError, setAnswerError] = useState<string | null>(null)
   const [emailError, setEmailError] = useState<string | null>(null)
   const [emailSuccess, setEmailSuccess] = useState<string | null>(null)
   const [pwdTouched, setPwdTouched] = useState(false)
@@ -38,6 +52,7 @@ export default function SignupPage() {
   const [, setPwdCheckError] = useState<string | null>(null)
 
   const navigate = useNavigate()
+  const location = useLocation()
 
   const agreements = useAgreementStore(s => s.value)
   const setManyAgreements = useAgreementStore(s => s.setMany)
@@ -62,6 +77,60 @@ export default function SignupPage() {
     }
     setMany({ lastName: noSpace })
     if (lastNameError && validateName(noSpace) === null) setLastNameError(null)
+  }
+
+  const birthDateDisplay = birthDate.replace(/^(\d{4})(\d{0,2})(\d{0,2})$/, (_, y, m, d) =>
+    [y, m, d].filter(Boolean).join('-')
+  )
+
+  const handleBirthDateChange = (v: string) => {
+    const digits = v.replace(/\D/g, '')
+
+    if (digits.length > 8) return
+
+    setMany({ birthDate: digits })
+
+    if (birthDateError && isPastDate(digits) === null && isValidCalendarDate(digits) === null) {
+      setBirthDateError(null)
+    }
+
+    if (birthDateError) {
+      setBirthDateError(null)
+    }
+  }
+
+  const handleBirthDateBlur = (v: string) => {
+    if (isPastDate(v)) {
+      setBirthDateError('Please enter a valid date')
+    }
+
+    if (isValidCalendarDate(v)) {
+      setBirthDateError('Please enter a valid date')
+    }
+
+    if (v.length < 8) {
+      setBirthDateError('Please enter the date of birth in 8 digits')
+      return
+    }
+  }
+
+  const handleAnswerChange = (v: string) => {
+    if (v.length > 30) {
+      setAnswerError('Input must not exceed 30 characters and number')
+      return
+    }
+
+    if (v.length === 1 && v[0] === ' ') {
+      return
+    }
+
+    if (v !== '' && !ANSWER_REGEX.test(v)) {
+      setAnswerError('Only letters, numbers, and spaces are allowed')
+      return
+    }
+
+    setAnswerError(null)
+    setMany({ answer: v })
   }
 
   const handleEmailChange = (v: string) => {
@@ -165,8 +234,18 @@ export default function SignupPage() {
     }
   }
 
+  const isBirthDateValid =
+    birthDate.length === 8 &&
+    birthDateError === null &&
+    isValidCalendarDate(birthDate) === null &&
+    isPastDate(birthDate) === null
+
+  const isAnswerValid = answer.trim() !== '' && answerError === null
+
+  const isQuestionSelected = identityQuestion.trim() !== ''
   const isEmailFormatValid = email.trim() !== '' && validateEmail(email) === null
   const alreadyVerified = emailVerified && verifiedEmail === email
+
   const pwdFormatError = pwdTouched && password.length > 0 && !PASSWORD_REGEX.test(password)
   const pwdMatchError =
     pwdCheckTouched && passwordCheck.length > 0 && !pwdFormatError && password !== passwordCheck
@@ -192,6 +271,9 @@ export default function SignupPage() {
     firstName.trim() !== '' &&
     lastName.trim() !== '' &&
     email.trim() !== '' &&
+    isBirthDateValid &&
+    isQuestionSelected &&
+    isAnswerValid &&
     validateName(firstName) === null &&
     validateName(lastName) === null &&
     validateEmail(email) === null &&
@@ -220,6 +302,9 @@ export default function SignupPage() {
         firstName,
         lastName,
         name: `${firstName} ${lastName}`.trim(),
+        birthDate: birthDate.replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3'),
+        signupQuestion: identityQuestion,
+        signupAnswer: answer,
         password,
       }
 
@@ -260,6 +345,13 @@ export default function SignupPage() {
 
   // 페이지 뷰 추가
   useEffect(() => {
+    const fromVerify = location.state?.fromVerify
+
+    if (!fromVerify) {
+      resetForm()
+      resetAgreements()
+    }
+
     if (IS_PROD && GA_ENABLED) {
       const entryTimestamp = Math.floor(Date.now() / 1000) // UNIX 타임스탬프
       ReactGA.event('view_sign_in', {
@@ -344,6 +436,43 @@ export default function SignupPage() {
             value={lastName}
           />
           {lastNameError && <span className="text-xs text-orange-300">{lastNameError}</span>}
+        </div>
+
+        <div>
+          <Input
+            type="text"
+            label="Date of Birth *"
+            placeholder="YYYY-MM-DD"
+            variant={birthDateError ? 'error' : 'primary'}
+            inputMode="numeric"
+            onChange={e => handleBirthDateChange(e.target.value)}
+            onBlur={() => handleBirthDateBlur(birthDate)}
+            value={birthDateDisplay}
+          />
+          {birthDateError && <span className="text-xs text-orange-300">{birthDateError}</span>}
+        </div>
+
+        <div>
+          <Dropdown
+            label="Identity Verification Question *"
+            placeholder="Please select a question"
+            options={Identity_Questions}
+            variant={answerError ? 'error' : 'primary'}
+            value={
+              identityQuestion
+                ? (Identity_Questions.find(q => q.value === identityQuestion) ?? null)
+                : null
+            }
+            onChange={q => setMany({ identityQuestion: q.value })}
+          />
+          <Input
+            variant={answerError ? 'error' : 'primary'}
+            type="text"
+            placeholder="Please enter your answer"
+            onChange={e => handleAnswerChange(e.target.value)}
+            value={answer}
+          />
+          {answerError && <span className="text-xs text-orange-300">{answerError}</span>}
         </div>
 
         <div className="w-[335px]">

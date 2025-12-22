@@ -58,3 +58,14 @@ export interface OAuthLoginRequest {
 }
 
 export type OAuthLoginResponse = LoginResponse
+
+export interface VerifyCodeRequest {
+  email: string
+  code: string
+}
+
+export interface ResetPasswordRequest {
+  email: string
+  code: string
+  newPassword: string
+}

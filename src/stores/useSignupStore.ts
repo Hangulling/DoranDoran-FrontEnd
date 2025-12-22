@@ -4,6 +4,9 @@ import { persist } from 'zustand/middleware'
 interface SignupFormState {
   firstName: string
   lastName: string
+  birthDate: string
+  identityQuestion: string
+  answer: string
   email: string
   password: string
   passwordCheck: string
@@ -18,6 +21,9 @@ export const useSignupFormStore = create<SignupFormState>()(
     set => ({
       firstName: '',
       lastName: '',
+      birthDate: '',
+      identityQuestion: '',
+      answer: '',
       email: '',
       password: '',
       passwordCheck: '',
@@ -28,6 +34,9 @@ export const useSignupFormStore = create<SignupFormState>()(
         set({
           firstName: '',
           lastName: '',
+          birthDate: '',
+          identityQuestion: '',
+          answer: '',
           email: '',
           password: '',
           passwordCheck: '',
