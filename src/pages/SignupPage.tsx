@@ -93,6 +93,10 @@ export default function SignupPage() {
     if (birthDateError && isPastDate(digits) === null && isValidCalendarDate(digits) === null) {
       setBirthDateError(null)
     }
+
+    if (birthDateError) {
+      setBirthDateError(null)
+    }
   }
 
   const handleBirthDateBlur = (v: string) => {
