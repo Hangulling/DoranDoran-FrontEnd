@@ -79,7 +79,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
             avatarUrl={roomAvatar}
             message={'Knock knock'}
             isSender={false}
-            variant={'error'}
+            variant={'basic'}
             showIcon={false}
           />
         )}
