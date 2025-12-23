@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type JSX, type RefObject } from 'react'
+import { Keyboard } from '@capacitor/keyboard'
 import Send from '../../assets/icon/send.svg'
 import ActiveSend from '../../assets/icon/activeSend.svg'
 import ErrorIcon from '../../assets/icon/error.svg'
@@ -21,7 +22,6 @@ const MAX_ROWS = 3
 const LINE_HEIGHT = 21
 const SINGLE_LINE_HEIGHT = 37
 
-// 위치 문제로 따로 구현
 const ToastMessage = ({ message, iconType }: ToastMessageProps) => {
   const iconMap: Record<IconType, JSX.Element> = {
     error: <img src={ErrorIcon} alt="error" />,
@@ -42,72 +42,71 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabl
   const [isComposing, setIsComposing] = useState(false)
   const [toast, setToast] = useState<ToastMessageProps | null>(null)
   const [isToastVisible, setIsToastVisible] = useState(false)
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false)
+
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  // 컴포넌트 언마운트 시 타이머 클리어
   useEffect(() => {
     return () => {
-      if (toastTimerRef.current) {
-        clearTimeout(toastTimerRef.current)
-      }
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    Keyboard.setScroll({ isDisabled: true })
+
+    const onWillShow = () => {
+      setIsKeyboardOpen(true)
+    }
+
+    const onDidHide = () => {
+      setIsKeyboardOpen(false)
+    }
+
+    Keyboard.addListener('keyboardWillShow', onWillShow)
+    Keyboard.addListener('keyboardDidHide', onDidHide)
+
+    return () => {
+      Keyboard.removeAllListeners()
+      Keyboard.setScroll({ isDisabled: false })
     }
   }, [])
 
   const showToast = (message: string, iconType: IconType) => {
-    if (toastTimerRef.current) {
-      clearTimeout(toastTimerRef.current)
-    }
-
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
     setToast({ message, iconType })
     setIsToastVisible(true)
     toastTimerRef.current = setTimeout(() => {
       setIsToastVisible(false)
-
-      // 애니메이션이 끝난 후 토스트 데이터 제거
-      setTimeout(() => {
-        setToast(null)
-      }, 400)
+      setTimeout(() => setToast(null), 400)
     }, 3600)
   }
 
   const handleCompositionStart = () => setIsComposing(true)
-
-  const handleCompositionEnd = () => {
-    setIsComposing(false)
-  }
+  const handleCompositionEnd = () => setIsComposing(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const originalValue = e.target.value
     let finalValue = originalValue
-
     if (finalValue.length > 50) {
       showToast('Maximum of 50 characters allowed', 'error')
       finalValue = finalValue.substring(0, 50)
     }
-
     setInputValue(finalValue)
-
     const textarea = inputRef.current
     if (textarea) {
       textarea.style.height = 'auto'
-
       const scrollHeight = textarea.scrollHeight
       const maxHeight = LINE_HEIGHT * MAX_ROWS + (SINGLE_LINE_HEIGHT - LINE_HEIGHT)
       const newHeight = Math.min(scrollHeight, maxHeight)
-
       textarea.style.height = `${newHeight}px`
       textarea.style.overflowY = scrollHeight > maxHeight ? 'auto' : 'hidden'
-
       setTextareaHeight(newHeight)
     }
   }
 
   const handleSendClick = () => {
-    // AI가 응답 중이거나 입력값이 없으면 전송 방지
-    if (disabled || !inputValue.trim()) {
-      return
-    }
-
+    if (disabled || !inputValue.trim()) return
     onSendMessage(inputValue.trim())
     setInputValue('')
     if (inputRef.current) {
@@ -116,18 +115,22 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabl
     }
   }
 
-  // 엔터 키 이벤트
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && !isComposing && !disabled) {
-      e.preventDefault() // 줄바꿈 방지
-      handleSendClick() // 메시지 전송
+      e.preventDefault()
+      handleSendClick()
     }
   }
 
   const isButtonDisabled = disabled || !inputValue.trim()
 
   return (
-    <div className="relative bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
+    <div
+      className={`relative bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)] ${
+        isKeyboardOpen ? 'pb-0' : 'pb-[env(safe-area-inset-bottom)]'
+      }`}
+      style={{ zIndex: 50 }}
+    >
       <div className="absolute bottom-full w-full left-0 flex justify-center">
         {toast && (
           <div

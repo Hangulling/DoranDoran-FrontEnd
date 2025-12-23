@@ -82,6 +82,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }, [isPublicPage]) // 경로가 바뀔 때마다 실행
 
   const isMain = pathname === '/'
+  const isChatPage = pathname.startsWith('/chat')
 
   const archiveMatch = useMatch('/archive/:id')
   const onArchive = !!archiveMatch
@@ -149,7 +150,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
       <main
         id="app-scroll"
-        className="flex-grow min-h-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]"
+        className={`flex-grow min-h-0 overflow-y-auto ${
+          isChatPage ? '' : 'pb-[env(safe-area-inset-bottom)]'
+        }`}
       >
         {children}
       </main>

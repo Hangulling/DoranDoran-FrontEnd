@@ -37,7 +37,7 @@ export default function FindEmailPage() {
 
       <Outlet context={{ setOnSubmit, setCanSubmit }} />
       <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center">
-        <div className="w-full max-w-md bg-white px-4 py-3 shadow-[0_-1px_2px_0_rgba(0,0,0,0.08)]">
+        <div className="w-full max-w-md bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-1px_2px_0_rgba(0,0,0,0.08)]">
           <Button
             onClick={handleConfirm}
             variant="primary"
