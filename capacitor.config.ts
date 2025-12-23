@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'K-oach',
   webDir: 'dist',
   server: {
-    url: 'http://localhost:3000', // adb reverse tcp:3000 tcp:3000
+    url: 'http://localhost:3000',
     cleartext: true,
   },
   plugins: {
@@ -16,6 +16,10 @@ const config: CapacitorConfig = {
         apple: false,
         twitter: false,
       },
+    },
+    Keyboard: {
+      resize: 'native',
+      resizeOnFullScreen: false,
     },
   },
 }
