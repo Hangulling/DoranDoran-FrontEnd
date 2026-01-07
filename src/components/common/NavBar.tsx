@@ -37,7 +37,7 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
     <>
       <div
         className={`mx-auto w-full max-w-md inset-x-0 navbar bg-white h-15 min-h-15 p-0
-        ${isChatPage ? '' : 'shadow-[0_1px_2px_rgba(0,0,0,0.12)]'}`}
+        ${isChatPage ? '' : 'shadow-[0_-1px_2px_rgba(0,0,0,0.12)]'}`}
       >
         <div className="navbar-start ml-5">
           {/* 뒤로가기 */}

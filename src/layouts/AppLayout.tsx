@@ -134,8 +134,21 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     <div className="relative mx-auto flex h-full w-full max-w-md flex-col overflow-x-hidden pt-[env(safe-area-inset-top)]">
       <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
 
+      {!isPublicPage && <SessionAutoLogout />}
+
+      <main
+        id="app-scroll"
+        className={'flex-grow min-h-0 overflow-y-auto'}
+      >
+        {children}
+      </main>
+
       {!hideNavBar && (
-        <header className="sticky top-0 shrink-0 z-40 bg-white">
+        <footer 
+          className={`sticky bottom-0 shrink-0 z-40 bg-white ${
+            isChatPage ? '' : 'pb-[env(safe-area-inset-bottom)]'
+          }`}
+        >
           <NavBar
             isMain={isMain}
             title={title}
@@ -144,18 +157,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             onToggleSidebar={toggleSidebar}
           />
           {closenessId && <ClosenessBar chatRoomId={closenessId} />}
-        </header>
+        </footer>
       )}
-      {!isPublicPage && <SessionAutoLogout />}
-
-      <main
-        id="app-scroll"
-        className={`flex-grow min-h-0 overflow-y-auto ${
-          isChatPage ? '' : 'pb-[env(safe-area-inset-bottom)]'
-        }`}
-      >
-        {children}
-      </main>
     </div>
   )
 }
