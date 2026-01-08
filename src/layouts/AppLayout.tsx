@@ -56,7 +56,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const isKnownPath = knownPatterns.some(rx => rx.test(pathname))
   const isUnknownPath = !isKnownPath
 
-  const skipNavPaths = ['/login', '/error', '/insta', '/onboarding']
+  const skipNavPaths = ['/login', '/error', '/insta']
 
   // 로그인 필요없는 페이지
   const isPublicPage =
@@ -98,6 +98,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     isUnknownPath ||
     (pathname.startsWith('/error') && state?.from === 'signup')
 
+// navbar 상단 고정 경로
+  const topNavPaths = ['/signup', '/find-email', '/find-password', '/onboarding']
+  const isTopNav = topNavPaths.some(path => pathname.startsWith(path))
+
   // 친밀도 바(채팅에서만)
   const closenessMatch = pathname.match(/^\/chat\/(\d+)$/)
   const closenessId = closenessMatch ? closenessMatch[1] : null
@@ -134,6 +138,20 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     <div className="relative mx-auto flex h-full w-full max-w-md flex-col overflow-x-hidden pt-[env(safe-area-inset-top)]">
       <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
 
+      {/* 상단 네비게이션 바 */}
+      {!hideNavBar && isTopNav && (
+        <header className="sticky top-0 shrink-0 z-40 bg-white">
+          <NavBar
+            position="top"
+            isMain={isMain}
+            title={title}
+            showBookmark={showBookmark}
+            showDelete={showDelete}
+            onToggleSidebar={toggleSidebar}
+          />
+        </header>
+      )}
+
       {!isPublicPage && <SessionAutoLogout />}
 
       <main
@@ -143,20 +161,22 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         {children}
       </main>
 
-      {!hideNavBar && (
-        <footer 
+     {/* 하단 네비게이션 바 */}
+      {!hideNavBar && !isTopNav && (
+        <footer
           className={`sticky bottom-0 shrink-0 z-40 bg-white ${
             isChatPage ? '' : 'pb-[env(safe-area-inset-bottom)]'
           }`}
         >
+          {closenessId && <ClosenessBar chatRoomId={closenessId} />}
           <NavBar
+            position="bottom"
             isMain={isMain}
             title={title}
             showBookmark={showBookmark}
             showDelete={showDelete}
             onToggleSidebar={toggleSidebar}
           />
-          {closenessId && <ClosenessBar chatRoomId={closenessId} />}
         </footer>
       )}
     </div>

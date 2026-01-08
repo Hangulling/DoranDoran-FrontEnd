@@ -10,12 +10,15 @@ import type { NavBarProps } from '../../types/common'
 import { BOT_TO_ROOM } from '../../types/archive'
 import { useNavBar } from '../../hooks/useNavBarAction'
 
-const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
+const NavBar: React.FC<
+  NavBarProps & { onToggleSidebar?: () => void; position?: 'top' | 'bottom' }
+> = ({
   title,
   isMain,
   showBookmark,
   showDelete,
   onToggleSidebar,
+  position = 'bottom',
 }) => {
   const { goBack, handleBookmarkClick, handleHamburgerClick, isChatPage } =
     useNavBar(onToggleSidebar)
@@ -33,11 +36,16 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
 
   const hasAnyInRoom = items.some(i => BOT_TO_ROOM[i.botType] === activeRoom)
 
+  const positionStyle =
+    position === 'top'
+      ? 'shadow-[0_1px_2px_rgba(0,0,0,0.08)] border-b border-gray-100' // 상단일 때: 아래 그림자/테두리
+      : 'shadow-[0_-1px_2px_rgba(0,0,0,0.12)] border-t border-gray-100' // 하단일 때: 위 그림자/테두리
+
   return (
     <>
       <div
         className={`mx-auto w-full max-w-md inset-x-0 navbar bg-white h-15 min-h-15 p-0
-        ${isChatPage ? '' : 'shadow-[0_-1px_2px_rgba(0,0,0,0.12)]'}`}
+        ${isChatPage ? '' : positionStyle}`}
       >
         <div className="navbar-start ml-5">
           {/* 뒤로가기 */}
@@ -81,7 +89,11 @@ const NavBar: React.FC<NavBarProps & { onToggleSidebar?: () => void }> = ({
 
           {/* 보관함 삭제 버튼 */}
           {showDelete && !selectionMode && hasAnyInRoom && (
-            <Button variant="archive" className="mr-1" onClick={enterSelectionMode}>
+            <Button
+              variant="archive"
+              className="mr-1"
+              onClick={enterSelectionMode}
+            >
               Delete
             </Button>
           )}
