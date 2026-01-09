@@ -1,13 +1,31 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
-type Variant = 'primary' | 'cancel' | 'text' | 'confirm' | 'tab' | 'archive' | 'home' | 'dropdown'
-type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full' | 'archive' | 'confirm' | 'dropdown'
+type Variant =
+  | 'primary'
+  | 'cancel'
+  | 'text'
+  | 'confirm'
+  | 'tab'
+  | 'archive'
+  | 'home'
+  | 'dropdown'
+type Size =
+  | 'xs'
+  | 'sm'
+  | 'md'
+  | 'lg'
+  | 'xl'
+  | 'full'
+  | 'archive'
+  | 'confirm'
+  | 'dropdown'
 
 const VARIANTS: Record<Variant, string> = {
-  primary: 'text-white rounded-lg disabled:bg-gray-100 disabled:text-gray-300',
+  primary:
+    'text-gray-0 text-subtitle text-[16px] rounded-xl disabled:bg-gray-100 disabled:text-gray-0',
   cancel: 'bg-gray-80 text-gray-600 rounded-lg',
   text: 'bg-transparent',
-  confirm: 'bg-green-400 text-white rounded-lg',
+  confirm: 'bg-green-400 text-white rounded-xl',
   tab: 'rounded-[18px] px-[14px] py-2 text-body text-sm',
   archive: 'text-gray-500 text-sm text-body',
   home: 'bg-green-400 text-white rounded-[18px] border border-green-400',
@@ -22,7 +40,7 @@ const SIZES: Record<Size, string> = {
   xl: 'w-[335px] h-14',
   full: 'w-full h-14',
   archive: 'px-4 py-2',
-  confirm: 'w-58 py-2',
+  confirm: 'w-full h-13',
   dropdown: 'w-[335px] h-12',
 }
 
