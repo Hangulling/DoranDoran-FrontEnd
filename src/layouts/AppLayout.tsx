@@ -157,19 +157,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </header>
       )}
 
-      {/* 상단 네비게이션 바 */}
-      {!hideNavBar && isTopNav && (
-        <header className="sticky top-0 shrink-0 z-40 bg-white">
-          <NavBar
-            position="top"
-            isMain={isMain}
-            title={title}
-            showBookmark={showBookmark}
-            showDelete={showDelete}
-          />
-        </header>
-      )}
-
       {!isPublicPage && <SessionAutoLogout />}
 
       <main id="app-scroll" className={'flex-grow min-h-0 overflow-y-auto'}>
