@@ -166,7 +166,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             title={title}
             showBookmark={showBookmark}
             showDelete={showDelete}
-            onToggleSidebar={toggleSidebar}
           />
         </header>
       )}
