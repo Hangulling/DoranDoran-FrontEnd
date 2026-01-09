@@ -8,12 +8,6 @@ export interface NavBarProps {
   showDelete?: boolean
 }
 
-// 사이드 바
-export interface SidebarProps {
-  isOpen: boolean
-  onClose: () => void
-}
-
 // 공통 모달
 export interface CommonModalProps {
   open: boolean
