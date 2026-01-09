@@ -3,8 +3,7 @@ import { useLocation, useMatch } from 'react-router-dom'
 import NavBar from '../components/common/NavBar'
 import useArchiveStore from '../stores/useArchiveStore'
 import ClosenessBar from '../components/chat/ClosenessBar'
-import { useEffect, useState } from 'react'
-import Sidebar from '../components/common/SideBar'
+import { useEffect } from 'react'
 import SessionAutoLogout from '../components/common/SessionAutoLogout'
 import { startIdleTimer, stopIdleTimer } from '../utils/idleTimer'
 
@@ -33,8 +32,6 @@ const agreementTitles: Record<string, string> = {
 const showBookmarkPaths = ['/']
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const toggleSidebar = () => setSidebarOpen(open => !open)
   const location = useLocation()
   const pathname = location.pathname
 
@@ -98,8 +95,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     isUnknownPath ||
     (pathname.startsWith('/error') && state?.from === 'signup')
 
-// navbar 상단 고정 경로
-  const topNavPaths = ['/signup', '/find-email', '/find-password', '/onboarding']
+  // navbar 상단 고정 경로
+  const topNavPaths = [
+    '/signup',
+    '/find-email',
+    '/find-password',
+    '/onboarding',
+    '/archive',
+    '/chat',
+  ]
   const isTopNav = topNavPaths.some(path => pathname.startsWith(path))
 
   // 친밀도 바(채팅에서만)
@@ -109,7 +113,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   // 북마크(채팅/친밀)
   const chatRoomMatch = pathname.match(/^\/(chat|closeness)\/(\d+)$/)
   const chatRoomId = chatRoomMatch ? chatRoomMatch[2] : null
-  const showBookmark = showBookmarkPaths.includes(pathname) || chatRoomId !== null
+  const showBookmark =
+    showBookmarkPaths.includes(pathname) || chatRoomId !== null
 
   const fromChat = (location.state as { from?: string } | null)?.from === 'chat'
 
@@ -121,7 +126,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     title = 'Delete'
   } else if (onArchive) {
     title =
-      (fromChat && archiveId && (chatRoomNames[archiveId] || `채팅방 ${archiveId}`)) || 'Archive'
+      (fromChat &&
+        archiveId &&
+        (chatRoomNames[archiveId] || `채팅방 ${archiveId}`)) ||
+      'Archive'
   } else if (chatRoomId) {
     title = chatRoomNames[chatRoomId] || `채팅방 ${chatRoomId}`
   } else if (agreementId) {
@@ -136,7 +144,18 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   return (
     <div className="relative mx-auto flex h-full w-full max-w-md flex-col overflow-x-hidden pt-[env(safe-area-inset-top)]">
-      <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
+      {/* 상단 네비게이션 바 */}
+      {!hideNavBar && isTopNav && (
+        <header className="sticky top-0 shrink-0 z-40 bg-white">
+          <NavBar
+            position="top"
+            isMain={isMain}
+            title={title}
+            showBookmark={showBookmark}
+            showDelete={showDelete}
+          />
+        </header>
+      )}
 
       {/* 상단 네비게이션 바 */}
       {!hideNavBar && isTopNav && (
@@ -154,14 +173,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
       {!isPublicPage && <SessionAutoLogout />}
 
-      <main
-        id="app-scroll"
-        className={'flex-grow min-h-0 overflow-y-auto'}
-      >
+      <main id="app-scroll" className={'flex-grow min-h-0 overflow-y-auto'}>
         {children}
       </main>
 
-     {/* 하단 네비게이션 바 */}
+      {/* 하단 네비게이션 바 */}
       {!hideNavBar && !isTopNav && (
         <footer
           className={`sticky bottom-0 shrink-0 z-40 bg-white ${
@@ -175,7 +191,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             title={title}
             showBookmark={showBookmark}
             showDelete={showDelete}
-            onToggleSidebar={toggleSidebar}
           />
         </footer>
       )}
