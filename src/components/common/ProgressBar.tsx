@@ -12,7 +12,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const steps = Array.from({ length: totalSteps }, (_, i) => i + 1)
 
   return (
-    <div className="w-full flex items-center gap-1 sticky top-0">
+    <div className="w-full flex items-center gap-1">
       {steps.map(step => {
         const isActive = step <= currentStep
 
