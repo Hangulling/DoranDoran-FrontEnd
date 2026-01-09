@@ -8,14 +8,14 @@ import ArrowRight from '../assets/icon/arrowRight.svg?react'
 import { updateOnboarding } from '../api'
 import { useUserStore } from '../stores/useUserStore'
 import OnboardingContent from '../components/onboarding/OnboardingContent'
+import ProgressBar from '../components/common/ProgressBar'
 
 export default function OnboardingPage() {
   const navigate = useNavigate()
   const userId = useUserStore(state => state.id)
 
-  const { page, direction, paginate, handleDragEnd, handleScreenClick } = useSlider(
-    ONBOARDING_SLIDES.length
-  )
+  const { page, direction, paginate, handleDragEnd, handleScreenClick } =
+    useSlider(ONBOARDING_SLIDES.length)
 
   const isLastPage = page === ONBOARDING_SLIDES.length - 1
 
@@ -51,31 +51,14 @@ export default function OnboardingPage() {
 
   return (
     <div
-      className="flex flex-col h-[100dvh] bg-white relative overflow-hidden"
+      className="flex flex-col min-h-full bg-gray-0 relative overflow-hidden px-5"
       onClick={handleScreenClick}
     >
-      {/* Header */}
-      <header className="shrink-0 relative flex items-center justify-center px-5 pt-[41px] pb-3 z-20">
-        <div className="flex gap-2">
-          {ONBOARDING_SLIDES.map((_, index) => (
-            <div
-              key={index}
-              className={`h-[10px] w-[10px] rounded-full transition-all duration-300 ${
-                index === page ? 'bg-green-500' : 'bg-gray-80'
-              }`}
-            />
-          ))}
-        </div>
-
-        <button
-          onClick={e => {
-            e.stopPropagation()
-            handleSkip()
-          }}
-          className="absolute right-5 text-gray-400 bg-gray-30 text-[16px] px-3 py-1 rounded-full"
-        >
-          Skip
-        </button>
+      <header>
+        <ProgressBar
+          totalSteps={ONBOARDING_SLIDES.length}
+          currentStep={page + 1}
+        />
       </header>
 
       <div className="flex-1 relative w-full">
