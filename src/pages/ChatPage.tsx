@@ -210,7 +210,7 @@ const ChatPage: React.FC = () => {
         ReactGA.event('send_greeting_message', {
           chatroom_id: chatroomId,
           bot_message: botMsg,
-          guide_message: guideMsg ?? '', // 가이드 메시지는 없을 수 있음
+          guide_message: guideMsg ?? '',
         })
       }
       setGreetingState('complete')

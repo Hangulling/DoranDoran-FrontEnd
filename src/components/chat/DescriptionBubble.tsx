@@ -1,6 +1,6 @@
 import React from 'react'
 import useTTS from '../../hooks/useTTS'
-import TTSIcon from './VolumeIcon'
+import TTSIcon from './Icon/VolumeIcon'
 import messageIcon from '../../assets/icon/message_x.svg'
 import useArchiveStore from '../../stores/useArchiveStore'
 

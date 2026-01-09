@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import TTSIcon from './VolumeIcon'
-import BookmarkIcon from './BookmarkIcon'
+import TTSIcon from './Icon/VolumeIcon'
+import BookmarkIcon from './Icon/BookmarkIcon'
 import useTTS from '../../hooks/useTTS'
 import FlagIcon from '../../assets/icon/flag.svg?react'
 
@@ -96,7 +96,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
               isBookmarked={isBookmarked ?? false}
               onToggle={toggleBookmark}
             />
-            <FlagIcon />
+            <FlagIcon className="fill-gray-0 text-gray-700" />
           </div>
         </div>
       </div>
