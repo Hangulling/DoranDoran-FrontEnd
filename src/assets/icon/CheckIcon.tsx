@@ -12,6 +12,7 @@ export default function CheckIcon({ className }: CheckIconProps) {
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
+      <rect width="20" height="20" rx="20" fill={className} />
       <path
         d="M15 6L8 14L5 10.8"
         stroke="currentColor"
