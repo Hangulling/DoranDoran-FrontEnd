@@ -52,7 +52,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const isKnownPath = knownPatterns.some(rx => rx.test(pathname))
   const isUnknownPath = !isKnownPath
 
-  const skipNavPaths = ['/login', '/error', '/insta']
+  const skipNavPaths = ['/login', '/error', '/insta', '/onboarding']
 
   // 로그인 필요없는 페이지
   const isPublicPage =
@@ -99,7 +99,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     '/signup',
     '/find-email',
     '/find-password',
-    '/onboarding',
     '/archive',
     '/chat',
   ]
