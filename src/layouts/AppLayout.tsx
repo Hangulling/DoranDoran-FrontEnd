@@ -2,7 +2,6 @@ import type React from 'react'
 import { useLocation, useMatch } from 'react-router-dom'
 import NavBar from '../components/common/NavBar'
 import useArchiveStore from '../stores/useArchiveStore'
-import ClosenessBar from '../components/chat/ClosenessBar'
 import { useEffect } from 'react'
 import SessionAutoLogout from '../components/common/SessionAutoLogout'
 import { startIdleTimer, stopIdleTimer } from '../utils/idleTimer'
@@ -53,7 +52,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const isKnownPath = knownPatterns.some(rx => rx.test(pathname))
   const isUnknownPath = !isKnownPath
 
-  const skipNavPaths = ['/login', '/error', '/insta']
+  const skipNavPaths = ['/login', '/error', '/insta', '/onboarding']
 
   // 로그인 필요없는 페이지
   const isPublicPage =
@@ -100,15 +99,14 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     '/signup',
     '/find-email',
     '/find-password',
-    '/onboarding',
     '/archive',
     '/chat',
   ]
   const isTopNav = topNavPaths.some(path => pathname.startsWith(path))
 
   // 친밀도 바(채팅에서만)
-  const closenessMatch = pathname.match(/^\/chat\/(\d+)$/)
-  const closenessId = closenessMatch ? closenessMatch[1] : null
+  //  const closenessMatch = pathname.match(/^\/chat\/(\d+)$/)
+  //  const closenessId = closenessMatch ? closenessMatch[1] : null
 
   // 북마크(채팅/친밀)
   const chatRoomMatch = pathname.match(/^\/(chat|closeness)\/(\d+)$/)
@@ -170,7 +168,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             isChatPage ? '' : 'pb-[env(safe-area-inset-bottom)]'
           }`}
         >
-          {closenessId && <ClosenessBar chatRoomId={closenessId} />}
           <NavBar
             position="bottom"
             isMain={isMain}
