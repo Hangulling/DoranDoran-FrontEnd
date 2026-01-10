@@ -1,23 +1,60 @@
 import { useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ONBOARDING_SLIDES } from '../constants/onboardingData'
-import { slideVariants } from '../constants/landingData'
 import { useSlider } from '../hooks/useSlider'
-import ArrowLeft from '../assets/icon/leftArrow.svg?react'
-import ArrowRight from '../assets/icon/arrowRight.svg?react'
 import { updateOnboarding } from '../api'
 import { useUserStore } from '../stores/useUserStore'
 import OnboardingContent from '../components/onboarding/OnboardingContent'
 import ProgressBar from '../components/common/ProgressBar'
+import Button from '../components/common/Button'
+import { useState } from 'react'
+import { ONBOARDING_STEPS } from '../constants/onboardingData'
+import LeftArrowIcon from '../assets/icon/leftArrow.svg?react'
 
 export default function OnboardingPage() {
   const navigate = useNavigate()
   const userId = useUserStore(state => state.id)
 
-  const { page, direction, paginate, handleDragEnd, handleScreenClick } =
-    useSlider(ONBOARDING_SLIDES.length)
+  const { page, paginate } = useSlider(ONBOARDING_STEPS.length)
 
-  const isLastPage = page === ONBOARDING_SLIDES.length - 1
+  const [selections, setSelections] = useState<Record<number, string[]>>({})
+  const [etcText, setEtcText] = useState('')
+
+  const currentStepData = ONBOARDING_STEPS[page]
+  const isLastPage = page === ONBOARDING_STEPS.length - 1
+
+  // 현재 단계의 선택된 값들 가져오기
+  const currentSelections = selections[page] || []
+
+  const ETC_VALUE = 'Other'
+  const isEtcSelected = currentSelections.includes(ETC_VALUE)
+  const isGrid = currentStepData.layout === 'grid'
+
+  // 버튼 활성화 조건
+  const isNextEnabled =
+    currentSelections.length > 0 &&
+    (!isEtcSelected || isGrid || etcText.trim().length > 0)
+
+  // 옵션 선택 핸들러
+  const handleSelect = (option: string) => {
+    setSelections(prev => {
+      const currentList = prev[page] || []
+      const isSelected = currentList.includes(option)
+
+      if (currentStepData.type === 'single') {
+        // 단일 선택
+        return { ...prev, [page]: [option] }
+      } else {
+        // 다중 선택
+        if (isSelected) {
+          return {
+            ...prev,
+            [page]: currentList.filter(item => item !== option),
+          }
+        } else {
+          return { ...prev, [page]: [...currentList, option] }
+        }
+      }
+    })
+  }
 
   // 완료 처리
   const handleCompleteOnboarding = async () => {
@@ -30,19 +67,34 @@ export default function OnboardingPage() {
     try {
       await updateOnboarding(userId, true)
       console.log('온보딩 완료 처리 성공')
-      navigate('/', { replace: true })
+      navigate('/', {
+        replace: true,
+        state: { showOnboardingModal: true },
+      })
     } catch (error) {
       console.error('온보딩 완료 처리 실패', error)
       navigate('/', { replace: true })
     }
   }
 
+  // 뒤로가기
+  const handleBack = () => {
+    if (page > 0) {
+      // setEtcText('')
+      paginate(-1)
+    } else {
+      navigate(-1)
+    }
+  }
+
+  // 스킵
   const handleSkip = () => {
     handleCompleteOnboarding()
   }
 
   const handleNextClick = () => {
-    if (page < ONBOARDING_SLIDES.length - 1) {
+    if (page < ONBOARDING_STEPS.length - 1) {
+      setEtcText('')
       paginate(1)
     } else {
       handleCompleteOnboarding()
@@ -50,76 +102,75 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div
-      className="flex flex-col min-h-full bg-gray-0 relative overflow-hidden px-5"
-      onClick={handleScreenClick}
-    >
-      <header>
+    <div className="flex flex-col min-h-full items-center bg-gray-0 relative px-5">
+      <header className="sticky top-0 z-30 w-full bg-gray-0 mb-[35px]">
+        {/* Nav Bar */}
+        <div className="flex justify-between items-center h-15 p-0">
+          {page !== 0 && (
+            <button onClick={handleBack}>
+              <LeftArrowIcon className="gray-600" />
+            </button>
+          )}
+
+          {page === 4 && (
+            <button
+              onClick={handleSkip}
+              className="text-[14px] text-gray-400 text-body py-2 px-1"
+            >
+              Skip
+            </button>
+          )}
+        </div>
+
         <ProgressBar
-          totalSteps={ONBOARDING_SLIDES.length}
+          totalSteps={ONBOARDING_STEPS.length}
           currentStep={page + 1}
         />
       </header>
 
-      <div className="flex-1 relative w-full">
-        <AnimatePresence initial={false} custom={direction} mode="wait">
-          <motion.div
-            key={page}
-            custom={direction}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="absolute inset-0 flex flex-col pt-3 z-10"
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.2}
-            onDragEnd={handleDragEnd}
-          >
-            <OnboardingContent slide={ONBOARDING_SLIDES[page]} />
-          </motion.div>
-        </AnimatePresence>
+      {/* 컨텐츠 */}
+      <div className="flex-1 w-full max-w-md overflow-y-auto pb-4">
+        <OnboardingContent
+          stepData={currentStepData}
+          selectedValues={currentSelections}
+          onSelect={handleSelect}
+          etcText={etcText}
+          onEtcTextChange={setEtcText}
+        />
       </div>
 
-      {/* 화살표 */}
-      <div className="absolute bottom-0 left-0 right-0 border-gray-200 border-t-[0.6px] px-5 py-3 flex justify-between items-center w-full z-30 bg-white">
-        <button
-          onClick={e => {
-            e.stopPropagation()
-            paginate(-1)
-          }}
-          disabled={page === 0}
-          className="p-2 rounded-full transition-colors"
-        >
-          <div style={{ color: page === 0 ? '#c0c4c3' : '#282A2A' }}>
-            <ArrowLeft />
-          </div>
-        </button>
-
-        {isLastPage ? (
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              handleSkip()
-            }}
-            className="bg-green-400 text-white px-3 py-1 rounded-full text-[16px] transition-transform"
-          >
-            Start
-          </button>
-        ) : (
-          <button
-            onClick={e => {
-              e.stopPropagation()
-              handleNextClick()
-            }}
-            className="p-2 rounded-full transition-colors"
-          >
-            <div style={{ color: '#282A2A' }}>
-              <ArrowRight />
-            </div>
-          </button>
-        )}
+      {/* 버튼 */}
+      <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center">
+        <div className="w-full max-w-md bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] h-18 px-5 py-[10px]">
+          {isLastPage ? (
+            <Button
+              type="submit"
+              className="bg-gray-800"
+              variant="primary"
+              size="confirm"
+              disabled={!isNextEnabled}
+              onClick={e => {
+                e.stopPropagation()
+                handleCompleteOnboarding()
+              }}
+            >
+              Complete
+            </Button>
+          ) : (
+            <Button
+              className="bg-gray-800"
+              variant="primary"
+              size="confirm"
+              disabled={!isNextEnabled}
+              onClick={e => {
+                e.stopPropagation()
+                handleNextClick()
+              }}
+            >
+              Next
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   )
