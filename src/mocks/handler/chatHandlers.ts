@@ -9,21 +9,16 @@ interface DetailedChatRoom {
   intimacy: number
 }
 
-let detailedChatRooms: DetailedChatRoom[] = initialChatRooms.map((room, index) => ({
-  roomId: room.roomRouteId,
-  roomName: room.roomName,
-  lastMessage: room.message,
-  category: ['SCHOOL', 'LOVER', 'COMPANY', 'CLIENT'][index % 4],
-  botId: [1, 2, 3, 4][index % 4],
-  intimacy: room.intimacy,
-}))
-
-const coachMarks: { [key: number]: boolean } = {
-  1: false,
-  2: false,
-  3: false,
-  4: false,
-}
+let detailedChatRooms: DetailedChatRoom[] = initialChatRooms.map(
+  (room, index) => ({
+    roomId: room.roomRouteId,
+    roomName: room.roomName,
+    lastMessage: room.message,
+    category: ['SCHOOL', 'LOVER', 'COMPANY', 'CLIENT'][index % 4],
+    botId: [1, 2, 3, 4][index % 4],
+    intimacy: room.intimacy,
+  })
+)
 
 const BODY = '/api/chat'
 
@@ -60,19 +55,22 @@ export const chatHandlers = [
       intimacy: number
     }
 
-    if (detailedChatRooms.some(room => room.roomName === newRoomInfo.roomName)) {
+    if (
+      detailedChatRooms.some(room => room.roomName === newRoomInfo.roomName)
+    ) {
       return HttpResponse.json({ message: 'DUPLICATE_TITLE' }, { status: 409 })
     }
 
     const newId =
-      detailedChatRooms.length > 0 ? Math.max(...detailedChatRooms.map(r => r.roomId)) + 1 : 1
+      detailedChatRooms.length > 0
+        ? Math.max(...detailedChatRooms.map(r => r.roomId)) + 1
+        : 1
     const newRoom: DetailedChatRoom = {
       roomId: newId,
       ...newRoomInfo,
     }
 
     detailedChatRooms.push(newRoom)
-    coachMarks[newId] = true
 
     return HttpResponse.json(
       {
@@ -90,7 +88,9 @@ export const chatHandlers = [
   http.patch(`${BODY}/lid/:id`, async ({ params, request }) => {
     const { id } = params
     const { roomName } = (await request.json()) as { roomName: string }
-    const roomToUpdate = detailedChatRooms.find(room => room.roomId === Number(id))
+    const roomToUpdate = detailedChatRooms.find(
+      room => room.roomId === Number(id)
+    )
 
     if (!roomToUpdate) {
       return HttpResponse.json({ message: 'NOT_FOUND' }, { status: 404 })
@@ -105,36 +105,15 @@ export const chatHandlers = [
   http.delete(`${BODY}/lid/:id`, ({ params }) => {
     const { roomId } = params
     const initialLength = detailedChatRooms.length
-    detailedChatRooms = detailedChatRooms.filter(room => room.roomId !== Number(roomId))
+    detailedChatRooms = detailedChatRooms.filter(
+      room => room.roomId !== Number(roomId)
+    )
 
     if (initialLength === detailedChatRooms.length) {
       return HttpResponse.json({ message: 'ALREADY_DELETED' }, { status: 404 })
     }
 
     return HttpResponse.json({ message: '소프트 딜리트 완료' })
-  }),
-
-  // 코치마크 실행 여부 확인
-  http.get(`${BODY}/lid/:id/mark`, ({ params }) => {
-    const { id } = params
-    const hasSeen = coachMarks[Number(id)] ?? true // default: true
-
-    return HttpResponse.json({ coachMark: hasSeen })
-  }),
-
-  // 코치마크 실행 상태 변경
-  http.post(`${BODY}/lid/:id/mark`, ({ params, request }) => {
-    const { id } = params
-    const url = new URL(request.url)
-    const q = url.searchParams.get('q') === 'true'
-
-    if (coachMarks[Number(id)] === undefined) {
-      return HttpResponse.json({ message: 'NOT_FOUND' }, { status: 404 })
-    }
-
-    coachMarks[Number(id)] = q
-
-    return HttpResponse.json({ message: '코치마크 실행 여부 변경' })
   }),
 
   // 메시지 전송
