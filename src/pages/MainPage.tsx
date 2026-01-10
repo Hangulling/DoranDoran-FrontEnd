@@ -54,7 +54,7 @@ const MainPage = () => {
         <CommonModal
           open={showCompleteModal}
           title="Welcome! You’re all set"
-          description="Ready to start practicing Korean with chat?"
+          description={['Ready to start practicing', 'Korean with chat?']}
           variant="signup"
           confirmText="Start"
           onConfirm={() => {
