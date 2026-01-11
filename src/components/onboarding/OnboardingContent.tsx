@@ -86,7 +86,7 @@ export default function OnboardingContent({
                 ${
                   isGrid
                     ? 'flex flex-col items-center justify-center'
-                    : `w-full h-[50px] px-5 text-left flex items-center justify-start gap-3 border ${
+                    : `w-full min-h-[50px] px-5 text-left flex items-center justify-start gap-3 border py-[14px] ${
                         isSelected
                           ? 'bg-primary-10 border-primary-200'
                           : 'bg-gray-0 border-gray-100'

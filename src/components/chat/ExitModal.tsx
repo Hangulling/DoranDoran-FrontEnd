@@ -21,7 +21,7 @@ const ExitModal: React.FC<Props> = ({ open, onConfirm, onCancel }) => {
   if (!open) return null
 
   const verticalOffset = 125
-  const translateXpx = window.innerWidth / 2 - 151.5
+  const translateXpx = window.innerWidth / 2 - 150
 
   return (
     <>
@@ -63,7 +63,7 @@ const ExitModal: React.FC<Props> = ({ open, onConfirm, onCancel }) => {
               src={checked ? CheckIcon : DisabledCheckIcon}
               alt={checked ? 'checked' : 'unchecked'}
             />
-            <span>don't watch again</span>
+            <span>don't show again</span>
           </label>
         </div>
       </div>

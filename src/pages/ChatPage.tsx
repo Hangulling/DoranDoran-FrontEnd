@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import CoachMark from '../components/chat/CoachMark'
 import ChatFooter from '../components/chat/ChatFooter'
 import type { Message } from '../types/chat'
 import { useModalStore } from '../stores/useUiStateStore'
@@ -8,19 +7,22 @@ import { chatRooms } from '../mocks/db/chat'
 import ExitModal from '../components/chat/ExitModal'
 import { useUserStore } from '../stores/useUserStore'
 import useRoomIdStore from '../stores/useRoomIdStore'
-import type { IntimacyAnalysisData, VocabularyExtractedData } from '../types/sseEvents'
+import type {
+  IntimacyAnalysisData,
+  VocabularyExtractedData,
+} from '../types/sseEvents'
 import { getUserById } from '../api'
 import useClosenessStore from '../stores/useClosenessStore'
 import { getClosenessAsText } from '../utils/conceptMap'
 import ReactGA from 'react-ga4'
 import { GA_ENABLED, IS_PROD } from '../constants/env'
 import { useBookmarkManager } from '../hooks/chat/useBookmarkManager'
-import { useCoachMark } from '../hooks/chat/useCoachMark'
 import { useChatExit } from '../hooks/chat/useChatExit'
 import { useInactivityTimer } from '../hooks/chat/useInactivityTimer'
 import { useChatHistory } from '../hooks/chat/useChatHistory'
 import ChatBody from '../components/chat/ChatBody'
 import { useChatInteraction } from '../hooks/chat/useChatInteraction'
+import ChatHeader from '../components/chat/ChatHeader'
 
 const INACTIVITY_DURATION_MS = 300000
 
@@ -56,7 +58,9 @@ const ChatPage: React.FC = () => {
   const [isHistoryLoading, setIsHistoryLoading] = useState(true)
   const [isInitChatReady, setIsInitChatReady] = useState(false)
   const [isNewChat, setIsNewChat] = useState<boolean | null>(null)
-  const [greetingState, setGreetingState] = useState<'pending' | 'loading' | 'complete'>('pending')
+  const [greetingState, setGreetingState] = useState<
+    'pending' | 'loading' | 'complete'
+  >('pending')
   const [greetingMsg1, setGreetingMsg1] = useState<string | null>(null)
   const [greetingMsg2, setGreetingMsg2] = useState<string | null>(null)
   const chatMainRef = useRef<HTMLDivElement>(null)
@@ -64,7 +68,8 @@ const ChatPage: React.FC = () => {
   const userId = useUserStore(state => state.id)
   const roomsMap = useRoomIdStore(state => state.roomsMap)
   const chatroomId = id ? roomsMap[id] : undefined
-  const closenessLevel = useClosenessStore.getState().getCloseness(id ?? '') ?? 1
+  const closenessLevel =
+    useClosenessStore.getState().getCloseness(id ?? '') ?? 1
   const closenessText = getClosenessAsText(closenessLevel)
   const accessToken = sessionStorage.getItem('accessToken') ?? ''
   const isAtBottomRef = useRef(true) // 스크롤 감지
@@ -73,15 +78,14 @@ const ChatPage: React.FC = () => {
     return chatRooms.find(r => String(r.roomRouteId) === String(id))
   }, [id])
 
-  const { showCoachMark, handleCloseCoachMark } = useCoachMark(userId, isInitChatReady)
-
-  const { handleChatBubbleBookmark, handleCorrectionBubbleBookmark } = useBookmarkManager({
-    chatroomId,
-    chatbotId,
-    closenessText,
-    messages,
-    setMessages,
-  })
+  const { handleChatBubbleBookmark, handleCorrectionBubbleBookmark } =
+    useBookmarkManager({
+      chatroomId,
+      chatbotId,
+      closenessText,
+      messages,
+      setMessages,
+    })
 
   const { isModalOpen, handleConfirmExit, handleCancelExit } = useChatExit({
     chatroomId,
@@ -240,10 +244,19 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
+      <ChatHeader
+        title={room?.roomName || 'Chat'}
+        closenessLevel={closenessLevel}
+        onBack={() => {
+          navigate(-1)
+        }}
+        onSettingClick={() => console.log('설정 클릭')}
+      />
+
       <div
         ref={chatMainRef}
         onScroll={handleScroll}
-        className="flex-grow overflow-y-auto px-5 pt-10"
+        className="flex-grow overflow-y-auto px-5 pt-6"
       >
         <ChatBody
           isHistoryLoading={isHistoryLoading}
@@ -262,7 +275,7 @@ const ChatPage: React.FC = () => {
           onCorrectionBubbleBookmark={handleCorrectionBubbleBookmark}
         />
       </div>
-      <CoachMark show={showCoachMark} onClose={handleCloseCoachMark} />
+
       <footer className="shrink-0">
         <ChatFooter
           inputRef={inputRef}
@@ -270,7 +283,11 @@ const ChatPage: React.FC = () => {
           disabled={isHistoryLoading || !isInitChatReady || isAiResponding}
         />
       </footer>
-      <ExitModal open={isModalOpen} onConfirm={handleConfirmExit} onCancel={handleCancelExit} />
+      <ExitModal
+        open={isModalOpen}
+        onConfirm={handleConfirmExit}
+        onCancel={handleCancelExit}
+      />
     </div>
   )
 }

@@ -52,7 +52,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const isKnownPath = knownPatterns.some(rx => rx.test(pathname))
   const isUnknownPath = !isKnownPath
 
-  const skipNavPaths = ['/login', '/error', '/insta', '/onboarding']
+  const skipNavPaths = ['/login', '/error', '/insta', '/onboarding', '/chat']
 
   // 로그인 필요없는 페이지
   const isPublicPage =
@@ -95,13 +95,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     (pathname.startsWith('/error') && state?.from === 'signup')
 
   // navbar 상단 고정 경로
-  const topNavPaths = [
-    '/signup',
-    '/find-email',
-    '/find-password',
-    '/archive',
-    '/chat',
-  ]
+  const topNavPaths = ['/signup', '/find-email', '/find-password', '/archive']
   const isTopNav = topNavPaths.some(path => pathname.startsWith(path))
 
   // 친밀도 바(채팅에서만)

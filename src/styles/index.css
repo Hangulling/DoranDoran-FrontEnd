@@ -18,7 +18,7 @@
   --color-gray-700: #454346;
   --color-gray-800: #2c2a2c;
   --color-gray-900: #121112;
-  
+
   --color-primary-10: #f3f1fd;
   --color-primary-50: #e3defc;
   --color-primary-100: #bbaff8;
@@ -58,9 +58,17 @@
   --color-system-blue: #546eff;
   --color-system-yellow: #ffbd38;
 
-  --gradient-1: linear-gradient(to right, #6A4FF0 0%, #7388FB 100%);
-  --gradient-2: linear-gradient(to right, #7487FB 0%, #6B51F0 100%), rgba(255, 255, 255, 0.6);
-  --gradient-3: linear-gradient(to right, #A4DEF3 0%, #A07CF4 100%), rgba(255, 255, 255, 0.8);
+  --background-image-gradient-1: linear-gradient(
+    to right,
+    #6a4ff0 0%,
+    #7388fb 100%
+  );
+  --background-image-gradient-2:
+    linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)),
+    linear-gradient(to right, #7487fb 0%, #6b51f0 100%);
+  --background-image-gradient-3:
+    linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+    linear-gradient(to right, #a4def3 0%, #a07cf4 100%);
 }
 
 @layer base {
