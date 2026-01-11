@@ -4,7 +4,6 @@ import type { VocabularyExtractedData } from '../../types/sseEvents'
 import ChatBubble from './ChatBubble'
 import CorrectionBubble from './CorrectionBubble'
 import DescriptionBubble from './DescriptionBubble'
-import Perfect from '../../assets/chat/correct.svg'
 
 interface ChatMessageItemProps {
   msg: EnrichedMessage
@@ -55,8 +54,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
             />
           ) : msg.isPerfect ? (
             // COMPLETE + PERFECT
-            <div className="flex flex-row justify-end text-[#54BDB4] text-[12px] mt-1 font-medium">
-              <img src={Perfect} alt="perfect" />
+            <div className="flex flex-row justify-end text-transparent bg-clip-text bg-gradient-1 text-[12px] mt-1 font-medium">
               perfect
             </div>
           ) : msg.correction && msg.correction.correctedSentence ? (

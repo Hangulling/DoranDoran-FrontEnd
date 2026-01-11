@@ -2,6 +2,8 @@ import React from 'react'
 import TTSIcon from './VolumeIcon'
 import BookmarkIcon from './BookmarkIcon'
 import useTTS from '../../hooks/useTTS'
+import FlagIcon from '../../assets/icon/flag.svg?react'
+import BookIcon from '../../assets/icon/book.svg?react'
 
 interface ChatBubbleProps {
   message: React.ReactNode
@@ -15,26 +17,25 @@ interface ChatBubbleProps {
 }
 
 const bubbleVariants = {
-  basic: 'bg-white border border-gray-100 rounded-lg rounded-tl-none', // 기본 답장
-  second: 'bg-white border border-gray-100 rounded-lg', // 두번째 답장
-  sender: 'bg-green-400 text-white rounded-lg rounded-tr-none', // 사용자 채팅
-  error: 'bg-white border border-orange-100 rounded-lg rounded-tl-none text-orange-200', // 에러 채팅
+  basic: 'bg-gray-0 border border-gray-100 rounded-xl rounded-tl-none', // 기본 답장
+  second: 'bg-gray-0 border border-gray-100 rounded-xl', // 두번째 답장
+  sender: 'bg-gradient-1 text-gray-0 rounded-xl rounded-tr-none text-subtitle', // 사용자 채팅
+  error:
+    'bg-gray-0 border border-gray-100 rounded-xl rounded-tl-none text-system-red', // 에러 채팅
 }
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({
   message,
   isSender,
-  avatarUrl,
   variant = 'basic',
   showIcon = false,
   messageId,
   isBookmarked,
   onBookmarkToggle,
 }) => {
-  const baseBubbleClass = 'py-[6px] px-2 text-[14px] max-w-[265px] rounded-lg'
+  const baseBubbleClass =
+    'py-[10px] px-[14px] text-[14px] max-w-[305px] rounded-xl'
   const bubbleClass = `${baseBubbleClass} ${isSender ? bubbleVariants.sender : bubbleVariants[variant]}`
-  const marginClass =
-    !isSender && (avatarUrl || variant === 'second' || variant === 'error') ? 'ml-10' : ''
 
   const ttsText = typeof message === 'string' ? message : ''
   const { onPlay: playTTS, playing: isPlaying } = useTTS(ttsText)
@@ -49,29 +50,26 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
     <div
       className={
         isSender
-          ? 'chat chat-end gap-x-[0] pt-0 pb-0'
-          : 'chat chat-start gap-x-[8px] relative pt-0 pb-0'
+          ? 'chat chat-end py-0 gap-0'
+          : 'chat chat-start relative py-0 gap-0'
       }
     >
-      {!isSender && avatarUrl && (variant === 'basic' || 'error') && (
-        <div className="chat-image avatar absolute top-0 left-0 w-8 h-8">
-          <div className="w-8 h-8 rounded-full overflow-hidden">
-            <img alt="프로필 사진" src={avatarUrl} />
-          </div>
-        </div>
-      )}
-
-      <div className={`${bubbleClass} ${marginClass} flex flex-col max-w-[265px]`}>
+      <div className={`${bubbleClass} flex flex-col`}>
         <span>{message}</span>
 
+        {/* 사전, 깃발 아이콘 추가하기 */}
         {!isSender && showIcon && (
-          <>
-            <div className="h-[1px] bg-gray-80 w-full my-1" />
-            <div className="flex flex-row justify-between">
+          <div className="flex flex-row justify-between mt-2 items-center">
+            <div className="flex flex-row gap-3 items-center">
               <TTSIcon playing={isPlaying} onPlay={playTTS} />
-              <BookmarkIcon isBookmarked={isBookmarked ?? false} onToggle={toggleBookmark} />
+              <BookIcon />
+              <BookmarkIcon
+                isBookmarked={isBookmarked ?? false}
+                onToggle={toggleBookmark}
+              />
             </div>
-          </>
+            <FlagIcon />
+          </div>
         )}
       </div>
     </div>

@@ -1,7 +1,12 @@
-import type { IntimacyAnalysisData, VocabularyExtractedData, VocabularyWord } from './sseEvents'
+import type {
+  IntimacyAnalysisData,
+  VocabularyExtractedData,
+  VocabularyWord,
+} from './sseEvents'
 
 // 컴포넌트용
 export interface ChatRoom {
+  id: number | string
   roomId: number
   roomName: string
   avatar: string

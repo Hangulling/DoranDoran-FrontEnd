@@ -22,6 +22,7 @@ import { useInactivityTimer } from '../hooks/chat/useInactivityTimer'
 import { useChatHistory } from '../hooks/chat/useChatHistory'
 import ChatBody from '../components/chat/ChatBody'
 import { useChatInteraction } from '../hooks/chat/useChatInteraction'
+import ChatHeader from '../components/chat/ChatHeader'
 
 const INACTIVITY_DURATION_MS = 300000
 
@@ -243,10 +244,19 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
+      <ChatHeader
+        title={room?.roomName || 'Chat'}
+        closenessLevel={closenessLevel}
+        onBack={() => {
+          navigate(-1)
+        }}
+        onSettingClick={() => console.log('설정 클릭')}
+      />
+
       <div
         ref={chatMainRef}
         onScroll={handleScroll}
-        className="flex-grow overflow-y-auto px-5 pt-10"
+        className="flex-grow overflow-y-auto px-5 pt-6"
       >
         <ChatBody
           isHistoryLoading={isHistoryLoading}
