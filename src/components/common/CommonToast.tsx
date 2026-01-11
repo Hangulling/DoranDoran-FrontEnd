@@ -23,12 +23,14 @@ const showToast = ({ message, iconType }: ToastProps) => {
     t => (
       <div className="w-full max-w-md">
         <div
-          className={`flex items-start mx-5 mb-[20px] bg-[rgba(15,16,16,0.8)] px-[14px] py-[16px] rounded-[12px] gap-[8px]
+          className={`flex items-start mx-5 mb-[20px] bg-[rgba(44,42,44,0.85)] px-[14px] py-[16px] rounded-[12px] gap-[8px]
           ${t.visible ? 'animate-fade-in-up' : 'toast-slide-fade-out'}
         `}
         >
           {iconType && iconMap[iconType]}
-          <span className="text-subtitle text-[14px] text-white">{message}</span>
+          <span className="text-subtitle text-[14px] text-gray-0">
+            {message}
+          </span>
         </div>
       </div>
     ),
