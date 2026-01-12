@@ -28,7 +28,7 @@ export default function BottomSheet({
         onClick={closeOnOverlayClick ? onClose : undefined}
       />
 
-      <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl bg-white px-4 pb-[calc(16px+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.14)]">
+      <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl bg-white px-5 pb-[calc(10px+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.14)]">
         <div className="mx-auto my-6 h-[5px] w-[46px] rounded-full bg-gray-800" />
 
         {(title || description) && (
