@@ -8,6 +8,9 @@ import DescriptionBubble from './DescriptionBubble'
 interface ChatMessageItemProps {
   msg: EnrichedMessage
   chatroomId: string | undefined
+  isVocabularyEnabled: boolean
+  isCorrectionEnabled: boolean
+  isTranslationEnabled: boolean
   onChatBubbleBookmark: (
     messageId: string,
     content: string,
@@ -23,7 +26,15 @@ interface ChatMessageItemProps {
 }
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
-  ({ msg, chatroomId, onChatBubbleBookmark, onCorrectionBubbleBookmark }) => {
+  ({
+    msg,
+    chatroomId,
+    isVocabularyEnabled,
+    isCorrectionEnabled,
+    isTranslationEnabled,
+    onChatBubbleBookmark,
+    onCorrectionBubbleBookmark,
+  }) => {
     return (
       <div className="mb-0">
         <div className="mt-5">
@@ -43,6 +54,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
 
         {/* 사용자 메시지 교정 */}
         {msg.isSender &&
+          isCorrectionEnabled &&
           (msg.analysisState === 'pending' ? (
             // PENDING
             <CorrectionBubble
@@ -68,6 +80,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
                 Kor: msg.correction.feedback.ko,
                 Eng: msg.correction.feedback.en,
               }}
+              showKorean={isTranslationEnabled}
               isSender={true}
               isLoading={false}
               isBookmarked={!!msg.bookmarkId}
@@ -85,6 +98,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
 
         {/* 어휘 */}
         {!msg.isSender &&
+          isVocabularyEnabled &&
           msg.vocabularyData &&
           msg.vocabularyData.words &&
           msg.vocabularyData.words.map((vocabWord, idx) => (
@@ -96,7 +110,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
                 Kor: vocabWord.context.ko,
                 Eng: vocabWord.context.en,
               }}
-              initialTab="Eng"
+              showKorean={isTranslationEnabled}
             />
           ))}
       </div>

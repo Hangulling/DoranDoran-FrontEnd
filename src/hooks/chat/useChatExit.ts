@@ -13,7 +13,11 @@ interface UseChatExitProps {
   routeId: string | undefined
 }
 
-export const useChatExit = ({ chatroomId, userId, routeId }: UseChatExitProps) => {
+export const useChatExit = ({
+  chatroomId,
+  userId,
+  routeId,
+}: UseChatExitProps) => {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const hasLeftRef = useRef(false) // 중복 나가기 방지
@@ -80,6 +84,17 @@ export const useChatExit = ({ chatroomId, userId, routeId }: UseChatExitProps) =
   const handleCancelExit = useCallback(() => {
     setIsModalOpen(false)
   }, [])
+
+  // 뒤로 가기
+  const handleGoBack = useCallback(() => {
+    if (noShowAgain) {
+      // 다시 보지 않기 설정이 되어있으면 바로 나가기 처리
+      handleConfirmExit()
+    } else {
+      // 설정이 안 되어있으면 모달 열기
+      setIsModalOpen(true)
+    }
+  }, [noShowAgain, handleConfirmExit])
 
   // 자동 로그아웃 시 정리
   useEffect(() => {
@@ -163,11 +178,20 @@ export const useChatExit = ({ chatroomId, userId, routeId }: UseChatExitProps) =
       window.removeEventListener('popstate', handlePopState)
       window.removeEventListener('beforeunload', handleUnload)
     }
-  }, [chatroomId, userId, navigate, noShowAgain, routeId, performLeaveChatroom, hasLeftRef])
+  }, [
+    chatroomId,
+    userId,
+    navigate,
+    noShowAgain,
+    routeId,
+    performLeaveChatroom,
+    hasLeftRef,
+  ])
 
   return {
     isModalOpen,
     handleConfirmExit,
     handleCancelExit,
+    handleGoBack,
   }
 }

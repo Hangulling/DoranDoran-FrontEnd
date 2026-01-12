@@ -30,7 +30,6 @@ export default function OnboardingContent({
   etcText = '',
   onEtcTextChange,
 }: OnboardingContentProps) {
-  const StepIcon = stepData.icon
   const isGrid = stepData.layout === 'grid'
 
   const ETC_VALUE = 'Other'
@@ -49,14 +48,10 @@ export default function OnboardingContent({
 
   return (
     <div className="flex flex-col h-full animate-fadeIn">
-      {/* 타이틀 & 아이콘 */}
+      {/* 타이틀 */}
       <div className="shrink-0">
-        <div className="flex justify-left mb-4">
-          <StepIcon />
-        </div>
-
         <div className="mb-[30px]">
-          <h2 className="text-[22px] text-display whitespace-pre-wrap mb-1">
+          <h2 className="text-[24px] text-display whitespace-pre-wrap mb-1">
             {stepData.title}
           </h2>
           <p className="text-body text-gray-300 text-[14px] min-h-[21px]">

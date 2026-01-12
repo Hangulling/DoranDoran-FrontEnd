@@ -1,10 +1,3 @@
-import React from 'react'
-import Icon1 from '../assets/onboarding/firstIcon.svg?react'
-import Icon2 from '../assets/onboarding/secondIcon.svg?react'
-import Icon3 from '../assets/onboarding/thirdIcon.svg?react'
-import Icon4 from '../assets/onboarding/fourthIcon.svg?react'
-import Icon5 from '../assets/onboarding/fifthIcon.svg?react'
-
 import Card1 from '../assets/onboarding/card1.png'
 import Card2 from '../assets/onboarding/card2.png'
 import Card3 from '../assets/onboarding/card3.png'
@@ -33,24 +26,18 @@ export interface OptionItem {
 
 export interface OnboardingStepData {
   id: number
-  title: React.ReactNode
+  title: string
   description?: string
   type: 'single' | 'multiple'
   layout?: 'list' | 'grid'
   hasEtc?: boolean
   options: OptionItem[]
-  icon: React.FC<React.SVGProps<SVGSVGElement>>
 }
 
 export const ONBOARDING_STEPS: OnboardingStepData[] = [
   {
     id: 1,
-    title: (
-      <>
-        'How did you hear{'\n'}about
-        <span className="text-primary-300"> Koach</span>?'
-      </>
-    ),
+    title: 'How did you hear\nabout Koach',
     type: 'single',
     layout: 'list',
     hasEtc: true,
@@ -61,16 +48,10 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
       { value: 'Facebook contents', label: 'Facebook contents' },
       { value: 'Recommended by a friend', label: 'Recommended by a friend' },
     ],
-    icon: Icon1,
   },
   {
     id: 2,
-    title: (
-      <>
-        How well do you{'\n'}
-        <span className="text-primary-300">know Korean?</span>
-      </>
-    ),
+    title: 'How well do you\nknow Korean?',
     type: 'single',
     layout: 'list',
     hasEtc: false,
@@ -89,16 +70,10 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
         image: Level5,
       },
     ],
-    icon: Icon2,
   },
   {
     id: 3,
-    title: (
-      <>
-        What is your <span className="text-primary-300">purpose</span>
-        {'\n'}for learning Korean?
-      </>
-    ),
+    title: 'What is your purpose\nfor learning Korean?',
     description: '* Multiple choices available',
     type: 'multiple',
     layout: 'grid',
@@ -109,16 +84,10 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
       { value: 'Workplace communication', image: Card3 },
       { value: 'Talking with seniors at school', image: Card4 },
     ],
-    icon: Icon3,
   },
   {
     id: 4,
-    title: (
-      <>
-        What do you want{'\n'}to
-        <span className="text-primary-300"> talk about?</span>
-      </>
-    ),
+    title: 'What do you want\nto talk about?',
     description: '* Multiple choices available',
     type: 'multiple',
     layout: 'list',
@@ -161,16 +130,10 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
         image: Travel,
       },
     ],
-    icon: Icon4,
   },
   {
     id: 5,
-    title: (
-      <>
-        Do you want to get{'\n'}
-        <span className="text-primary-300">chat notifications?</span>
-      </>
-    ),
+    title: 'Do you want to get\nchat notifications?',
     description: 'We’ll send you a message to start the chat.',
     type: 'single',
     layout: 'list',
@@ -187,6 +150,5 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
         subLabel: "No worries—I'll stay quiet… for now 👀",
       },
     ],
-    icon: Icon5,
   },
 ]

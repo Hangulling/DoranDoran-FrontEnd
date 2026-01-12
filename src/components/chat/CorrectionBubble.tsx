@@ -6,7 +6,7 @@ import FlagIcon from '../../assets/icon/flag.svg?react'
 
 interface CorrectionBubbleProps {
   chatRoomId: string
-  initialTab?: string
+  showKorean?: boolean
   descriptionByTab?: Record<string, string>
   correctedSentence?: string
   isSender?: boolean
@@ -27,6 +27,7 @@ const bubbleClass =
   'rounded-[16px] p-0 w-[305px] mb-0 overflow-hidden border-[1px] border-transparent bg-origin-border bg-[linear-gradient(#fff,#fff),linear-gradient(rgba(255,255,255,0.6),rgba(255,255,255,0.6)),linear-gradient(to_right,#7487FB_0%,#6B51F0_100%)] [background-clip:padding-box,border-box,border-box]'
 
 const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
+  showKorean = false,
   descriptionByTab,
   messageId,
   originalContent,
@@ -86,7 +87,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
                 <div className="bg-primary-10 animate-pulse rounded-[4px] h-[19px] w-5/6"></div>
               </div>
             ) : (
-              currentDescription['Eng']
+              currentDescription[showKorean ? 'Kor' : 'Eng']
             )}
           </div>
 

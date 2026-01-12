@@ -27,7 +27,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   }
 
   return (
-    <header className="sticky shrink-0 top-0 z-50 bg-gray-0 shadow-[0_1px_4px_rgba(0,0,0,0.06)] h-16 px-5 flex items-center justify-between">
+    <header className="sticky shrink-0 top-0 z-30 bg-gray-0 shadow-[0_1px_4px_rgba(0,0,0,0.06)] h-16 px-5 flex items-center justify-between">
       {/* 뒤로가기 */}
       <button onClick={handleBack} className="p-2 -ml-2">
         <LeftArrowIcon className="text-gray-600" />

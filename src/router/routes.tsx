@@ -19,17 +19,17 @@ const ErrorPage = lazy(() => import('../pages/ErrorPage'))
 const TestMainPage = lazy(() => import('../test/TestMainPage'))
 const TestClosenessPage = lazy(() => import('../test/TestClosenessPage'))
 const TestChatPage = lazy(() => import('../test/TestChatPage'))
-const LandingPage = lazy(() => import('../pages/LandingPage'))
 const OnboardingPage = lazy(() => import('../pages/OnboardingPage'))
 const FindEmailPage = lazy(() => import('../pages/find-email/FindEmailPage'))
-const FindPasswordPage = lazy(() => import('../pages/find-passoword/FindPasswordPage'))
+const FindPasswordPage = lazy(
+  () => import('../pages/find-passoword/FindPasswordPage')
+)
 
 export function Routes() {
   return (
     <RouterRoutes>
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/insta" element={<LandingPage />} />
       {/* Test routes */}
       <Route
         path="/test/chat/:model"
