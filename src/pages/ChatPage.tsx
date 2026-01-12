@@ -87,11 +87,12 @@ const ChatPage: React.FC = () => {
       setMessages,
     })
 
-  const { isModalOpen, handleConfirmExit, handleCancelExit } = useChatExit({
-    chatroomId,
-    userId,
-    routeId: id,
-  })
+  const { isModalOpen, handleConfirmExit, handleCancelExit, handleGoBack } =
+    useChatExit({
+      chatroomId,
+      userId,
+      routeId: id,
+    })
 
   const { inactivityError, resetInactivityTimer, stopInactivityTimer } =
     useInactivityTimer(INACTIVITY_DURATION_MS)
@@ -247,9 +248,7 @@ const ChatPage: React.FC = () => {
       <ChatHeader
         title={room?.roomName || 'Chat'}
         closenessLevel={closenessLevel}
-        onBack={() => {
-          navigate(-1)
-        }}
+        onBack={handleGoBack}
         onSettingClick={() => console.log('설정 클릭')}
       />
 
