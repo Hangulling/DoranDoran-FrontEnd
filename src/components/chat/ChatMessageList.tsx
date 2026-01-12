@@ -4,7 +4,9 @@ import type { VocabularyExtractedData } from '../../types/sseEvents'
 import ChatBubble from './ChatBubble'
 import ChatMessageItem from './ChatMessageItem'
 
-const LoadingDot = () => <span className="loading loading-dots loading-[5px] text-gray-200" />
+const LoadingDot = () => (
+  <span className="loading loading-dots loading-[5px] text-gray-200" />
+)
 
 interface ChatMessageListProps {
   messages: EnrichedMessage[]
@@ -13,6 +15,9 @@ interface ChatMessageListProps {
   inactivityError: boolean
   roomAvatar: string | undefined
   chatroomId: string | undefined
+  isVocabularyEnabled: boolean
+  isCorrectionEnabled: boolean
+  isTranslationEnabled: boolean
   onChatBubbleBookmark: (
     messageId: string,
     content: string,
@@ -34,6 +39,9 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
   inactivityError,
   roomAvatar,
   chatroomId,
+  isVocabularyEnabled,
+  isCorrectionEnabled,
+  isTranslationEnabled,
   onChatBubbleBookmark,
   onCorrectionBubbleBookmark,
 }) => {
@@ -44,6 +52,9 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
           key={msg.id}
           msg={msg}
           chatroomId={chatroomId}
+          isVocabularyEnabled={isVocabularyEnabled}
+          isCorrectionEnabled={isCorrectionEnabled}
+          isTranslationEnabled={isTranslationEnabled}
           onChatBubbleBookmark={onChatBubbleBookmark}
           onCorrectionBubbleBookmark={onCorrectionBubbleBookmark}
         />

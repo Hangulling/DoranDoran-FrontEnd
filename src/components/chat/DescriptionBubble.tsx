@@ -14,7 +14,7 @@ const VARIANTS: Record<VARIANT, string> = {
 interface DescriptionBubbleProps {
   word: string
   pronunciation: string
-  initialTab?: string
+  showKorean?: boolean
   descriptionByTab: Record<string, string>
   variant?: VARIANT
   isSelected?: boolean
@@ -24,6 +24,7 @@ interface DescriptionBubbleProps {
 const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
   word,
   pronunciation,
+  showKorean = false,
   descriptionByTab,
   variant = 'chat',
   isSelected,
@@ -69,7 +70,9 @@ const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
       {variant === 'chat' && (
         <div className="h-[1px] bg-gray-50 w-full my-[6px]" />
       )}
-      <div className="text-[14px] text-gray-800">{descriptionByTab['Eng']}</div>
+      <div className="text-[14px] text-gray-800">
+        {descriptionByTab[showKorean ? 'Kor' : 'Eng']}
+      </div>
     </div>
   )
 }

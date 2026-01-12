@@ -20,6 +20,9 @@ interface ChatBodyProps {
   sseError: string | null
   inactivityError: boolean
   chatroomId: string | undefined
+  isVocabularyEnabled: boolean
+  isCorrectionEnabled: boolean
+  isTranslationEnabled: boolean
   onChatBubbleBookmark: (
     messageId: string,
     content: string,
@@ -46,7 +49,8 @@ const ChatBody: React.FC<ChatBodyProps> = props => {
   return (
     <>
       {/* 그리팅 */}
-      {(props.greetingState === 'loading' || props.greetingState === 'complete') && (
+      {(props.greetingState === 'loading' ||
+        props.greetingState === 'complete') && (
         <InitChat
           avatar={props.roomAvatar}
           onReady={props.onInitReady}
@@ -64,6 +68,9 @@ const ChatBody: React.FC<ChatBodyProps> = props => {
         inactivityError={props.inactivityError}
         roomAvatar={props.roomAvatar}
         chatroomId={props.chatroomId}
+        isVocabularyEnabled={props.isVocabularyEnabled}
+        isCorrectionEnabled={props.isCorrectionEnabled}
+        isTranslationEnabled={props.isTranslationEnabled}
         onChatBubbleBookmark={props.onChatBubbleBookmark}
         onCorrectionBubbleBookmark={props.onCorrectionBubbleBookmark}
       />
