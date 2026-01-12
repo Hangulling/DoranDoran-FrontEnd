@@ -9,6 +9,7 @@ type Variant =
   | 'archive'
   | 'home'
   | 'dropdown'
+  | 'bottomSheet'
 type Size =
   | 'xs'
   | 'sm'
@@ -19,6 +20,7 @@ type Size =
   | 'archive'
   | 'confirm'
   | 'dropdown'
+  | 'bottomSheetText'
 
 const VARIANTS: Record<Variant, string> = {
   primary:
@@ -30,6 +32,8 @@ const VARIANTS: Record<Variant, string> = {
   archive: 'text-gray-500 text-sm text-body',
   home: 'bg-green-400 text-white rounded-[18px] border border-green-400',
   dropdown: 'px-3',
+  bottomSheet:
+    'rounded-xl text-subtitle text-sm text-gray-800 bg-gray-0 border border-gray-100 focus:border-primary-200 focus:bg-primary-10',
 }
 
 const SIZES: Record<Size, string> = {
@@ -42,6 +46,7 @@ const SIZES: Record<Size, string> = {
   archive: 'px-4 py-2',
   confirm: 'w-full h-13',
   dropdown: 'w-[335px] h-12',
+  bottomSheetText: 'w-[335px] h-[49px]',
 }
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
