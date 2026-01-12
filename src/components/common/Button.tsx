@@ -22,7 +22,7 @@ type Size =
 
 const VARIANTS: Record<Variant, string> = {
   primary:
-    'text-gray-0 text-subtitle text-[16px] rounded-xl disabled:bg-gray-100 disabled:text-gray-0',
+    'bg-primary-300 text-gray-0 text-subtitle text-[16px] rounded-[12px] disabled:bg-gray-100 disabled:text-gray-0',
   cancel: 'bg-gray-80 text-gray-600 rounded-lg',
   text: 'bg-transparent',
   confirm: 'bg-primary-300 text-white rounded-xl',

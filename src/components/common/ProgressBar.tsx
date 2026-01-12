@@ -20,7 +20,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
           <div
             key={step}
             className={`flex-1 h-1 rounded-full transition-colors duration-300 ease-out
-              ${isActive ? 'bg-gray-800' : 'bg-gray-100'}`}
+              ${isActive ? 'bg-primary-300' : 'bg-gray-100'}`}
           />
         )
       })}
