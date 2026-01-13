@@ -16,9 +16,6 @@ const ChatPage = lazy(() => import('../pages/ChatPage'))
 const ArchivePage = lazy(() => import('../pages/ArchivePage'))
 const PolicyPage = lazy(() => import('../pages/PolicyPage'))
 const ErrorPage = lazy(() => import('../pages/ErrorPage'))
-const TestMainPage = lazy(() => import('../test/TestMainPage'))
-const TestClosenessPage = lazy(() => import('../test/TestClosenessPage'))
-const TestChatPage = lazy(() => import('../test/TestChatPage'))
 const OnboardingPage = lazy(() => import('../pages/OnboardingPage'))
 const FindEmailPage = lazy(() => import('../pages/find-email/FindEmailPage'))
 const FindPasswordPage = lazy(
@@ -30,31 +27,6 @@ export function Routes() {
     <RouterRoutes>
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/login" element={<LoginPage />} />
-      {/* Test routes */}
-      <Route
-        path="/test/chat/:model"
-        element={
-          <PrivateRoute>
-            <TestMainPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/test/closeness/:model/:id"
-        element={
-          <PrivateRoute>
-            <TestClosenessPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/test/chat/:model/:id"
-        element={
-          <PrivateRoute>
-            <TestChatPage />
-          </PrivateRoute>
-        }
-      />
 
       <Route
         path="/"
