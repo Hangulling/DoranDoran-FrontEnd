@@ -103,7 +103,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="flex flex-col min-h-full items-center bg-gray-0 relative px-5">
-      <header className="sticky top-0 z-30 w-full bg-gray-0 mb-[35px]">
+      <header className="sticky top-0 z-30 w-full bg-gray-0 mb-10">
         {/* Nav Bar */}
         <div className="flex justify-between items-center h-15 p-0">
           {page !== 0 && (

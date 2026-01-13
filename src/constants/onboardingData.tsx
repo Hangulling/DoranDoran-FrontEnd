@@ -1,9 +1,9 @@
 import React from 'react'
 
-import Card1 from '../assets/onboarding/card1.png'
-import Card2 from '../assets/onboarding/card2.png'
-import Card3 from '../assets/onboarding/card3.png'
-import Card4 from '../assets/onboarding/card4.png'
+import Card1 from '../assets/onboarding/casual.svg'
+import Card2 from '../assets/onboarding/dating.svg'
+import Card3 from '../assets/onboarding/workplace.svg'
+import Card4 from '../assets/onboarding/school.svg'
 
 import Entertainment from '../assets/onboarding/entertainment.svg'
 import Food from '../assets/onboarding/food.svg'
@@ -107,10 +107,26 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
     layout: 'grid',
     hasEtc: true,
     options: [
-      { value: 'Casual chats with Korean friends', image: Card1 },
-      { value: 'Natural phrases for dating', image: Card2 },
-      { value: 'Workplace communication', image: Card3 },
-      { value: 'Talking with seniors at school', image: Card4 },
+      {
+        value: 'Casual chats with Korean friends',
+        label: 'Casual chats with Korean friends',
+        image: Card1,
+      },
+      {
+        value: 'Natural phrases for dating',
+        label: 'Natural phrases for dating',
+        image: Card2,
+      },
+      {
+        value: 'Workplace communication',
+        label: 'Workplace communication',
+        image: Card3,
+      },
+      {
+        value: 'Talking with seniors at school',
+        label: 'Talking with seniors at school',
+        image: Card4,
+      },
     ],
   },
   {
@@ -175,7 +191,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
       {
         value: 'no',
         label: 'Not now',
-        subLabel: "No worries—I'll stay quiet… for now 👀",
+        subLabel: "No worries—I'll stay quiet… for now.",
       },
     ],
   },
