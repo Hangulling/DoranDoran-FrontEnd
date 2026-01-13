@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import type { EnrichedMessage } from '../../pages/ChatPage'
 import type { VocabularyExtractedData } from '../../types/sseEvents'
 import ChatBubble from './ChatBubble'
 import CorrectionBubble from './CorrectionBubble'
 import DescriptionBubble from './DescriptionBubble'
+import CheckIcon from '../../assets/icon/CheckIcon'
+import StarIcon from '../../assets/icon/Asterisk'
 
 interface ChatMessageItemProps {
   msg: EnrichedMessage
@@ -35,9 +37,50 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
     onChatBubbleBookmark,
     onCorrectionBubbleBookmark,
   }) => {
+    const [showDescription, setShowDescription] = useState(true)
+    const [showFeedback, setShowFeedback] = useState(true)
+
+    const toggleFeedback = () => {
+      setShowFeedback(prev => !prev)
+    }
+
+    const renderStatusIcon = () => {
+      let IconComponent = null
+      // Perfect인 경우
+      if (msg.isPerfect) {
+        IconComponent = CheckIcon
+      }
+      // 교정 아이콘 표시
+      else if (
+        msg.analysisState === 'pending' ||
+        (msg.correction && msg.correction.correctedSentence)
+      ) {
+        IconComponent = StarIcon
+      } else {
+        return null
+      }
+
+      return (
+        <button
+          onClick={toggleFeedback}
+          className={`flex items-center justify-center w-7 h-7 rounded-full transition-colors duration-200 mr-[6px] ${
+            showFeedback
+              ? 'bg-purple-10 text-primary-300'
+              : 'bg-gradient-1 text-gray-0'
+          }`}
+        >
+          <IconComponent />
+        </button>
+      )
+    }
+
     return (
       <div className="mb-0">
-        <div className="mt-5">
+        <div
+          className={`mt-5 flex items-center justify-${msg.isSender ? 'end' : 'start'}`}
+        >
+          {msg.isSender && renderStatusIcon()}
+
           <ChatBubble
             message={msg.text}
             isSender={msg.isSender}
@@ -49,6 +92,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
             onBookmarkToggle={(messageId, content) =>
               onChatBubbleBookmark(messageId, content, msg.vocabularyData)
             }
+            isBookActive={showDescription}
+            onBookToggle={() => setShowDescription(prev => !prev)}
           />
         </div>
 
@@ -66,39 +111,44 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
             />
           ) : msg.isPerfect ? (
             // COMPLETE + PERFECT
-            <div className="flex flex-row justify-end text-transparent bg-clip-text bg-gradient-1 text-[12px] mt-1 font-medium">
-              perfect
-            </div>
+            showFeedback && (
+              <div className="flex flex-row justify-end text-transparent bg-clip-text bg-gradient-1 text-[12px] mt-1 font-medium animate-fadeIn">
+                Perfect
+              </div>
+            )
           ) : msg.correction && msg.correction.correctedSentence ? (
             // COMPLETE + CORRECTION
-            <CorrectionBubble
-              chatRoomId={chatroomId ?? ''}
-              messageId={msg.id}
-              originalContent={msg.text}
-              correctedContent={msg.correction.correctedSentence}
-              descriptionByTab={{
-                Kor: msg.correction.feedback.ko,
-                Eng: msg.correction.feedback.en,
-              }}
-              showKorean={isTranslationEnabled}
-              isSender={true}
-              isLoading={false}
-              isBookmarked={!!msg.bookmarkId}
-              onBookmarkToggle={(messageId, content, correctedContent) =>
-                onCorrectionBubbleBookmark(
-                  messageId,
-                  content,
-                  correctedContent,
-                  msg.correction!.feedback.ko,
-                  msg.correction!.feedback.en
-                )
-              }
-            />
+            showFeedback && (
+              <CorrectionBubble
+                chatRoomId={chatroomId ?? ''}
+                messageId={msg.id}
+                originalContent={msg.text}
+                correctedContent={msg.correction.correctedSentence}
+                descriptionByTab={{
+                  Kor: msg.correction.feedback.ko,
+                  Eng: msg.correction.feedback.en,
+                }}
+                showKorean={isTranslationEnabled}
+                isSender={true}
+                isLoading={false}
+                isBookmarked={!!msg.bookmarkId}
+                onBookmarkToggle={(messageId, content, correctedContent) =>
+                  onCorrectionBubbleBookmark(
+                    messageId,
+                    content,
+                    correctedContent,
+                    msg.correction!.feedback.ko,
+                    msg.correction!.feedback.en
+                  )
+                }
+              />
+            )
           ) : null)}
 
         {/* 어휘 */}
         {!msg.isSender &&
           isVocabularyEnabled &&
+          showDescription &&
           msg.vocabularyData &&
           msg.vocabularyData.words &&
           msg.vocabularyData.words.map((vocabWord, idx) => (

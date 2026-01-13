@@ -1,5 +1,5 @@
 import React from 'react'
-import VolumeIcon from '../../assets/icon/volume.svg?react'
+import VolumeIcon from '../../../assets/icon/volume.svg?react'
 
 interface TTSIconProps {
   onPlay: () => void

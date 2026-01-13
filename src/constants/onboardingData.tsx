@@ -1,13 +1,9 @@
-import Card1 from '../assets/onboarding/card1.png'
-import Card2 from '../assets/onboarding/card2.png'
-import Card3 from '../assets/onboarding/card3.png'
-import Card4 from '../assets/onboarding/card4.png'
+import React from 'react'
 
-import Level1 from '../assets/onboarding/level1.svg'
-import Level2 from '../assets/onboarding/level2.svg'
-import Level3 from '../assets/onboarding/level3.svg'
-import Level4 from '../assets/onboarding/level4.svg'
-import Level5 from '../assets/onboarding/level5.svg'
+import Card1 from '../assets/onboarding/casual.svg'
+import Card2 from '../assets/onboarding/dating.svg'
+import Card3 from '../assets/onboarding/workplace.svg'
+import Card4 from '../assets/onboarding/school.svg'
 
 import Entertainment from '../assets/onboarding/entertainment.svg'
 import Food from '../assets/onboarding/food.svg'
@@ -18,7 +14,7 @@ import Travel from '../assets/onboarding/travel.svg'
 
 export interface OptionItem {
   value: string
-  label?: string
+  label?: React.ReactNode
   subLabel?: string
   image?: string
   level?: number
@@ -56,18 +52,50 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
     layout: 'list',
     hasEtc: false,
     options: [
-      { value: 'level1', label: 'Just getting started', image: Level1 },
-      { value: 'level2', label: 'Know some basic words', image: Level2 },
+      {
+        value: 'level1',
+        label: (
+          <span>
+            <span className="text-gray-400 text-[12px] mr-[10px]">lv.1</span>
+            Just getting started
+          </span>
+        ),
+      },
+      {
+        value: 'level2',
+        label: (
+          <span>
+            <span className="text-gray-400 text-[12px] mr-[10px]">lv.2</span>
+            Know some basic words
+          </span>
+        ),
+      },
       {
         value: 'level3',
-        label: 'Can hold simple conversations',
-        image: Level3,
+        label: (
+          <span>
+            <span className="text-gray-400 text-[12px] mr-[10px]">lv.3</span>
+            Can hold simple conversations
+          </span>
+        ),
       },
-      { value: 'level4', label: 'Comfortable with many topics', image: Level4 },
+      {
+        value: 'level4',
+        label: (
+          <span>
+            <span className="text-gray-400 text-[12px] mr-[10px]">lv.4</span>
+            Comfortable with many topics
+          </span>
+        ),
+      },
       {
         value: 'level5',
-        label: 'Comfortable discussing specific topics',
-        image: Level5,
+        label: (
+          <span>
+            <span className="text-gray-400 text-[12px] mr-[10px]">lv.5</span>
+            Comfortable discussing specific topics
+          </span>
+        ),
       },
     ],
   },
@@ -79,10 +107,26 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
     layout: 'grid',
     hasEtc: true,
     options: [
-      { value: 'Casual chats with Korean friends', image: Card1 },
-      { value: 'Natural phrases for dating', image: Card2 },
-      { value: 'Workplace communication', image: Card3 },
-      { value: 'Talking with seniors at school', image: Card4 },
+      {
+        value: 'Casual chats with Korean friends',
+        label: 'Casual chats with Korean friends',
+        image: Card1,
+      },
+      {
+        value: 'Natural phrases for dating',
+        label: 'Natural phrases for dating',
+        image: Card2,
+      },
+      {
+        value: 'Workplace communication',
+        label: 'Workplace communication',
+        image: Card3,
+      },
+      {
+        value: 'Talking with seniors at school',
+        label: 'Talking with seniors at school',
+        image: Card4,
+      },
     ],
   },
   {
@@ -147,7 +191,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
       {
         value: 'no',
         label: 'Not now',
-        subLabel: "No worries—I'll stay quiet… for now 👀",
+        subLabel: "No worries—I'll stay quiet… for now.",
       },
     ],
   },
