@@ -1,5 +1,5 @@
 import React from 'react'
-import Bookmark from '../../assets/icon/bookmark.svg?react'
+import Bookmark from '../../../assets/icon/bookmark.svg?react'
 
 interface BookmarkIconProps {
   isBookmarked: boolean

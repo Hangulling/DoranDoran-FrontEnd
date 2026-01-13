@@ -1,5 +1,5 @@
 import React from 'react'
-import Book from '../../assets/icon/book.svg?react'
+import Book from '../../../assets/icon/book.svg?react'
 
 interface BookIconProps {
   isActive: boolean
