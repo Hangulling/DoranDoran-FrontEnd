@@ -29,7 +29,7 @@ platform :ios do
       path: "App/App.xcodeproj", # 프로젝트 파일 경로
       code_sign_identity: "iPhone Distribution",
       bundle_identifier: "com.koach.app",
-      profile_name: "match AppStore com.koach.app" # match로 받은 프로파일 이름
+      profile_name: "match AppStore com.koach.app", # match로 받은 프로파일 이름
 			team_id: "8UY99NV2AM"
     )
 
