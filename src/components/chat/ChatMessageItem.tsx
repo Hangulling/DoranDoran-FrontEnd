@@ -6,6 +6,7 @@ import CorrectionBubble from './CorrectionBubble'
 import DescriptionBubble from './DescriptionBubble'
 import CheckIcon from '../../assets/icon/CheckIcon'
 import StarIcon from '../../assets/icon/Asterisk'
+import ReloadIcon from '../../assets/icon/reload.svg?react'
 
 interface ChatMessageItemProps {
   msg: EnrichedMessage
@@ -41,11 +42,28 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
     const [showFeedback, setShowFeedback] = useState(true)
 
     const toggleFeedback = () => {
-      setShowFeedback(prev => !prev)
+      if (!msg.isSendFailed) {
+        setShowFeedback(prev => !prev)
+      }
     }
 
     const renderStatusIcon = () => {
       let IconComponent = null
+
+      // 전송 실패
+      if (msg.isSendFailed) {
+        IconComponent = ReloadIcon
+        return (
+          <button
+            onClick={() => {
+              // 재전송 미정
+              console.log('재전송 클릭')
+            }}
+          >
+            <IconComponent />
+          </button>
+        )
+      }
       // Perfect인 경우
       if (msg.isPerfect) {
         IconComponent = CheckIcon
@@ -99,51 +117,57 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
 
         {/* 사용자 메시지 교정 */}
         {msg.isSender &&
-          isCorrectionEnabled &&
-          (msg.analysisState === 'pending' ? (
-            // PENDING
-            <CorrectionBubble
-              chatRoomId={chatroomId ?? ''}
-              messageId={msg.id}
-              originalContent={msg.text}
-              isSender={true}
-              isLoading={true} // 스켈레톤
-            />
-          ) : msg.isPerfect ? (
-            // COMPLETE + PERFECT
-            showFeedback && (
-              <div className="flex flex-row justify-end text-transparent bg-clip-text bg-gradient-1 text-[12px] mt-1 font-medium animate-fadeIn">
-                Perfect
-              </div>
-            )
-          ) : msg.correction && msg.correction.correctedSentence ? (
-            // COMPLETE + CORRECTION
-            showFeedback && (
+          (msg.isSendFailed ? (
+            <div className="flex flex-row justify-end text-system-red text-[12px] mt-1 text-subtitle animate-fadeIn">
+              Not sent
+            </div>
+          ) : (
+            isCorrectionEnabled &&
+            (msg.analysisState === 'pending' ? (
+              // PENDING
               <CorrectionBubble
                 chatRoomId={chatroomId ?? ''}
                 messageId={msg.id}
                 originalContent={msg.text}
-                correctedContent={msg.correction.correctedSentence}
-                descriptionByTab={{
-                  Kor: msg.correction.feedback.ko,
-                  Eng: msg.correction.feedback.en,
-                }}
-                showKorean={isTranslationEnabled}
                 isSender={true}
-                isLoading={false}
-                isBookmarked={!!msg.bookmarkId}
-                onBookmarkToggle={(messageId, content, correctedContent) =>
-                  onCorrectionBubbleBookmark(
-                    messageId,
-                    content,
-                    correctedContent,
-                    msg.correction!.feedback.ko,
-                    msg.correction!.feedback.en
-                  )
-                }
+                isLoading={true} // 스켈레톤
               />
-            )
-          ) : null)}
+            ) : msg.isPerfect ? (
+              // COMPLETE + PERFECT
+              showFeedback && (
+                <div className="flex flex-row justify-end text-transparent bg-clip-text bg-gradient-1 text-[12px] mt-1 text-subtitle animate-fadeIn">
+                  Perfect
+                </div>
+              )
+            ) : msg.correction && msg.correction.correctedSentence ? (
+              // COMPLETE + CORRECTION
+              showFeedback && (
+                <CorrectionBubble
+                  chatRoomId={chatroomId ?? ''}
+                  messageId={msg.id}
+                  originalContent={msg.text}
+                  correctedContent={msg.correction.correctedSentence}
+                  descriptionByTab={{
+                    Kor: msg.correction.feedback.ko,
+                    Eng: msg.correction.feedback.en,
+                  }}
+                  showKorean={isTranslationEnabled}
+                  isSender={true}
+                  isLoading={false}
+                  isBookmarked={!!msg.bookmarkId}
+                  onBookmarkToggle={(messageId, content, correctedContent) =>
+                    onCorrectionBubbleBookmark(
+                      messageId,
+                      content,
+                      correctedContent,
+                      msg.correction!.feedback.ko,
+                      msg.correction!.feedback.en
+                    )
+                  }
+                />
+              )
+            ) : null)
+          ))}
 
         {/* 어휘 */}
         {!msg.isSender &&

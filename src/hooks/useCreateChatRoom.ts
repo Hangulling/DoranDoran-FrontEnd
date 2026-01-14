@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { createChatRoom } from '../api'
 import useRoomIdStore from '../stores/useRoomIdStore'
 import useClosenessStore from '../stores/useClosenessStore'
+import showToast from '../components/common/CommonToast'
 
 interface CreateChatRoomParams {
   userId: string
@@ -25,6 +26,10 @@ export const useCreateChatRoom = (routeId: string) => {
     },
 
     onError: error => {
+      showToast({
+        message: 'Oops! The chat didn’t start. Try again!',
+        iconType: 'error',
+      })
       console.error('채팅방 생성 실패:', error)
     },
   })

@@ -64,9 +64,8 @@ const MainPage = () => {
             },
           })
         },
-        onError: error => {
-          console.error('Failed to create chat room:', error)
-          // 필요 시 에러 토스트 처리
+        onError: () => {
+          setIsSheetOpen(false)
         },
       }
     )

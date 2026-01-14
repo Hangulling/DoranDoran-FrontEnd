@@ -36,6 +36,7 @@ export interface EnrichedMessage extends Message {
   isPerfect?: boolean // Perfect 여부 저장
   analysisState?: 'pending' | 'complete' // 교정 데이터 로딩
   bookmarkId?: string | null
+  isSendFailed?: boolean
 }
 
 const chatBotIdByRoom = (conceptValue: string): string => {
@@ -148,7 +149,13 @@ const ChatPage: React.FC = () => {
     setGreetingMsg2,
   })
 
-  const { isAiResponding, sseError, handleSendMessage } = useChatInteraction({
+  const {
+    isAiResponding,
+    sseError,
+    sendError,
+    handleSendMessage,
+    handleRetry,
+  } = useChatInteraction({
     chatroomId,
     userId,
     accessToken,
@@ -287,6 +294,8 @@ const ChatPage: React.FC = () => {
           messages={messages}
           isAiResponding={isAiResponding}
           sseError={sseError}
+          sendError={sendError}
+          onRetry={handleRetry}
           inactivityError={inactivityError}
           chatroomId={chatroomId}
           isVocabularyEnabled={isVocabularyEnabled}
@@ -304,11 +313,6 @@ const ChatPage: React.FC = () => {
           disabled={isHistoryLoading || !isInitChatReady || isAiResponding}
         />
       </footer>
-      <ExitModal
-        open={isModalOpen}
-        onConfirm={handleConfirmExit}
-        onCancel={handleCancelExit}
-      />
       <ExitModal
         open={isModalOpen}
         onConfirm={handleConfirmExit}
