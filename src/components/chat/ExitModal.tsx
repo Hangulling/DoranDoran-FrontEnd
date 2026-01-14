@@ -1,8 +1,7 @@
 import React from 'react'
 import { useModalStore } from '../../stores/useUiStateStore'
 import CommonModal from '../common/CommonModal'
-import CheckIcon from '../../assets/icon/checkAll.svg'
-import DisabledCheckIcon from '../../assets/icon/disabledCheckAll.svg'
+import CheckIcon from '../../assets/icon/CheckIcon'
 
 interface Props {
   open: boolean
@@ -21,7 +20,7 @@ const ExitModal: React.FC<Props> = ({ open, onConfirm, onCancel }) => {
   if (!open) return null
 
   const verticalOffset = 125
-  const translateXpx = window.innerWidth / 2 - 151.5
+  const translateXpx = window.innerWidth / 2 - 150
 
   return (
     <>
@@ -46,12 +45,12 @@ const ExitModal: React.FC<Props> = ({ open, onConfirm, onCancel }) => {
       {/* 다시 보지 않기 */}
       <div className="fixed w-full inset-x-0 top-1/2 z-[1001] -translate-y-1/2 pointer-events-none">
         <div
-          className="w-[149px]"
+          className="w-[147px]"
           style={{
             transform: `translateX(${translateXpx}px) translateY(${verticalOffset}px)`,
           }}
         >
-          <label className="flex items-center gap-2 text-[14px] text-white pointer-events-auto w-fit">
+          <label className="flex items-center gap-[10px] text-[14px] text-gray-0 pointer-events-auto w-fit">
             <input
               type="checkbox"
               id="noShowAgainCheck"
@@ -59,11 +58,12 @@ const ExitModal: React.FC<Props> = ({ open, onConfirm, onCancel }) => {
               checked={checked}
               onChange={e => setChecked(e.target.checked)}
             />
-            <img
-              src={checked ? CheckIcon : DisabledCheckIcon}
-              alt={checked ? 'checked' : 'unchecked'}
-            />
-            <span>don't watch again</span>
+            {checked ? (
+              <CheckIcon className="w-5 h-5 fill-primary-400 text-gray-0" />
+            ) : (
+              <div className="w-5 h-5 rounded-full bg-gray-0 ring-1 ring-inset ring-gray-200"></div>
+            )}
+            <span>don't show again</span>
           </label>
         </div>
       </div>

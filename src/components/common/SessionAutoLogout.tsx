@@ -5,7 +5,7 @@ import { useAuthCleanupStore } from '../../stores/useAuthCleanupStore'
 import { useUserStore } from '../../stores/useUserStore'
 import useClosenessStore from '../../stores/useClosenessStore'
 import useRoomIdStore from '../../stores/useRoomIdStore'
-import { useCoachStore, useModalStore } from '../../stores/useUiStateStore'
+import { useModalStore } from '../../stores/useUiStateStore'
 
 export default function SessionAutoLogout() {
   const [open, setOpen] = useState(false)
@@ -33,7 +33,6 @@ export default function SessionAutoLogout() {
     useUserStore.getState().reset()
     useClosenessStore.getState().reset()
     useRoomIdStore.getState().reset()
-    useCoachStore.getState().reset()
     useModalStore.getState().reset()
 
     setOpen(false)

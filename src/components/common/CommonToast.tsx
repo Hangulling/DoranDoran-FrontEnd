@@ -1,7 +1,7 @@
 import { type JSX } from 'react'
 import { toast } from 'react-hot-toast'
 import ErrorIcon from '../../assets/icon/error.svg'
-import CheckIcon from '../../assets/icon/checkRound.svg'
+import CheckIcon from '../../assets/icon/CheckIcon'
 import type { ToastProps } from '../../types/common'
 
 export type IconType = 'error' | 'checkRound'
@@ -9,7 +9,9 @@ export type IconType = 'error' | 'checkRound'
 // 에러 / 체크 아이콘 선택
 const iconMap: Record<IconType, JSX.Element> = {
   error: <img src={ErrorIcon} alt="error" />,
-  checkRound: <img src={CheckIcon} alt="check" />,
+  checkRound: (
+    <CheckIcon className="text-gray-700 fill-system-blue-okay m-0.5" />
+  ),
 }
 
 let toastActive = false
@@ -23,12 +25,14 @@ const showToast = ({ message, iconType }: ToastProps) => {
     t => (
       <div className="w-full max-w-md">
         <div
-          className={`flex items-start mx-5 mb-[20px] bg-[rgba(15,16,16,0.8)] px-[14px] py-[16px] rounded-[12px] gap-[8px]
+          className={`flex items-start mx-5 mb-[20px] bg-[rgba(44,42,44,0.85)] px-[14px] py-[16px] rounded-[12px] gap-3
           ${t.visible ? 'animate-fade-in-up' : 'toast-slide-fade-out'}
         `}
         >
           {iconType && iconMap[iconType]}
-          <span className="text-subtitle text-[14px] text-white">{message}</span>
+          <span className="text-subtitle text-[14px] text-gray-0">
+            {message}
+          </span>
         </div>
       </div>
     ),

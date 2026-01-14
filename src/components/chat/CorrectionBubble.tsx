@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import useClosenessStore from '../../stores/useClosenessStore'
-import TTSIcon from './VolumeIcon'
-import BookmarkIcon from './BookmarkIcon'
+import TTSIcon from './Icon/VolumeIcon'
+import BookmarkIcon from './Icon/BookmarkIcon'
 import useTTS from '../../hooks/useTTS'
-import { useParams } from 'react-router-dom'
+import FlagIcon from '../../assets/icon/flag.svg?react'
 
 interface CorrectionBubbleProps {
   chatRoomId: string
-  initialTab?: string
+  showKorean?: boolean
   descriptionByTab?: Record<string, string>
   correctedSentence?: string
   isSender?: boolean
@@ -16,15 +15,19 @@ interface CorrectionBubbleProps {
   correctedContent?: string
   isLoading?: boolean
   isBookmarked?: boolean
-  onBookmarkToggle?: (messageId: string, content: string, correctedContent: string) => void
+  onBookmarkToggle?: (
+    messageId: string,
+    content: string,
+    correctedContent: string
+  ) => void
 }
 
-const tabs = ['Kor', 'Eng']
 const wrapperClass = 'chat chat-end gap-0 pt-[10px] pb-0'
-const bubbleClass = 'bg-green-50 rounded-lg px-[10px] py-[10px] w-[265px] mb-0'
+const bubbleClass =
+  'rounded-[16px] p-0 w-[305px] mb-0 overflow-hidden border-[1px] border-transparent bg-origin-border bg-[linear-gradient(#fff,#fff),linear-gradient(rgba(255,255,255,0.6),rgba(255,255,255,0.6)),linear-gradient(to_right,#7487FB_0%,#6B51F0_100%)] [background-clip:padding-box,border-box,border-box]'
 
 const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
-  initialTab = 'Eng',
+  showKorean = false,
   descriptionByTab,
   messageId,
   originalContent,
@@ -33,9 +36,9 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   isBookmarked,
   onBookmarkToggle,
 }) => {
-  const { id: routeId } = useParams<{ id: string }>()
-  const [selectedTab, setSelectedTab] = useState(initialTab)
-  const [currentDescription, setCurrentDescription] = useState(descriptionByTab ?? {})
+  const [currentDescription, setCurrentDescription] = useState(
+    descriptionByTab ?? {}
+  )
 
   useEffect(() => {
     if (descriptionByTab) {
@@ -43,10 +46,9 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
     }
   }, [descriptionByTab])
 
-  const closeness = useClosenessStore(state => state.getCloseness(routeId ?? '')) ?? 1
-  const closenessText = closeness === 1 ? 'Polite' : closeness === 2 ? 'Casual' : 'Friendly'
-
-  const { onPlay: playTTS, playing: isPlaying } = useTTS(isLoading ? '' : (correctedContent ?? '')) // 로딩 중 비활
+  const { onPlay: playTTS, playing: isPlaying } = useTTS(
+    isLoading ? '' : (correctedContent ?? '')
+  ) // 로딩 중 비활
 
   const toggleBookmark = () => {
     if (isLoading) return // 로딩 중 비활
@@ -60,55 +62,42 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   return (
     <div className={wrapperClass}>
       <div className={bubbleClass}>
-        <div className="flex items-center justify-between text-[12px] text-title text-green-500">
-          <div>
-            <p>
-              closeness level - <span>{closenessText}</span>
-            </p>
-          </div>
-          <div className="flex p-0.5 bg-green-80 rounded-[6px]">
-            {tabs.map(tab => (
-              <button
-                key={tab}
-                className={
-                  selectedTab === tab
-                    ? 'px-1 py-0.5 rounded-[4px] bg-white text-green-400 text-subtitle shadow-none'
-                    : 'px-1 py-0.5 rounded-[4px] bg-green-80 text-green-300 text-subtitle shadow-none'
-                }
-                style={{ border: 'none' }}
-                onClick={() => setSelectedTab(tab)}
-                type="button"
-                disabled={isLoading}
-              >
-                {tab}
-              </button>
-            ))}
+        <div className="bg-primary-10 pt-3 pb-[10px] px-[14px]">
+          <div className="flex items-center justify-between text-[12px] text-title text-primary-300">
+            <p>Correction by closeness level</p>
           </div>
         </div>
 
-        <div className="mt-2">
-          {isLoading ? (
-            <div className="bg-green-80 animate-pulse rounded-[4px] h-4 w-3/4"></div>
-          ) : (
-            <p className="text-title text-[12px]">{correctedContent}</p>
-          )}
-        </div>
+        {/* 교정된 문장 */}
+        <div className="bg-gray-0 px-[10px] pt-[10px]">
+          <div className="flex flex-row justify-start mb-[6.5px] gap-x-[6px]">
+            <TTSIcon playing={isPlaying} onPlay={playTTS} />
+            {isLoading ? (
+              <div className="bg-primary-10 animate-pulse rounded-[4px] h-4 w-3/4"></div>
+            ) : (
+              <p className="text-title text-[14px]">{correctedContent}</p>
+            )}
+          </div>
 
-        <div className="h-[1px] bg-green-80 w-full my-2" />
-        <div className="text-[14px] text-gray-700">
-          {isLoading ? (
-            <div className="space-y-1.5 pt-1">
-              <div className="bg-green-80 animate-pulse rounded-[4px] h-[14px] w-full"></div>
-              <div className="bg-green-80 animate-pulse rounded-[4px] h-[14px] w-5/6"></div>
-            </div>
-          ) : (
-            currentDescription[selectedTab]
-          )}
-        </div>
-        <div className="h-[1.5px] bg-green-80 w-full my-2" />
-        <div className="flex flex-row justify-between">
-          <TTSIcon playing={isPlaying} onPlay={playTTS} />
-          <BookmarkIcon isBookmarked={isBookmarked ?? false} onToggle={toggleBookmark} />
+          {/* 설명 */}
+          <div className="text-[14px] text-gray-700">
+            {isLoading ? (
+              <div className="space-y-1.5 pt-1">
+                <div className="bg-primary-10 animate-pulse rounded-[4px] h-[19px] w-full"></div>
+                <div className="bg-primary-10 animate-pulse rounded-[4px] h-[19px] w-5/6"></div>
+              </div>
+            ) : (
+              currentDescription[showKorean ? 'Kor' : 'Eng']
+            )}
+          </div>
+
+          <div className="flex flex-row justify-between mt-2 mb-3">
+            <BookmarkIcon
+              isBookmarked={isBookmarked ?? false}
+              onToggle={toggleBookmark}
+            />
+            <FlagIcon className="fill-gray-0 text-gray-700" />
+          </div>
         </div>
       </div>
     </div>

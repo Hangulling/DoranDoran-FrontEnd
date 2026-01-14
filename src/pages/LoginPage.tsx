@@ -7,22 +7,30 @@ import character from '../assets/auth/character.svg'
 import doran from '../assets/auth/doranText.svg'
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { login, oauthLogin } from '../api/auth'
 import { useUserStore } from '../stores/useUserStore'
 import ReactGA from 'react-ga4'
 import { GA_ENABLED, IS_PROD } from '../constants/env'
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import GoogleLoginButton from '../components/common/GoogleLoginButton'
+import { isNativeApp } from '../utils/isNativeApp'
+import { type SocialLoginResponse } from '@capgo/capacitor-social-login'
+import { SocialLogin } from '@capgo/capacitor-social-login'
+import showToast from '../components/common/CommonToast'
+import LastLoginBubble from '../components/common/LastLoginBubble'
 
 type ErrorKind = 'wrong_email' | 'wrong_password' | 'both' | 'general' | null
+type Provider = 'google' | 'email'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<ErrorKind>(null)
   const [errorMsg, setErrorMsg] = useState('')
+  const [lastLogin, setLastLogin] = useState<Provider | null>(null)
   const navigate = useNavigate()
+  const location = useLocation()
 
   const setStoreId = useUserStore(s => s.setId)
   const setStoreName = useUserStore(s => s.setName)
@@ -69,6 +77,38 @@ export default function LoginPage() {
     return { type: 'both', msg: 'Email error + Password error' }
   }
 
+  const handleGoogleNativeLogin = async () => {
+    if (!isNativeApp()) return
+
+    try {
+      const r = (await SocialLogin.login({
+        provider: 'google',
+        //  options: { scopes: ['profile', 'email'] },
+      })) as SocialLoginResponse
+
+      const idToken = r.result?.idToken
+
+      if (!idToken) {
+        alert('Google 로그인 실패 (앱)')
+        return
+      }
+
+      const res = await oauthLogin({
+        provider: 'google',
+        idToken,
+      })
+
+      if (res.success) {
+        const user = res.data.user
+        setStoreId(user.id)
+        setStoreName(user.name)
+        navigate(user.isOnboard ? '/' : '/onboarding')
+      }
+    } catch (err) {
+      console.error('네이티브 로그인 실패', err)
+      alert('네이티브 Google 로그인 실패')
+    }
+  }
   const handleLogin = async () => {
     setError(null)
     setErrorMsg('')
@@ -111,6 +151,8 @@ export default function LoginPage() {
       if (user) {
         setStoreId(user.id)
         setStoreName(user.name)
+
+        localStorage.setItem('last_login', 'email')
 
         if (IS_PROD && GA_ENABLED) {
           ReactGA.set({ user_id: user.id })
@@ -206,6 +248,7 @@ export default function LoginPage() {
       if (user) {
         setStoreId(user.id)
         setStoreName(user.name)
+        localStorage.setItem('last_login', 'google')
 
         if (IS_PROD && GA_ENABLED) {
           ReactGA.set({ user_id: user.id })
@@ -294,6 +337,26 @@ export default function LoginPage() {
     if (e.key === 'Enter') handleLogin()
   }
 
+  useEffect(() => {
+    const toastState = location.state?.toast
+    if (!toastState) return
+
+    showToast({
+      message: toastState.message,
+      iconType: toastState.iconType,
+    })
+
+    navigate(location.pathname, { replace: true })
+  }, [location.state, navigate, location.pathname])
+
+  useEffect(() => {
+    const stored = localStorage.getItem('last_login') as Provider | null
+    console.log(stored)
+    if (stored === 'google' || stored === 'email') {
+      setLastLogin(stored)
+    }
+  }, [])
+
   return (
     <div className="flex justify-center items-center min-h-screen overflow-y-hidden pt-[38px] pb-[65px]">
       <div className="w-full bg-white rounded-lg">
@@ -310,21 +373,21 @@ export default function LoginPage() {
               src={bubble1}
               alt="bubble1"
               className="absolute top-[80px] left-[2px] object-contain w-[112px] h-[33px]
-                 z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
+                    z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
             />
 
             <img
               src={bubble2}
               alt="bubble2"
               className="absolute top-[22px] left-1/2 -translate-x-1/3 object-contain w-[120px] h-[33px]
-                 z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
+                    z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
             />
 
             <img
               src={bubble3}
               alt="bubble3"
               className="absolute top-[80px] right-[10px] object-contain w-[102px] h-[33px]
-                 z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
+                    z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.14)]"
             />
 
             <img
@@ -362,16 +425,27 @@ export default function LoginPage() {
                 {!error && errorMsg && errorMsg}
               </span>
             )}
+            <div className="relative">
+              <Button
+                variant="primary"
+                size="xl"
+                className="bg-gray-800 my-4 w-full text-subtitle"
+                onClick={handleLogin}
+              >
+                Login
+              </Button>
+              {lastLogin === 'email' && <LastLoginBubble provider="email" />}
+            </div>
 
-            <Button
-              variant="primary"
-              size="xl"
-              className="bg-gray-800 my-4 w-full text-subtitle"
-              onClick={handleLogin}
-            >
-              Login
-            </Button>
-
+            <div className="flex justify-center py-2 gap-2 text-sm text-title text-gray-500">
+              <Link to="/find-email" className="underline underline-offset-4">
+                Forgot Email?
+              </Link>
+              <span>or</span>
+              <Link to="/find-password" className="underline underline-offset-4">
+                Forgot Password?
+              </Link>
+            </div>
             <div className="relative my-5">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-100"></div>
@@ -395,15 +469,23 @@ export default function LoginPage() {
               />
             </div>
 
-            <div className="my-4 w-full">
-              <GoogleLoginButton onClick={handleCustomGoogleClick} />
+            <div className="relative my-4 w-full">
+              <GoogleLoginButton
+                onClick={() => {
+                  if (isNativeApp()) {
+                    handleGoogleNativeLogin()
+                  } else {
+                    handleCustomGoogleClick()
+                  }
+                }}
+              />
+              {lastLogin === 'google' && <LastLoginBubble provider="google" />}
             </div>
           </div>
         </div>
-
         <div className="flex justify-center items-center gap-2 mb-4 text-sm">
           <span className="text-gray-700 text-body">Don't have an account yet?</span>
-          <Link to="/signup" className="underline underline-offset-4 text-title text-gray-800">
+          <Link to="/signup" className="underline underline-offset-4 text-title text-gray-500">
             Sign up
           </Link>
         </div>

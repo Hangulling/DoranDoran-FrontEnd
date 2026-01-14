@@ -1,6 +1,6 @@
 import { useMatch, useNavigate } from 'react-router-dom'
 
-export function useNavBar(onToggleSidebar?: () => void) {
+export function useNavBar() {
   const navigate = useNavigate()
 
   const chatMatch = useMatch('/chat/:id')
@@ -8,7 +8,8 @@ export function useNavBar(onToggleSidebar?: () => void) {
   const archiveMatch = useMatch('/archive/:id')
 
   const isChatPage = Boolean(chatMatch)
-  const currentId = chatMatch?.params.id ?? closenessMatch?.params.id ?? archiveMatch?.params.id
+  const currentId =
+    chatMatch?.params.id ?? closenessMatch?.params.id ?? archiveMatch?.params.id
 
   // 뒤로가기
   const goBack = () => {
@@ -26,17 +27,9 @@ export function useNavBar(onToggleSidebar?: () => void) {
     }
   }
 
-  // GA 포함 핸들러
-  const handleHamburgerClick = () => {
-    if (onToggleSidebar) {
-      onToggleSidebar()
-    }
-  }
-
   return {
     goBack,
     handleBookmarkClick,
-    handleHamburgerClick,
     isChatPage,
   }
 }

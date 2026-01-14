@@ -22,7 +22,8 @@ export function useChatStream<T = unknown>(
   userId?: string,
   accessToken?: string,
   onEventReceived?: (eventType: string, data: T) => void,
-  onError?: (event: Event) => void
+  onError?: (event: Event) => void,
+  retryKey: number = 0
 ): UseChatStreamResult {
   const eventSourceRef = useRef<EventSource | null>(null)
 
@@ -128,7 +129,9 @@ export function useChatStream<T = unknown>(
             setIsLoading(false)
           }
         } else {
-          console.log('[SSE] EventSource is attempting to reconnect automatically.')
+          console.log(
+            '[SSE] EventSource is attempting to reconnect automatically.'
+          )
           setIsLoading(true)
         }
       }
@@ -145,7 +148,7 @@ export function useChatStream<T = unknown>(
         eventSourceRef.current = null
       }
     }
-  }, [chatroomId, userId, accessToken])
+  }, [chatroomId, userId, accessToken, retryKey])
 
   return { isLoading, error }
 }

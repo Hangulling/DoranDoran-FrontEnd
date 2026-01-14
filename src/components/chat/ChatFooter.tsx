@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type JSX, type RefObject } from 'react'
-import Send from '../../assets/icon/send.svg'
-import ActiveSend from '../../assets/icon/activeSend.svg'
+import { Keyboard } from '@capacitor/keyboard'
+import SendIcon from '../../assets/chat/send.svg'
 import ErrorIcon from '../../assets/icon/error.svg'
 import CheckIcon from '../../assets/icon/checkRound.svg'
 
@@ -19,9 +19,8 @@ type ToastMessageProps = {
 
 const MAX_ROWS = 3
 const LINE_HEIGHT = 21
-const SINGLE_LINE_HEIGHT = 37
+const SINGLE_LINE_HEIGHT = 21
 
-// 위치 문제로 따로 구현
 const ToastMessage = ({ message, iconType }: ToastMessageProps) => {
   const iconMap: Record<IconType, JSX.Element> = {
     error: <img src={ErrorIcon} alt="error" />,
@@ -36,78 +35,82 @@ const ToastMessage = ({ message, iconType }: ToastMessageProps) => {
   )
 }
 
-const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabled }) => {
+const ChatFooter: React.FC<ChatFooterProps> = ({
+  inputRef,
+  onSendMessage,
+  disabled,
+}) => {
   const [inputValue, setInputValue] = useState('')
   const [textareaHeight, setTextareaHeight] = useState(SINGLE_LINE_HEIGHT)
   const [isComposing, setIsComposing] = useState(false)
   const [toast, setToast] = useState<ToastMessageProps | null>(null)
   const [isToastVisible, setIsToastVisible] = useState(false)
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false)
+
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  // 컴포넌트 언마운트 시 타이머 클리어
   useEffect(() => {
     return () => {
-      if (toastTimerRef.current) {
-        clearTimeout(toastTimerRef.current)
-      }
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    Keyboard.setScroll({ isDisabled: true })
+
+    const onWillShow = () => {
+      setIsKeyboardOpen(true)
+    }
+
+    const onDidHide = () => {
+      setIsKeyboardOpen(false)
+    }
+
+    Keyboard.addListener('keyboardWillShow', onWillShow)
+    Keyboard.addListener('keyboardDidHide', onDidHide)
+
+    return () => {
+      Keyboard.removeAllListeners()
+      Keyboard.setScroll({ isDisabled: false })
     }
   }, [])
 
   const showToast = (message: string, iconType: IconType) => {
-    if (toastTimerRef.current) {
-      clearTimeout(toastTimerRef.current)
-    }
-
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
     setToast({ message, iconType })
     setIsToastVisible(true)
     toastTimerRef.current = setTimeout(() => {
       setIsToastVisible(false)
-
-      // 애니메이션이 끝난 후 토스트 데이터 제거
-      setTimeout(() => {
-        setToast(null)
-      }, 400)
+      setTimeout(() => setToast(null), 400)
     }, 3600)
   }
 
   const handleCompositionStart = () => setIsComposing(true)
-
-  const handleCompositionEnd = () => {
-    setIsComposing(false)
-  }
+  const handleCompositionEnd = () => setIsComposing(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const originalValue = e.target.value
     let finalValue = originalValue
-
     if (finalValue.length > 50) {
       showToast('Maximum of 50 characters allowed', 'error')
       finalValue = finalValue.substring(0, 50)
     }
-
     setInputValue(finalValue)
-
     const textarea = inputRef.current
     if (textarea) {
       textarea.style.height = 'auto'
-
       const scrollHeight = textarea.scrollHeight
-      const maxHeight = LINE_HEIGHT * MAX_ROWS + (SINGLE_LINE_HEIGHT - LINE_HEIGHT)
+      const maxHeight =
+        LINE_HEIGHT * MAX_ROWS + (SINGLE_LINE_HEIGHT - LINE_HEIGHT)
       const newHeight = Math.min(scrollHeight, maxHeight)
-
       textarea.style.height = `${newHeight}px`
       textarea.style.overflowY = scrollHeight > maxHeight ? 'auto' : 'hidden'
-
       setTextareaHeight(newHeight)
     }
   }
 
   const handleSendClick = () => {
-    // AI가 응답 중이거나 입력값이 없으면 전송 방지
-    if (disabled || !inputValue.trim()) {
-      return
-    }
-
+    if (disabled || !inputValue.trim()) return
     onSendMessage(inputValue.trim())
     setInputValue('')
     if (inputRef.current) {
@@ -116,18 +119,24 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabl
     }
   }
 
-  // 엔터 키 이벤트
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && !isComposing && !disabled) {
-      e.preventDefault() // 줄바꿈 방지
-      handleSendClick() // 메시지 전송
+      e.preventDefault()
+      handleSendClick()
     }
   }
 
-  const isButtonDisabled = disabled || !inputValue.trim()
+  // 버튼 표시 조건
+  const isSendActive = !disabled && inputValue.trim().length > 0
 
   return (
-    <div className="relative bg-white shadow-[0_-1px_2px_rgba(0,0,0,0.08)]">
+    <div
+      className={`relative bg-gray-0 shadow-[0_-1px_4px_rgba(0,0,0,0.06)] ${
+        isKeyboardOpen ? 'pb-0' : 'pb-[env(safe-area-inset-bottom)]'
+      }`}
+      style={{ zIndex: 50 }}
+    >
+      {/* 토스트 */}
       <div className="absolute bottom-full w-full left-0 flex justify-center">
         {toast && (
           <div
@@ -138,30 +147,35 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ inputRef, onSendMessage, disabl
         )}
       </div>
 
-      <div className="flex items-center w-full px-5 py-2.5">
-        <textarea
-          ref={inputRef}
-          placeholder="Type a message"
-          value={inputValue}
-          onCompositionStart={handleCompositionStart}
-          onCompositionEnd={handleCompositionEnd}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          rows={1}
-          style={{
-            height: textareaHeight,
-            lineHeight: `${LINE_HEIGHT}px`,
-            resize: 'none',
-          }}
-          className="flex-grow px-3 py-2 mr-2 border border-gray-100 bg-gray-50 rounded-[20px] focus:border-gray-100 focus:outline-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-        />
-        <button onClick={handleSendClick} disabled={isButtonDisabled}>
-          {!disabled && inputValue.trim() ? (
-            <img src={ActiveSend} alt="활성화된 보내기" />
-          ) : (
-            <img src={Send} alt="보내기" />
+      {/* textarea */}
+      <div className="w-full px-5 py-[10px]">
+        <div className="relative w-full px-4 py-[15px] bg-[#f1f1f1] border-[#f1f1f1] rounded-[22px] overflow-hidden text-14px min-h-[51px]">
+          <textarea
+            ref={inputRef}
+            placeholder="Type a message"
+            value={inputValue}
+            onCompositionStart={handleCompositionStart}
+            onCompositionEnd={handleCompositionEnd}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            rows={1}
+            style={{
+              height: textareaHeight,
+              lineHeight: `${LINE_HEIGHT}px`,
+              resize: 'none',
+            }}
+            className="w-full pr-[46px] bg-transparent border-none outline-none focus:ring-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] block p-0 m-0"
+          />
+
+          {isSendActive && (
+            <button
+              onClick={handleSendClick}
+              className="absolute bottom-[10px] right-4 flex items-center justify-center transition-opacity duration-200"
+            >
+              <img src={SendIcon} alt="보내기" />
+            </button>
           )}
-        </button>
+        </div>
       </div>
     </div>
   )

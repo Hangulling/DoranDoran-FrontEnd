@@ -1,5 +1,5 @@
 export interface ChatRoomWithMessage {
-  roomRouteId: number
+  roomRouteId: number | string
   roomName: string
   concept: string
   avatar: string
@@ -8,5 +8,5 @@ export interface ChatRoomWithMessage {
 
 export interface ChatRoomItemProps {
   room: ChatRoomWithMessage
-  onClick: (id: number, roomName: string) => void
+  onClick: (id: number | string, roomName: string) => void
 }

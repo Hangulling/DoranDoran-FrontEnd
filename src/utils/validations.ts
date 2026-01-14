@@ -48,3 +48,46 @@ export const validatePassword = (password: string, confirm: string): string | nu
 
   return null
 }
+
+export const isValidCalendarDate = (birthDate: string) => {
+  if (birthDate.length < 8) {
+    return 'Please enter the date of birth in 8 digits'
+  }
+
+  const y = Number(birthDate.slice(0, 4))
+  const m = Number(birthDate.slice(4, 6))
+  const d = Number(birthDate.slice(6, 8))
+
+  const date = new Date(y, m - 1, d)
+
+  const validDate = date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d
+
+  if (!validDate) {
+    return 'Please enter a valid date'
+  }
+
+  return null
+}
+
+export const isPastDate = (birthDate: string) => {
+  if (birthDate.length < 8) {
+    return 'Please enter the date of birth in 8 digits'
+  }
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const y = Number(birthDate.slice(0, 4))
+  const m = Number(birthDate.slice(4, 6))
+  const d = Number(birthDate.slice(6, 8))
+
+  const validDate = new Date(y, m - 1, d) <= today
+
+  if (!validDate) {
+    return 'Please enter a valid date'
+  }
+
+  return null
+}
+
+export const ANSWER_REGEX = /^[A-Za-z0-9][A-Za-z0-9 ]*$/

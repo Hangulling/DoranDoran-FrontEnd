@@ -1,5 +1,5 @@
-import type { User, CreatePayload, UpdatePayload, UserStatus } from '../types/user'
-import api from './api'
+import type { User, CreatePayload, UpdatePayload, UserStatus, EmailPayload } from '../types/user'
+import api, { publicApi } from './api'
 import { USER_ENDPOINTS } from './endpoints'
 
 export const createUser = async (payload: CreatePayload): Promise<User> => {
@@ -61,4 +61,9 @@ export const deleteUser = async (userId: string): Promise<void> => {
 export const checkHealth = async (): Promise<string> => {
   const response = await api.get<string>(USER_ENDPOINTS.HEALTH)
   return response.data
+}
+
+export const findEmail = async (data: EmailPayload) => {
+  const res = await publicApi.post(USER_ENDPOINTS.FIND_EMAIL, data)
+  return res.data
 }

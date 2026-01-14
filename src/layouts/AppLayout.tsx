@@ -2,9 +2,7 @@ import type React from 'react'
 import { useLocation, useMatch } from 'react-router-dom'
 import NavBar from '../components/common/NavBar'
 import useArchiveStore from '../stores/useArchiveStore'
-import ClosenessBar from '../components/chat/ClosenessBar'
-import { useEffect, useState } from 'react'
-import Sidebar from '../components/common/SideBar'
+import { useEffect } from 'react'
 import SessionAutoLogout from '../components/common/SessionAutoLogout'
 import { startIdleTimer, stopIdleTimer } from '../utils/idleTimer'
 
@@ -33,8 +31,6 @@ const agreementTitles: Record<string, string> = {
 const showBookmarkPaths = ['/']
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const toggleSidebar = () => setSidebarOpen(open => !open)
   const location = useLocation()
   const pathname = location.pathname
 
@@ -48,13 +44,14 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     /^\/closeness(?:\/|$)/,
     /^\/policy(?:\/|$)/,
     /^\/error(?:\/|$)/,
-    /^\/insta(?:\/|$)/,
     /^\/onboarding(?:\/|$)/,
+    /^\/find-email(?:\/|$)/,
+    /^\/find-password(?:\/|$)/,
   ]
   const isKnownPath = knownPatterns.some(rx => rx.test(pathname))
   const isUnknownPath = !isKnownPath
 
-  const skipNavPaths = ['/login', '/error', '/insta', '/onboarding']
+  const skipNavPaths = ['/login', '/error', '/onboarding', '/chat']
 
   // 로그인 필요없는 페이지
   const isPublicPage =
@@ -62,7 +59,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     pathname.startsWith('/signup') ||
     pathname.startsWith('/policy') ||
     pathname.startsWith('/error') ||
-    pathname.startsWith('/insta') ||
+    pathname.startsWith('/find-email') ||
+    pathname.startsWith('/find-password') ||
     isUnknownPath
 
   // 비활성 타이머 로직
@@ -78,6 +76,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }, [isPublicPage]) // 경로가 바뀔 때마다 실행
 
   const isMain = pathname === '/'
+  const isChatPage = pathname.startsWith('/chat')
 
   const archiveMatch = useMatch('/archive/:id')
   const onArchive = !!archiveMatch
@@ -93,14 +92,19 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     isUnknownPath ||
     (pathname.startsWith('/error') && state?.from === 'signup')
 
+  // navbar 상단 고정 경로
+  const topNavPaths = ['/signup', '/find-email', '/find-password', '/archive']
+  const isTopNav = topNavPaths.some(path => pathname.startsWith(path))
+
   // 친밀도 바(채팅에서만)
-  const closenessMatch = pathname.match(/^\/chat\/(\d+)$/)
-  const closenessId = closenessMatch ? closenessMatch[1] : null
+  //  const closenessMatch = pathname.match(/^\/chat\/(\d+)$/)
+  //  const closenessId = closenessMatch ? closenessMatch[1] : null
 
   // 북마크(채팅/친밀)
   const chatRoomMatch = pathname.match(/^\/(chat|closeness)\/(\d+)$/)
   const chatRoomId = chatRoomMatch ? chatRoomMatch[2] : null
-  const showBookmark = showBookmarkPaths.includes(pathname) || chatRoomId !== null
+  const showBookmark =
+    showBookmarkPaths.includes(pathname) || chatRoomId !== null
 
   const fromChat = (location.state as { from?: string } | null)?.from === 'chat'
 
@@ -112,35 +116,59 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     title = 'Delete'
   } else if (onArchive) {
     title =
-      (fromChat && archiveId && (chatRoomNames[archiveId] || `채팅방 ${archiveId}`)) || 'Archive'
+      (fromChat &&
+        archiveId &&
+        (chatRoomNames[archiveId] || `채팅방 ${archiveId}`)) ||
+      'Archive'
   } else if (chatRoomId) {
     title = chatRoomNames[chatRoomId] || `채팅방 ${chatRoomId}`
   } else if (agreementId) {
     title = agreementTitles[agreementId]
+  } else if (pathname.startsWith('/find-email')) {
+    title = 'Find your Email'
+  } else if (pathname.startsWith('/find-password')) {
+    title = 'Reset Password'
   } else {
     title = pageTitles[pathname] || '페이지'
   }
 
   return (
-    <div className="relative mx-auto flex h-full w-full max-w-md flex-col overflow-x-hidden">
-      <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
-
-      {!hideNavBar && (
+    <div className="relative mx-auto flex h-full w-full max-w-md flex-col overflow-x-hidden pt-[env(safe-area-inset-top)]">
+      {/* 상단 네비게이션 바 */}
+      {!hideNavBar && isTopNav && (
         <header className="sticky top-0 shrink-0 z-40 bg-white">
           <NavBar
+            position="top"
             isMain={isMain}
             title={title}
             showBookmark={showBookmark}
             showDelete={showDelete}
-            onToggleSidebar={toggleSidebar}
           />
-          {closenessId && <ClosenessBar chatRoomId={closenessId} />}
         </header>
       )}
+
       {!isPublicPage && <SessionAutoLogout />}
-      <main id="app-scroll" className="flex-grow min-h-0 overflow-y-auto">
+
+      <main id="app-scroll" className={'flex-grow min-h-0 overflow-y-auto'}>
         {children}
       </main>
+
+      {/* 하단 네비게이션 바 */}
+      {!hideNavBar && !isTopNav && (
+        <footer
+          className={`sticky bottom-0 shrink-0 z-40 bg-white ${
+            isChatPage ? '' : 'pb-[env(safe-area-inset-bottom)]'
+          }`}
+        >
+          <NavBar
+            position="bottom"
+            isMain={isMain}
+            title={title}
+            showBookmark={showBookmark}
+            showDelete={showDelete}
+          />
+        </footer>
+      )}
     </div>
   )
 }

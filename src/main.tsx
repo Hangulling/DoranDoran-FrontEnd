@@ -8,6 +8,8 @@ import MaintenancePage from './pages/MaintenancePage.tsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { GOOGLE_CLIENT_ID } from './constants/env'
+import { isNativeApp } from './utils/isNativeApp.ts'
+import { SocialLogin } from '@capgo/capacitor-social-login'
 
 const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID
@@ -15,6 +17,16 @@ const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
 
 const urlParams = new URLSearchParams(window.location.search)
 const paramInternal = urlParams.get('internal') === 'true'
+
+if (isNativeApp()) {
+  SocialLogin.initialize({
+    google: {
+      webClientId: GOOGLE_CLIENT_ID,
+      iOSClientId: GOOGLE_CLIENT_ID,
+      iOSServerClientId: GOOGLE_CLIENT_ID,
+    },
+  })
+}
 
 if (paramInternal) {
   sessionStorage.setItem('isInternalTraffic', 'true')
