@@ -75,12 +75,12 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
             {isLoading ? (
               <div className="bg-primary-10 animate-pulse rounded-[4px] h-4 w-3/4"></div>
             ) : (
-              <p className="text-subtitle text-[14px]">{correctedContent}</p>
+              <p className="text-title text-[14px]">{correctedContent}</p>
             )}
           </div>
 
           {/* 설명 */}
-          <div className="text-[14px] text-gray-800">
+          <div className="text-[14px] text-gray-700">
             {isLoading ? (
               <div className="space-y-1.5 pt-1">
                 <div className="bg-primary-10 animate-pulse rounded-[4px] h-[19px] w-full"></div>

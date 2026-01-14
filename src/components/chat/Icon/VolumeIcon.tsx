@@ -1,5 +1,5 @@
 import React from 'react'
-import VolumeIcon from '../../../assets/icon/volume.svg?react'
+import VolumeIcon from '../../../assets/icon/VolumeIcon'
 
 interface TTSIconProps {
   onPlay: () => void
@@ -14,7 +14,7 @@ const TTSIcon: React.FC<TTSIconProps> = ({ onPlay, playing }) => {
       aria-label="음성 재생"
     >
       {playing ? (
-        <VolumeIcon className="text-primary-300" />
+        <VolumeIcon className="text-primary-300" fillColor="#6C51F0" />
       ) : (
         <VolumeIcon className="text-gray-700" />
       )}

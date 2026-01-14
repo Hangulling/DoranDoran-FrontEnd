@@ -11,7 +11,6 @@ import FindPasswordReset from '../pages/find-passoword/FindPasswordReset'
 const MainPage = lazy(() => import('../pages/MainPage'))
 const SignupPage = lazy(() => import('../pages/SignupPage'))
 const LoginPage = lazy(() => import('../pages/LoginPage'))
-const ClosenessPage = lazy(() => import('../pages/ClosenessPage'))
 const ChatPage = lazy(() => import('../pages/ChatPage'))
 const ArchivePage = lazy(() => import('../pages/ArchivePage'))
 const PolicyPage = lazy(() => import('../pages/PolicyPage'))
@@ -33,14 +32,6 @@ export function Routes() {
         element={
           <PrivateRoute>
             <MainPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/closeness/:id"
-        element={
-          <PrivateRoute>
-            <ClosenessPage />
           </PrivateRoute>
         }
       />

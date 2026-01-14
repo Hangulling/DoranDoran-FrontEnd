@@ -42,7 +42,7 @@ const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
 
   return (
     <div className={containerClass}>
-      <div className="flex items-center justify-between text-[14px] mb-[2px]">
+      <div className="flex items-center justify-between text-[14px]">
         <div className="flex items-center flex-wrap">
           <div className="mr-1 h-5 w-5">
             {correctMsg ? (
@@ -54,7 +54,7 @@ const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
           <span
             className={`${
               variant === 'archive' ? 'text-sm' : 'text-[14px]'
-            } ${correctMsg ? 'text-body text-gray-400' : 'text-subtitle text-gray-700'}`}
+            } ${correctMsg ? 'text-body text-gray-400' : 'text-title text-gray-800'}`}
           >
             {word}
           </span>
@@ -64,13 +64,9 @@ const DescriptionBubble: React.FC<DescriptionBubbleProps> = ({
             </span>
           )}
         </div>
-        <div className="flex p-0.5 bg-gray-80 rounded-[6px]"></div>
       </div>
 
-      {variant === 'chat' && (
-        <div className="h-[1px] bg-gray-50 w-full my-[6px]" />
-      )}
-      <div className="text-[14px] text-gray-800">
+      <div className="text-[14px] text-gray-70 mt-2">
         {descriptionByTab[showKorean ? 'Kor' : 'Eng']}
       </div>
     </div>

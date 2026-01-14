@@ -18,6 +18,8 @@ interface ChatBodyProps {
   messages: EnrichedMessage[]
   isAiResponding: boolean
   sseError: string | null
+  sendError: string | null
+  onRetry: () => void
   inactivityError: boolean
   chatroomId: string | undefined
   isVocabularyEnabled: boolean
@@ -65,6 +67,8 @@ const ChatBody: React.FC<ChatBodyProps> = props => {
         messages={props.messages}
         isAiResponding={props.isAiResponding}
         sseError={props.sseError}
+        sendError={props.sendError}
+        onRetry={props.onRetry}
         inactivityError={props.inactivityError}
         roomAvatar={props.roomAvatar}
         chatroomId={props.chatroomId}
