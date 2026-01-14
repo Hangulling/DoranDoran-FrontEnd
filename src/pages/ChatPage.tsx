@@ -318,11 +318,6 @@ const ChatPage: React.FC = () => {
         onConfirm={handleConfirmExit}
         onCancel={handleCancelExit}
       />
-      <ExitModal
-        open={isModalOpen}
-        onConfirm={handleConfirmExit}
-        onCancel={handleCancelExit}
-      />
 
       <BottomSheet
         isOpen={isSettingOpen}
