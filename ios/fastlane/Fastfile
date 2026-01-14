@@ -44,9 +44,7 @@ platform :ios do
         provisioningProfiles: { 
           "com.koach.app" => "match AppStore com.koach.app"
         }
-      },
-      # 👇 [중요] DEVELOPMENT_TEAM 설정 추가
-      xcargs: "-allowProvisioningUpdates=NO CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY='iPhone Distribution' PROVISIONING_PROFILE_SPECIFIER='match AppStore com.koach.app' DEVELOPMENT_TEAM='8UY99NV2AM'"
+      }
     )
 
     # TestFlight 업로드 (Pilot)
