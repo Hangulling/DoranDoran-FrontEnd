@@ -25,7 +25,7 @@ platform :ios do
     # 앱 빌드 (Gym)
     gym(
       scheme: "App", # Capacitor 기본 스킴은 보통 'App'
-      workspace: "App.xcworkspace",
+      workspace: "App/App.xcworkspace",
       configuration: "Release",
       clean: true,
       export_method: "app-store",
