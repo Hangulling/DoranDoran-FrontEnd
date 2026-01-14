@@ -22,6 +22,16 @@ platform :ios do
       api_key: api_key
     )
 
+		# Xcode의 자동 서명을 끄고 수동 서명으로 변경
+		update_code_signing_settings(
+      use_automatic_signing: false,
+      targets: ["App"],
+      path: "App/App.xcodeproj", # 프로젝트 파일 경로
+      code_sign_identity: "iPhone Distribution",
+      bundle_identifier: "com.koach.app",
+      profile_name: "match AppStore com.koach.app" # match로 받은 프로파일 이름
+    )
+
     # 앱 빌드 (Gym)
     gym(
       scheme: "App", # Capacitor 기본 스킴은 보통 'App'
