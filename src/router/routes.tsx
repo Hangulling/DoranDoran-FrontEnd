@@ -26,7 +26,7 @@ const ErrorPage = lazy(() => import('../pages/ErrorPage'))
 const OnboardingPage = lazy(() => import('../pages/OnboardingPage'))
 const FindEmailPage = lazy(() => import('../pages/find-email/FindEmailPage'))
 const FindPasswordPage = lazy(
-  () => import('../pages/find-passoword/FindPasswordPage')
+  () => import('../pages/find-password/FindPasswordPage')
 )
 
 export function Routes() {
