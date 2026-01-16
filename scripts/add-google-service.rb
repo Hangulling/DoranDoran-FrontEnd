@@ -1,31 +1,72 @@
 require 'xcodeproj'
+require 'plist'
 
-# 프로젝트 경로 설정
+# 경로 설정
 project_path = 'ios/App/App.xcodeproj'
-file_name = 'GoogleService-Info.plist'
+target_name = 'App'
+google_service_plist_path = 'ios/App/App/GoogleService-Info.plist'
+info_plist_path = 'ios/App/App/Info.plist'
 
-puts "Attempting to add #{file_name} to Xcode project..."
-
-project = Xcodeproj::Project.open(project_path)
-target = project.targets.first
-group = project.main_group['App'] # App 그룹 찾기
-
-# 파일 참조가 이미 있는지 확인하고 없으면 추가
-file_ref = group.files.find { |f| f.path == file_name }
-if file_ref
-  puts "#{file_name} reference already exists."
-else
-  file_ref = group.new_file(file_name)
-  puts "Created file reference for #{file_name}."
+# GoogleService-Info.plist 파일이 실제로 있는지 확인
+unless File.exist?(google_service_plist_path)
+  puts "Error: #{google_service_plist_path} not found. Make sure to create it before running this script."
+  exit 1
 end
 
-# 빌드 페이즈(Copy Bundle Resources)에 추가
-resources_phase = target.resources_build_phase
-if resources_phase.files_references.include?(file_ref)
-  puts "#{file_name} is already in Copy Bundle Resources phase."
+# Xcode 프로젝트에 GoogleService-Info.plist 파일 연결
+project = Xcodeproj::Project.open(project_path)
+target = project.targets.find { |t| t.name == target_name }
+group = project.main_group.find_subpath('App', true)
+
+file_ref = group.files.find { |f| f.path == 'GoogleService-Info.plist' }
+unless file_ref
+  file_ref = group.new_file('GoogleService-Info.plist')
+  puts "Added GoogleService-Info.plist to file reference."
+end
+
+unless target.resources_build_phase.files_references.include?(file_ref)
+  target.resources_build_phase.add_file_reference(file_ref)
+  puts "Added GoogleService-Info.plist to build phase."
+end
+
+project.save
+
+# REVERSED_CLIENT_ID 읽어서 Info.plist에 주입하기
+puts "Injecting REVERSED_CLIENT_ID into Info.plist..."
+
+# Google PLIST 읽기 (XML 파싱)
+google_plist_content = Xcodeproj::Plist.read_from_path(google_service_plist_path)
+reversed_client_id = google_plist_content['REVERSED_CLIENT_ID']
+
+if reversed_client_id.nil? || reversed_client_id.empty?
+  puts "Error: Could not find REVERSED_CLIENT_ID in GoogleService-Info.plist"
+  exit 1
+end
+
+puts "Found REVERSED_CLIENT_ID: #{reversed_client_id}"
+
+# Info.plist 읽기
+info_plist = Xcodeproj::Plist.read_from_path(info_plist_path)
+
+# URL Types 배열이 없으면 생성
+info_plist['CFBundleURLTypes'] ||= []
+
+# 이미 등록되어 있는지 확인
+existing_scheme = info_plist['CFBundleURLTypes'].find do |type|
+  type['CFBundleURLSchemes']&.include?(reversed_client_id)
+end
+
+if existing_scheme
+  puts "URL Scheme already exists in Info.plist."
 else
-  resources_phase.add_file_reference(file_ref)
-  puts "Added #{file_name} to Copy Bundle Resources phase."
-  project.save
-  puts "Project saved successfully!"
+  # 새 스킴 추가
+  new_url_type = {
+    'CFBundleTypeRole' => 'Editor',
+    'CFBundleURLSchemes' => [reversed_client_id]
+  }
+  info_plist['CFBundleURLTypes'] << new_url_type
+  
+  # 변경사항 저장
+  Xcodeproj::Plist.write_to_path(info_plist, info_plist_path)
+  puts "Successfully added #{reversed_client_id} to Info.plist!"
 end

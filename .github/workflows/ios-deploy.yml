@@ -23,6 +23,10 @@ jobs:
         run: |
           echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
 
+      - name: Create GoogleService-Info.plist
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" > ios/App/App/GoogleService-Info.plist
+
       - name: Build Web Assets & Sync Capacitor
         run: |
           npm run build
@@ -31,7 +35,7 @@ jobs:
       - name: Install xcodeproj gem
         run: gem install xcodeproj
 
-      - name: Link GoogleService-Info.plist to Xcode Project
+      - name: Link GoogleService-Info.plist and Configure Info.plist
         run: ruby scripts/add-google-service.rb
 
       - name: Setup Ruby
