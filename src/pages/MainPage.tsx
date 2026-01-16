@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import Banner from '../components/main/Banner'
+import { StatusBar, Style } from '@capacitor/status-bar'
+
 import ChatRoomList from '../components/main/ChatRoomList'
 import ClosenessSheet from '../components/chat/ClosenessSheet'
 import CommonModal from '../components/common/CommonModal'
@@ -9,6 +10,8 @@ import { useFetchUser } from '../hooks/useFetchUser'
 import { useFetchChatRooms } from '../hooks/useFetchChatRooms'
 import { useCreateChatRoom } from '../hooks/useCreateChatRoom'
 import { getChatBotIdByConcept } from '../utils/chatbotMap'
+import Carousel from '../components/main/Carousel'
+import Dashboard from '../components/main/DashBoard'
 
 const MainPage = () => {
   const navigate = useNavigate()
@@ -19,7 +22,7 @@ const MainPage = () => {
     id: number
     name: string
   } | null>(null)
-  const { userName, userId } = useFetchUser()
+  const { userId } = useFetchUser()
   const { chatMsg, isLoading } = useFetchChatRooms(userId)
 
   const { mutate: createRoom, isPending: isCreating } = useCreateChatRoom(
@@ -71,14 +74,53 @@ const MainPage = () => {
     )
   }
 
+  useEffect(() => {
+    const setTransparentBar = async () => {
+      try {
+        // 웹뷰를 상태바 밑으로 확장
+        await StatusBar.setOverlaysWebView({ overlay: true })
+        // 상태바 배경색을 투명으로 설정 (Android 필수)
+        await StatusBar.setBackgroundColor({ color: 'transparent' })
+        // 상태바 아이콘 색상 (이미지가 밝으면 Dark, 어두우면 Light)
+        await StatusBar.setStyle({ style: Style.Dark })
+      } catch (e) {
+        console.log('StatusBar error', e)
+      }
+    }
+
+    setTransparentBar()
+
+    // 원래대로 복구
+    return () => {
+      const resetStatusBar = async () => {
+        try {
+          // 투명 모드 해제
+          await StatusBar.setOverlaysWebView({ overlay: false })
+          // 원래 앱의 배경색으로 복구
+          await StatusBar.setBackgroundColor({ color: '#FFFFFF' })
+          // 글자색을 원래대로
+          await StatusBar.setStyle({ style: Style.Light })
+        } catch (e) {
+          console.log('StatusBar reset error', e)
+        }
+      }
+      resetStatusBar()
+    }
+  }, [])
+
   return (
     <div>
-      <Banner userName={userName} />
+      <Carousel />
 
-      <div className="max-w-md mx-auto px-5 pb-16 mt-[30px]">
-        <div className="text-title mb-4 text-[20px] border-b border-gray-80 pb-2">
-          Chats
+      <div className="px-5 relative z-20">
+        {/* 카드의 정중앙이 캐러셀 밑변 */}
+        <div className="-mt-[33px]">
+          <Dashboard days={10} savedCount={5} />
         </div>
+      </div>
+
+      <div className="max-w-md mx-auto px-5 mt-8">
+        <div className="text-title mb-2 text-[18px]">Chatting Room</div>
 
         <ChatRoomList
           isLoading={isLoading}

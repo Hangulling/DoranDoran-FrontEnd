@@ -1,10 +1,13 @@
-import axios, { type AxiosInstance, type AxiosError, type InternalAxiosRequestConfig } from 'axios'
+import axios, {
+  type AxiosInstance,
+  type AxiosError,
+  type InternalAxiosRequestConfig,
+} from 'axios'
 import { AUTH_ENDPOINTS } from './endpoints'
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://3.21.177.186:8080').replace(
-  /\/+$/,
-  ''
-)
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL || 'https://api.doran-chat.com'
+).replace(/\/+$/, '')
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -37,7 +40,10 @@ const tokenService = {
   },
 }
 
-function emitAuthEvent(type: 'auth:expired' | 'auth:logout' | 'auth:inactive', detail?: unknown) {
+function emitAuthEvent(
+  type: 'auth:expired' | 'auth:logout' | 'auth:inactive',
+  detail?: unknown
+) {
   const manualLogout = sessionStorage.getItem('session:manualLogout') === '1'
   if (manualLogout && (type === 'auth:expired' || type === 'auth:inactive')) {
     return
@@ -109,7 +115,8 @@ async function refreshAccessToken(): Promise<string | null> {
     const res = await api.post(AUTH_ENDPOINTS.REFRESH_TOKEN, { refreshToken })
     const data = res.data?.data ?? res.data
     const newAccess = data?.accessToken as string | undefined
-    const newRefresh = (data?.refreshToken as string | undefined) ?? refreshToken
+    const newRefresh =
+      (data?.refreshToken as string | undefined) ?? refreshToken
 
     if (!newAccess) throw new Error('No new access token')
 
@@ -148,7 +155,12 @@ function installResponseInterceptor(instance: AxiosInstance) {
         url.includes(AUTH_ENDPOINTS.REFRESH_TOKEN) ||
         url.includes(AUTH_ENDPOINTS.LOGOUT)
 
-      if (status === 401 && originalRequest && !originalRequest._retry && !isAuthEndpoint) {
+      if (
+        status === 401 &&
+        originalRequest &&
+        !originalRequest._retry &&
+        !isAuthEndpoint
+      ) {
         originalRequest._retry = true
 
         if (isRefreshing) {
@@ -159,7 +171,9 @@ function installResponseInterceptor(instance: AxiosInstance) {
                 originalRequest.headers.Authorization = `Bearer ${newToken}`
                 resolve(instance(originalRequest))
               } else {
-                emitAuthEvent('auth:expired', { reason: 'refresh_failed_queue' })
+                emitAuthEvent('auth:expired', {
+                  reason: 'refresh_failed_queue',
+                })
                 resolve(Promise.reject(error))
               }
             })

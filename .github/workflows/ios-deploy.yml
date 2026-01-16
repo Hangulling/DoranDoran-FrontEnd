@@ -16,13 +16,23 @@ jobs:
         with:
           node-version: 22.x
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm ci
+
+      - name: Create .env.production file
+        run: |
+          echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
 
       - name: Build Web Assets & Sync Capacitor
         run: |
           npm run build
           npx cap sync ios
+
+      - name: Install xcodeproj gem
+        run: gem install xcodeproj
+
+      - name: Link GoogleService-Info.plist to Xcode Project
+        run: ruby scripts/add-google-service.rb
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
