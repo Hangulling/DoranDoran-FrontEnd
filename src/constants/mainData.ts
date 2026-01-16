@@ -3,6 +3,7 @@ import friend from '../assets/main/friend.png'
 import honey from '../assets/main/honey.png'
 import senior from '../assets/main/senior.png'
 import coworker from '../assets/main/coworker.png'
+import manager from '../assets/main/manager.png'
 
 export const MAIN_DATA: ChatRoomWithMessage[] = [
   {
@@ -30,3 +31,11 @@ export const MAIN_DATA: ChatRoomWithMessage[] = [
     avatar: senior,
   },
 ]
+
+export const MANAGER_ROOM: ChatRoomWithMessage = {
+  roomRouteId: 9,
+  roomName: 'service manager',
+  concept: 'service manager',
+  message: 'Do you need any help?',
+  avatar: manager,
+}

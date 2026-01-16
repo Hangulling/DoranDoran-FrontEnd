@@ -12,6 +12,7 @@ import { useCreateChatRoom } from '../hooks/useCreateChatRoom'
 import { getChatBotIdByConcept } from '../utils/chatbotMap'
 import Carousel from '../components/main/Carousel'
 import Dashboard from '../components/main/Dashboard'
+import InstaContent from '../components/main/InstaContent'
 
 const MainPage = () => {
   const navigate = useNavigate()
@@ -38,6 +39,10 @@ const MainPage = () => {
       history.replaceState({}, '')
     }
   }, [location])
+
+  const handleCardClick = (id: number) => {
+    console.log(`카드 ${id} 클릭됨`)
+  }
 
   const handleRoomClick = (id: number, roomName: string) => {
     setSelectedRoom({ id, name: roomName })
@@ -119,7 +124,7 @@ const MainPage = () => {
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-5 mt-8">
+      <div className="max-w-md mx-auto px-5 my-8">
         <div className="text-title mb-2 text-[18px]">Chatting Room</div>
 
         <ChatRoomList
@@ -128,6 +133,13 @@ const MainPage = () => {
           onRoomClick={handleRoomClick}
         />
       </div>
+
+      <section className="max-w-md mx-auto ml-5 mb-[77px]">
+        <div className="text-title mb-3 mr-5 text-[18px]">
+          Koach Pick K - contents
+        </div>
+        <InstaContent onCardClick={handleCardClick} />
+      </section>
 
       <ClosenessSheet
         isOpen={isSheetOpen}
