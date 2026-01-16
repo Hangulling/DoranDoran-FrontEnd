@@ -81,7 +81,7 @@ const ClosenessSheet = ({
             <img
               src={conceptImages[0]}
               alt="Closeness Level 1"
-              className="object-contain"
+              className="object-contain block"
             />
           </button>
 
@@ -100,7 +100,7 @@ const ClosenessSheet = ({
             <img
               src={conceptImages[1]}
               alt="Closeness Level 2"
-              className="object-contain"
+              className="object-contain block"
             />
           </button>
         </div>
