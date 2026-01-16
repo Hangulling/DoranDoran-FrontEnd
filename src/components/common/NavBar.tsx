@@ -45,8 +45,8 @@ const NavBar: React.FC<NavBarProps & { position?: 'top' | 'bottom' }> = ({
         : location.pathname.startsWith(path)
 
     return isActive
-      ? 'text-gray-800 fill-current'
-      : 'text-gray-300 fill-none active:text-gray-800 fill-current transition-colors'
+      ? 'text-primary-300 fill-current'
+      : 'text-gray-300 fill-none active:text-gray-300 fill-current transition-colors'
   }
 
   return (
