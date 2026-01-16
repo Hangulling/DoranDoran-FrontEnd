@@ -130,6 +130,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     title = 'Find your Email'
   } else if (pathname.startsWith('/find-password')) {
     title = 'Reset Password'
+  } else if (pathname.startsWith('/signup')) {
+    title = 'Sign Up'
   } else {
     title = pageTitles[pathname] || '페이지'
   }
