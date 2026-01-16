@@ -1,15 +1,23 @@
 import { lazy } from 'react'
 import { Navigate, Route, Routes as RouterRoutes } from 'react-router-dom'
 import PrivateRoute from './PrivateRoute'
-import FindEmailForm from '../pages/find-email/FindEmailForm'
 import FindEmailNotFound from '../pages/find-email/FindEmailNotFound'
 import FindEmailSuccess from '../pages/find-email/FindEmailSuccess'
-import FindPasswordEmail from '../pages/find-passoword/FindPasswordEmail'
-import FindPasswordVerify from '../pages/find-passoword/FindPasswordVerify'
-import FindPasswordReset from '../pages/find-passoword/FindPasswordReset'
+import FindPasswordEmail from '../pages/find-password/FindPasswordEmail'
+import FindPasswordVerify from '../pages/find-password/FindPasswordVerify'
+import FindPasswordReset from '../pages/find-password/FindPasswordReset'
+import SignupTerm from '../pages/signup/steps/SignupTerm'
+import SignupEmail from '../pages/signup/steps/SignupEmail'
+import SignupPassword from '../pages/signup/steps/SignupPassword'
+import SignupName from '../pages/signup/steps/SignupName'
+import SignupQuestion from '../pages/signup/steps/SignupQuestion'
+import SignupBirthDate from '../pages/signup/steps/SignupBirthDate'
+import FindEmailName from '../pages/find-email/steps/FindEmailName'
+import FindEmailBirthDate from '../pages/find-email/steps/FindEmailBirthDate'
+import FindEmailQuestion from '../pages/find-email/steps/FindEmailQuestion'
 
 const MainPage = lazy(() => import('../pages/MainPage'))
-const SignupPage = lazy(() => import('../pages/SignupPage'))
+const SignupPage = lazy(() => import('../pages/signup/SignupPage'))
 const LoginPage = lazy(() => import('../pages/LoginPage'))
 const ChatPage = lazy(() => import('../pages/ChatPage'))
 const ArchivePage = lazy(() => import('../pages/ArchivePage'))
@@ -24,7 +32,15 @@ const FindPasswordPage = lazy(
 export function Routes() {
   return (
     <RouterRoutes>
-      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/signup" element={<SignupPage />}>
+        <Route index element={<Navigate to="term" replace />} />
+        <Route path="term" element={<SignupTerm />} />
+        <Route path="name" element={<SignupName />} />
+        <Route path="birthdate" element={<SignupBirthDate />} />
+        <Route path="email" element={<SignupEmail />} />
+        <Route path="password" element={<SignupPassword />} />
+        <Route path="question" element={<SignupQuestion />} />
+      </Route>
       <Route path="/login" element={<LoginPage />} />
 
       <Route
@@ -61,8 +77,10 @@ export function Routes() {
       />
       <Route path="/policy/:id" element={<PolicyPage />} />
       <Route path="/find-email" element={<FindEmailPage />}>
-        <Route index element={<Navigate to="form" replace />} />
-        <Route path="form" element={<FindEmailForm />} />
+        <Route index element={<Navigate to="name" replace />} />
+        <Route path="name" element={<FindEmailName />} />
+        <Route path="birthdate" element={<FindEmailBirthDate />} />
+        <Route path="question" element={<FindEmailQuestion />} />
         <Route path="not-found" element={<FindEmailNotFound />} />
         <Route path="success" element={<FindEmailSuccess />} />
       </Route>

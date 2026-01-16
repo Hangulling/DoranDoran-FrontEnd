@@ -1,12 +1,12 @@
 import Button from '../../components/common/Button'
 import Input from '../../components/common/Input'
-import findCharacterIcon from '../../assets/auth/character-confiused.svg'
 import { Link, useOutletContext } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
 import { validateEmail } from '../../utils/validations'
 import { resetPasswordRequest } from '../../api'
 import { isAxiosError } from 'axios'
 import { usePasswordResetStore } from '../../stores/usePasswordResetStore'
+import FormIntro from '../../components/common/FormIntro'
 
 type OutletContext = {
   setSubmit: (fn: () => void) => void
@@ -19,6 +19,7 @@ export default function FindPasswordEmail() {
   const [emailError, setEmailError] = useState<string | null>('')
   const [isRequested, setIsRequested] = useState(false)
   const { setSubmit, setCanSubmit } = useOutletContext<OutletContext>()
+
   const handleEmailChange = (v: string) => {
     setEmail(v)
     if (emailError) setEmailError(null)
@@ -26,7 +27,9 @@ export default function FindPasswordEmail() {
     if (isRequested) setIsRequested(false)
   }
 
-  const isEmailFormatValid = email.trim() !== '' && validateEmail(email) === null
+  const isEmailFormatValid =
+    email.trim() !== '' && validateEmail(email) === null
+
   const handleVerify = async () => {
     try {
       await resetPasswordRequest(email)
@@ -50,11 +53,21 @@ export default function FindPasswordEmail() {
     }
   }
 
+  const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === ' ') e.preventDefault()
+    if (e.nativeEvent.isComposing) return
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (isEmailFormatValid) handleVerify()
+    }
+  }
+
   const handleSubmit = useCallback(() => {
     if (!isRequested) return
   }, [isRequested])
 
-  const isFormValid = email.trim() !== '' && validateEmail(email) === null && isRequested
+  const isFormValid =
+    email.trim() !== '' && validateEmail(email) === null && isRequested
 
   useEffect(() => {
     setSubmit(() => handleSubmit)
@@ -66,43 +79,46 @@ export default function FindPasswordEmail() {
 
   return (
     <div>
-      <div className="w-[355px]">
-        <label className="block ml-2 my-2 whitespace-nowrap text-gray-800 text-base text-subtitle">
-          Enter your registered email address
-        </label>
-        <div className="flex items-end mx-2 gap-4">
-          <Input
-            type="email"
-            placeholder="Enter your E-mail"
-            size="sm"
-            variant={emailError ? 'error' : 'primary'}
-            onChange={e => handleEmailChange(e.target.value)}
-            value={email}
-          />
-          <Button
-            type="button"
-            variant="primary"
-            className="bg-gray-800 my-2 text-subtitle"
-            size="sm"
-            disabled={!isEmailFormatValid}
-            onClick={handleVerify}
-          >
-            Confirm
-          </Button>
-        </div>
+      <div>
+        <FormIntro variant="signup">
+          <p>What's your email?</p>
+        </FormIntro>
+        <Input
+          type="email"
+          label="E-mail"
+          placeholder="Enter your E-mail"
+          variant={emailError ? 'error' : 'primary'}
+          noUnderline
+          onChange={e => handleEmailChange(e.target.value)}
+          value={email}
+          onKeyDown={handleEmailKeyDown}
+          rightElement={
+            <div>
+              <Button
+                variant="primary"
+                className="bg-gray-800 p-2 !rounded-[10px]"
+                onClick={handleVerify}
+                disabled={!isEmailFormatValid}
+                size="sm"
+              >
+                Verify
+              </Button>
+            </div>
+          }
+        />
         {emailError ? (
-          <div className="mx-3 text-body text-xs text-orange-300 whitespace-pre-line">
+          <div className="mt-1 text-body text-xs text-system-red whitespace-pre-line">
             {emailError}
           </div>
         ) : emailSuccess ? (
-          <span className="mx-3 text-body text-xs text-blue-500">{emailSuccess}</span>
+          <span className="mt-1 text-body text-xs text-system-blue">
+            {emailSuccess}
+          </span>
         ) : null}
       </div>
-      <div className="flex flex-col justify-center items-center gap-2 mt-10">
-        <img src={findCharacterIcon} />
-        <div className="flex flex-col items-center text-sm text-body text-gray-600 gap-1">
-          <div>Can't remeber the email</div>
-          <div>you signed with?</div>
+      <div className="flex flex-col gap-1 mt-8">
+        <div className="text-sm text-body text-gray-500">
+          Can't remeber the email you signed up with?
         </div>
         <Link
           to="/find-email"

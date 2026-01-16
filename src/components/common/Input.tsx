@@ -2,49 +2,82 @@ import { useState } from 'react'
 import eye from '../../assets/icon/eye.svg'
 import eyeOff from '../../assets/icon/eyeOff.svg'
 import Button from './Button'
+import CloseCircleIcon from '../../assets/icon/CloseCircleIcon'
+
 interface InputProps {
   id?: string
   name?: string
   label?: string
   type?: string
   placeholder?: string
-  variant?: 'primary' | 'error'
+  variant?: 'primary' | 'error' | 'underline' | 'underlineError'
   error?: string
   size?: 'sm' | 'md' | 'lg'
   value?: string
   readOnly?: boolean
   inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode']
+  clearable?: boolean
+  noUnderline?: boolean
+  rightElement?: React.ReactNode
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
+  onClear?: () => void
 }
 
 export default function Input({
   id,
   name,
   label,
-  variant = 'primary',
+  variant = 'underline',
   type = 'text',
   size = 'lg',
   placeholder,
   value,
   inputMode,
   readOnly,
+  clearable,
+  noUnderline,
+  rightElement,
   onChange,
   onBlur,
   onKeyDown,
+  onClear,
 }: InputProps) {
-  const [show, setShow] = useState<boolean>(false)
+  const [show, setShow] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
+
   const isPassword = type === 'password'
+  const hasValue = (value?.length ?? 0) > 0
+  const isError = variant === 'error' || variant === 'underlineError'
+
+  const labelColor = hasValue && !isFocused ? 'text-gray-400' : 'text-gray-800'
+
+  const borderColor = isError
+    ? 'border-system-red'
+    : isFocused
+      ? 'border-primary-200'
+      : hasValue
+        ? 'border-gray-400'
+        : 'border-gray-100'
+
   const VARIANTS = {
-    primary: 'flex border rounded-lg border-gray-100 px-3 my-2',
-    error: 'flex border rounded-lg border-orange-300 px-3 my-2',
+    primary: 'flex border rounded-lg px-3 my-2',
+    underline: 'flex border-b',
+    error: 'flex border rounded-lg px-3 my-2',
+    underlineError: 'flex border-b mb-2',
   } as const
 
   const SIZES = {
     sm: 'w-[247px] h-12',
     md: 'w-[254px] h-12',
     lg: 'w-[335px] h-12',
+  } as const
+
+  const handleFocus = () => setIsFocused(true)
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(false)
+    onBlur?.(e)
   }
 
   return (
@@ -52,31 +85,91 @@ export default function Input({
       {label && (
         <label
           htmlFor={id}
-          className="whitespace-nowrap text-gray-800 text-base text-subtitle my-2"
+          className={`whitespace-nowrap text-sm text-subtitle my-2 transition-colors ${labelColor}`}
         >
           {label}
         </label>
       )}
-      <div className={`${VARIANTS[variant]} ${SIZES[size]} `}>
-        <input
-          type={isPassword ? (show ? 'text' : 'password') : type}
-          id={id}
-          name={name}
-          placeholder={placeholder}
-          className="outline-none w-full text-sm text-body "
-          value={value}
-          onChange={onChange}
-          onBlur={onBlur}
-          onKeyDown={onKeyDown}
-          inputMode={inputMode}
-          readOnly={readOnly}
-        />
-        {isPassword && value && value.length > 0 && (
-          <Button type="button" variant="text" size="xs" onClick={() => setShow(s => !s)}>
-            <img src={show ? eye : eyeOff} alt="eye" className="w-5 h-5" />
-          </Button>
-        )}
-      </div>
+
+      {noUnderline ? (
+        <div className={`${SIZES[size]} flex items-center gap-2`}>
+          <div
+            className={`flex flex-1 items-center h-12 ${VARIANTS[variant]} ${borderColor} transition-colors`}
+          >
+            <input
+              type={isPassword ? (show ? 'text' : 'password') : type}
+              id={id}
+              name={name}
+              placeholder={placeholder}
+              className="outline-none w-full text-base text-body py-2"
+              value={value}
+              onChange={onChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onKeyDown={onKeyDown}
+              inputMode={inputMode}
+              readOnly={readOnly}
+            />
+
+            {isPassword && hasValue && (
+              <Button
+                type="button"
+                variant="text"
+                size="xs"
+                onClick={() => setShow(s => !s)}
+              >
+                <img src={show ? eye : eyeOff} alt="eye" className="w-5 h-5" />
+              </Button>
+            )}
+
+            {clearable && hasValue && (
+              <Button type="button" variant="text" size="xs" onClick={onClear}>
+                <CloseCircleIcon />
+              </Button>
+            )}
+          </div>
+
+          {rightElement}
+        </div>
+      ) : (
+        <div
+          className={`${VARIANTS[variant]} ${SIZES[size]} ${borderColor} transition-colors`}
+        >
+          <input
+            type={isPassword ? (show ? 'text' : 'password') : type}
+            id={id}
+            name={name}
+            placeholder={placeholder}
+            className="outline-none w-full text-sm text-body"
+            value={value}
+            onChange={onChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onKeyDown={onKeyDown}
+            inputMode={inputMode}
+            readOnly={readOnly}
+          />
+
+          {rightElement}
+
+          {isPassword && hasValue && (
+            <Button
+              type="button"
+              variant="text"
+              size="xs"
+              onClick={() => setShow(s => !s)}
+            >
+              <img src={show ? eye : eyeOff} alt="eye" className="w-5 h-5" />
+            </Button>
+          )}
+
+          {clearable && hasValue && (
+            <Button type="button" variant="text" size="xs" onClick={onClear}>
+              <CloseCircleIcon />
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   )
 }
