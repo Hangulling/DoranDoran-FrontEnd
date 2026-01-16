@@ -3,16 +3,24 @@ import type { EnrichedMessage } from '../../pages/ChatPage'
 import type { VocabularyExtractedData } from '../../types/sseEvents'
 import ChatBubble from './ChatBubble'
 import ChatMessageItem from './ChatMessageItem'
+import ReloadIcon from '../../assets/icon/reload.svg?react'
 
-const LoadingDot = () => <span className="loading loading-dots loading-[5px] text-gray-200" />
+const LoadingDot = () => (
+  <span className="loading loading-dots loading-[5px] text-gray-200" />
+)
 
 interface ChatMessageListProps {
   messages: EnrichedMessage[]
   isAiResponding: boolean
   sseError: string | null
+  sendError: string | null
   inactivityError: boolean
   roomAvatar: string | undefined
   chatroomId: string | undefined
+  isVocabularyEnabled: boolean
+  isCorrectionEnabled: boolean
+  isTranslationEnabled: boolean
+  onRetry: () => void
   onChatBubbleBookmark: (
     messageId: string,
     content: string,
@@ -31,9 +39,14 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
   messages,
   isAiResponding,
   sseError,
+  sendError,
   inactivityError,
   roomAvatar,
   chatroomId,
+  isVocabularyEnabled,
+  isCorrectionEnabled,
+  isTranslationEnabled,
+  onRetry,
   onChatBubbleBookmark,
   onCorrectionBubbleBookmark,
 }) => {
@@ -44,6 +57,9 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
           key={msg.id}
           msg={msg}
           chatroomId={chatroomId}
+          isVocabularyEnabled={isVocabularyEnabled}
+          isCorrectionEnabled={isCorrectionEnabled}
+          isTranslationEnabled={isTranslationEnabled}
           onChatBubbleBookmark={onChatBubbleBookmark}
           onCorrectionBubbleBookmark={onCorrectionBubbleBookmark}
         />
@@ -65,10 +81,24 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
       {/* 에러 */}
       <div className="mt-5">
         {sseError && (
+          <div className="flex items-center gap-[6px]">
+            <ChatBubble
+              message={'Oops, network error. Please try again.'}
+              isSender={false}
+              variant={'error'}
+              showIcon={false}
+            />
+            <button onClick={onRetry} aria-label="Retry">
+              <ReloadIcon />
+            </button>
+          </div>
+        )}
+
+        {/* 사용자 메시지 전송 실패*/}
+        {sendError && (
           <ChatBubble
-            avatarUrl={roomAvatar}
-            message={'Failed to load AI response'}
-            isSender={false}
+            message={sendError}
+            isSender={true}
             variant={'error'}
             showIcon={false}
           />
@@ -76,7 +106,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
 
         {inactivityError && (
           <ChatBubble
-            avatarUrl={roomAvatar}
             message={'Knock knock'}
             isSender={false}
             variant={'basic'}

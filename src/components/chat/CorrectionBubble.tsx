@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import TTSIcon from './VolumeIcon'
-import BookmarkIcon from './BookmarkIcon'
+import TTSIcon from './Icon/VolumeIcon'
+import BookmarkIcon from './Icon/BookmarkIcon'
 import useTTS from '../../hooks/useTTS'
 import FlagIcon from '../../assets/icon/flag.svg?react'
 
 interface CorrectionBubbleProps {
   chatRoomId: string
-  initialTab?: string
+  showKorean?: boolean
   descriptionByTab?: Record<string, string>
   correctedSentence?: string
   isSender?: boolean
@@ -27,6 +27,7 @@ const bubbleClass =
   'rounded-[16px] p-0 w-[305px] mb-0 overflow-hidden border-[1px] border-transparent bg-origin-border bg-[linear-gradient(#fff,#fff),linear-gradient(rgba(255,255,255,0.6),rgba(255,255,255,0.6)),linear-gradient(to_right,#7487FB_0%,#6B51F0_100%)] [background-clip:padding-box,border-box,border-box]'
 
 const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
+  showKorean = false,
   descriptionByTab,
   messageId,
   originalContent,
@@ -74,19 +75,19 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
             {isLoading ? (
               <div className="bg-primary-10 animate-pulse rounded-[4px] h-4 w-3/4"></div>
             ) : (
-              <p className="text-subtitle text-[14px]">{correctedContent}</p>
+              <p className="text-title text-[14px]">{correctedContent}</p>
             )}
           </div>
 
           {/* 설명 */}
-          <div className="text-[14px] text-gray-800">
+          <div className="text-[14px] text-gray-700">
             {isLoading ? (
               <div className="space-y-1.5 pt-1">
                 <div className="bg-primary-10 animate-pulse rounded-[4px] h-[19px] w-full"></div>
                 <div className="bg-primary-10 animate-pulse rounded-[4px] h-[19px] w-5/6"></div>
               </div>
             ) : (
-              currentDescription['Eng']
+              currentDescription[showKorean ? 'Kor' : 'Eng']
             )}
           </div>
 
@@ -95,7 +96,7 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
               isBookmarked={isBookmarked ?? false}
               onToggle={toggleBookmark}
             />
-            <FlagIcon />
+            <FlagIcon className="fill-gray-0 text-gray-700" />
           </div>
         </div>
       </div>

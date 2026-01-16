@@ -8,14 +8,22 @@ interface ChatRoomListProps {
   onRoomClick: (id: number, roomName: string) => void
 }
 
-const ChatRoomList = ({ isLoading, chatMsg, onRoomClick }: ChatRoomListProps) => {
+const ChatRoomList = ({
+  isLoading,
+  chatMsg,
+  onRoomClick,
+}: ChatRoomListProps) => {
   return (
     <div className="flex flex-col gap-[10px]">
       {isLoading ? (
         <LoadingSpinner />
       ) : (
         chatMsg.map(room => (
-          <ChatRoomItem key={room.roomRouteId} room={room} onClick={onRoomClick} />
+          <ChatRoomItem
+            key={room.roomRouteId}
+            room={room}
+            onClick={(id, name) => onRoomClick(Number(id), name)}
+          />
         ))
       )}
     </div>

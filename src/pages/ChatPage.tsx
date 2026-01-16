@@ -23,6 +23,10 @@ import { useChatHistory } from '../hooks/chat/useChatHistory'
 import ChatBody from '../components/chat/ChatBody'
 import { useChatInteraction } from '../hooks/chat/useChatInteraction'
 import ChatHeader from '../components/chat/ChatHeader'
+import BottomSheet from '../components/common/BottomSheet'
+import ToggleSwitch from '../components/common/ToggleSwitch'
+import Button from '../components/common/Button'
+import { useChatSettingStore } from '../stores/useChatSetting'
 
 const INACTIVITY_DURATION_MS = 300000
 
@@ -32,6 +36,7 @@ export interface EnrichedMessage extends Message {
   isPerfect?: boolean // Perfect 여부 저장
   analysisState?: 'pending' | 'complete' // 교정 데이터 로딩
   bookmarkId?: string | null
+  isSendFailed?: boolean
 }
 
 const chatBotIdByRoom = (conceptValue: string): string => {
@@ -63,10 +68,22 @@ const ChatPage: React.FC = () => {
   >('pending')
   const [greetingMsg1, setGreetingMsg1] = useState<string | null>(null)
   const [greetingMsg2, setGreetingMsg2] = useState<string | null>(null)
+  const [isSettingOpen, setIsSettingOpen] = useState(false) // 세팅 오픈
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const userId = useUserStore(state => state.id)
   const roomsMap = useRoomIdStore(state => state.roomsMap)
+  const {
+    isVocabularyEnabled,
+    setVocabularyEnabled,
+    isCorrectionEnabled,
+    setCorrectionEnabled,
+    isTranslationEnabled,
+    setTranslationEnabled,
+  } = useChatSettingStore()
+  const [tempVocabulary, setTempVocabulary] = useState(isVocabularyEnabled)
+  const [tempCorrection, setTempCorrection] = useState(isCorrectionEnabled)
+  const [tempTranslation, setTempTranslation] = useState(isTranslationEnabled)
   const chatroomId = id ? roomsMap[id] : undefined
   const closenessLevel =
     useClosenessStore.getState().getCloseness(id ?? '') ?? 1
@@ -78,6 +95,27 @@ const ChatPage: React.FC = () => {
     return chatRooms.find(r => String(r.roomRouteId) === String(id))
   }, [id])
 
+  // 세팅 열기
+  const openSettings = () => {
+    setTempVocabulary(isVocabularyEnabled)
+    setTempCorrection(isCorrectionEnabled)
+    setTempTranslation(isTranslationEnabled)
+    setIsSettingOpen(true)
+  }
+
+  // 세팅 저장 버튼
+  const handleSaveSettings = () => {
+    setVocabularyEnabled(tempVocabulary)
+    setCorrectionEnabled(tempCorrection)
+    setTranslationEnabled(tempTranslation)
+    setIsSettingOpen(false)
+    console.log('설정 저장 완료:', {
+      vocabulary: tempVocabulary,
+      correction: tempCorrection,
+      translation: tempTranslation,
+    })
+  }
+
   const { handleChatBubbleBookmark, handleCorrectionBubbleBookmark } =
     useBookmarkManager({
       chatroomId,
@@ -87,11 +125,12 @@ const ChatPage: React.FC = () => {
       setMessages,
     })
 
-  const { isModalOpen, handleConfirmExit, handleCancelExit } = useChatExit({
-    chatroomId,
-    userId,
-    routeId: id,
-  })
+  const { isModalOpen, handleConfirmExit, handleCancelExit, handleGoBack } =
+    useChatExit({
+      chatroomId,
+      userId,
+      routeId: id,
+    })
 
   const { inactivityError, resetInactivityTimer, stopInactivityTimer } =
     useInactivityTimer(INACTIVITY_DURATION_MS)
@@ -110,7 +149,13 @@ const ChatPage: React.FC = () => {
     setGreetingMsg2,
   })
 
-  const { isAiResponding, sseError, handleSendMessage } = useChatInteraction({
+  const {
+    isAiResponding,
+    sseError,
+    sendError,
+    handleSendMessage,
+    handleRetry,
+  } = useChatInteraction({
     chatroomId,
     userId,
     accessToken,
@@ -162,24 +207,6 @@ const ChatPage: React.FC = () => {
     }
   }, [])
 
-  useEffect(() => {
-    if (IS_PROD && GA_ENABLED && chatroomId && userId) {
-      const sessionKey = `viewed_chatroom_${chatroomId}`
-      const alreadyViewed = sessionStorage.getItem(sessionKey)
-
-      // alreadyViewed가 'true'가 아닐 때만 이벤트 전송
-      if (alreadyViewed !== 'true') {
-        const yyyyMmDd = new Date().toISOString().slice(0, 10)
-        ReactGA.event('view_chatroom', {
-          chatroom_id: chatroomId,
-          date: yyyyMmDd,
-        })
-        // 이벤트 전송 후 sessionStorage에 플래그 설정
-        sessionStorage.setItem(sessionKey, 'true')
-      }
-    }
-  }, [chatroomId, userId]) // chatroomId와 userId가 확정되면 1회 실행
-
   // 봇/가이드 메시지 도착
   useEffect(() => {
     const checkCompletion = (botMsg: string, guideMsg: string | null) => {
@@ -190,7 +217,7 @@ const ChatPage: React.FC = () => {
         ReactGA.event('send_greeting_message', {
           chatroom_id: chatroomId,
           bot_message: botMsg,
-          guide_message: guideMsg ?? '', // 가이드 메시지는 없을 수 있음
+          guide_message: guideMsg ?? '',
         })
       }
       setGreetingState('complete')
@@ -243,14 +270,12 @@ const ChatPage: React.FC = () => {
   }, [messages])
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden relative">
       <ChatHeader
         title={room?.roomName || 'Chat'}
         closenessLevel={closenessLevel}
-        onBack={() => {
-          navigate(-1)
-        }}
-        onSettingClick={() => console.log('설정 클릭')}
+        onBack={handleGoBack}
+        onSettingClick={openSettings}
       />
 
       <div
@@ -269,8 +294,13 @@ const ChatPage: React.FC = () => {
           messages={messages}
           isAiResponding={isAiResponding}
           sseError={sseError}
+          sendError={sendError}
+          onRetry={handleRetry}
           inactivityError={inactivityError}
           chatroomId={chatroomId}
+          isVocabularyEnabled={isVocabularyEnabled}
+          isCorrectionEnabled={isCorrectionEnabled}
+          isTranslationEnabled={isTranslationEnabled}
           onChatBubbleBookmark={handleChatBubbleBookmark}
           onCorrectionBubbleBookmark={handleCorrectionBubbleBookmark}
         />
@@ -288,6 +318,40 @@ const ChatPage: React.FC = () => {
         onConfirm={handleConfirmExit}
         onCancel={handleCancelExit}
       />
+
+      <BottomSheet
+        isOpen={isSettingOpen}
+        onClose={() => setIsSettingOpen(false)}
+        title="Auto-open messages"
+        description="Turn this on to view messages instantly."
+      >
+        <div className="flex flex-col gap-[20px] mt-[14px] mb-[30px]">
+          <div className="flex justify-between items-center">
+            <span className="text-[16px]">Vocabulary</span>
+            <ToggleSwitch
+              checked={tempVocabulary}
+              onClick={() => setTempVocabulary(!tempVocabulary)}
+            />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-[16px]">Tone Adjustment</span>
+            <ToggleSwitch
+              checked={tempCorrection}
+              onClick={() => setTempCorrection(!tempCorrection)}
+            />
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-[16px]">Korean Explanation</span>
+            <ToggleSwitch
+              checked={tempTranslation}
+              onClick={() => setTempTranslation(!tempTranslation)}
+            />
+          </div>
+        </div>
+        <Button variant="primary" size="confirm" onClick={handleSaveSettings}>
+          Save
+        </Button>
+      </BottomSheet>
     </div>
   )
 }

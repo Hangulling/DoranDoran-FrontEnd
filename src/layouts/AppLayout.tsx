@@ -44,7 +44,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     /^\/closeness(?:\/|$)/,
     /^\/policy(?:\/|$)/,
     /^\/error(?:\/|$)/,
-    /^\/insta(?:\/|$)/,
     /^\/onboarding(?:\/|$)/,
     /^\/find-email(?:\/|$)/,
     /^\/find-password(?:\/|$)/,
@@ -52,7 +51,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const isKnownPath = knownPatterns.some(rx => rx.test(pathname))
   const isUnknownPath = !isKnownPath
 
-  const skipNavPaths = ['/login', '/error', '/insta', '/onboarding', '/chat']
+  const skipNavPaths = ['/login', '/error', '/onboarding', '/chat']
 
   // 로그인 필요없는 페이지
   const isPublicPage =
@@ -60,7 +59,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     pathname.startsWith('/signup') ||
     pathname.startsWith('/policy') ||
     pathname.startsWith('/error') ||
-    pathname.startsWith('/insta') ||
     pathname.startsWith('/find-email') ||
     pathname.startsWith('/find-password') ||
     isUnknownPath

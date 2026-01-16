@@ -10,6 +10,7 @@ type Variant =
   | 'home'
   | 'dropdown'
   | 'bottomSheet'
+  | 'modal'
 type Size =
   | 'xs'
   | 'sm'
@@ -21,10 +22,11 @@ type Size =
   | 'confirm'
   | 'dropdown'
   | 'bottomSheetText'
+  | 'modal'
 
 const VARIANTS: Record<Variant, string> = {
   primary:
-    'text-gray-0 text-subtitle text-[16px] rounded-xl bg-primary-300 disabled:bg-gray-100',
+    'bg-primary-300 text-gray-0 text-subtitle text-[16px] rounded-[12px] disabled:bg-gray-100 disabled:text-gray-0',
   cancel: 'bg-gray-80 text-gray-600 rounded-lg',
   text: 'bg-transparent',
   confirm: 'bg-primary-300 text-white rounded-xl',
@@ -34,6 +36,7 @@ const VARIANTS: Record<Variant, string> = {
   dropdown: 'px-3',
   bottomSheet:
     'rounded-xl text-subtitle text-sm text-gray-800 bg-gray-0 border border-gray-100 focus:border-primary-200 focus:bg-primary-10',
+  modal: 'rounded-[10px] text-subtitle text-[14px]',
 }
 
 const SIZES: Record<Size, string> = {
@@ -47,6 +50,7 @@ const SIZES: Record<Size, string> = {
   confirm: 'w-full h-13',
   dropdown: 'w-[335px] h-12',
   bottomSheetText: 'w-[335px] h-[49px]',
+  modal: 'py-3',
 }
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

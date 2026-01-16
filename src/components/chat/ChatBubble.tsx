@@ -1,9 +1,9 @@
 import React from 'react'
-import TTSIcon from './VolumeIcon'
-import BookmarkIcon from './BookmarkIcon'
+import TTSIcon from './Icon/VolumeIcon'
+import BookmarkIcon from './Icon/BookmarkIcon'
 import useTTS from '../../hooks/useTTS'
 import FlagIcon from '../../assets/icon/flag.svg?react'
-import BookIcon from '../../assets/icon/book.svg?react'
+import BookIcon from './Icon/BookIcon'
 
 interface ChatBubbleProps {
   message: React.ReactNode
@@ -14,6 +14,8 @@ interface ChatBubbleProps {
   messageId?: string // 북마크
   isBookmarked?: boolean
   onBookmarkToggle?: (messageId: string, content: string) => void // 북마크
+  onBookToggle?: () => void
+  isBookActive?: boolean
 }
 
 const bubbleVariants = {
@@ -32,6 +34,8 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
   messageId,
   isBookmarked,
   onBookmarkToggle,
+  onBookToggle,
+  isBookActive = false,
 }) => {
   const baseBubbleClass =
     'py-[10px] px-[14px] text-[14px] max-w-[305px] rounded-xl'
@@ -62,13 +66,13 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
           <div className="flex flex-row justify-between mt-2 items-center">
             <div className="flex flex-row gap-3 items-center">
               <TTSIcon playing={isPlaying} onPlay={playTTS} />
-              <BookIcon />
+              <BookIcon onToggle={onBookToggle} isActive={isBookActive} />
               <BookmarkIcon
                 isBookmarked={isBookmarked ?? false}
                 onToggle={toggleBookmark}
               />
             </div>
-            <FlagIcon />
+            <FlagIcon className="fill-gray-0 text-gray-700" />
           </div>
         )}
       </div>

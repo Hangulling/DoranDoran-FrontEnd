@@ -20,15 +20,15 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
         return (
           <div
             key={step}
-            className="flex-1 h-1 rounded-full bg-gray-100 overflow-hidden"
+            className="flex-1 h-1 rounded-full bg-gray-100 overflow-hidden relative"
           >
-            {isCompleted && (
-              <div className="h-full w-full bg-primary-300 transition-all duration-300" />
-            )}
-
-            {isCurrent && (
-              <div className="h-full w-1/2 bg-primary-300 transition-all duration-300" />
-            )}
+            <div
+              className={`h-full bg-primary-300 rounded-full transition-all duration-150 ease-out
+                ${isCompleted ? 'w-full delay-0' : ''} 
+                ${isCurrent ? 'w-1/2 delay-150' : ''} 
+                ${!isCompleted && !isCurrent ? 'w-0 delay-0' : ''}
+              `}
+            />
           </div>
         )
       })}
