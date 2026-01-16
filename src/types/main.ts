@@ -3,7 +3,7 @@ export interface ChatRoomWithMessage {
   roomName: string
   concept: string
   avatar: string
-  message: string
+  message?: string
 }
 
 export interface ChatRoomItemProps {

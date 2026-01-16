@@ -19,19 +19,14 @@ import FindEmailQuestion from '../pages/find-email/steps/FindEmailQuestion'
 const MainPage = lazy(() => import('../pages/MainPage'))
 const SignupPage = lazy(() => import('../pages/signup/SignupPage'))
 const LoginPage = lazy(() => import('../pages/LoginPage'))
-const ClosenessPage = lazy(() => import('../pages/ClosenessPage'))
 const ChatPage = lazy(() => import('../pages/ChatPage'))
 const ArchivePage = lazy(() => import('../pages/ArchivePage'))
 const PolicyPage = lazy(() => import('../pages/PolicyPage'))
 const ErrorPage = lazy(() => import('../pages/ErrorPage'))
-const TestMainPage = lazy(() => import('../test/TestMainPage'))
-const TestClosenessPage = lazy(() => import('../test/TestClosenessPage'))
-const TestChatPage = lazy(() => import('../test/TestChatPage'))
-const LandingPage = lazy(() => import('../pages/LandingPage'))
 const OnboardingPage = lazy(() => import('../pages/OnboardingPage'))
 const FindEmailPage = lazy(() => import('../pages/find-email/FindEmailPage'))
 const FindPasswordPage = lazy(
-  () => import('../pages/find-password/FindPasswordPage')
+  () => import('../pages/find-passoword/FindPasswordPage')
 )
 
 export function Routes() {
@@ -47,46 +42,12 @@ export function Routes() {
         <Route path="question" element={<SignupQuestion />} />
       </Route>
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/insta" element={<LandingPage />} />
-      {/* Test routes */}
-      <Route
-        path="/test/chat/:model"
-        element={
-          <PrivateRoute>
-            <TestMainPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/test/closeness/:model/:id"
-        element={
-          <PrivateRoute>
-            <TestClosenessPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/test/chat/:model/:id"
-        element={
-          <PrivateRoute>
-            <TestChatPage />
-          </PrivateRoute>
-        }
-      />
 
       <Route
         path="/"
         element={
           <PrivateRoute>
             <MainPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/closeness/:id"
-        element={
-          <PrivateRoute>
-            <ClosenessPage />
           </PrivateRoute>
         }
       />

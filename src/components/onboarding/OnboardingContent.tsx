@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import CheckIcon from '../../assets/icon/CheckIcon'
 import type { OnboardingStepData } from '../../constants/onboardingData'
 
 interface OnboardingContentProps {
@@ -10,19 +9,6 @@ interface OnboardingContentProps {
   onEtcTextChange?: (text: string) => void
 }
 
-// 체크박스
-function CheckCircle({ isSelected }: { isSelected: boolean }) {
-  return (
-    <div
-      className={`w-[20px] h-[20px] rounded-full border transition-all flex items-center justify-center
-        ${isSelected ? 'bg-primary-300 border-primary-300' : 'bg-gray-0 border-gray-200 shadow-[inset_0_0_0_1px_rgb(196,195,198)]'}
-      `}
-    >
-      {isSelected && <CheckIcon className="text-gray-0" />}
-    </div>
-  )
-}
-
 export default function OnboardingContent({
   stepData,
   selectedValues,
@@ -30,7 +16,6 @@ export default function OnboardingContent({
   etcText = '',
   onEtcTextChange,
 }: OnboardingContentProps) {
-  const StepIcon = stepData.icon
   const isGrid = stepData.layout === 'grid'
 
   const ETC_VALUE = 'Other'
@@ -49,14 +34,10 @@ export default function OnboardingContent({
 
   return (
     <div className="flex flex-col h-full animate-fadeIn">
-      {/* 타이틀 & 아이콘 */}
+      {/* 타이틀 */}
       <div className="shrink-0">
-        <div className="flex justify-left mb-4">
-          <StepIcon />
-        </div>
-
         <div className="mb-[30px]">
-          <h2 className="text-[22px] text-display whitespace-pre-wrap mb-1">
+          <h2 className="text-[24px] text-display whitespace-pre-wrap mb-1">
             {stepData.title}
           </h2>
           <p className="text-body text-gray-300 text-[14px] min-h-[21px]">
@@ -64,6 +45,7 @@ export default function OnboardingContent({
           </p>
         </div>
       </div>
+
       <div className="flex-1 overflow-y-auto pb-18 scrollbar-hide">
         {/* 옵션 목록 */}
         <div
@@ -82,36 +64,21 @@ export default function OnboardingContent({
                 key={value}
                 onClick={() => onSelect(value)}
                 className={`
-                relative rounded-xl transition-all duration-200 overflow-hidden
+                relative rounded-[12px] transition-all duration-200 overflow-hidden border
+                ${
+                  isSelected
+                    ? 'bg-primary-10 border-primary-200'
+                    : 'bg-gray-0 border-gray-100'
+                }
                 ${
                   isGrid
-                    ? 'flex flex-col items-center justify-center'
-                    : `w-full min-h-[50px] px-5 text-left flex items-center justify-start gap-3 border py-[14px] ${
-                        isSelected
-                          ? 'bg-primary-10 border-primary-200'
-                          : 'bg-gray-0 border-gray-100'
-                      }`
+                    ? 'flex flex-col items-start justify-center h-[102px] gap-1 px-5 py-[14px]'
+                    : 'w-full min-h-[49px] px-5 flex items-center justify-start gap-[10px] py-[14px]'
                 }
               `}
               >
-                {/* Grid 체크박스 */}
-                {isGrid && (
-                  <div className="absolute top-[10px] right-[9px] z-10">
-                    <CheckCircle isSelected={isSelected} />
-                  </div>
-                )}
-
-                {/* Grid 이미지 */}
-                {isGrid && optionItem.image && (
-                  <img
-                    src={optionItem.image}
-                    alt={value}
-                    className="object-contain"
-                  />
-                )}
-
                 {/* 텍스트 앞 아이콘 */}
-                {!isGrid && optionItem.image && (
+                {optionItem.image && (
                   <img
                     src={optionItem.image}
                     alt="icon"
@@ -120,9 +87,7 @@ export default function OnboardingContent({
                 )}
 
                 {/* 텍스트 */}
-                <div
-                  className={`flex flex-col ${isGrid ? 'items-center' : 'items-start'}`}
-                >
+                <div className="flex flex-col items-start text-left">
                   {/* Label */}
                   {optionItem.label && (
                     <span className={'text-subtitle text-[14px]'}>
@@ -131,17 +96,12 @@ export default function OnboardingContent({
                   )}
 
                   {/* SubLabel */}
-                  {!isGrid && optionItem.subLabel && (
+                  {optionItem.subLabel && (
                     <span className="text-[12px] text-gray-400 text-body mt-0.5 text-left">
                       {optionItem.subLabel}
                     </span>
                   )}
                 </div>
-
-                {/* 선택 시 오버레이 효과 */}
-                {isGrid && isSelected && (
-                  <div className="absolute inset-0 bg-[#6A4FF0]/20 pointer-events-none" />
-                )}
               </button>
             )
           })}
@@ -160,10 +120,8 @@ export default function OnboardingContent({
              }
           `}
           >
-            {/* 텍스트 + 체크박스 */}
             <div className="w-full px-5 py-0 flex items-center justify-between">
               <span className="text-[14px] text-subtitle">Other</span>
-              {isGrid && <CheckCircle isSelected={isEtcSelected} />}
             </div>
 
             {/* 확장 입력 영역 */}

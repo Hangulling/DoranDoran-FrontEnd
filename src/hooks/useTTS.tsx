@@ -5,6 +5,7 @@ import showToast from '../components/common/CommonToast'
 const useTTS = (text: string) => {
   const [playing, setPlaying] = useState(false)
   const playingRef = useRef(false)
+  const stoppedManuallyRef = useRef(false)
 
   // 컴포넌트가 사라질 때(뒤로가기 등) 말하기 중단
   useEffect(() => {
@@ -15,6 +16,7 @@ const useTTS = (text: string) => {
 
   const stopSpeaking = async () => {
     try {
+      stoppedManuallyRef.current = true
       await TextToSpeech.stop()
       setPlaying(false)
       playingRef.current = false
@@ -36,6 +38,7 @@ const useTTS = (text: string) => {
     }
 
     try {
+      stoppedManuallyRef.current = false
       setPlaying(true)
       playingRef.current = true
 
@@ -55,6 +58,10 @@ const useTTS = (text: string) => {
       console.error('TTS Error:', error)
       setPlaying(false)
       playingRef.current = false
+      // 수동 중지
+      if (stoppedManuallyRef.current) {
+        return
+      }
 
       // 에러 발생
       showToast({ message: 'Unable to play audio', iconType: 'error' })
