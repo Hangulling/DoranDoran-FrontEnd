@@ -4,6 +4,8 @@ import { usePasswordResetStore } from '../../stores/usePasswordResetStore'
 import { PASSWORD_REGEX, validatePassword } from '../../utils/validations'
 import { resetPassword } from '../../api'
 import { useNavigate, useOutletContext } from 'react-router-dom'
+import FormIntro from '../../components/common/FormIntro'
+import CommonModal from '../../components/common/CommonModal'
 
 type OutletContext = {
   setSubmit: (fn: () => void) => void
@@ -11,13 +13,16 @@ type OutletContext = {
 }
 
 export default function FindPasswordReset() {
-  const { password, passwordCheck, setPassword, setPasswordCheck } = usePasswordResetStore()
+  const { password, passwordCheck, setPassword, setPasswordCheck } =
+    usePasswordResetStore()
   const { email, code } = usePasswordResetStore()
   const [passwordError, setPasswordError] = useState<string | null>(null)
   const navigate = useNavigate()
+  const [openModal, setOpenModal] = useState(false)
   const { setSubmit, setCanSubmit } = useOutletContext<OutletContext>()
   const pwdFormatError = password.length > 0 && !PASSWORD_REGEX.test(password)
-  const pwdMatchError = passwordCheck.length > 0 && !pwdFormatError && password !== passwordCheck
+  const pwdMatchError =
+    passwordCheck.length > 0 && !pwdFormatError && password !== passwordCheck
 
   const handlePasswordChange = (v: string) => {
     const value = v.replace(/\s+/g, '')
@@ -42,6 +47,8 @@ export default function FindPasswordReset() {
     password === passwordCheck
 
   const handleSubmit = useCallback(async () => {
+    setOpenModal(false)
+
     try {
       const payload = {
         email,
@@ -73,6 +80,9 @@ export default function FindPasswordReset() {
 
   return (
     <div>
+      <FormIntro variant="signup">
+        <p>Create your new password</p>
+      </FormIntro>
       <div className="w-[335px]">
         <Input
           type="password"
@@ -92,12 +102,29 @@ export default function FindPasswordReset() {
           variant={pwdMatchError ? 'error' : 'primary'}
         />
         {passwordError ? (
-          <span className="text-orange-300 text-xs">{passwordError}</span>
+          <span className="text-system-red text-body text-xs">
+            {passwordError}
+          </span>
         ) : (
           password &&
-          passwordCheck && <span className="text-blue-500 text-xs">Passwords match.</span>
+          passwordCheck && (
+            <span className="text-system-blue text-body text-xs">
+              Passwords match.
+            </span>
+          )
         )}
       </div>
+      {openModal && (
+        <CommonModal
+          variant="signup"
+          open
+          title="Password reset complete"
+          confirmText="Start"
+          description="It's all done! Ready to start chatting?"
+          onCancel={() => setOpenModal(false)}
+          onConfirm={handleSubmit}
+        />
+      )}
     </div>
   )
 }

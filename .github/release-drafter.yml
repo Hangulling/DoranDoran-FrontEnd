@@ -46,6 +46,7 @@ version-resolver:
   minor:
     labels:
       - 'feat'
+      - 'chore'
   patch:
     labels:
       - 'fix'

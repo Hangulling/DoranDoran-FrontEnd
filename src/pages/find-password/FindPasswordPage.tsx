@@ -1,8 +1,8 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Button from '../../components/common/Button'
-import StepIndicator from '../../components/account/StepIndicator'
 import { useEffect, useState } from 'react'
 import { usePasswordResetStore } from '../../stores/usePasswordResetStore'
+import ProgressBar from '../../components/common/ProgressBar'
 
 export default function FindPasswordPage() {
   const [label, setLabel] = useState<string | null>(null)
@@ -48,9 +48,10 @@ export default function FindPasswordPage() {
   useEffect(() => {
     reset()
   }, [reset])
+
   return (
     <div className="flex flex-col justify-center items-center">
-      <StepIndicator currentStep={currentStep} totalSteps={3} />
+      <ProgressBar currentStep={currentStep} totalSteps={3} />
 
       <Outlet context={{ setSubmit, setCanSubmit }} />
       <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center">

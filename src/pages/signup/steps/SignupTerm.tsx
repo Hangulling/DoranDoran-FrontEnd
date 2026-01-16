@@ -1,0 +1,35 @@
+import { useOutletContext } from 'react-router-dom'
+import Agreement from '../../../components/common/Agreement'
+import FormIntro from '../../../components/common/FormIntro'
+import { useAgreementStore } from '../../../stores/useAgreementStore'
+import { useEffect } from 'react'
+
+type OutletContext = {
+  setCanSubmit: (v: boolean) => void
+}
+
+export default function SignupTerm() {
+  const agreements = useAgreementStore(s => s.value)
+  const setManyAgreements = useAgreementStore(s => s.setMany)
+  const { setCanSubmit } = useOutletContext<OutletContext>()
+  const requiredAgreed =
+    agreements.service && agreements.privacy && agreements.ageLimit
+
+  useEffect(() => {
+    setCanSubmit(requiredAgreed)
+  }, [requiredAgreed, setCanSubmit])
+
+  return (
+    <div>
+      <FormIntro variant="signup">
+        <p>
+          Nice to meet you :)
+          <p>Please review the terms.</p>
+        </p>
+      </FormIntro>
+      <div className="my-2">
+        <Agreement value={agreements} onChange={setManyAgreements} />
+      </div>
+    </div>
+  )
+}
