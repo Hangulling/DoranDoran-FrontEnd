@@ -11,7 +11,7 @@ import { useFetchChatRooms } from '../hooks/useFetchChatRooms'
 import { useCreateChatRoom } from '../hooks/useCreateChatRoom'
 import { getChatBotIdByConcept } from '../utils/chatbotMap'
 import Carousel from '../components/main/Carousel'
-import Dashboard from '../components/main/DashBoard'
+import Dashboard from '../components/main/Dashboard'
 
 const MainPage = () => {
   const navigate = useNavigate()
