@@ -28,25 +28,27 @@ export default function BottomSheet({
         onClick={closeOnOverlayClick ? onClose : undefined}
       />
 
-      <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl bg-white px-4 pb-[calc(16px+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.14)]">
-        <div className="mx-auto my-6 h-[5px] w-[46px] rounded-full bg-gray-800" />
+      <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center">
+        <div className="w-full max-w-md rounded-t-2xl bg-white px-4 pb-[calc(16px+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.14)] max-h-[60vh] overflow-hidden flex flex-col">
+          <div className="mx-auto my-4 h-[5px] w-[46px] rounded-full bg-gray-800" />
 
-        {(title || description) && (
-          <div className="mb-4 text-center">
-            {title && (
-              <h2 className="text-title text-lg text-gray-800">{title}</h2>
-            )}
-            {description && (
-              <p className="mt-1 text-body text-sm text-gray-600">
-                {description}
-              </p>
-            )}
-          </div>
-        )}
+          {(title || description) && (
+            <div className="mb-3 text-center">
+              {title && (
+                <h2 className="text-title text-lg text-gray-800">{title}</h2>
+              )}
+              {description && (
+                <p className="mt-1 text-body text-sm text-gray-600">
+                  {description}
+                </p>
+              )}
+            </div>
+          )}
 
-        <div className="max-h-[70vh] overflow-y-auto">{children}</div>
+          <div className="flex-1 overflow-y-auto">{children}</div>
 
-        {footer && <div>{footer}</div>}
+          {footer && <div className="pt-3">{footer}</div>}
+        </div>
       </div>
     </>
   )
