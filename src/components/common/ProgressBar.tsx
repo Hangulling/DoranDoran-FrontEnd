@@ -14,14 +14,22 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   return (
     <div className="w-full flex items-center gap-1">
       {steps.map(step => {
-        const isActive = step <= currentStep
+        const isCompleted = step < currentStep
+        const isCurrent = step === currentStep
 
         return (
           <div
             key={step}
-            className={`flex-1 h-1 rounded-full transition-colors duration-300 ease-out
-              ${isActive ? 'bg-primary-300' : 'bg-gray-100'}`}
-          />
+            className="flex-1 h-1 rounded-full bg-gray-100 overflow-hidden relative"
+          >
+            <div
+              className={`h-full bg-primary-300 rounded-full transition-all duration-150 ease-out
+                ${isCompleted ? 'w-full delay-0' : ''} 
+                ${isCurrent ? 'w-1/2 delay-150' : ''} 
+                ${!isCompleted && !isCurrent ? 'w-0 delay-0' : ''}
+              `}
+            />
+          </div>
         )
       })}
     </div>
