@@ -25,7 +25,7 @@ jobs:
 
       - name: Create GoogleService-Info.plist
         run: |
-          echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" > ios/App/App/GoogleService-Info.plist
+          echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" | base64 --decode > ios/App/App/GoogleService-Info.plist
 
       - name: Build Web Assets & Sync Capacitor
         run: |
