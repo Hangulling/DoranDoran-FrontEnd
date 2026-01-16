@@ -2,7 +2,7 @@ default_platform(:ios)
 
 platform :ios do
   desc "Push a new release build to the App Store"
-  lane :release do
+  lane :release do |options|
     # CI 환경 설정
     setup_ci
 
@@ -21,6 +21,12 @@ platform :ios do
       readonly: true,
       api_key: api_key
     )
+		if options[:build_number]
+      increment_build_number(
+        build_number: options[:build_number],
+        xcodeproj: "App/App.xcodeproj"
+      )
+    end
 
 		# Xcode의 자동 서명을 끄고 수동 서명으로 변경
 		update_code_signing_settings(
