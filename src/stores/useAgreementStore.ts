@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type TermId = 'service' | 'privacy' | 'marketing'
+export type TermId = 'service' | 'privacy' | 'ageLimit' | 'marketing'
 export type AgreementValue = Record<TermId, boolean>
 
 interface State {
@@ -15,12 +15,33 @@ interface State {
 export const useAgreementStore = create<State>()(
   persist(
     set => ({
-      value: { service: false, privacy: false, marketing: false },
-      setOne: (id, checked) => set(s => ({ value: { ...s.value, [id]: checked } })),
+      value: {
+        service: false,
+        privacy: false,
+        ageLimit: false,
+        marketing: false,
+      },
+      setOne: (id, checked) =>
+        set(s => ({ value: { ...s.value, [id]: checked } })),
       setAll: checked =>
-        set(() => ({ value: { service: checked, privacy: checked, marketing: checked } })),
+        set(() => ({
+          value: {
+            service: checked,
+            privacy: checked,
+            ageLimit: checked,
+            marketing: checked,
+          },
+        })),
       setMany: next => set(() => ({ value: next })),
-      reset: () => set(() => ({ value: { service: false, privacy: false, marketing: false } })),
+      reset: () =>
+        set(() => ({
+          value: {
+            service: false,
+            privacy: false,
+            ageLimit: false,
+            marketing: false,
+          },
+        })),
     }),
     { name: 'agreement' }
   )
