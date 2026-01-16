@@ -14,15 +14,8 @@ type OutletContext = {
 }
 
 export default function FindEmailQuestion() {
-  const {
-    firstName,
-    lastName,
-    birthDate,
-    identityQuestion,
-    answer,
-    setMany,
-    reset: resetForm,
-  } = useFindEmailStore()
+  const { firstName, lastName, birthDate, identityQuestion, answer, setMany } =
+    useFindEmailStore()
   const [answerError, setAnswerError] = useState<string | null>(null)
   const { setSubmit, setCanSubmit } = useOutletContext<OutletContext>()
   const navigate = useNavigate()
