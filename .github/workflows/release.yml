@@ -38,7 +38,7 @@ jobs:
       # 변경된 package.json, CHANGELOG.md, 그리고 새 태그를 원격 저장소에 푸시
       - name: Push Version Commit and Tag
         run: |
-          git push --follow-tags origin main-
+          git push --follow-tags origin main
 
       # 릴리즈 게시
       - name: Publish Release
