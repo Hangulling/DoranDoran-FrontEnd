@@ -15,10 +15,6 @@ const ChatRoomList = ({
   chatMsg,
   onRoomClick,
 }: ChatRoomListProps) => {
-  const handleManagerClick = () => {
-    console.log('매니저 클릭')
-  }
-
   return (
     <div className="flex w-full flex-col">
       {isLoading ? (
@@ -35,7 +31,10 @@ const ChatRoomList = ({
             </React.Fragment>
           ))}
 
-          <ChatRoomItem room={MANAGER_ROOM} onClick={handleManagerClick} />
+          <ChatRoomItem
+            room={MANAGER_ROOM}
+            onClick={(id, name) => onRoomClick(Number(id), name)}
+          />
         </>
       )}
     </div>

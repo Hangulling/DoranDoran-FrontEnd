@@ -15,7 +15,7 @@ const getStatusMessage = (diffDays: number | undefined): string => {
 export const useFetchChatRooms = (userId: string) => {
   const navigate = useNavigate()
   const [chatMsg, setChatMsg] = useState<ChatRoomWithMessage[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     if (!userId) return

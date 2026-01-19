@@ -13,6 +13,7 @@ import { getChatBotIdByConcept } from '../utils/chatbotMap'
 import Carousel from '../components/main/Carousel'
 import Dashboard from '../components/main/Dashboard'
 import InstaContent from '../components/main/InstaContent'
+import { MANAGER_ROOM } from '../constants/mainData'
 
 const MainPage = () => {
   const navigate = useNavigate()
@@ -45,6 +46,17 @@ const MainPage = () => {
   }
 
   const handleRoomClick = (id: number, roomName: string) => {
+    if (id === MANAGER_ROOM.roomRouteId) {
+      navigate(`/chat/${id}`, {
+        state: {
+          roomRouteId: id,
+          concept: roomName,
+          closeness: 0,
+        },
+      })
+      return
+    }
+
     setSelectedRoom({ id, name: roomName })
     setIsSheetOpen(true)
   }
@@ -84,10 +96,10 @@ const MainPage = () => {
       try {
         // 웹뷰를 상태바 밑으로 확장
         await StatusBar.setOverlaysWebView({ overlay: true })
-        // 상태바 배경색을 투명으로 설정 (Android 필수)
+        // 상태바 배경색을 투명으로 설정
         await StatusBar.setBackgroundColor({ color: 'transparent' })
-        // 상태바 아이콘 색상 (이미지가 밝으면 Dark, 어두우면 Light)
-        await StatusBar.setStyle({ style: Style.Dark })
+        // 상태바 아이콘 색상
+        await StatusBar.setStyle({ style: Style.Light })
       } catch (e) {
         console.log('StatusBar error', e)
       }
@@ -120,7 +132,7 @@ const MainPage = () => {
       <div className="px-5 relative z-20">
         {/* 카드의 정중앙이 캐러셀 밑변 */}
         <div className="-mt-[33px]">
-          <Dashboard days={10} savedCount={5} />
+          <Dashboard />
         </div>
       </div>
 
