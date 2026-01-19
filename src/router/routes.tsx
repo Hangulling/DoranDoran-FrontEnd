@@ -15,10 +15,13 @@ import SignupBirthDate from '../pages/signup/steps/SignupBirthDate'
 import FindEmailName from '../pages/find-email/steps/FindEmailName'
 import FindEmailBirthDate from '../pages/find-email/steps/FindEmailBirthDate'
 import FindEmailQuestion from '../pages/find-email/steps/FindEmailQuestion'
+import LoginEmailPage from '../pages/LoginEmailPage'
+import ProfilePage from '../pages/ProfilePage'
 
 const MainPage = lazy(() => import('../pages/MainPage'))
 const SignupPage = lazy(() => import('../pages/signup/SignupPage'))
 const LoginPage = lazy(() => import('../pages/LoginPage'))
+const MyPage = lazy(() => import('../pages/MyPage'))
 const ChatPage = lazy(() => import('../pages/ChatPage'))
 const ArchivePage = lazy(() => import('../pages/ArchivePage'))
 const PolicyPage = lazy(() => import('../pages/PolicyPage'))
@@ -42,7 +45,11 @@ export function Routes() {
         <Route path="question" element={<SignupQuestion />} />
       </Route>
       <Route path="/login" element={<LoginPage />} />
-
+      <Route path="/login/email" element={<LoginEmailPage />} />
+      <Route path="/mypage">
+        <Route index element={<MyPage />} />
+        <Route path="profile" element={<ProfilePage />} />
+      </Route>
       <Route
         path="/"
         element={
@@ -75,6 +82,7 @@ export function Routes() {
           </PrivateRoute>
         }
       />
+
       <Route path="/policy/:id" element={<PolicyPage />} />
       <Route path="/find-email" element={<FindEmailPage />}>
         <Route index element={<Navigate to="name" replace />} />
