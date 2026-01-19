@@ -7,6 +7,7 @@ import { getClosenessAsText } from '../../utils/conceptMap'
 
 interface ChatHeaderProps {
   title: string
+  avatar?: string
   closenessLevel?: number
   onBack?: () => void
   onSettingClick?: () => void
@@ -14,6 +15,7 @@ interface ChatHeaderProps {
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
   title,
+  avatar,
   closenessLevel,
   onBack,
   onSettingClick,
@@ -36,7 +38,15 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           <LeftArrowIcon className="text-gray-600" />
         </button>
 
-        <div className="flex flex-col items-start">
+        <div className="w-10 h-10 rounded-[12px] overflow-hidden shrink-0 mr-[2px]">
+          <img
+            src={avatar}
+            alt={title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        <div className="flex flex-col items-start justify-center">
           <h1 className="text-title text-[16px]">{capitalizeName(title)}</h1>
           {closenessLevel !== undefined && (
             <div className="flex text-[12px] text-primary-400">
