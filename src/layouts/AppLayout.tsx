@@ -13,6 +13,7 @@ interface AppLayoutProps {
 const pageTitles: Record<string, string> = {
   '/': '',
   '/signup': 'Sign Up',
+  '/login/email': 'Continue with Email',
   '/archive': 'Archive',
 }
 
@@ -47,11 +48,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     /^\/onboarding(?:\/|$)/,
     /^\/find-email(?:\/|$)/,
     /^\/find-password(?:\/|$)/,
+    /^\/mypage(?:\/|$)/,
   ]
   const isKnownPath = knownPatterns.some(rx => rx.test(pathname))
   const isUnknownPath = !isKnownPath
 
-  const skipNavPaths = ['/login', '/error', '/onboarding', '/chat']
+  const skipNavPaths = ['/error', '/onboarding', '/chat']
 
   // 로그인 필요없는 페이지
   const isPublicPage =
@@ -90,10 +92,19 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const hideNavBar =
     skipNavPaths.some(p => pathname.startsWith(p)) ||
     isUnknownPath ||
-    (pathname.startsWith('/error') && state?.from === 'signup')
+    (pathname.startsWith('/error') && state?.from === 'signup') ||
+    pathname === '/login'
 
   // navbar 상단 고정 경로
-  const topNavPaths = ['/signup', '/find-email', '/find-password', '/archive']
+  const topNavPaths = [
+    '/signup',
+    '/login/email',
+    '/find-email',
+    '/find-password',
+    '/archive',
+    '/mypage/profile',
+  ]
+
   const isTopNav = topNavPaths.some(path => pathname.startsWith(path))
 
   // 친밀도 바(채팅에서만)
@@ -130,6 +141,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     title = 'Reset Password'
   } else if (pathname.startsWith('/signup')) {
     title = 'Sign Up'
+  } else if (pathname.startsWith('/login')) {
+    title = pathname === '/login' ? '' : 'Continue with Email'
+  } else if (pathname.startsWith('/mypage')) {
+    title = pathname === '/mypage' ? '' : 'My Profile'
   } else {
     title = pageTitles[pathname] || '페이지'
   }
