@@ -4,7 +4,9 @@
 @plugin "daisyui";
 
 @theme {
-  --font-family-sans: 'Noto Sans', 'Noto Sans KR', sans-serif;
+  --font-family-sans:
+    'Noto Sans', 'Noto Sans KR', 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', sans-serif;
 
   --color-gray-0: #ffffff;
   --color-gray-10: #fafafa;
