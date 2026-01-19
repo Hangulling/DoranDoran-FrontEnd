@@ -5,8 +5,8 @@ interface LastLoginBubbleProps {
 }
 
 const positionMap: Record<Provider, string> = {
-  google: 'absolute bottom-12 right-10',
-  email: 'absolute  bottom-12 right-10',
+  google: 'absolute bottom-12 right-6',
+  email: 'absolute  bottom-12 right-6',
 }
 
 export default function LastLoginBubble({ provider }: LastLoginBubbleProps) {
@@ -15,9 +15,9 @@ export default function LastLoginBubble({ provider }: LastLoginBubbleProps) {
       <div className="relative bg-gray-900/90 text-center text-white text-xs px-2 py-1 rounded-[13px]">
         Last login
         <span
-          className="absolute left-5 -translate-x-1/2 -bottom-[5px] w-0 h-0
-            border-l-[6px] border-l-transparent
-            border-r-[6px] border-r-transparent
+          className="absolute right-3 -translate-x-1/2 -bottom-[5px] w-0 h-0
+            border-l-[1px] border-l-transparent
+            border-r-[15px] border-r-transparent
             border-t-[6px] border-t-[#0F1010]/90
           "
         />

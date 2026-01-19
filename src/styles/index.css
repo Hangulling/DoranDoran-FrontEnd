@@ -4,11 +4,14 @@
 @plugin "daisyui";
 
 @theme {
-  --font-family-sans: 'Noto Sans', 'Noto Sans KR', sans-serif;
+  --font-family-sans:
+    'Noto Sans', 'Noto Sans KR', 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', sans-serif;
 
   --color-gray-0: #ffffff;
   --color-gray-10: #fafafa;
   --color-gray-50: #f7f7f8;
+  --color-gray-80: #e6e5e6;
   --color-gray-100: #dedddf;
   --color-gray-200: #c4c3c6;
   --color-gray-300: #aba9ad;
@@ -135,4 +138,13 @@
 
 .toast-slide-fade-in {
   animation: slideInFadeIn 0.4s ease-out forwards;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

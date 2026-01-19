@@ -12,6 +12,8 @@ import { useCreateChatRoom } from '../hooks/useCreateChatRoom'
 import { getChatBotIdByConcept } from '../utils/chatbotMap'
 import Carousel from '../components/main/Carousel'
 import Dashboard from '../components/main/Dashboard'
+import InstaContent from '../components/main/InstaContent'
+import { MANAGER_ROOM } from '../constants/mainData'
 
 const MainPage = () => {
   const navigate = useNavigate()
@@ -39,7 +41,22 @@ const MainPage = () => {
     }
   }, [location])
 
+  const handleCardClick = (id: number) => {
+    console.log(`카드 ${id} 클릭됨`)
+  }
+
   const handleRoomClick = (id: number, roomName: string) => {
+    if (id === MANAGER_ROOM.roomRouteId) {
+      navigate(`/chat/${id}`, {
+        state: {
+          roomRouteId: id,
+          concept: roomName,
+          closeness: 0,
+        },
+      })
+      return
+    }
+
     setSelectedRoom({ id, name: roomName })
     setIsSheetOpen(true)
   }
@@ -79,10 +96,10 @@ const MainPage = () => {
       try {
         // 웹뷰를 상태바 밑으로 확장
         await StatusBar.setOverlaysWebView({ overlay: true })
-        // 상태바 배경색을 투명으로 설정 (Android 필수)
+        // 상태바 배경색을 투명으로 설정
         await StatusBar.setBackgroundColor({ color: 'transparent' })
-        // 상태바 아이콘 색상 (이미지가 밝으면 Dark, 어두우면 Light)
-        await StatusBar.setStyle({ style: Style.Dark })
+        // 상태바 아이콘 색상
+        await StatusBar.setStyle({ style: Style.Light })
       } catch (e) {
         console.log('StatusBar error', e)
       }
@@ -115,11 +132,11 @@ const MainPage = () => {
       <div className="px-5 relative z-20">
         {/* 카드의 정중앙이 캐러셀 밑변 */}
         <div className="-mt-[33px]">
-          <Dashboard days={10} savedCount={5} />
+          <Dashboard />
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-5 mt-8">
+      <div className="max-w-md mx-auto px-5 my-8">
         <div className="text-title mb-2 text-[18px]">Chatting Room</div>
 
         <ChatRoomList
@@ -128,6 +145,13 @@ const MainPage = () => {
           onRoomClick={handleRoomClick}
         />
       </div>
+
+      <section className="max-w-md mx-auto ml-5 mb-[77px]">
+        <div className="text-title mb-3 mr-5 text-[18px]">
+          Koach Pick K - contents
+        </div>
+        <InstaContent onCardClick={handleCardClick} />
+      </section>
 
       <ClosenessSheet
         isOpen={isSheetOpen}

@@ -222,8 +222,6 @@ export const useChatInteraction = ({
     ]
   )
 
-  // SSE 스트림 훅 호출
-
   useChatStream<EventDataMap>(
     chatroomId ?? '',
     userId,

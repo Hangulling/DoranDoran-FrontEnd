@@ -26,6 +26,7 @@ interface ChatMessageItemProps {
     feedbackKo: string,
     feedbackEn: string
   ) => void
+  onReport: (messageId: string) => void
 }
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
@@ -37,6 +38,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
     isTranslationEnabled,
     onChatBubbleBookmark,
     onCorrectionBubbleBookmark,
+    onReport,
   }) => {
     const [showDescription, setShowDescription] = useState(true)
     const [showFeedback, setShowFeedback] = useState(true)
@@ -112,6 +114,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
             }
             isBookActive={showDescription}
             onBookToggle={() => setShowDescription(prev => !prev)}
+            onReport={() => onReport(msg.id)}
           />
         </div>
 
@@ -164,6 +167,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
                       msg.correction!.feedback.en
                     )
                   }
+                  onReport={() => onReport(msg.id)}
                 />
               )
             ) : null)

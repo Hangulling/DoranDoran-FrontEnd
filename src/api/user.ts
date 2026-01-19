@@ -1,4 +1,10 @@
-import type { User, CreatePayload, UpdatePayload, UserStatus, EmailPayload } from '../types/user'
+import type {
+  User,
+  CreatePayload,
+  UpdatePayload,
+  UserStatus,
+  EmailPayload,
+} from '../types/user'
 import api, { publicApi } from './api'
 import { USER_ENDPOINTS } from './endpoints'
 
@@ -28,23 +34,83 @@ export const getUserByEmail = async (email: string): Promise<User> => {
 }
 
 // 정보 업데이트
-export const updateUser = async (userId: string, payload: UpdatePayload): Promise<User> => {
+export const updateUser = async (
+  userId: string,
+  payload: UpdatePayload
+): Promise<User> => {
   const response = await api.put<User>(USER_ENDPOINTS.UPDATE(userId), payload)
   return response.data
 }
 
 // 상태 변경
-export const updateStatus = async (userId: string, status: UserStatus): Promise<void> => {
+export const updateStatus = async (
+  userId: string,
+  status: UserStatus
+): Promise<void> => {
   await api.patch(USER_ENDPOINTS.UPDATE_STATUS(userId), null, {
     params: { status },
   })
 }
 
 // 온보딩 상태 업데이트
-export const updateOnboarding = async (userId: string, isOnboard: boolean): Promise<void> => {
+export const updateOnboarding = async (
+  userId: string,
+  isOnboard: boolean
+): Promise<void> => {
   await api.patch(USER_ENDPOINTS.UPDATE_ONBOARDING(userId), {
     isOnboard,
   })
+}
+
+// 문의용 이메일 조회
+export const getUserEmailForSupport = async (
+  userId: string
+): Promise<string> => {
+  const response = await api.get(USER_ENDPOINTS.GET_EMAIL(userId))
+  return response.data.data
+}
+
+// 관심 주제 조회
+export const getUserInterests = async (userId: string) => {
+  const response = await api.get(USER_ENDPOINTS.GET_INTERESTS(userId))
+  return response.data
+}
+
+// 관심 주제 저장
+export const updateInterests = async (userId: string, topicKeys: string[]) => {
+  const response = await api.put(USER_ENDPOINTS.UPDATE_INTERESTS(userId), {
+    topicKeys,
+  })
+  return response.data
+}
+
+// 알림 설정 조회
+export const getNotificationSetting = async (userId: string) => {
+  const response = await api.get(USER_ENDPOINTS.GET_NOTIFICATIONS(userId))
+  return response.data
+}
+
+// 알림 설정 변경
+export const updateNotificationSetting = async (
+  userId: string,
+  pushEnabled: boolean
+) => {
+  const response = await api.put(USER_ENDPOINTS.UPDATE_NOTIFICATIONS(userId), {
+    pushEnabled,
+  })
+  return response.data
+}
+
+// 통계 조회
+export const getUserStats = async (userId: string) => {
+  const response = await api.get(USER_ENDPOINTS.GET_STATS(userId))
+  return response.data
+}
+
+// 퍼펙트 증가
+export const increasePerfectCount = async (userId: string) => {
+  const response = await api.post(USER_ENDPOINTS.INCREASE_PERFECT(userId))
+  return response.data
 }
 
 // 비밀번호 재설정
