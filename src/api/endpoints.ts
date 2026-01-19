@@ -12,6 +12,9 @@ export const USER_ENDPOINTS = {
   GET_BY_ID: (userId: string) => `/api/users/${userId}`,
   GET_BY_EMAIL: (email: string) => `/api/users/email/${email}`,
 
+  // 문의용 사용자 이메일 조회
+  GET_EMAIL: (userId: string) => `/api/users/${userId}/email`,
+
   // 이메일 중복 확인
   CHECK_EMAIL: (email: string) => `/api/users/check-email/${email}`,
 
@@ -26,6 +29,25 @@ export const USER_ENDPOINTS = {
 
   // 온보딩 확인 업데이트
   UPDATE_ONBOARDING: (userId: string) => `/api/users/${userId}/onboard`,
+
+  // 관심 주제 조회
+  GET_INTERESTS: (userId: string) => `/api/users/${userId}/interests`,
+
+  // 관심 주제 수정
+  UPDATE_INTERESTS: (userId: string) => `/api/users/${userId}/interests`,
+
+  // 알림 설정 조회
+  GET_NOTIFICATIONS: (userId: string) => `/api/users/${userId}/notifications`,
+
+  // 알림 설정 변경
+  UPDATE_NOTIFICATIONS: (userId: string) =>
+    `/api/users/${userId}/notifications`,
+
+  // 대시보드 상태 조회
+  GET_STATS: (userId: string) => `/api/users/${userId}/stats`,
+
+  // 퍼펙트 증가
+  INCREASE_PERFECT: (userId: string) => `/api/users/${userId}/stats/perfect`,
 
   // 비밀번호 재설정
   PASSWORD_RESET: '/api/users/password/reset',
@@ -91,7 +113,12 @@ export const CHAT_ENDPOINTS = {
   CHATROOM_LIST_LIMITED: '/api/chat/chatrooms/all',
 
   // 메시지 목록 조회
-  MESSAGES_LIST: (chatroomId: string, userId?: string, page: number = 0, size: number = 50) => {
+  MESSAGES_LIST: (
+    chatroomId: string,
+    userId?: string,
+    page: number = 0,
+    size: number = 50
+  ) => {
     const params = new URLSearchParams()
     if (userId) params.append('userId', userId)
     params.append('page', page.toString())
@@ -100,18 +127,20 @@ export const CHAT_ENDPOINTS = {
   },
 
   // 메시지 전송
-  SEND_MESSAGE: (chatroomId: string) => `/api/chat/chatrooms/${chatroomId}/messages`,
+  SEND_MESSAGE: (chatroomId: string) =>
+    `/api/chat/chatrooms/${chatroomId}/messages`,
+
+  // 메시지 전송 취소
+  CANCEL_MESSAGE: (chatroomId: string, messageId: string) =>
+    `/api/chat/chatrooms/${chatroomId}/messages/${messageId}/cancel`,
 
   // 친밀도 업데이트
-  UPDATE_INTIMACY_LEVEL: (chatroomId: string) => `/api/chat/chatrooms/${chatroomId}/intimacy`,
+  UPDATE_INTIMACY_LEVEL: (chatroomId: string) =>
+    `/api/chat/chatrooms/${chatroomId}/intimacy`,
 
   // 채팅방 나가기 (소프트 삭제)
   LEAVE_CHATROOM: (chatroomId: string, userId: string) =>
     `/api/chat/chatrooms/${chatroomId}/leave?userId=${userId}`,
-
-  // WebSocket 채팅 연결
-  WEBSOCKET_CHAT: (chatroomId: string, userId?: string) =>
-    `/ws/chat/${chatroomId}${userId ? `?userId=${userId}` : ''}`,
 
   // SSE
   MESSAGE_STREAM: (chatroomId: string, userId?: string) =>
@@ -143,7 +172,11 @@ export const BOOKMARK_ENDPOINTS = {
   },
 
   // 봇타입 별 커서기반 조회
-  LIST_CURSOR_BY_BOTTYPE: (botType: BotType, lastId?: string, size: number = 15) => {
+  LIST_CURSOR_BY_BOTTYPE: (
+    botType: BotType,
+    lastId?: string,
+    size: number = 15
+  ) => {
     const params = new URLSearchParams()
     if (lastId) params.append('lastId', lastId)
     if (size) params.append('size', String(size))
@@ -152,7 +185,11 @@ export const BOOKMARK_ENDPOINTS = {
   },
 
   // 방별 커서기반 조회
-  LIST_CURSOR_BY_CHATROOM: (chatroomId: string, lastId?: string, size: number = 15) => {
+  LIST_CURSOR_BY_CHATROOM: (
+    chatroomId: string,
+    lastId?: string,
+    size: number = 15
+  ) => {
     const params = new URLSearchParams()
     if (lastId) params.append('lastId', lastId)
     params.append('size', String(size))
@@ -165,7 +202,8 @@ export const BOOKMARK_ENDPOINTS = {
     `/api/store/bookmarks/page?page=${page}&size=${size}&sort=${sort}`,
 
   // 챗봇 타입별 북마크 조회
-  LIST_BY_BOT_TYPE: (botType: BotType) => `/api/store/bookmarks/bot-type/${botType}`,
+  LIST_BY_BOT_TYPE: (botType: BotType) =>
+    `/api/store/bookmarks/bot-type/${botType}`,
 
   // 북마크 개수 조회
   COUNT: '/api/store/bookmarks/count',
@@ -177,5 +215,30 @@ export const BOOKMARK_ENDPOINTS = {
   DELETE_MANY: '/api/store/bookmarks',
 
   // 방별 보관함 조회 (새로고침 시 사용)
-  LIST_BY_CHATROOMID: (chatroomId: string) => `/api/store/bookmarks/chatroom/${chatroomId}`,
+  LIST_BY_CHATROOMID: (chatroomId: string) =>
+    `/api/store/bookmarks/chatroom/${chatroomId}`,
+}
+
+// Home endpoints
+export const HOME_ENDPOINTS = {
+  // 게시글 목록 조회
+  GET_POSTS: '/api/home/posts',
+  // 게시글 상세 조회
+  GET_POST_DETAIL: (externalId: string) => `/api/home/posts/${externalId}`,
+}
+
+// Support endpoints
+export const SUPPORT_ENDPOINTS = {
+  // 문의/신고 생성
+  CREATE: '/api/support',
+}
+
+// Notification endpoints
+export const NOTIFICATION_ENDPOINTS = {
+  // FCM 토큰 등록
+  REGISTER: '/api/notifications/register',
+  // 푸시 발송 (내부 테스트용 등)
+  SEND: '/api/notifications/send',
+  // 푸시 로그 조회
+  LOGS: (userId: string) => `/api/notifications/logs?userId=${userId}`,
 }
