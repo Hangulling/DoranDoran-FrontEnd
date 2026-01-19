@@ -19,6 +19,7 @@ export interface User {
   firstName: string
   lastName: string
   name: string
+  birthDate: string
   passwordHash: string
   picture: string
   info: string
