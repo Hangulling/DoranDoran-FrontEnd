@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App.tsx'
 import './styles/index.css'
 import React from 'react'
-import ReactGA from 'react-ga4'
 import MaintenancePage from './pages/MaintenancePage.tsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { GoogleOAuthProvider } from '@react-oauth/google'
@@ -12,8 +11,6 @@ import { isNativeApp } from './utils/isNativeApp.ts'
 import { SocialLogin } from '@capgo/capacitor-social-login'
 
 const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
-const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID
-const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
 
 const urlParams = new URLSearchParams(window.location.search)
 const paramInternal = urlParams.get('internal') === 'true'
@@ -30,31 +27,6 @@ if (isNativeApp()) {
 
 if (paramInternal) {
   sessionStorage.setItem('isInternalTraffic', 'true')
-}
-
-// 페이지뷰 자동 수집 제거
-if (import.meta.env.PROD && GA_TRACKING_ID && GA_ENABLED) {
-  const isInternal = sessionStorage.getItem('isInternalTraffic') === 'true'
-
-  const gaConfigOptions: { traffic_type?: string; send_page_view: boolean } = {
-    send_page_view: false,
-  }
-
-  if (isInternal) {
-    gaConfigOptions.traffic_type = 'internal'
-  }
-
-  ReactGA.initialize(GA_TRACKING_ID, {
-    gtagOptions: gaConfigOptions,
-  })
-
-  console.log(
-    isInternal
-      ? '[GA] Production GA Initialized (Internal Traffic)'
-      : '[GA] Production GA Initialized'
-  )
-} else {
-  console.warn('[GA] GA not initialized (Disabled, Dev mode, or no Tracking ID)')
 }
 
 const isDev = import.meta.env.DEV
