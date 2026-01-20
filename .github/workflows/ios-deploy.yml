@@ -41,6 +41,13 @@ jobs:
           npm run build
           npx cap sync ios
 
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
+
+      - name: Pod install (repo update)
+        working-directory: ios/App
+        run: pod install --repo-update
+
       - name: Install xcodeproj gem
         run: gem install xcodeproj
 
