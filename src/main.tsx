@@ -19,8 +19,6 @@ if (isNativeApp()) {
   SocialLogin.initialize({
     google: {
       webClientId: GOOGLE_CLIENT_ID,
-      iOSClientId: GOOGLE_CLIENT_ID,
-      iOSServerClientId: GOOGLE_CLIENT_ID,
     },
   })
 }
