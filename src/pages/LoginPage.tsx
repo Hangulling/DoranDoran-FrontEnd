@@ -72,6 +72,15 @@ export default function LoginPage() {
     return { type: 'both', msg: 'Email error + Password error' }
   }
 
+  const stringifyError = (e: unknown) => {
+    try {
+      if (e instanceof Error) return `${e.name}: ${e.message}`
+      return JSON.stringify(e)
+    } catch {
+      return String(e)
+    }
+  }
+
   const handleGoogleNativeLogin = async () => {
     if (!isNativeApp()) return
 
@@ -96,11 +105,13 @@ export default function LoginPage() {
         const user = res.data.user
         setStoreId(user.id)
         setStoreName(user.name)
+        localStorage.setItem('last_login', 'google')
         navigate(user.isOnboard ? '/' : '/onboarding')
       }
     } catch (err) {
+      const msg = stringifyError(err)
       console.error('네이티브 로그인 실패', err)
-      alert('네이티브 Google 로그인 실패')
+      alert(`네이티브 Google 로그인 실패\n${msg}`)
     }
   }
 
