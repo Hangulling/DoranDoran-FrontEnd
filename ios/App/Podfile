@@ -20,6 +20,9 @@ end
 target 'App' do
   capacitor_pods
   # Add your Pods here
+  pod 'FirebaseCore'
+  pod 'FirebaseAuth'
+  pod 'GoogleSignIn'
 end
 
 post_install do |installer|
