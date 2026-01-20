@@ -111,7 +111,7 @@ export default function LoginPage() {
     } catch (err) {
       const msg = stringifyError(err)
       console.error('네이티브 로그인 실패', err)
-      alert(`네이티브 Google 로그인 실패\n${msg}`)
+      alert(`Google 로그인 실패 \n ${msg}`)
     }
   }
 
