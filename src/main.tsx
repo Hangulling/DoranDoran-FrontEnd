@@ -10,6 +10,32 @@ import { isNativeApp } from './utils/isNativeApp.ts'
 import { SocialLogin } from '@capgo/capacitor-social-login'
 import { GOOGLE_WEB_CLIENT_ID, GOOGLE_IOS_CLIENT_ID } from './constants/env'
 
+window.onerror = function (
+  msg: string | Event,
+  src?: string,
+  line?: number,
+  col?: number,
+  err?: unknown
+) {
+  const stack = err instanceof Error ? (err.stack ?? '') : ''
+  alert(
+    `JS Error:\n${String(msg)}\n${String(src)}:${String(line)}:${String(
+      col
+    )}\n${stack}`
+  )
+  return false
+}
+
+window.onunhandledrejection = function (e: PromiseRejectionEvent) {
+  const reason = e.reason as unknown
+  const message =
+    reason instanceof Error
+      ? `${reason.message}\n${reason.stack ?? ''}`
+      : String(reason)
+
+  alert(`Promise Error:\n${message}`)
+}
+
 const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 
 const urlParams = new URLSearchParams(window.location.search)
@@ -18,13 +44,26 @@ const paramInternal = urlParams.get('internal') === 'true'
 const isNative = isNativeApp()
 
 if (isNative) {
-  SocialLogin.initialize({
-    google: {
-      webClientId: GOOGLE_WEB_CLIENT_ID,
-      iOSClientId: GOOGLE_IOS_CLIENT_ID,
-      iOSServerClientId: GOOGLE_WEB_CLIENT_ID,
-    },
-  })
+  if (!GOOGLE_WEB_CLIENT_ID || !GOOGLE_IOS_CLIENT_ID) {
+    alert(
+      `Google Client ID missing\nweb=${String(
+        GOOGLE_WEB_CLIENT_ID
+      )}\nios=${String(GOOGLE_IOS_CLIENT_ID)}`
+    )
+  } else {
+    try {
+      SocialLogin.initialize({
+        google: {
+          webClientId: GOOGLE_WEB_CLIENT_ID,
+          iOSClientId: GOOGLE_IOS_CLIENT_ID,
+          iOSServerClientId: GOOGLE_WEB_CLIENT_ID,
+        },
+      })
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e)
+      alert(`SocialLogin init failed: ${message}`)
+    }
+  }
 }
 
 if (paramInternal) {
