@@ -29,6 +29,7 @@ export default function LoginPage() {
   const setStoreName = useUserStore(s => s.setName)
 
   const googleLoginContainerRef = useRef<HTMLDivElement | null>(null)
+  const isNative = isNativeApp()
 
   // 페이지 뷰
   useEffect(() => {
@@ -287,26 +288,27 @@ export default function LoginPage() {
             {lastLogin === 'email' && <LastLoginBubble provider="email" />}
           </div>
 
-          <div ref={googleLoginContainerRef} className="hidden">
-            <GoogleLogin
-              onSuccess={handleOAuthSuccess}
-              onError={handleOAuthError}
-              useOneTap={false}
-              theme="outline"
-              size="large"
-              text="signup_with"
-              shape="rectangular"
-              width="100%"
-              locale="en"
-            />
-          </div>
+          {!isNative && (
+            <div ref={googleLoginContainerRef} className="hidden">
+              <GoogleLogin
+                onSuccess={handleOAuthSuccess}
+                onError={handleOAuthError}
+                useOneTap={false}
+                theme="outline"
+                size="large"
+                text="signup_with"
+                shape="rectangular"
+                width="100%"
+                locale="en"
+              />
+            </div>
+          )}
 
           <div className="relative mt-4 w-full">
             <GoogleLoginButton
-              onClick={() => {
-                if (isNativeApp()) handleGoogleNativeLogin()
-                else handleCustomGoogleClick()
-              }}
+              onClick={() =>
+                isNative ? handleGoogleNativeLogin() : handleCustomGoogleClick()
+              }
             />
 
             {lastLogin === 'google' && <LastLoginBubble provider="google" />}
