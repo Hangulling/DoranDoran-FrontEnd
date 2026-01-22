@@ -38,6 +38,8 @@ export interface EnrichedMessage extends Message {
   analysisState?: 'pending' | 'complete' // 교정 데이터 로딩
   bookmarkId?: string | null
   isSendFailed?: boolean
+  isCancelled?: boolean
+  targetUserMsgId?: string | null
 }
 
 const chatBotIdByRoom = (conceptValue: string): string => {
@@ -153,6 +155,7 @@ const ChatPage: React.FC = () => {
       chatroomId,
       userId,
       routeId: id,
+      enableGuard: !isManagerRoom,
     })
 
   const { inactivityError, resetInactivityTimer, stopInactivityTimer } =
@@ -178,6 +181,8 @@ const ChatPage: React.FC = () => {
     sendError,
     handleSendMessage,
     handleRetry,
+    handleCancel,
+    handleResend,
   } = useChatInteraction({
     chatroomId,
     userId,
@@ -205,7 +210,6 @@ const ChatPage: React.FC = () => {
       setIsHistoryLoading(false)
       setIsInitChatReady(true)
       // 매니저 초기 메시지 설정
-      // setMessages([{ id: 'm1', text: MANAGER_ROOM.message, isSender: false, ... }])
     }
   }, [isManagerRoom])
 
@@ -307,7 +311,7 @@ const ChatPage: React.FC = () => {
         title={room?.roomName || 'Chat'}
         avatar={room?.avatar}
         closenessLevel={isManagerRoom ? undefined : closenessLevel}
-        onBack={isManagerRoom ? () => navigate(-1) : handleGoBack}
+        onBack={isManagerRoom ? () => navigate('/') : handleGoBack}
         onSettingClick={isManagerRoom ? undefined : openSettings}
       />
 
@@ -337,6 +341,7 @@ const ChatPage: React.FC = () => {
           onChatBubbleBookmark={handleChatBubbleBookmark}
           onCorrectionBubbleBookmark={handleCorrectionBubbleBookmark}
           onReport={handleOpenReport}
+          onResend={handleResend}
         />
       </div>
 
@@ -346,6 +351,8 @@ const ChatPage: React.FC = () => {
             inputRef={inputRef}
             onSendMessage={handleSendMessage}
             disabled={isHistoryLoading || !isInitChatReady || isAiResponding}
+            isAiResponding={isAiResponding}
+            onCancel={handleCancel}
           />
         )}
       </footer>

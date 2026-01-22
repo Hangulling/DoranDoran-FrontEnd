@@ -49,6 +49,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     /^\/find-email(?:\/|$)/,
     /^\/find-password(?:\/|$)/,
     /^\/mypage(?:\/|$)/,
+    /^\/insta(?:\/|$)/,
   ]
   const isKnownPath = knownPatterns.some(rx => rx.test(pathname))
   const isUnknownPath = !isKnownPath
@@ -103,13 +104,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     '/find-password',
     '/archive',
     '/mypage/profile',
+    '/insta',
   ]
 
   const isTopNav = topNavPaths.some(path => pathname.startsWith(path))
-
-  // 친밀도 바(채팅에서만)
-  //  const closenessMatch = pathname.match(/^\/chat\/(\d+)$/)
-  //  const closenessId = closenessMatch ? closenessMatch[1] : null
 
   // 북마크(채팅/친밀)
   const chatRoomMatch = pathname.match(/^\/(chat|closeness)\/(\d+)$/)
@@ -145,12 +143,18 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     title = pathname === '/login' ? '' : 'Continue with Email'
   } else if (pathname.startsWith('/mypage')) {
     title = pathname === '/mypage' ? '' : 'My Profile'
+  } else if (pathname.startsWith('/insta')) {
+    title = 'Learning from Instagram'
   } else {
     title = pageTitles[pathname] || '페이지'
   }
 
   return (
-    <div className="relative mx-auto flex h-full w-full max-w-md flex-col overflow-x-hidden pt-[env(safe-area-inset-top)]">
+    <div
+      className={`relative mx-auto flex h-full w-full max-w-md flex-col overflow-x-hidden ${
+        isMain ? 'pt-0' : 'pt-[env(safe-area-inset-top)]'
+      }`}
+    >
       {/* 상단 네비게이션 바 */}
       {!hideNavBar && isTopNav && (
         <header className="sticky top-0 shrink-0 z-40 bg-white">

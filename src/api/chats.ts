@@ -77,11 +77,14 @@ export async function sendMessage(
 }
 
 // 메시지 전송 취소
-export async function cancelMessage(
-  chatroomId: string,
-  messageId: string
-): Promise<void> {
-  await api.post(CHAT_ENDPOINTS.CANCEL_MESSAGE(chatroomId, messageId))
+export async function cancelMessage(messageId: string): Promise<void> {
+  await api.post(CHAT_ENDPOINTS.CANCEL_MESSAGE(messageId))
+}
+
+// 메시지 단건 조회
+export async function getMessage(messageId: string): Promise<ApiMessage> {
+  const res = await api.get(CHAT_ENDPOINTS.GET_MESSAGE(messageId))
+  return res.data
 }
 
 // 친밀도 업데이트

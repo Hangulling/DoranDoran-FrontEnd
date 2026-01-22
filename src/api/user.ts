@@ -101,7 +101,7 @@ export const updateNotificationSetting = async (
   return response.data
 }
 
-// 통계 조회
+// 대시보드 상태 조회
 export const getUserStats = async (userId: string) => {
   const response = await api.get(USER_ENDPOINTS.GET_STATS(userId))
   return response.data

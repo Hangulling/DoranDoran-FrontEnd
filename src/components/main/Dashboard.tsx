@@ -1,19 +1,16 @@
 import { useUserStore } from '../../stores/useUserStore'
 
-interface DashboardProps {
-  days?: number // 연속 접속
-  perfectCount?: number // 퍼펙트 수
-}
-
-const Dashboard = ({ days = 1 }: DashboardProps) => {
+const Dashboard = () => {
   const savedCount = useUserStore(state => state.savedCount)
+  const streakCount = useUserStore(state => state.streakCount)
+  const perfectCount = useUserStore(state => state.perfectCount)
 
   return (
     <div className="bg-gray-0 rounded-[8px] shadow-[0px_0px_8px_rgba(0,0,0,0.12)] flex justify-around items-center py-3 px-[33.5px] w-full h-[66px]">
       {/* 연속 접속 */}
       <div className="flex flex-col items-center cursor-pointer">
         <div className="flex items-center gap-1 text-gray-700 text-title text-[16px]">
-          <span>{days}-day</span>
+          <span>{streakCount}-day</span>
         </div>
         <span className="text-[#7D7D7D] text-[12px]">Day Streak</span>
       </div>
@@ -32,6 +29,9 @@ const Dashboard = ({ days = 1 }: DashboardProps) => {
 
       {/* 퍼펙트 수 */}
       <div className="flex flex-col items-center cursor-pointer">
+        <span className="text-gray-700 text-title text-[16px]">
+          {perfectCount}
+        </span>
         <span className="text-[#7D7D7D] text-[12px]">Perfect Answers</span>
       </div>
     </div>

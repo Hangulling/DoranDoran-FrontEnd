@@ -16,7 +16,7 @@ export const conceptMap = (id: string | undefined): string => {
 // 친밀도 매핑
 const CLOSENESS_TEXT_MAP: Record<number, string> = {
   1: 'Polite',
-  2: 'Casual',
+  2: 'Friendly',
   3: 'Friendly',
 }
 
