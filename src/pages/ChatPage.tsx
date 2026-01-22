@@ -38,6 +38,8 @@ export interface EnrichedMessage extends Message {
   analysisState?: 'pending' | 'complete' // 교정 데이터 로딩
   bookmarkId?: string | null
   isSendFailed?: boolean
+  isCancelled?: boolean
+  targetUserMsgId?: string | null
 }
 
 const chatBotIdByRoom = (conceptValue: string): string => {
@@ -179,6 +181,8 @@ const ChatPage: React.FC = () => {
     sendError,
     handleSendMessage,
     handleRetry,
+    handleCancel,
+    handleResend,
   } = useChatInteraction({
     chatroomId,
     userId,
@@ -337,6 +341,7 @@ const ChatPage: React.FC = () => {
           onChatBubbleBookmark={handleChatBubbleBookmark}
           onCorrectionBubbleBookmark={handleCorrectionBubbleBookmark}
           onReport={handleOpenReport}
+          onResend={handleResend}
         />
       </div>
 
@@ -346,6 +351,8 @@ const ChatPage: React.FC = () => {
             inputRef={inputRef}
             onSendMessage={handleSendMessage}
             disabled={isHistoryLoading || !isInitChatReady || isAiResponding}
+            isAiResponding={isAiResponding}
+            onCancel={handleCancel}
           />
         )}
       </footer>

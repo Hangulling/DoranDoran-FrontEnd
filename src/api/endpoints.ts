@@ -134,6 +134,9 @@ export const CHAT_ENDPOINTS = {
   CANCEL_MESSAGE: (messageId: string) =>
     `/api/chat/messages/${messageId}/cancel`,
 
+  // 메시지 단건 조회
+  GET_MESSAGE: (messageId: string) => `/api/chat/messages/${messageId}`,
+
   // 친밀도 업데이트
   UPDATE_INTIMACY_LEVEL: (chatroomId: string) =>
     `/api/chat/chatrooms/${chatroomId}/intimacy`,

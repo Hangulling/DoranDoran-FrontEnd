@@ -29,6 +29,7 @@ interface ChatMessageItemProps {
     feedbackEn: string
   ) => void
   onReport: (messageId: string) => void
+  onResend?: (cancelledMsgId: string, targetUserMsgId: string) => void
 }
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
@@ -41,6 +42,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
     onChatBubbleBookmark,
     onCorrectionBubbleBookmark,
     onReport,
+    onResend,
   }) => {
     const [showDescription, setShowDescription] = useState(true)
     const [showFeedback, setShowFeedback] = useState(true)
@@ -130,6 +132,20 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
             onBookToggle={() => setShowDescription(prev => !prev)}
             onReport={() => onReport(msg.id)}
           />
+
+          {/* 응답 중지 */}
+          {!msg.isSender && msg.isCancelled && (
+            <button
+              className="ml-[6px] flex items-center justify-center"
+              onClick={() => {
+                if (onResend && msg.targetUserMsgId) {
+                  onResend(msg.id, msg.targetUserMsgId)
+                }
+              }}
+            >
+              <ReloadIcon />
+            </button>
+          )}
         </div>
 
         {/* 사용자 메시지 교정 */}
