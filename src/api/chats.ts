@@ -77,11 +77,8 @@ export async function sendMessage(
 }
 
 // 메시지 전송 취소
-export async function cancelMessage(
-  chatroomId: string,
-  messageId: string
-): Promise<void> {
-  await api.post(CHAT_ENDPOINTS.CANCEL_MESSAGE(chatroomId, messageId))
+export async function cancelMessage(messageId: string): Promise<void> {
+  await api.post(CHAT_ENDPOINTS.CANCEL_MESSAGE(messageId))
 }
 
 // 친밀도 업데이트
