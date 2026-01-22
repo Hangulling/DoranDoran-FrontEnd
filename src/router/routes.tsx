@@ -19,6 +19,7 @@ import LoginEmailPage from '../pages/LoginEmailPage'
 import ProfilePage from '../pages/ProfilePage'
 
 const MainPage = lazy(() => import('../pages/MainPage'))
+const InstaPage = lazy(() => import('../pages/InstaPage'))
 const SignupPage = lazy(() => import('../pages/signup/SignupPage'))
 const LoginPage = lazy(() => import('../pages/LoginPage'))
 const MyPage = lazy(() => import('../pages/MyPage'))
@@ -55,6 +56,14 @@ export function Routes() {
         element={
           <PrivateRoute>
             <MainPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/insta/:externalId"
+        element={
+          <PrivateRoute>
+            <InstaPage />
           </PrivateRoute>
         }
       />

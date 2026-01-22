@@ -153,6 +153,7 @@ const ChatPage: React.FC = () => {
       chatroomId,
       userId,
       routeId: id,
+      enableGuard: !isManagerRoom,
     })
 
   const { inactivityError, resetInactivityTimer, stopInactivityTimer } =
@@ -205,7 +206,6 @@ const ChatPage: React.FC = () => {
       setIsHistoryLoading(false)
       setIsInitChatReady(true)
       // 매니저 초기 메시지 설정
-      // setMessages([{ id: 'm1', text: MANAGER_ROOM.message, isSender: false, ... }])
     }
   }, [isManagerRoom])
 
@@ -307,7 +307,7 @@ const ChatPage: React.FC = () => {
         title={room?.roomName || 'Chat'}
         avatar={room?.avatar}
         closenessLevel={isManagerRoom ? undefined : closenessLevel}
-        onBack={isManagerRoom ? () => navigate(-1) : handleGoBack}
+        onBack={isManagerRoom ? () => navigate('/') : handleGoBack}
         onSettingClick={isManagerRoom ? undefined : openSettings}
       />
 

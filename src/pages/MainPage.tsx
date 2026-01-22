@@ -5,7 +5,6 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 import ChatRoomList from '../components/main/ChatRoomList'
 import ClosenessSheet from '../components/chat/ClosenessSheet'
 import CommonModal from '../components/common/CommonModal'
-import { useGoBack } from '../hooks/useGoBack'
 import { useFetchUser } from '../hooks/useFetchUser'
 import { useFetchChatRooms } from '../hooks/useFetchChatRooms'
 import { useCreateChatRoom } from '../hooks/useCreateChatRoom'
@@ -31,9 +30,6 @@ const MainPage = () => {
     selectedRoom ? String(selectedRoom.id) : ''
   )
 
-  // 뒤로 가기 방지
-  useGoBack()
-
   useEffect(() => {
     if (location.state?.showOnboardingModal) {
       setShowCompleteModal(true)
@@ -41,8 +37,8 @@ const MainPage = () => {
     }
   }, [location])
 
-  const handleCardClick = (id: number) => {
-    console.log(`카드 ${id} 클릭됨`)
+  const handleCardClick = (externalId: string) => {
+    navigate(`/insta/${externalId}`)
   }
 
   const handleRoomClick = (id: number, roomName: string) => {
