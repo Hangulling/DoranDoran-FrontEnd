@@ -4,7 +4,7 @@ const ServerErrorView = () => {
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <img src={ServerError} alt="Server Error" />
-      <h2 className="text-[22px] font-semibold text-gray-400 mt-[14px] mb-3 text-center">
+      <h2 className="text-[22px] text-title text-gray-400 mt-3 mb-4 text-center">
         Uh-oh!
         <br />
         Something went wrong.
