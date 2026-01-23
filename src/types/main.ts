@@ -9,4 +9,5 @@ export interface ChatRoomWithMessage {
 export interface ChatRoomItemProps {
   room: ChatRoomWithMessage
   onClick: (id: number | string, roomName: string) => void
+  isLoading?: boolean
 }

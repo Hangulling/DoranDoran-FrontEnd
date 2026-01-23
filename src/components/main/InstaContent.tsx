@@ -8,6 +8,7 @@ interface InstaContentProps {
 
 const InstaContent = ({ onCardClick }: InstaContentProps) => {
   const [posts, setPosts] = useState<HomePost[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -16,10 +17,47 @@ const InstaContent = ({ onCardClick }: InstaContentProps) => {
         setPosts(data)
       } catch (error) {
         console.error('Failed to fetch home posts:', error)
+      } finally {
+        setIsLoading(false)
       }
     }
     fetchPosts()
   }, [])
+
+  // 스켈레톤 카드 컴포넌트
+  const SkeletonCard = () => (
+    <div
+      className="
+        flex-shrink-0 
+        relative 
+        h-[152px] w-[180px] 
+        rounded-[16px] overflow-hidden
+        bg-gray-0 border border-gray-80
+      "
+    >
+      {/* 이미지 스켈레톤 */}
+      <div className="h-[90px] w-full bg-primary-30 animate-pulse" />
+
+      {/* 텍스트 스켈레톤 */}
+      <div className="flex-1 flex flex-col justify-center px-4 py-[10px] gap-1">
+        <div className="h-[18px] w-full bg-primary-30 rounded animate-pulse" />
+        <div className="h-[18px] w-3/4 bg-primary-30 rounded animate-pulse" />
+      </div>
+    </div>
+  )
+
+  // 로딩 중일 때 스켈레톤 표시
+  if (isLoading) {
+    return (
+      <div className="w-full">
+        <div className="no-scrollbar flex w-full gap-x-2 overflow-x-auto px-5">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   if (posts.length === 0) return null
 
