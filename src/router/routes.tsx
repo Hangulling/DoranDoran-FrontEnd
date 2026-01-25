@@ -17,13 +17,18 @@ import FindEmailBirthDate from '../pages/find-email/steps/FindEmailBirthDate'
 import FindEmailQuestion from '../pages/find-email/steps/FindEmailQuestion'
 import LoginEmailPage from '../pages/LoginEmailPage'
 import ProfilePage from '../pages/ProfilePage'
+import SavedPage from '../pages/saved/SavedPage'
 
 const MainPage = lazy(() => import('../pages/MainPage'))
 const SignupPage = lazy(() => import('../pages/signup/SignupPage'))
 const LoginPage = lazy(() => import('../pages/LoginPage'))
 const MyPage = lazy(() => import('../pages/MyPage'))
 const ChatPage = lazy(() => import('../pages/ChatPage'))
-const ArchivePage = lazy(() => import('../pages/ArchivePage'))
+const ArchivePage = lazy(() => import('../pages/archive/ArchivePage'))
+const SentenceArchivePage = lazy(
+  () => import('../pages/archive/SentenceArchivePage')
+)
+const WordArchivePage = lazy(() => import('../pages/archive/WordArchivePage'))
 const PolicyPage = lazy(() => import('../pages/PolicyPage'))
 const ErrorPage = lazy(() => import('../pages/ErrorPage'))
 const OnboardingPage = lazy(() => import('../pages/OnboardingPage'))
@@ -67,13 +72,31 @@ export function Routes() {
         }
       />
       <Route
-        path="/archive/:id"
+        path="/archive"
         element={
           <PrivateRoute>
             <ArchivePage />
           </PrivateRoute>
         }
       />
+
+      <Route
+        path="/archive/sentences"
+        element={
+          <PrivateRoute>
+            <SentenceArchivePage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/archive/words"
+        element={
+          <PrivateRoute>
+            <WordArchivePage />
+          </PrivateRoute>
+        }
+      />
+
       <Route
         path="/onboarding"
         element={
@@ -82,7 +105,7 @@ export function Routes() {
           </PrivateRoute>
         }
       />
-
+      <Route path="/saved" element={<SavedPage />} />
       <Route path="/policy/:id" element={<PolicyPage />} />
       <Route path="/find-email" element={<FindEmailPage />}>
         <Route index element={<Navigate to="name" replace />} />
