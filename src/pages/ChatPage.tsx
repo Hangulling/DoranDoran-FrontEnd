@@ -28,6 +28,8 @@ import ToggleSwitch from '../components/common/ToggleSwitch'
 import Button from '../components/common/Button'
 import { useChatSettingStore } from '../stores/useChatSetting'
 import ReportSheet from '../components/chat/ReportSheet'
+import { createSupport } from '../api/support'
+import showToast from '../components/common/CommonToast'
 
 const INACTIVITY_DURATION_MS = 300000
 
@@ -40,6 +42,7 @@ export interface EnrichedMessage extends Message {
   isSendFailed?: boolean
   isCancelled?: boolean
   targetUserMsgId?: string | null
+  isReported?: boolean
 }
 
 const chatBotIdByRoom = (conceptValue: string): string => {
@@ -144,10 +147,40 @@ const ChatPage: React.FC = () => {
   }
 
   // 신고 접수
-  const handleReportSubmit = (messageId: string, reason: string) => {
-    console.log('신고 완료 처리:', messageId, reason)
-    // API
-    handleCloseReport()
+  const handleReportSubmit = async (messageId: string, reason: string) => {
+    try {
+      const targetMessage = messages.find(m => m.id === messageId)
+      const messageContent = targetMessage?.text || ''
+
+      await createSupport(
+        {
+          type: 'REPORT',
+          category: reason,
+          content: reason,
+          chatroomId,
+          messageId,
+          messageContent,
+        },
+        {
+          userId, // 헤더에 들어갈 User ID
+        }
+      )
+      showToast({
+        message: 'Thanks for letting us know!',
+        iconType: 'checkRound',
+      })
+      console.log('신고 완료 처리:', messageId, reason)
+
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === messageId ? { ...msg, isReported: true } : msg
+        )
+      )
+    } catch (error) {
+      console.error('신고 요청 실패:', error)
+    } finally {
+      handleCloseReport()
+    }
   }
 
   const { isModalOpen, handleConfirmExit, handleCancelExit, handleGoBack } =
@@ -306,13 +339,13 @@ const ChatPage: React.FC = () => {
   }, [messages])
 
   return (
-    <div className="flex flex-col h-full overflow-hidden relative">
+    <div className="flex flex-col h-full overflow-hidden relative bg-gray-10">
       <ChatHeader
         title={room?.roomName || 'Chat'}
         avatar={room?.avatar}
-        closenessLevel={isManagerRoom ? undefined : closenessLevel}
-        onBack={isManagerRoom ? () => navigate('/') : handleGoBack}
-        onSettingClick={isManagerRoom ? undefined : openSettings}
+        closenessLevel={closenessLevel}
+        onBack={handleGoBack}
+        onSettingClick={openSettings}
       />
 
       <div

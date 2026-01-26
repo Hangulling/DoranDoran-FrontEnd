@@ -35,7 +35,7 @@ const VARIANTS: Record<Variant, string> = {
   home: 'bg-primary-300 text-gray-0 rounded-[10px] text-[14px] text-subtitle border border-primary-300',
   dropdown: 'px-3',
   bottomSheet:
-    'rounded-xl text-subtitle text-sm text-gray-800 bg-gray-0 border border-gray-100 focus:border-primary-200 focus:bg-primary-10',
+    'rounded-xl text-subtitle text-sm text-gray-800 bg-gray-0 border border-gray-100 active:border-primary-200 active:bg-primary-10 focus:border-primary-200 focus:bg-primary-10 transition-colors',
   modal: 'rounded-[10px] text-subtitle text-[14px]',
 }
 
