@@ -5,7 +5,8 @@ import type { ErrorPageProps, FromPage } from '../types/common'
 export function useErrorPage({ errorCode }: ErrorPageProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const state = (location.state as { code?: number; from?: FromPage } | undefined) || {}
+  const state =
+    (location.state as { code?: number; from?: FromPage } | undefined) || {}
 
   const code = errorCode ?? state.code ?? 400
 
@@ -20,9 +21,11 @@ export function useErrorPage({ errorCode }: ErrorPageProps) {
   }, [location.state, navigate, code])
 
   // Go Back
-  const from = state.from || (location.pathname.startsWith('/signup') ? 'signup' : undefined)
+  const from =
+    state.from ||
+    (location.pathname.startsWith('/signup') ? 'signup' : undefined)
 
-  const backTarget = from === 'signup' ? '/signup' : '/login'
+  const backTarget = from === 'signup' ? '/signup' : '/'
 
   const handleClickBack = () => {
     navigate(backTarget, { replace: true })
