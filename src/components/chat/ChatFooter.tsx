@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type JSX, type RefObject } from 'react'
 import { Keyboard } from '@capacitor/keyboard'
 import SendIcon from '../../assets/chat/send.svg'
 import ErrorIcon from '../../assets/icon/error.svg'
-import CheckIcon from '../../assets/icon/checkRound.svg'
+import CheckIcon from '../../assets/icon/CheckIcon'
 import PauseIcon from '../../assets/chat/pause.svg'
 
 interface ChatFooterProps {
@@ -27,7 +27,9 @@ const SINGLE_LINE_HEIGHT = 21
 const ToastMessage = ({ message, iconType }: ToastMessageProps) => {
   const iconMap: Record<IconType, JSX.Element> = {
     error: <img src={ErrorIcon} alt="error" />,
-    checkRound: <img src={CheckIcon} alt="check" />,
+    checkRound: (
+      <CheckIcon className="text-gray-700 fill-system-blue-okay m-0.5" />
+    ),
   }
 
   return (

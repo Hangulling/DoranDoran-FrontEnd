@@ -32,10 +32,10 @@ const VARIANTS: Record<Variant, string> = {
   confirm: 'bg-primary-300 text-white rounded-xl',
   tab: 'rounded-[18px] px-[14px] py-2 text-body text-sm',
   archive: 'text-gray-500 text-sm text-body',
-  home: 'bg-green-400 text-white rounded-[18px] border border-green-400',
+  home: 'bg-primary-300 text-gray-0 rounded-[10px] text-[14px] text-subtitle border border-primary-300',
   dropdown: 'px-3',
   bottomSheet:
-    'rounded-xl text-subtitle text-sm text-gray-800 bg-gray-0 border border-gray-100 focus:border-primary-200 focus:bg-primary-10',
+    'rounded-xl text-subtitle text-sm text-gray-800 bg-gray-0 border border-gray-100 active:border-primary-200 active:bg-primary-10 focus:border-primary-200 focus:bg-primary-10 transition-colors',
   modal: 'rounded-[10px] text-subtitle text-[14px]',
 }
 

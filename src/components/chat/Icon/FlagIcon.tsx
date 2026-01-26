@@ -10,7 +10,8 @@ const FlagIcon: React.FC<FlagIconProps> = ({ isReported, onActive }) => {
   return (
     <button
       onClick={onActive}
-      className="focus:outline-none"
+      disabled={isReported} // 중복신고 방지
+      className={`focus:outline-none ${isReported ? 'cursor-default' : ''}`}
       aria-label="신고하기"
     >
       {isReported ? (

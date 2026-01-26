@@ -4,11 +4,13 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 interface UserState {
   id: string
   name: string
-  savedCount: number
-  streakCount: number
-  perfectCount: number
+  email: string
+  savedCount: number | null
+  streakCount: number | null
+  perfectCount: number | null
   setId: (id: string) => void
   setName: (name: string) => void
+  setEmail: (email: string) => void
   setSavedCount: (count: number) => void
   setStreakCount: (count: number) => void
   setPerfectCount: (count: number) => void
@@ -20,11 +22,13 @@ export const useUserStore = create<UserState>()(
     set => ({
       id: '',
       name: '',
-      savedCount: 0,
-      streakCount: 0,
-      perfectCount: 0,
+      email: '',
+      savedCount: null,
+      streakCount: null,
+      perfectCount: null,
       setId: id => set({ id }),
       setName: name => set({ name }),
+      setEmail: email => set({ email }),
       setSavedCount: count => set({ savedCount: count }),
       setStreakCount: count => set({ streakCount: count }),
       setPerfectCount: count => set({ perfectCount: count }),
@@ -32,6 +36,7 @@ export const useUserStore = create<UserState>()(
         set({
           id: '',
           name: '',
+          email: '',
           savedCount: undefined,
           streakCount: undefined,
           perfectCount: undefined,
@@ -42,6 +47,11 @@ export const useUserStore = create<UserState>()(
     {
       name: 'user-storage',
       storage: createJSONStorage(() => sessionStorage),
+      partialize: state => ({
+        id: state.id,
+        name: state.name,
+        email: state.email,
+      }),
     }
   )
 )

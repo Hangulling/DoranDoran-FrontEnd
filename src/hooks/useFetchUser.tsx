@@ -8,9 +8,11 @@ export const useFetchUser = () => {
   const navigate = useNavigate()
   const [userName, setUserName] = useState<string>('')
   const [userId, setUserId] = useState<string>('')
+  const [userEmail, setUserEmail] = useState<string>('')
 
   const setStoreName = useUserStore(state => state.setName)
   const setStoreId = useUserStore(state => state.setId)
+  const setStoreEmail = useUserStore(state => state.setEmail)
   const setSavedCount = useUserStore(state => state.setSavedCount)
   const setStreakCount = useUserStore(state => state.setStreakCount)
   const setPerfectCount = useUserStore(state => state.setPerfectCount)
@@ -32,6 +34,8 @@ export const useFetchUser = () => {
         setStoreName(profile.name)
         setUserId(profile.id)
         setStoreId(profile.id)
+        setUserEmail(profile.email)
+        setStoreEmail(profile.email)
 
         setSavedCount(bookmarkCount)
         setStreakCount(stats.streakCount)
@@ -45,11 +49,12 @@ export const useFetchUser = () => {
   }, [
     setStoreName,
     setStoreId,
+    setStoreEmail,
     setSavedCount,
     navigate,
     setStreakCount,
     setPerfectCount,
   ])
 
-  return { userName, userId }
+  return { userName, userId, userEmail }
 }

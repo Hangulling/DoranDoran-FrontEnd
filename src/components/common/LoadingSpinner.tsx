@@ -3,9 +3,9 @@ import type { LoadingSpinnerProps } from '../../types/common'
 export default function LoadingSpinner({ message }: LoadingSpinnerProps) {
   return (
     <div className="flex flex-col justify-center items-center h-64">
-      <span className="loading loading-spinner loading-lg"></span>
+      <span className="loading loading-spinner loading-lg text-primary-300"></span>
       {message && (
-        <p className="mt-4 text-sm text-primary-300 text-center">{message}</p>
+        <p className="mt-4 text-sm text-gray-600 text-center">{message}</p>
       )}
     </div>
   )
