@@ -29,6 +29,7 @@ export default function LoginPage() {
   const setStoreName = useUserStore(s => s.setName)
 
   const googleLoginContainerRef = useRef<HTMLDivElement | null>(null)
+  const isNative = isNativeApp()
 
   // 페이지 뷰
   useEffect(() => {
@@ -72,12 +73,22 @@ export default function LoginPage() {
     return { type: 'both', msg: 'Email error + Password error' }
   }
 
+  const stringifyError = (e: unknown) => {
+    try {
+      if (e instanceof Error) return `${e.name}: ${e.message}`
+      return JSON.stringify(e)
+    } catch {
+      return String(e)
+    }
+  }
+
   const handleGoogleNativeLogin = async () => {
     if (!isNativeApp()) return
 
     try {
       const r = (await SocialLogin.login({
         provider: 'google',
+        options: {},
       })) as SocialLoginResponse
 
       const idToken = r.result?.idToken
@@ -96,11 +107,13 @@ export default function LoginPage() {
         const user = res.data.user
         setStoreId(user.id)
         setStoreName(user.name)
+        localStorage.setItem('last_login', 'google')
         navigate(user.isOnboard ? '/' : '/onboarding')
       }
     } catch (err) {
+      const msg = stringifyError(err)
       console.error('네이티브 로그인 실패', err)
-      alert('네이티브 Google 로그인 실패')
+      alert(`Google 로그인 실패 \n ${msg}`)
     }
   }
 
@@ -276,26 +289,27 @@ export default function LoginPage() {
             {lastLogin === 'email' && <LastLoginBubble provider="email" />}
           </div>
 
-          <div ref={googleLoginContainerRef} className="hidden">
-            <GoogleLogin
-              onSuccess={handleOAuthSuccess}
-              onError={handleOAuthError}
-              useOneTap={false}
-              theme="outline"
-              size="large"
-              text="signup_with"
-              shape="rectangular"
-              width="100%"
-              locale="en"
-            />
-          </div>
+          {!isNative && (
+            <div ref={googleLoginContainerRef} className="hidden">
+              <GoogleLogin
+                onSuccess={handleOAuthSuccess}
+                onError={handleOAuthError}
+                useOneTap={false}
+                theme="outline"
+                size="large"
+                text="signup_with"
+                shape="rectangular"
+                width="100%"
+                locale="en"
+              />
+            </div>
+          )}
 
           <div className="relative mt-4 w-full">
             <GoogleLoginButton
-              onClick={() => {
-                if (isNativeApp()) handleGoogleNativeLogin()
-                else handleCustomGoogleClick()
-              }}
+              onClick={() =>
+                isNative ? handleGoogleNativeLogin() : handleCustomGoogleClick()
+              }
             />
 
             {lastLogin === 'google' && <LastLoginBubble provider="google" />}
