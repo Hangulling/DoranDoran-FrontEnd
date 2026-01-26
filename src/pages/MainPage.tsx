@@ -43,7 +43,7 @@ const MainPage = () => {
 
   const handleRoomClick = (id: number, roomName: string) => {
     if (id === MANAGER_ROOM.roomRouteId) {
-      navigate(`/chat/${id}`, {
+      navigate(`/manager`, {
         state: {
           roomRouteId: id,
           concept: roomName,

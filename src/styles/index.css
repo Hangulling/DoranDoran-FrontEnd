@@ -108,6 +108,13 @@
   .text-display {
     @apply font-bold;
   }
+
+  .gradient-border {
+    border: 1px solid transparent;
+    background:
+      linear-gradient(#ffffff, #ffffff) padding-box,
+      var(--background-image-gradient-1) border-box;
+  }
 }
 
 /* 토스트 애니메이션 */

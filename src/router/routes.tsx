@@ -25,6 +25,7 @@ const SignupPage = lazy(() => import('../pages/signup/SignupPage'))
 const LoginPage = lazy(() => import('../pages/LoginPage'))
 const MyPage = lazy(() => import('../pages/MyPage'))
 const ChatPage = lazy(() => import('../pages/ChatPage'))
+const ManagerChatPage = lazy(() => import('../pages/ManagerChatPage'))
 const ArchivePage = lazy(() => import('../pages/ArchivePage'))
 const PolicyPage = lazy(() => import('../pages/PolicyPage'))
 const ErrorPage = lazy(() => import('../pages/ErrorPage'))
@@ -74,6 +75,14 @@ export function Routes() {
           element={
             <PrivateRoute>
               <ChatPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/manager"
+          element={
+            <PrivateRoute>
+              <ManagerChatPage />
             </PrivateRoute>
           }
         />
