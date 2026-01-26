@@ -131,6 +131,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
             isBookActive={showDescription}
             onBookToggle={() => setShowDescription(prev => !prev)}
             onReport={() => onReport(msg.id)}
+            isReported={msg.isReported}
           />
 
           {/* 응답 중지 */}
