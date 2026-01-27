@@ -17,7 +17,6 @@ import FindEmailBirthDate from '../pages/find-email/steps/FindEmailBirthDate'
 import FindEmailQuestion from '../pages/find-email/steps/FindEmailQuestion'
 import LoginEmailPage from '../pages/LoginEmailPage'
 import ProfilePage from '../pages/ProfilePage'
-import SavedPage from '../pages/saved/SavedPage'
 
 const MainPage = lazy(() => import('../pages/MainPage'))
 const SignupPage = lazy(() => import('../pages/signup/SignupPage'))
