@@ -37,6 +37,8 @@ interface ChatBodyProps {
     feedbackKo: string,
     feedbackEn: string
   ) => void
+  onReport: (messageId: string) => void
+  onResend?: (cancelledMsgId: string, targetUserMsgId: string) => void
 }
 
 const ChatBody: React.FC<ChatBodyProps> = props => {
@@ -77,6 +79,8 @@ const ChatBody: React.FC<ChatBodyProps> = props => {
         isTranslationEnabled={props.isTranslationEnabled}
         onChatBubbleBookmark={props.onChatBubbleBookmark}
         onCorrectionBubbleBookmark={props.onCorrectionBubbleBookmark}
+        onReport={props.onReport}
+        onResend={props.onResend}
       />
     </>
   )

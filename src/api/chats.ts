@@ -12,7 +12,9 @@ import api from './api'
 import { CHAT_ENDPOINTS } from './endpoints'
 
 // 채팅방 생성(또는 기존 채팅방 조회)
-export async function createChatRoom(data: CreateChatroomPayload): Promise<ApiChatRoom> {
+export async function createChatRoom(
+  data: CreateChatroomPayload
+): Promise<ApiChatRoom> {
   const res = await api.post(CHAT_ENDPOINTS.CREATE, data)
   return res.data
 }
@@ -29,14 +31,19 @@ export async function chatRoomList(
 }
 
 // 채팅방 단건 조회
-export async function getChatRoom(chatroomId: string, userId?: string): Promise<ApiChatRoom> {
+export async function getChatRoom(
+  chatroomId: string,
+  userId?: string
+): Promise<ApiChatRoom> {
   const params = userId ? { userId } : {}
   const res = await api.get(CHAT_ENDPOINTS.GET_CHATROOM(chatroomId), { params })
   return res.data
 }
 
 // 채팅방 목록 (최대 4개) 조회
-export async function getChatRoomListLimited(userId?: string): Promise<ApiChatRoom[]> {
+export async function getChatRoomListLimited(
+  userId?: string
+): Promise<ApiChatRoom[]> {
   const params = userId ? { userId } : {}
   const res = await api.get(CHAT_ENDPOINTS.CHATROOM_LIST_LIMITED, { params })
   return res.data
@@ -51,9 +58,12 @@ export async function getMessages(
     size?: number
   } = {}
 ): Promise<PagedApiMessageResponse> {
-  const res = await api.get<PagedApiMessageResponse>(CHAT_ENDPOINTS.MESSAGES_LIST(chatroomId), {
-    params,
-  })
+  const res = await api.get<PagedApiMessageResponse>(
+    CHAT_ENDPOINTS.MESSAGES_LIST(chatroomId),
+    {
+      params,
+    }
+  )
   return res.data
 }
 
@@ -66,17 +76,34 @@ export async function sendMessage(
   return res.data
 }
 
+// 메시지 전송 취소
+export async function cancelMessage(messageId: string): Promise<void> {
+  await api.post(CHAT_ENDPOINTS.CANCEL_MESSAGE(messageId))
+}
+
+// 메시지 단건 조회
+export async function getMessage(messageId: string): Promise<ApiMessage> {
+  const res = await api.get(CHAT_ENDPOINTS.GET_MESSAGE(messageId))
+  return res.data
+}
+
 // 친밀도 업데이트
 export async function updateIntimacy(
   chatroomId: string,
   payload: UpdateIntimacyPayload
 ): Promise<ApiChatRoom> {
-  const response = await api.patch(CHAT_ENDPOINTS.UPDATE_INTIMACY_LEVEL(chatroomId), payload)
+  const response = await api.patch(
+    CHAT_ENDPOINTS.UPDATE_INTIMACY_LEVEL(chatroomId),
+    payload
+  )
   return response.data
 }
 
 // 채팅방 나가기 (소프트 딜리트)
-export async function leaveChatroom(chatroomId: string, userId: string): Promise<void> {
+export async function leaveChatroom(
+  chatroomId: string,
+  userId: string
+): Promise<void> {
   await api.post(CHAT_ENDPOINTS.LEAVE_CHATROOM(chatroomId, userId))
 }
 
@@ -93,7 +120,9 @@ export function getSseUrl(chatroomId: string, userId?: string): string {
 }
 
 // 마지막 채팅 시간
-export async function getLastInteractions(userId: string): Promise<LastInteraction[]> {
+export async function getLastInteractions(
+  userId: string
+): Promise<LastInteraction[]> {
   const url = CHAT_ENDPOINTS.LAST_INTERACTIONS(userId)
   const res = await api.get<LastInteraction[]>(url)
   return res.data

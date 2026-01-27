@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import type { EnrichedMessage } from '../../pages/ChatPage'
 import type { VocabularyExtractedData } from '../../types/sseEvents'
 import ChatBubble from './ChatBubble'
@@ -7,6 +7,8 @@ import DescriptionBubble from './DescriptionBubble'
 import CheckIcon from '../../assets/icon/CheckIcon'
 import StarIcon from '../../assets/icon/Asterisk'
 import ReloadIcon from '../../assets/icon/reload.svg?react'
+import { increasePerfectCount } from '../../api'
+import { useUserStore } from '../../stores/useUserStore'
 
 interface ChatMessageItemProps {
   msg: EnrichedMessage
@@ -26,6 +28,8 @@ interface ChatMessageItemProps {
     feedbackKo: string,
     feedbackEn: string
   ) => void
+  onReport: (messageId: string) => void
+  onResend?: (cancelledMsgId: string, targetUserMsgId: string) => void
 }
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
@@ -37,9 +41,23 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
     isTranslationEnabled,
     onChatBubbleBookmark,
     onCorrectionBubbleBookmark,
+    onReport,
+    onResend,
   }) => {
     const [showDescription, setShowDescription] = useState(true)
     const [showFeedback, setShowFeedback] = useState(true)
+    const userId = useUserStore(state => state.id)
+    const hasCountedRef = useRef(false)
+
+    // perfect 카운트 증가
+    useEffect(() => {
+      if (msg.isSender && msg.isPerfect && userId && !hasCountedRef.current) {
+        hasCountedRef.current = true
+        increasePerfectCount(userId).catch(err => {
+          console.error('Failed to increase perfect count:', err)
+        })
+      }
+    }, [msg.isSender, msg.isPerfect, userId])
 
     const toggleFeedback = () => {
       if (!msg.isSendFailed) {
@@ -112,7 +130,23 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
             }
             isBookActive={showDescription}
             onBookToggle={() => setShowDescription(prev => !prev)}
+            onReport={() => onReport(msg.id)}
+            isReported={msg.isReported}
           />
+
+          {/* 응답 중지 */}
+          {!msg.isSender && msg.isCancelled && (
+            <button
+              className="ml-[6px] flex items-center justify-center"
+              onClick={() => {
+                if (onResend && msg.targetUserMsgId) {
+                  onResend(msg.id, msg.targetUserMsgId)
+                }
+              }}
+            >
+              <ReloadIcon />
+            </button>
+          )}
         </div>
 
         {/* 사용자 메시지 교정 */}
@@ -164,6 +198,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
                       msg.correction!.feedback.en
                     )
                   }
+                  onReport={() => onReport(msg.id)}
                 />
               )
             ) : null)

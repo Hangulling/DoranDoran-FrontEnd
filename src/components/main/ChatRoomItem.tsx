@@ -2,12 +2,16 @@ import type { ChatRoomItemProps } from '../../types/main'
 import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter'
 import { MAIN_DATA, MANAGER_ROOM } from '../../constants/mainData'
 
-const ChatRoomItem = ({ room, onClick }: ChatRoomItemProps) => {
+const ChatRoomItem = ({ room, onClick, isLoading }: ChatRoomItemProps) => {
   const targetData =
     MAIN_DATA.find(data => data.roomName === room.roomName) ||
     (room.roomName === MANAGER_ROOM.roomName ? MANAGER_ROOM : null)
 
   if (!targetData) return null
+
+  const Skeleton = () => (
+    <div className="h-[18px] w-[283px] bg-primary-30 rounded-[4px] animate-pulse" />
+  )
 
   return (
     <button
@@ -25,7 +29,11 @@ const ChatRoomItem = ({ room, onClick }: ChatRoomItemProps) => {
         <span className="text-title text-[16px]">
           {capitalizeFirstLetter(targetData.roomName)}
         </span>
-        <span className="text-gray-800 text-[14px]">{room.message}</span>
+        {isLoading ? (
+          <Skeleton />
+        ) : (
+          <span className="text-gray-800 text-[14px]">{room.message}</span>
+        )}
       </div>
     </button>
   )

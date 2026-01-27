@@ -33,6 +33,12 @@ export interface User {
   updatedAt: string
 }
 
+// 사용자 대시보드 정보
+export interface UserStats {
+  streakCount: number
+  perfectCount: number
+}
+
 // 사용자 정보 업데이트 요청
 export interface UpdatePayload {
   firstName?: string

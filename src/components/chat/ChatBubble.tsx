@@ -2,7 +2,7 @@ import React from 'react'
 import TTSIcon from './Icon/VolumeIcon'
 import BookmarkIcon from './Icon/BookmarkIcon'
 import useTTS from '../../hooks/useTTS'
-import FlagIcon from '../../assets/icon/flag.svg?react'
+import FlagIcon from './Icon/FlagIcon'
 import BookIcon from './Icon/BookIcon'
 
 interface ChatBubbleProps {
@@ -16,14 +16,17 @@ interface ChatBubbleProps {
   onBookmarkToggle?: (messageId: string, content: string) => void // 북마크
   onBookToggle?: () => void
   isBookActive?: boolean
+  isReported?: boolean
+  onReport?: () => void
 }
 
 const bubbleVariants = {
-  basic: 'bg-gray-0 border border-gray-100 rounded-xl rounded-tl-none', // 기본 답장
-  second: 'bg-gray-0 border border-gray-100 rounded-xl', // 두번째 답장
-  sender: 'bg-gradient-1 text-gray-0 rounded-xl rounded-tr-none text-subtitle', // 사용자 채팅
+  basic: 'bg-gray-0 border border-gray-100 rounded-2xl rounded-tl-none', // 기본 답장
+  second: 'bg-gray-0 border border-gray-100 rounded-2xl', // 두번째 답장
+  sender:
+    'bg-primary-300 text-gray-0 rounded-2xl rounded-tr-none text-subtitle', // 사용자 채팅
   error:
-    'bg-gray-0 border border-gray-100 rounded-xl rounded-tl-none text-system-red', // 에러 채팅
+    'bg-gray-0 border border-gray-100 rounded-2xl rounded-tl-none text-system-red', // 에러 채팅
 }
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({
@@ -36,10 +39,16 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
   onBookmarkToggle,
   onBookToggle,
   isBookActive = false,
+  isReported = false,
+  onReport,
 }) => {
   const baseBubbleClass =
-    'py-[10px] px-[14px] text-[14px] max-w-[305px] rounded-xl'
-  const bubbleClass = `${baseBubbleClass} ${isSender ? bubbleVariants.sender : bubbleVariants[variant]}`
+    'py-[10px] px-[14px] text-[14px] max-w-[305px] rounded-2xl'
+  // 취소할 경우 빈 말풍선
+  const isEmptyMessage = typeof message === 'string' && message === ''
+  const bubbleClass = `${baseBubbleClass} ${
+    isSender ? bubbleVariants.sender : bubbleVariants[variant]
+  } ${isEmptyMessage ? 'min-w-[59px]' : ''}`
 
   const ttsText = typeof message === 'string' ? message : ''
   const { onPlay: playTTS, playing: isPlaying } = useTTS(ttsText)
@@ -59,7 +68,8 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
       }
     >
       <div className={`${bubbleClass} flex flex-col`}>
-        <span>{message}</span>
+        {/* 빈 말풍선 높이 유지 */}
+        <span>{isEmptyMessage ? '\u00A0' : message}</span>
 
         {/* 사전, 깃발 아이콘 추가하기 */}
         {!isSender && showIcon && (
@@ -72,7 +82,10 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
                 onToggle={toggleBookmark}
               />
             </div>
-            <FlagIcon className="fill-gray-0 text-gray-700" />
+            <FlagIcon
+              isReported={isReported}
+              onActive={onReport || (() => {})}
+            />
           </div>
         )}
       </div>

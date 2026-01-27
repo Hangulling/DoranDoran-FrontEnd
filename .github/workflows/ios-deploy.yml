@@ -7,9 +7,18 @@ on:
 
 jobs:
   build-ios:
-    runs-on: macos-latest
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
+
+      - name: List Xcode versions
+        run: ls -1 /Applications | grep Xcode
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
+
+      - name: Show selected Xcode
+        run: xcodebuild -version
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -32,6 +41,13 @@ jobs:
           npm run build
           npx cap sync ios
 
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
+
+      - name: Pod install (repo update)
+        working-directory: ios/App
+        run: pod install --repo-update
+
       - name: Install xcodeproj gem
         run: gem install xcodeproj
 
@@ -41,7 +57,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0'
+          ruby-version: '3.2'
           bundler-cache: true
 
       - name: Install Fastlane

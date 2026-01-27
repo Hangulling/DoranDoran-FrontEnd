@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import TTSIcon from './Icon/VolumeIcon'
 import BookmarkIcon from './Icon/BookmarkIcon'
 import useTTS from '../../hooks/useTTS'
-import FlagIcon from '../../assets/icon/flag.svg?react'
+import FlagIcon from './Icon/FlagIcon'
 
 interface CorrectionBubbleProps {
   chatRoomId: string
@@ -20,6 +20,8 @@ interface CorrectionBubbleProps {
     content: string,
     correctedContent: string
   ) => void
+  isReported?: boolean
+  onReport?: () => void
 }
 
 const wrapperClass = 'chat chat-end gap-0 pt-[10px] pb-0'
@@ -35,6 +37,8 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
   isLoading,
   isBookmarked,
   onBookmarkToggle,
+  isReported = false,
+  onReport,
 }) => {
   const [currentDescription, setCurrentDescription] = useState(
     descriptionByTab ?? {}
@@ -96,7 +100,10 @@ const CorrectionBubble: React.FC<CorrectionBubbleProps> = ({
               isBookmarked={isBookmarked ?? false}
               onToggle={toggleBookmark}
             />
-            <FlagIcon className="fill-gray-0 text-gray-700" />
+            <FlagIcon
+              isReported={isReported}
+              onActive={onReport || (() => {})}
+            />
           </div>
         </div>
       </div>

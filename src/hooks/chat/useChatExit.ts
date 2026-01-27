@@ -11,12 +11,14 @@ interface UseChatExitProps {
   chatroomId: string | undefined
   userId: string
   routeId: string | undefined
+  enableGuard?: boolean
 }
 
 export const useChatExit = ({
   chatroomId,
   userId,
   routeId,
+  enableGuard = true,
 }: UseChatExitProps) => {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -117,6 +119,8 @@ export const useChatExit = ({
 
   // 브라우저 뒤로가기(popstate) / 탭 닫기(beforeunload)
   useEffect(() => {
+    if (!enableGuard) return
+
     window.history.pushState(null, '', window.location.href)
 
     // OS 뒤로가기
@@ -186,6 +190,7 @@ export const useChatExit = ({
     routeId,
     performLeaveChatroom,
     hasLeftRef,
+    enableGuard,
   ])
 
   return {

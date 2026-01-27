@@ -56,7 +56,7 @@ const ClosenessSheet = ({
       isOpen={isOpen}
       onClose={onClose}
       title={
-        <p>
+        <p className="text-[20px] leading-[1.4] tracking-[-0.3px]">
           Choose how close you are
           <br />
           with your
@@ -64,7 +64,7 @@ const ClosenessSheet = ({
         </p>
       }
     >
-      <div className="flex flex-col items-center w-full mt-1">
+      <div className="flex flex-col items-center w-full mt-[14px]">
         <div className="flex justify-center gap-3 w-full">
           {/* 친밀도 1 */}
           <button

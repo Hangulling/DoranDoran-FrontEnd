@@ -1,38 +1,60 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUserStore } from '../stores/useUserStore'
-import { getCurrentUser } from '../api'
-import ReactGA from 'react-ga4'
-import { GA_ENABLED, IS_PROD } from '../constants/env'
+import { getCurrentUser, getUserStats } from '../api'
+import { countBookmarks } from '../api/archive'
 
 export const useFetchUser = () => {
   const navigate = useNavigate()
   const [userName, setUserName] = useState<string>('')
   const [userId, setUserId] = useState<string>('')
+  const [userEmail, setUserEmail] = useState<string>('')
+
   const setStoreName = useUserStore(state => state.setName)
   const setStoreId = useUserStore(state => state.setId)
+  const setStoreEmail = useUserStore(state => state.setEmail)
+  const setSavedCount = useUserStore(state => state.setSavedCount)
+  const setStreakCount = useUserStore(state => state.setStreakCount)
+  const setPerfectCount = useUserStore(state => state.setPerfectCount)
 
   useEffect(() => {
     async function fetchUser() {
       try {
-        const response = await getCurrentUser()
-        const profile = response.data
+        // 사용자 정보 조회
+        const userResponse = await getCurrentUser()
+        const profile = userResponse.data
+
+        // ID 사용하여 정보 병렬 조회
+        const [bookmarkCount, stats] = await Promise.all([
+          countBookmarks(),
+          getUserStats(profile.id),
+        ])
+
         setUserName(profile.name)
         setStoreName(profile.name)
         setUserId(profile.id)
         setStoreId(profile.id)
+        setUserEmail(profile.email)
+        setStoreEmail(profile.email)
 
-        // 로그인 후 메인페이지 진입 시, User-ID 재설정
-        if (IS_PROD && GA_ENABLED) {
-          ReactGA.set({ user_id: profile.id })
-        }
+        setSavedCount(bookmarkCount)
+        setStreakCount(stats.streakCount)
+        setPerfectCount(stats.perfectCount)
       } catch (err) {
         console.error('사용자 정보 로드 실패:', err)
         navigate('/error', { state: { from: '/main' } })
       }
     }
     fetchUser()
-  }, [setStoreName, setStoreId, navigate])
+  }, [
+    setStoreName,
+    setStoreId,
+    setStoreEmail,
+    setSavedCount,
+    navigate,
+    setStreakCount,
+    setPerfectCount,
+  ])
 
-  return { userName, userId }
+  return { userName, userId, userEmail }
 }

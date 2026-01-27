@@ -8,7 +8,7 @@ import type {
   IntimacyAnalysisData,
   VocabularyExtractedData,
 } from '../../types/sseEvents'
-import { sendMessage } from '../../api'
+import { cancelMessage, getMessage, sendMessage } from '../../api'
 import { useUserMsgStore } from '../../stores/useUserMsgStore'
 
 interface UseChatInteractionProps {
@@ -60,11 +60,79 @@ export const useChatInteraction = ({
     setRetryCount(prev => prev + 1)
   }, [resetInactivityTimer])
 
+  const handleResend = async (
+    cancelledMsgId: string,
+    targetUserMsgId: string
+  ) => {
+    try {
+      const originMessage = await getMessage(targetUserMsgId)
+      const content = originMessage.content
+
+      setMessages(prev =>
+        prev.filter(
+          msg => msg.id !== cancelledMsgId && msg.id !== targetUserMsgId
+        )
+      )
+
+      // 메시지 다시 전송
+      await handleSendMessage(content)
+    } catch (error) {
+      console.error('Failed to resend message:', error)
+    }
+  }
+
+  // 메시지 중지
+  const handleCancel = async () => {
+    if (!isAiResponding) return
+
+    // 로딩 중지
+    setIsAiResponding(false)
+    resetInactivityTimer()
+
+    // correctionBubble 숨김
+    const targetUserMsgId = lastUserMsgIdRef.current
+    if (targetUserMsgId) {
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === targetUserMsgId
+            ? { ...msg, analysisState: 'complete' }
+            : msg
+        )
+      )
+    }
+
+    // 빈 말풍선 추가
+    const cancelledMessage: EnrichedMessage = {
+      id: Date.now().toString(),
+      text: '',
+      isSender: false,
+      avatarUrl: roomAvatar ?? '',
+      variant: 'basic',
+      showIcon: false,
+      isCancelled: true,
+      targetUserMsgId: targetUserMsgId,
+    }
+    setMessages(prev => [...prev, cancelledMessage])
+
+    // 서버에 전송 취소
+    if (targetUserMsgId) {
+      try {
+        await cancelMessage(targetUserMsgId)
+      } catch (error) {
+        console.error('Failed to cancel message:', error)
+      }
+      // 중단 후 참조 초기화
+      lastUserMsgIdRef.current = null
+    }
+  }
+
   // 메시지 전송
   const handleSendMessage = async (text: string) => {
     resetInactivityTimer() // 타이머 리셋
     setSendError(null)
     setSseError(null)
+
+    lastUserMsgIdRef.current = text
 
     if (!chatroomId) {
       console.error('채팅방 ID가 없습니다.')
@@ -175,11 +243,7 @@ export const useChatInteraction = ({
           setMessages(prev =>
             prev.map(msg => {
               if (msg.id === targetMsgId) {
-                if (
-                  intimacyData &&
-                  intimacyData.correctedSentence &&
-                  intimacyData.corrections
-                ) {
+                if (intimacyData && intimacyData.correctedSentence) {
                   return {
                     ...msg,
                     correction: intimacyData,
@@ -222,8 +286,6 @@ export const useChatInteraction = ({
     ]
   )
 
-  // SSE 스트림 훅 호출
-
   useChatStream<EventDataMap>(
     chatroomId ?? '',
     userId,
@@ -243,5 +305,7 @@ export const useChatInteraction = ({
     sendError,
     handleSendMessage,
     handleRetry,
+    handleCancel,
+    handleResend,
   }
 }

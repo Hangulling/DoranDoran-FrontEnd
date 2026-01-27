@@ -3,7 +3,7 @@ import ChatFooter from '../components/chat/ChatFooter'
 import type { Message } from '../types/chat'
 import { useModalStore } from '../stores/useUiStateStore'
 import { useNavigate, useParams } from 'react-router-dom'
-import { chatRooms } from '../mocks/db/chat'
+import { MAIN_DATA, MANAGER_ROOM } from '../constants/mainData'
 import ExitModal from '../components/chat/ExitModal'
 import { useUserStore } from '../stores/useUserStore'
 import useRoomIdStore from '../stores/useRoomIdStore'
@@ -27,6 +27,9 @@ import BottomSheet from '../components/common/BottomSheet'
 import ToggleSwitch from '../components/common/ToggleSwitch'
 import Button from '../components/common/Button'
 import { useChatSettingStore } from '../stores/useChatSetting'
+import ReportSheet from '../components/chat/ReportSheet'
+import { createSupport } from '../api/support'
+import showToast from '../components/common/CommonToast'
 
 const INACTIVITY_DURATION_MS = 300000
 
@@ -37,6 +40,9 @@ export interface EnrichedMessage extends Message {
   analysisState?: 'pending' | 'complete' // 교정 데이터 로딩
   bookmarkId?: string | null
   isSendFailed?: boolean
+  isCancelled?: boolean
+  targetUserMsgId?: string | null
+  isReported?: boolean
 }
 
 const chatBotIdByRoom = (conceptValue: string): string => {
@@ -69,6 +75,8 @@ const ChatPage: React.FC = () => {
   const [greetingMsg1, setGreetingMsg1] = useState<string | null>(null)
   const [greetingMsg2, setGreetingMsg2] = useState<string | null>(null)
   const [isSettingOpen, setIsSettingOpen] = useState(false) // 세팅 오픈
+  const [isReportOpen, setIsReportOpen] = useState(false)
+  const [reportTargetId, setReportTargetId] = useState<string | null>(null)
   const chatMainRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const userId = useUserStore(state => state.id)
@@ -91,9 +99,12 @@ const ChatPage: React.FC = () => {
   const accessToken = sessionStorage.getItem('accessToken') ?? ''
   const isAtBottomRef = useRef(true) // 스크롤 감지
 
+  const isManagerRoom = String(id) === String(MANAGER_ROOM.roomRouteId)
+
   const room = useMemo(() => {
-    return chatRooms.find(r => String(r.roomRouteId) === String(id))
-  }, [id])
+    if (isManagerRoom) return MANAGER_ROOM
+    return MAIN_DATA.find(r => String(r.roomRouteId) === String(id))
+  }, [id, isManagerRoom])
 
   // 세팅 열기
   const openSettings = () => {
@@ -125,11 +136,59 @@ const ChatPage: React.FC = () => {
       setMessages,
     })
 
+  const handleOpenReport = (messageId: string) => {
+    setReportTargetId(messageId)
+    setIsReportOpen(true)
+  }
+
+  const handleCloseReport = () => {
+    setIsReportOpen(false)
+    setReportTargetId(null)
+  }
+
+  // 신고 접수
+  const handleReportSubmit = async (messageId: string, reason: string) => {
+    try {
+      const targetMessage = messages.find(m => m.id === messageId)
+      const messageContent = targetMessage?.text || ''
+
+      await createSupport(
+        {
+          type: 'REPORT',
+          category: reason,
+          content: reason,
+          chatroomId,
+          messageId,
+          messageContent,
+        },
+        {
+          userId, // 헤더에 들어갈 User ID
+        }
+      )
+      showToast({
+        message: 'Thanks for letting us know!',
+        iconType: 'checkRound',
+      })
+      console.log('신고 완료 처리:', messageId, reason)
+
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === messageId ? { ...msg, isReported: true } : msg
+        )
+      )
+    } catch (error) {
+      console.error('신고 요청 실패:', error)
+    } finally {
+      handleCloseReport()
+    }
+  }
+
   const { isModalOpen, handleConfirmExit, handleCancelExit, handleGoBack } =
     useChatExit({
       chatroomId,
       userId,
       routeId: id,
+      enableGuard: !isManagerRoom,
     })
 
   const { inactivityError, resetInactivityTimer, stopInactivityTimer } =
@@ -155,6 +214,8 @@ const ChatPage: React.FC = () => {
     sendError,
     handleSendMessage,
     handleRetry,
+    handleCancel,
+    handleResend,
   } = useChatInteraction({
     chatroomId,
     userId,
@@ -176,6 +237,14 @@ const ChatPage: React.FC = () => {
     const isBottom = scrollHeight - scrollTop - clientHeight < 50
     isAtBottomRef.current = isBottom
   }
+
+  useEffect(() => {
+    if (isManagerRoom) {
+      setIsHistoryLoading(false)
+      setIsInitChatReady(true)
+      // 매니저 초기 메시지 설정
+    }
+  }, [isManagerRoom])
 
   // 키보드 올라올 때 스크롤 보정
   useEffect(() => {
@@ -270,9 +339,10 @@ const ChatPage: React.FC = () => {
   }, [messages])
 
   return (
-    <div className="flex flex-col h-full overflow-hidden relative">
+    <div className="flex flex-col h-full overflow-hidden relative bg-gray-10">
       <ChatHeader
         title={room?.roomName || 'Chat'}
+        avatar={room?.avatar}
         closenessLevel={closenessLevel}
         onBack={handleGoBack}
         onSettingClick={openSettings}
@@ -303,55 +373,71 @@ const ChatPage: React.FC = () => {
           isTranslationEnabled={isTranslationEnabled}
           onChatBubbleBookmark={handleChatBubbleBookmark}
           onCorrectionBubbleBookmark={handleCorrectionBubbleBookmark}
+          onReport={handleOpenReport}
+          onResend={handleResend}
         />
       </div>
 
       <footer className="shrink-0">
-        <ChatFooter
-          inputRef={inputRef}
-          onSendMessage={handleSendMessage}
-          disabled={isHistoryLoading || !isInitChatReady || isAiResponding}
-        />
+        {!isManagerRoom && (
+          <ChatFooter
+            inputRef={inputRef}
+            onSendMessage={handleSendMessage}
+            disabled={isHistoryLoading || !isInitChatReady || isAiResponding}
+            isAiResponding={isAiResponding}
+            onCancel={handleCancel}
+          />
+        )}
       </footer>
+
       <ExitModal
         open={isModalOpen}
         onConfirm={handleConfirmExit}
         onCancel={handleCancelExit}
       />
 
-      <BottomSheet
-        isOpen={isSettingOpen}
-        onClose={() => setIsSettingOpen(false)}
-        title="Auto-open messages"
-        description="Turn this on to view messages instantly."
-      >
-        <div className="flex flex-col gap-[20px] mt-[14px] mb-[30px]">
-          <div className="flex justify-between items-center">
-            <span className="text-[16px]">Vocabulary</span>
-            <ToggleSwitch
-              checked={tempVocabulary}
-              onClick={() => setTempVocabulary(!tempVocabulary)}
-            />
+      <ReportSheet
+        isOpen={isReportOpen}
+        onClose={handleCloseReport}
+        messageId={reportTargetId}
+        onReport={handleReportSubmit}
+      />
+
+      {!isManagerRoom && (
+        <BottomSheet
+          isOpen={isSettingOpen}
+          onClose={() => setIsSettingOpen(false)}
+          title="Auto-open messages"
+          description="Turn this on to view messages instantly."
+        >
+          <div className="flex flex-col gap-[20px] mt-[14px] mb-[30px]">
+            <div className="flex justify-between items-center">
+              <span className="text-[16px]">Vocabulary</span>
+              <ToggleSwitch
+                checked={tempVocabulary}
+                onClick={() => setTempVocabulary(!tempVocabulary)}
+              />
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-[16px]">Tone Adjustment</span>
+              <ToggleSwitch
+                checked={tempCorrection}
+                onClick={() => setTempCorrection(!tempCorrection)}
+              />
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-[16px]">Korean Explanation</span>
+              <ToggleSwitch
+                checked={tempTranslation}
+                onClick={() => setTempTranslation(!tempTranslation)}
+              />
+            </div>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-[16px]">Tone Adjustment</span>
-            <ToggleSwitch
-              checked={tempCorrection}
-              onClick={() => setTempCorrection(!tempCorrection)}
-            />
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-[16px]">Korean Explanation</span>
-            <ToggleSwitch
-              checked={tempTranslation}
-              onClick={() => setTempTranslation(!tempTranslation)}
-            />
-          </div>
-        </div>
-        <Button variant="primary" size="confirm" onClick={handleSaveSettings}>
-          Save
-        </Button>
-      </BottomSheet>
+          <Button variant="primary" size="confirm" onClick={handleSaveSettings}>
+            Save
+          </Button>
+        </BottomSheet>
+      )}
     </div>
   )
 }

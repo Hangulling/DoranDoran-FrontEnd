@@ -4,7 +4,9 @@
 @plugin "daisyui";
 
 @theme {
-  --font-family-sans: 'Noto Sans', 'Noto Sans KR', sans-serif;
+  --font-family-sans:
+    'Noto Sans', 'Noto Sans KR', 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', sans-serif;
 
   --color-gray-0: #ffffff;
   --color-gray-10: #fafafa;
@@ -21,6 +23,7 @@
   --color-gray-900: #121112;
 
   --color-primary-10: #f3f1fd;
+  --color-primary-30: #efecfd;
   --color-primary-50: #e3defc;
   --color-primary-80: #cfc7fa;
   --color-primary-100: #bbaff8;
@@ -106,6 +109,13 @@
   }
   .text-display {
     @apply font-bold;
+  }
+
+  .gradient-border {
+    border: 1px solid transparent;
+    background:
+      linear-gradient(#ffffff, #ffffff) padding-box,
+      var(--background-image-gradient-1) border-box;
   }
 }
 

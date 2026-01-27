@@ -1,4 +1,5 @@
 import { lazy } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 import { Navigate, Route, Routes as RouterRoutes } from 'react-router-dom'
 import PrivateRoute from './PrivateRoute'
 import FindEmailNotFound from '../pages/find-email/FindEmailNotFound'
@@ -19,10 +20,12 @@ import LoginEmailPage from '../pages/LoginEmailPage'
 import ProfilePage from '../pages/ProfilePage'
 
 const MainPage = lazy(() => import('../pages/MainPage'))
+const InstaPage = lazy(() => import('../pages/InstaPage'))
 const SignupPage = lazy(() => import('../pages/signup/SignupPage'))
 const LoginPage = lazy(() => import('../pages/LoginPage'))
 const MyPage = lazy(() => import('../pages/MyPage'))
 const ChatPage = lazy(() => import('../pages/ChatPage'))
+const ManagerChatPage = lazy(() => import('../pages/ManagerChatPage'))
 const ArchivePage = lazy(() => import('../pages/archive/ArchivePage'))
 const SentenceArchivePage = lazy(
   () => import('../pages/archive/SentenceArchivePage')
@@ -38,89 +41,106 @@ const FindPasswordPage = lazy(
 
 export function Routes() {
   return (
-    <RouterRoutes>
-      <Route path="/signup" element={<SignupPage />}>
-        <Route index element={<Navigate to="term" replace />} />
-        <Route path="term" element={<SignupTerm />} />
-        <Route path="name" element={<SignupName />} />
-        <Route path="birthdate" element={<SignupBirthDate />} />
-        <Route path="email" element={<SignupEmail />} />
-        <Route path="password" element={<SignupPassword />} />
-        <Route path="question" element={<SignupQuestion />} />
-      </Route>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/login/email" element={<LoginEmailPage />} />
-      <Route path="/mypage">
-        <Route index element={<MyPage />} />
-        <Route path="profile" element={<ProfilePage />} />
-      </Route>
-      <Route
-        path="/"
-        element={
-          <PrivateRoute>
-            <MainPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/chat/:id"
-        element={
-          <PrivateRoute>
-            <ChatPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/archive"
-        element={
-          <PrivateRoute>
-            <ArchivePage />
-          </PrivateRoute>
-        }
-      />
+    <ErrorBoundary fallback={<ErrorPage errorCode={500} />}>
+      <RouterRoutes>
+        <Route path="/signup" element={<SignupPage />}>
+          <Route index element={<Navigate to="term" replace />} />
+          <Route path="term" element={<SignupTerm />} />
+          <Route path="name" element={<SignupName />} />
+          <Route path="birthdate" element={<SignupBirthDate />} />
+          <Route path="email" element={<SignupEmail />} />
+          <Route path="password" element={<SignupPassword />} />
+          <Route path="question" element={<SignupQuestion />} />
+        </Route>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login/email" element={<LoginEmailPage />} />
+        <Route path="/mypage">
+          <Route index element={<MyPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+        </Route>
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <MainPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/insta/:externalId"
+          element={
+            <PrivateRoute>
+              <InstaPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/chat/:id"
+          element={
+            <PrivateRoute>
+              <ChatPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/manager"
+          element={
+            <PrivateRoute>
+              <ManagerChatPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/archive"
+          element={
+            <PrivateRoute>
+              <ArchivePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/archive/sentences"
+          element={
+            <PrivateRoute>
+              <SentenceArchivePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/archive/words"
+          element={
+            <PrivateRoute>
+              <WordArchivePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/onboarding"
+          element={
+            <PrivateRoute>
+              <OnboardingPage />
+            </PrivateRoute>
+          }
+        />
 
-      <Route
-        path="/archive/sentences"
-        element={
-          <PrivateRoute>
-            <SentenceArchivePage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/archive/words"
-        element={
-          <PrivateRoute>
-            <WordArchivePage />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/onboarding"
-        element={
-          <PrivateRoute>
-            <OnboardingPage />
-          </PrivateRoute>
-        }
-      />
-      <Route path="/policy/:id" element={<PolicyPage />} />
-      <Route path="/find-email" element={<FindEmailPage />}>
-        <Route index element={<Navigate to="name" replace />} />
-        <Route path="name" element={<FindEmailName />} />
-        <Route path="birthdate" element={<FindEmailBirthDate />} />
-        <Route path="question" element={<FindEmailQuestion />} />
-        <Route path="not-found" element={<FindEmailNotFound />} />
-        <Route path="success" element={<FindEmailSuccess />} />
-      </Route>
-      <Route path="/find-password" element={<FindPasswordPage />}>
-        <Route index element={<Navigate to="email" replace />} />
-        <Route path="email" element={<FindPasswordEmail />} />
-        <Route path="verify" element={<FindPasswordVerify />} />
-        <Route path="reset" element={<FindPasswordReset />} />
-      </Route>
-      <Route path="/error" element={<ErrorPage />} />
-      <Route path="*" element={<ErrorPage errorCode={404} />} />
-    </RouterRoutes>
+        <Route path="/policy/:id" element={<PolicyPage />} />
+        <Route path="/find-email" element={<FindEmailPage />}>
+          <Route index element={<Navigate to="name" replace />} />
+          <Route path="name" element={<FindEmailName />} />
+          <Route path="birthdate" element={<FindEmailBirthDate />} />
+          <Route path="question" element={<FindEmailQuestion />} />
+          <Route path="not-found" element={<FindEmailNotFound />} />
+          <Route path="success" element={<FindEmailSuccess />} />
+        </Route>
+        <Route path="/find-password" element={<FindPasswordPage />}>
+          <Route index element={<Navigate to="email" replace />} />
+          <Route path="email" element={<FindPasswordEmail />} />
+          <Route path="verify" element={<FindPasswordVerify />} />
+          <Route path="reset" element={<FindPasswordReset />} />
+        </Route>
+        <Route path="/error" element={<ErrorPage errorCode={500} />} />
+        <Route path="*" element={<ErrorPage errorCode={404} />} />
+      </RouterRoutes>
+    </ErrorBoundary>
   )
 }
