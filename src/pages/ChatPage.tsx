@@ -127,6 +127,7 @@ const ChatPage: React.FC = () => {
     })
   }
 
+  // 북마크
   const { handleChatBubbleBookmark, handleCorrectionBubbleBookmark } =
     useBookmarkManager({
       chatroomId,
@@ -208,6 +209,7 @@ const ChatPage: React.FC = () => {
     setGreetingMsg2,
   })
 
+  // 채팅 기능
   const {
     isAiResponding,
     sseError,
@@ -230,6 +232,13 @@ const ChatPage: React.FC = () => {
     setGreetingState,
   })
 
+  // 재전송
+  const handleRetryUserMessage = (msgId: string, content: string) => {
+    // 기존 실패 메시지 삭제
+    setMessages(prev => prev.filter(m => m.id !== msgId))
+    handleSendMessage(content)
+  }
+
   // 스크롤 위치 감지 함수
   const handleScroll = () => {
     if (!chatMainRef.current) return
@@ -237,14 +246,6 @@ const ChatPage: React.FC = () => {
     const isBottom = scrollHeight - scrollTop - clientHeight < 50
     isAtBottomRef.current = isBottom
   }
-
-  useEffect(() => {
-    if (isManagerRoom) {
-      setIsHistoryLoading(false)
-      setIsInitChatReady(true)
-      // 매니저 초기 메시지 설정
-    }
-  }, [isManagerRoom])
 
   // 키보드 올라올 때 스크롤 보정
   useEffect(() => {
@@ -375,6 +376,7 @@ const ChatPage: React.FC = () => {
           onCorrectionBubbleBookmark={handleCorrectionBubbleBookmark}
           onReport={handleOpenReport}
           onResend={handleResend}
+          onRetryUserMessage={handleRetryUserMessage}
         />
       </div>
 

@@ -30,6 +30,7 @@ interface ChatMessageItemProps {
   ) => void
   onReport: (messageId: string) => void
   onResend?: (cancelledMsgId: string, targetUserMsgId: string) => void
+  onRetryUserMessage?: (msgId: string, content: string) => void
 }
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
@@ -43,6 +44,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
     onCorrectionBubbleBookmark,
     onReport,
     onResend,
+    onRetryUserMessage,
   }) => {
     const [showDescription, setShowDescription] = useState(true)
     const [showFeedback, setShowFeedback] = useState(true)
@@ -74,8 +76,9 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
         return (
           <button
             onClick={() => {
-              // 재전송 미정
-              console.log('재전송 클릭')
+              if (onRetryUserMessage) {
+                onRetryUserMessage(msg.id, msg.text)
+              }
             }}
           >
             <IconComponent />

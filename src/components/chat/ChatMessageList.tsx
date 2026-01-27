@@ -35,6 +35,7 @@ interface ChatMessageListProps {
   ) => void
   onReport: (messageId: string) => void
   onResend?: (cancelledMsgId: string, targetUserMsgId: string) => void
+  onRetryUserMessage?: (msgId: string, content: string) => void
 }
 
 const ChatMessageList: React.FC<ChatMessageListProps> = ({
@@ -53,6 +54,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
   onCorrectionBubbleBookmark,
   onReport,
   onResend,
+  onRetryUserMessage,
 }) => {
   return (
     <div className="space-y-4">
@@ -68,6 +70,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
           onCorrectionBubbleBookmark={onCorrectionBubbleBookmark}
           onReport={onReport}
           onResend={onResend}
+          onRetryUserMessage={onRetryUserMessage}
         />
       ))}
 
