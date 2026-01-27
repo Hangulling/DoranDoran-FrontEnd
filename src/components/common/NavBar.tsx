@@ -1,7 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import LeftArrowIcon from '../../assets/icon/leftArrow.svg?react'
-import CloseIcon from '../../assets/icon/close.svg'
 import HomeIcon from '../../assets/icon/home.svg?react'
 import MyIcon from '../../assets/icon/my.svg?react'
 import SavedIcon from '../../assets/icon/saved.svg?react'
@@ -10,6 +9,7 @@ import Button from './Button'
 import type { NavBarProps } from '../../types/common'
 import { BOT_TO_ROOM } from '../../types/archive'
 import { useNavBar } from '../../hooks/useNavBarAction'
+import CloseIcon from '../../assets/icon/CloseIcon'
 
 const NavBar: React.FC<NavBarProps & { position?: 'top' | 'bottom' }> = ({
   title,
@@ -31,7 +31,9 @@ const NavBar: React.FC<NavBarProps & { position?: 'top' | 'bottom' }> = ({
     deselectAll,
   } = useArchiveStore()
 
-  const hasAnyInRoom = items.some(i => BOT_TO_ROOM[i.botType] === activeRoom)
+  const hasAnyInRoom = activeRoom.includes('All')
+    ? items.length > 0
+    : items.some(i => activeRoom.includes(BOT_TO_ROOM[i.botType]))
 
   const positionStyle =
     position === 'top'
@@ -87,8 +89,8 @@ const NavBar: React.FC<NavBarProps & { position?: 'top' | 'bottom' }> = ({
 
               {/* 선택 모드 */}
               {selectionMode && (
-                <Button onClick={exitSelectionMode}>
-                  <img src={CloseIcon} />
+                <Button variant="text" onClick={exitSelectionMode}>
+                  <CloseIcon className="text-gray-600" />
                 </Button>
               )}
             </div>

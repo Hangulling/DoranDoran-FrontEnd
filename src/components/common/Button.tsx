@@ -31,7 +31,7 @@ const VARIANTS: Record<Variant, string> = {
   text: 'bg-transparent',
   confirm: 'bg-primary-300 text-white rounded-xl',
   tab: 'rounded-[18px] px-[14px] py-2 text-body text-sm',
-  archive: 'text-gray-500 text-sm text-body',
+  archive: 'text-gray-400 text-sm text-subtitle',
   home: 'bg-primary-300 text-gray-0 rounded-[10px] text-[14px] text-subtitle border border-primary-300',
   dropdown: 'px-3',
   bottomSheet:

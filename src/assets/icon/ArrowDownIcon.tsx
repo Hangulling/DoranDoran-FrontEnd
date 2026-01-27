@@ -1,8 +1,8 @@
-interface ArrowRightIconProps {
+interface ArrowDownIconProp {
   className?: string
 }
 
-export default function ArrowRightIcon({ className }: ArrowRightIconProps) {
+export default function ArrowDownIcon({ className }: ArrowDownIconProp) {
   return (
     <svg
       width="16"
@@ -13,7 +13,7 @@ export default function ArrowRightIcon({ className }: ArrowRightIconProps) {
       className={className}
     >
       <path
-        d="M6 4L10 8L6 12"
+        d="M4 6L8 10L12 6"
         stroke="currentColor"
         strokeWidth="1.4"
         strokeLinecap="round"

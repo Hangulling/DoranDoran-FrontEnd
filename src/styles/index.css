@@ -25,6 +25,7 @@
   --color-primary-10: #f3f1fd;
   --color-primary-30: #efecfd;
   --color-primary-50: #e3defc;
+  --color-primary-80: #cfc7fa;
   --color-primary-100: #bbaff8;
   --color-primary-200: #9480f4;
   --color-primary-300: #6c51f0;
@@ -59,6 +60,7 @@
   --color-purple-900: #030109;
 
   --color-system-red: #ff6149;
+  --color-system-red-02: #ffb8ad;
   --color-system-blue: #546eff;
   --color-system-blue-okay: #76e9f6;
   --color-system-yellow: #ffbd38;
