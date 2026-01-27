@@ -92,9 +92,9 @@ const MainPage = () => {
       try {
         // 웹뷰를 상태바 밑으로 확장
         await StatusBar.setOverlaysWebView({ overlay: true })
-        // 상태바 배경색을 투명으로 설정
-        await StatusBar.setBackgroundColor({ color: 'transparent' })
-        // 상태바 아이콘 색상
+
+        await StatusBar.setBackgroundColor({ color: '#00000000' })
+
         await StatusBar.setStyle({ style: Style.Light })
       } catch (e) {
         console.log('StatusBar error', e)

@@ -14,26 +14,25 @@ const ChatRoomList = ({
   chatMsg,
   onRoomClick,
 }: ChatRoomListProps) => {
-  const displayData = isLoading ? MAIN_DATA : chatMsg // 스켈레톤 중 구조 먼저 표시
+  const baseData = isLoading ? MAIN_DATA : chatMsg
+
+  const displayData = [...baseData, MANAGER_ROOM]
 
   return (
     <div className="flex w-full flex-col">
-      {displayData.map(room => (
+      {displayData.map((room, index) => (
         <React.Fragment key={room.roomRouteId}>
           <ChatRoomItem
             room={room}
             onClick={(id, name) => onRoomClick(Number(id), name)}
             isLoading={isLoading}
           />
-          <div className="my-[6px] h-[1px] w-full bg-gray-80" />
+
+          {index < displayData.length - 1 && (
+            <div className="my-[6px] h-[1px] w-full bg-gray-80" />
+          )}
         </React.Fragment>
       ))}
-
-      <ChatRoomItem
-        room={MANAGER_ROOM}
-        onClick={(id, name) => onRoomClick(Number(id), name)}
-        isLoading={isLoading}
-      />
     </div>
   )
 }

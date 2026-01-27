@@ -10,7 +10,7 @@ const ChatRoomItem = ({ room, onClick, isLoading }: ChatRoomItemProps) => {
   if (!targetData) return null
 
   const Skeleton = () => (
-    <div className="h-[18px] w-[283px] bg-primary-30 rounded-[4px] animate-pulse" />
+    <div className="h-[18px] w-[210px] bg-primary-30 rounded-[4px] animate-pulse" />
   )
 
   return (
