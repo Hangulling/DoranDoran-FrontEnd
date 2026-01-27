@@ -6,6 +6,7 @@ export function useNavBar() {
   const chatMatch = useMatch('/chat/:id')
   const closenessMatch = useMatch('/closeness/:id')
   const archiveMatch = useMatch('/archive/:id')
+  const instaMatch = useMatch('/insta/:externalId')
 
   const isChatPage = Boolean(chatMatch)
   const currentId =
@@ -13,7 +14,11 @@ export function useNavBar() {
 
   // 뒤로가기
   const goBack = () => {
-    navigate(-1)
+    if (instaMatch) {
+      navigate('/')
+    } else {
+      navigate(-1)
+    }
   }
 
   // 북마크 바로가기

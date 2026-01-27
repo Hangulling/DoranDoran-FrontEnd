@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getHomePostDetail } from '../api/home'
-import type { HomePost } from '../types/home'
-import LoadingSpinner from '../components/common/LoadingSpinner'
 import Button from '../components/common/Button'
 import instagram from '../assets/main/instagram.png'
 import { useHomeStore } from '../stores/useHomeStore'
+import type { HomePost } from '../types/home'
 import LeftArrow from '../assets/icon/leftArrow.svg?react'
 
 const ImageSkeleton = () => (
@@ -13,7 +12,7 @@ const ImageSkeleton = () => (
 )
 
 const TextSkeleton = () => (
-  <div className="space-y-3 w-full animate-pulse">
+  <div className="space-y-1 w-full animate-pulse">
     <div className="h-[18px] w-full bg-primary-30 rounded-[4px]" />
     <div className="h-[18px] w-full bg-primary-30 rounded-[4px]" />
     <div className="h-[18px] w-[60%] bg-primary-30 rounded-[4px]" />
@@ -71,10 +70,6 @@ const InstaPage = () => {
     window.open(post.permalink, '_blank', 'noopener,noreferrer')
   }
 
-  if (loading) {
-    return <LoadingSpinner />
-  }
-
   if (!post) {
     navigate('/error')
     return null
@@ -116,7 +111,7 @@ const InstaPage = () => {
       </div>
 
       {totalCount > 0 && (
-        <footer className="max-w-md fixed bottom-0 left-0 right-0 h-[50px] bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] border-t border-gray-100 grid grid-cols-3 items-center px-5 py-[14px] mx-auto text-[14px]">
+        <footer className="max-w-app md:max-w-tablet lg:max-w-desktop fixed bottom-0 left-0 right-0 h-[50px] bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] border-t border-gray-100 grid grid-cols-3 items-center px-5 py-[14px] mx-auto text-[14px]">
           <div className="flex justify-start">
             <button
               onClick={handlePrev}
