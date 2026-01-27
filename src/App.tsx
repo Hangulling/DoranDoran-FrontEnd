@@ -39,7 +39,7 @@ function App() {
   }, [navigate, location]) // location이 바뀔 때마다 리스너를 갱신하여 최신 경로 감지
 
   return (
-    <div className="relative flex flex-col h-dvh mx-auto w-full max-w-md bg-white">
+    <div className="relative flex flex-col h-dvh mx-auto w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-white">
       <Toaster position="bottom-center" />
       <AppLayout>
         <Suspense fallback={<LoadingSpinner />}>

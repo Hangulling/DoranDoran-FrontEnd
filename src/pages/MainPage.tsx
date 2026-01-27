@@ -69,10 +69,10 @@ const MainPage = () => {
         intimacyLevel: closeness,
       },
       {
-        onSuccess: () => {
+        onSuccess: newRoom => {
           setIsSheetOpen(false)
           // 채팅방 생성 완료 후 이동
-          navigate(`/chat/${selectedRoom.id}`, {
+          navigate(`/chat/${newRoom.id}`, {
             state: {
               roomRouteId: selectedRoom.id,
               concept: selectedRoom.name,
@@ -92,9 +92,9 @@ const MainPage = () => {
       try {
         // 웹뷰를 상태바 밑으로 확장
         await StatusBar.setOverlaysWebView({ overlay: true })
-        // 상태바 배경색을 투명으로 설정
-        await StatusBar.setBackgroundColor({ color: 'transparent' })
-        // 상태바 아이콘 색상
+
+        await StatusBar.setBackgroundColor({ color: '#00000000' })
+
         await StatusBar.setStyle({ style: Style.Light })
       } catch (e) {
         console.log('StatusBar error', e)
@@ -132,7 +132,7 @@ const MainPage = () => {
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-5 my-8">
+      <div className="max-w-app md:max-w-tablet lg:max-w-desktop mx-auto px-5 my-8">
         <div className="text-title mb-2 text-[18px]">Chatting Room</div>
 
         <ChatRoomList
@@ -142,7 +142,7 @@ const MainPage = () => {
         />
       </div>
 
-      <section className="max-w-md mx-auto ml-5 mb-[77px]">
+      <section className="max-w-app md:max-w-tablet lg:max-w-desktop mx-auto ml-5 mb-[77px]">
         <div className="text-title mb-3 mr-5 text-[18px]">
           Koach Pick K - contents
         </div>

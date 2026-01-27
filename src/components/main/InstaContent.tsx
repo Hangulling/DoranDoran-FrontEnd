@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getHomePosts } from '../../api/home'
 import type { HomePost } from '../../types/home'
+import { useHomeStore } from '../../stores/useHomeStore'
 
 interface InstaContentProps {
   onCardClick?: (externalId: string) => void
@@ -9,12 +10,14 @@ interface InstaContentProps {
 const InstaContent = ({ onCardClick }: InstaContentProps) => {
   const [posts, setPosts] = useState<HomePost[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const { setHomePosts } = useHomeStore()
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         const data = await getHomePosts()
         setPosts(data)
+        setHomePosts(data)
       } catch (error) {
         console.error('Failed to fetch home posts:', error)
       } finally {
@@ -22,7 +25,7 @@ const InstaContent = ({ onCardClick }: InstaContentProps) => {
       }
     }
     fetchPosts()
-  }, [])
+  }, [setHomePosts])
 
   // 스켈레톤 카드 컴포넌트
   const SkeletonCard = () => (

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type JSX, type RefObject } from 'react'
 import { Keyboard } from '@capacitor/keyboard'
+import { Capacitor } from '@capacitor/core'
 import SendIcon from '../../assets/chat/send.svg'
 import ErrorIcon from '../../assets/icon/error.svg'
 import CheckIcon from '../../assets/icon/CheckIcon'
@@ -63,7 +64,12 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   }, [])
 
   useEffect(() => {
-    Keyboard.setScroll({ isDisabled: true })
+    if (!Capacitor.isNativePlatform()) return
+
+    // 네이티브 앱인 경우에만 실행
+    Keyboard.setScroll({ isDisabled: true }).catch(err =>
+      console.warn('Keyboard setScroll failed:', err)
+    )
 
     const onWillShow = () => {
       setIsKeyboardOpen(true)
@@ -73,12 +79,21 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
       setIsKeyboardOpen(false)
     }
 
-    Keyboard.addListener('keyboardWillShow', onWillShow)
-    Keyboard.addListener('keyboardDidHide', onDidHide)
+    // 리스너 등록
+    const setupListeners = async () => {
+      try {
+        await Keyboard.addListener('keyboardWillShow', onWillShow)
+        await Keyboard.addListener('keyboardDidHide', onDidHide)
+      } catch (err) {
+        console.warn('Keyboard listeners failed:', err)
+      }
+    }
+
+    setupListeners()
 
     return () => {
-      Keyboard.removeAllListeners()
-      Keyboard.setScroll({ isDisabled: false })
+      Keyboard.removeAllListeners().catch(err => console.warn(err))
+      Keyboard.setScroll({ isDisabled: false }).catch(err => console.warn(err))
     }
   }, [])
 

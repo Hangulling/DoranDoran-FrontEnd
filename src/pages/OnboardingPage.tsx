@@ -129,7 +129,7 @@ export default function OnboardingPage() {
       </header>
 
       {/* 컨텐츠 */}
-      <div className="flex-1 w-full max-w-md overflow-y-auto pb-4">
+      <div className="flex-1 w-full max-w-app md:max-w-tablet lg:max-w-desktop overflow-y-auto pb-4">
         <OnboardingContent
           stepData={currentStepData}
           selectedValues={currentSelections}
@@ -141,7 +141,7 @@ export default function OnboardingPage() {
 
       {/* 버튼 */}
       <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center">
-        <div className="w-full max-w-md bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] h-18 px-5 pt-[10px] pb-[calc(10px+env(safe-area-inset-bottom))]">
+        <div className="w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] h-18 px-5 pt-[10px] pb-[calc(10px+env(safe-area-inset-bottom))]">
           {isLastPage ? (
             <Button
               type="submit"
