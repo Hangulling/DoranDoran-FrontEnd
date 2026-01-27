@@ -3,14 +3,12 @@ module.exports = {
   darkMode: false,
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
-    screens: {
-      sm: '480px',
-      md: '768px',
-      lg: '1025px',
-      xl: '1280px',
-      xl2: '1360px',
-    },
     extend: {
+      maxWidth: {
+        app: '448px', // 모바일 기본 (기존 max-w-md)
+        tablet: '768px', // 태블릿 대응 너비
+        desktop: '1024px', // 데스크탑 대응 너비
+      },
       lineHeight: {
         150: '1.5', // 150% 행간 추가
       },

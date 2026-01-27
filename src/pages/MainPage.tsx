@@ -132,7 +132,7 @@ const MainPage = () => {
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-5 my-8">
+      <div className="max-w-app md:max-w-tablet lg:max-w-desktop mx-auto px-5 my-8">
         <div className="text-title mb-2 text-[18px]">Chatting Room</div>
 
         <ChatRoomList
@@ -142,7 +142,7 @@ const MainPage = () => {
         />
       </div>
 
-      <section className="max-w-md mx-auto ml-5 mb-[77px]">
+      <section className="max-w-app md:max-w-tablet lg:max-w-desktop mx-auto ml-5 mb-[77px]">
         <div className="text-title mb-3 mr-5 text-[18px]">
           Koach Pick K - contents
         </div>

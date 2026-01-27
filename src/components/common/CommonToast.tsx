@@ -23,7 +23,7 @@ const showToast = ({ message, iconType }: ToastProps) => {
 
   toast.custom(
     t => (
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-app md:max-w-tablet lg:max-w-desktop">
         <div
           className={`flex items-start mx-5 mb-[20px] bg-[rgba(44,42,44,0.85)] px-[14px] py-[16px] rounded-[12px] gap-3
           ${t.visible ? 'animate-fade-in-up' : 'toast-slide-fade-out'}

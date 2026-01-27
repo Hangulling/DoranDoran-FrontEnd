@@ -19,7 +19,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 w-full mx-auto max-w-md z-100 flex items-center justify-center"
+      className="fixed inset-0 w-full mx-auto max-w-app md:max-w-tablet lg:max-w-desktop z-100 flex items-center justify-center"
       role="dialog"
     >
       <div className="absolute inset-0 bg-gray-800/80" onClick={onCancel}></div>

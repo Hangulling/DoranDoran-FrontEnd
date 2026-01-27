@@ -54,7 +54,7 @@ const NavBar: React.FC<NavBarProps & { position?: 'top' | 'bottom' }> = ({
   return (
     <>
       <div
-        className={`mx-auto w-full max-w-md inset-x-0 navbar bg-gray-0 p-0
+        className={`mx-auto w-full max-w-app md:max-w-tablet lg:max-w-desktop inset-x-0 navbar bg-gray-0 p-0
         ${isChatPage ? '' : positionStyle}`}
       >
         {position === 'bottom' ? (
