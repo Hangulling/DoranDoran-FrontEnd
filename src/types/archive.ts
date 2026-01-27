@@ -1,4 +1,16 @@
-export type Room = 'Friend' | 'Honey' | 'Coworker' | 'Senior'
+export type Room = 'All' | 'Friend' | 'Honey' | 'Coworker' | 'Senior'
+export type Closeness = 'Polite' | 'Friendly'
+export type ArchiveType = 'sentences' | 'words'
+export type Lang = 'ENG' | 'KOR'
+export type SpecificRoom = Exclude<Room, 'All'>
+
+export interface ArchiveEntry {
+  key: ArchiveType
+  title: string
+  description: string
+  to: string
+  bgColor: string
+}
 
 export interface ExpressionItem {
   id: string
@@ -28,7 +40,7 @@ export interface Vocabulary {
 
 // --- AI 피드백 ---
 export interface AiResponse {
-  intimacyLevel?: string // 예: "Close" | "Casual"
+  intimacyLevel?: Closeness // 예: "Polite" | "Friendly"
   description?: string
   translation?: Translation
   vocabulary?: Vocabulary[]
@@ -70,14 +82,14 @@ export interface CursorPage<T> {
   empty: boolean
 }
 
-export const BOT_TO_ROOM: Record<BotType, Room> = {
+export const BOT_TO_ROOM: Record<BotType, SpecificRoom> = {
   friend: 'Friend',
   honey: 'Honey',
   coworker: 'Coworker',
   senior: 'Senior',
 }
 
-export const ROOM_TO_BOT: Record<Room, BotType> = {
+export const ROOM_TO_BOT: Record<SpecificRoom, BotType> = {
   Friend: 'friend',
   Honey: 'honey',
   Coworker: 'coworker',

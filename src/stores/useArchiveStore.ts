@@ -1,19 +1,28 @@
 import { create } from 'zustand'
-import type { BookmarkResponse, Room } from '../types/archive'
+import type { ArchiveType, BookmarkResponse, Room } from '../types/archive'
 import { BOT_TO_ROOM } from '../types/archive'
+import type { ClosenessFilter } from '../components/archive/ClosenessSelect'
+import { toCloseness } from '../constants/archiveData'
 
 interface ArchiveState {
   items: BookmarkResponse[]
+
+  contentType: ArchiveType
+  closenessFilter: ClosenessFilter
+
   selectedIds: Set<string>
   selectionMode: boolean
   deleteMode: boolean
-  activeRoom: Room
+  activeRoom: Room[]
 
   seedItems: (items: BookmarkResponse[]) => void
   appendItems: (items: BookmarkResponse[]) => void
   resetItems: () => void
 
-  setActiveRoom: (room: Room) => void
+  setContentType: (t: ArchiveType) => void
+  setClosenessFilter: (f: ClosenessFilter) => void
+
+  setActiveRoom: (room: Room[]) => void
   enterSelectionMode: () => void
   exitSelectionMode: () => void
   toggleSelect: (id: string) => void
@@ -23,11 +32,45 @@ interface ArchiveState {
   deleteSelected: () => void
 }
 
+const isWordItem = (b: BookmarkResponse) =>
+  (b.aiResponse?.vocabulary?.length ?? 0) > 0
+
+const isSentenceItem = (b: BookmarkResponse) => !!b.aiResponse?.description
+
+const getSelectableIds = (
+  items: BookmarkResponse[],
+  rooms: Room[],
+  contentType: ArchiveType,
+  closenessFilter: ClosenessFilter
+) => {
+  let base = items.filter(b =>
+    contentType === 'words' ? isWordItem(b) : isSentenceItem(b)
+  )
+
+  if (!rooms.includes('All')) {
+    const roomSet = new Set(rooms)
+    base = base.filter(b => roomSet.has(BOT_TO_ROOM[b.botType]))
+  }
+
+  if (closenessFilter !== 'all') {
+    base = base.filter(b => {
+      const c = toCloseness(b.aiResponse?.intimacyLevel ?? '')
+      return c === closenessFilter
+    })
+  }
+
+  return base.map(b => b.id)
+}
+
 const useArchiveStore = create<ArchiveState>(set => ({
   items: [],
+
+  contentType: 'words',
+  closenessFilter: 'all',
+
   selectedIds: new Set(),
   selectionMode: false,
-  activeRoom: 'Honey',
+  activeRoom: ['All'],
   deleteMode: false,
 
   seedItems: items => set({ items }),
@@ -47,6 +90,24 @@ const useArchiveStore = create<ArchiveState>(set => ({
       selectedIds: new Set(),
       selectionMode: false,
       deleteMode: false,
+      activeRoom: ['All'],
+      closenessFilter: 'all',
+      contentType: 'words',
+    }),
+
+  setContentType: t =>
+    set({
+      contentType: t,
+      selectedIds: new Set(),
+      selectionMode: false,
+      deleteMode: false,
+    }),
+
+  setClosenessFilter: f =>
+    set({
+      closenessFilter: f,
+      selectedIds: new Set(),
+      deleteMode: false,
     }),
 
   setActiveRoom: room =>
@@ -57,7 +118,9 @@ const useArchiveStore = create<ArchiveState>(set => ({
     }),
 
   enterSelectionMode: () => set({ selectionMode: true }),
-  exitSelectionMode: () => set({ selectionMode: false, selectedIds: new Set(), deleteMode: false }),
+
+  exitSelectionMode: () =>
+    set({ selectionMode: false, selectedIds: new Set(), deleteMode: false }),
 
   toggleSelect: (id: string) =>
     set(state => {
@@ -65,23 +128,31 @@ const useArchiveStore = create<ArchiveState>(set => ({
       if (next.has(id)) next.delete(id)
       else next.add(id)
 
-      const idsInRoom = state.items
-        .filter(i => BOT_TO_ROOM[i.botType] === state.activeRoom)
-        .map(i => i.id)
+      const idsInScope = getSelectableIds(
+        state.items,
+        state.activeRoom,
+        state.contentType,
+        state.closenessFilter
+      )
 
-      const allSelectedInRoom = idsInRoom.length > 0 && idsInRoom.every(x => next.has(x))
+      const allSelectedInScope =
+        idsInScope.length > 0 && idsInScope.every(x => next.has(x))
 
-      return { selectedIds: next, deleteMode: allSelectedInRoom }
+      return { selectedIds: next, deleteMode: allSelectedInScope }
     }),
 
   selectAll: () =>
     set(state => {
-      const idsInRoom = state.items
-        .filter(i => BOT_TO_ROOM[i.botType] === state.activeRoom)
-        .map(i => i.id)
+      const idsInScope = getSelectableIds(
+        state.items,
+        state.activeRoom,
+        state.contentType,
+        state.closenessFilter
+      )
+
       return {
-        selectedIds: new Set(idsInRoom),
-        deleteMode: idsInRoom.length > 0,
+        selectedIds: new Set(idsInScope),
+        deleteMode: idsInScope.length > 0,
         selectionMode: true,
       }
     }),

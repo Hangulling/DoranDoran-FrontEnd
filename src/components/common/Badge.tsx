@@ -5,15 +5,15 @@ interface BadgeProps {
 }
 
 const VARIANT_STYLES: Record<BadgeVariant, string> = {
-  Friendly: 'bg-label-pink',
-  Polite: 'bg-label-blue',
-  Casual: 'bg-label-yellow',
+  Friendly: 'text-primary-300',
+  Polite: 'text-secondary-500',
+  Casual: 'text-primary-300',
 }
 
 export default function Badge({ variant }: BadgeProps) {
   return (
     <div
-      className={`my-1 px-2 py-1 h-[19px] leading-none text-subtitle text-[10px] text-white rounded-sm  ${VARIANT_STYLES[variant]}`}
+      className={`bg-white/[64%] my-1 px-2 py-1 h-[22px] leading-none text-body text-xs rounded-full  ${VARIANT_STYLES[variant]}`}
     >
       {variant}
     </div>

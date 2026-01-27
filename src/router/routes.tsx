@@ -26,7 +26,11 @@ const LoginPage = lazy(() => import('../pages/LoginPage'))
 const MyPage = lazy(() => import('../pages/MyPage'))
 const ChatPage = lazy(() => import('../pages/ChatPage'))
 const ManagerChatPage = lazy(() => import('../pages/ManagerChatPage'))
-const ArchivePage = lazy(() => import('../pages/ArchivePage'))
+const ArchivePage = lazy(() => import('../pages/archive/ArchivePage'))
+const SentenceArchivePage = lazy(
+  () => import('../pages/archive/SentenceArchivePage')
+)
+const WordArchivePage = lazy(() => import('../pages/archive/WordArchivePage'))
 const PolicyPage = lazy(() => import('../pages/PolicyPage'))
 const ErrorPage = lazy(() => import('../pages/ErrorPage'))
 const OnboardingPage = lazy(() => import('../pages/OnboardingPage'))
@@ -87,10 +91,26 @@ export function Routes() {
           }
         />
         <Route
-          path="/archive/:id"
+          path="/archive"
           element={
             <PrivateRoute>
               <ArchivePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/archive/sentences"
+          element={
+            <PrivateRoute>
+              <SentenceArchivePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/archive/words"
+          element={
+            <PrivateRoute>
+              <WordArchivePage />
             </PrivateRoute>
           }
         />

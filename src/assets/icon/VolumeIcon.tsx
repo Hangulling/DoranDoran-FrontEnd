@@ -1,11 +1,13 @@
 interface VolumeIconProps {
   className?: string
   fillColor?: string
+  onClick?: (e: React.MouseEvent<SVGSVGElement>) => void
 }
 
 export default function VolumeIcon({
   className,
   fillColor = 'none',
+  onClick,
 }: VolumeIconProps) {
   return (
     <svg
@@ -15,6 +17,7 @@ export default function VolumeIcon({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
+      onClick={onClick}
     >
       <path
         d="M12.5 6.66684C13.0175 7.05496 13.4375 7.55822 13.7268 8.13679C14.0161 8.71535 14.1667 9.35332 14.1667 10.0002C14.1667 10.647 14.0161 11.285 13.7268 11.8636C13.4375 12.4421 13.0175 12.9454 12.5 13.3335M14.75 4.16684C15.62 4.86989 16.3217 5.75862 16.8037 6.76795C17.2858 7.77727 17.536 8.88164 17.536 10.0002C17.536 11.1187 17.2858 12.2231 16.8037 13.2324C16.3217 14.2417 15.62 15.1305 14.75 15.8335"

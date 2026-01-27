@@ -14,7 +14,8 @@ const pageTitles: Record<string, string> = {
   '/': '',
   '/signup': 'Sign Up',
   '/login/email': 'Continue with Email',
-  '/archive': 'Archive',
+  '/archive/sentences': 'Sentences',
+  '/archive/words': 'Words',
 }
 
 const chatRoomNames: Record<string, string> = {
@@ -81,9 +82,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const isMain = pathname === '/'
   const isChatPage = pathname.startsWith('/chat')
 
-  const archiveMatch = useMatch('/archive/:id')
-  const onArchive = !!archiveMatch
-  const archiveId = archiveMatch?.params.id
+  const archiveMatch = useMatch('/archive/sentences')
+  const wordMatch = useMatch('/archive/words')
+  const onArchive = !!archiveMatch || !!wordMatch
   const agreementMatch = useMatch('/policy/:id')
   const agreementId = agreementMatch?.params.id
 
@@ -102,7 +103,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     '/login/email',
     '/find-email',
     '/find-password',
-    '/archive',
+    '/archive/sentences',
+    '/archive/words',
     '/mypage/profile',
     '/insta',
   ]
@@ -115,20 +117,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const showBookmark =
     showBookmarkPaths.includes(pathname) || chatRoomId !== null
 
-  const fromChat = (location.state as { from?: string } | null)?.from === 'chat'
-
   const { selectionMode } = useArchiveStore()
 
   // 타이틀
   let title = ''
   if (selectionMode) {
     title = 'Delete'
-  } else if (onArchive) {
-    title =
-      (fromChat &&
-        archiveId &&
-        (chatRoomNames[archiveId] || `채팅방 ${archiveId}`)) ||
-      'Archive'
   } else if (chatRoomId) {
     title = chatRoomNames[chatRoomId] || `채팅방 ${chatRoomId}`
   } else if (agreementId) {
