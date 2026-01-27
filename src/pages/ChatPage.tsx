@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import ChatFooter from '../components/chat/ChatFooter'
 import type { Message } from '../types/chat'
 import { useModalStore } from '../stores/useUiStateStore'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { MAIN_DATA, MANAGER_ROOM } from '../constants/mainData'
 import ExitModal from '../components/chat/ExitModal'
 import { useUserStore } from '../stores/useUserStore'
@@ -63,7 +63,7 @@ const chatBotIdByRoom = (conceptValue: string): string => {
 const ChatPage: React.FC = () => {
   const navigate = useNavigate()
   const { id } = useParams()
-  const chatbotId = chatBotIdByRoom(id ?? '')
+  const location = useLocation()
   const setNoShowAgain = useModalStore(state => state.setNoShowAgain)
   const [messages, setMessages] = useState<EnrichedMessage[]>([]) // 확장
   const [isHistoryLoading, setIsHistoryLoading] = useState(true)
@@ -92,19 +92,28 @@ const ChatPage: React.FC = () => {
   const [tempVocabulary, setTempVocabulary] = useState(isVocabularyEnabled)
   const [tempCorrection, setTempCorrection] = useState(isCorrectionEnabled)
   const [tempTranslation, setTempTranslation] = useState(isTranslationEnabled)
-  const chatroomId = id ? roomsMap[id] : undefined
-  const closenessLevel =
-    useClosenessStore.getState().getCloseness(id ?? '') ?? 1
-  const closenessText = getClosenessAsText(closenessLevel)
+  const chatroomId = id
   const accessToken = sessionStorage.getItem('accessToken') ?? ''
   const isAtBottomRef = useRef(true) // 스크롤 감지
 
-  const isManagerRoom = String(id) === String(MANAGER_ROOM.roomRouteId)
+  const routeId = useMemo(() => {
+    if (location.state?.roomRouteId) {
+      return String(location.state.roomRouteId)
+    }
+    const foundId = Object.keys(roomsMap).find(key => roomsMap[key] === id)
+    return foundId
+  }, [id, location.state, roomsMap])
+
+  const chatbotId = chatBotIdByRoom(routeId ?? '')
+  const closenessLevel =
+    useClosenessStore.getState().getCloseness(routeId ?? '') ?? 1
+  const closenessText = getClosenessAsText(closenessLevel)
+  const isManagerRoom = String(routeId) === String(MANAGER_ROOM.roomRouteId)
 
   const room = useMemo(() => {
     if (isManagerRoom) return MANAGER_ROOM
-    return MAIN_DATA.find(r => String(r.roomRouteId) === String(id))
-  }, [id, isManagerRoom])
+    return MAIN_DATA.find(r => String(r.roomRouteId) === String(routeId))
+  }, [routeId, isManagerRoom])
 
   // 세팅 열기
   const openSettings = () => {
@@ -188,7 +197,7 @@ const ChatPage: React.FC = () => {
     useChatExit({
       chatroomId,
       userId,
-      routeId: id,
+      routeId: routeId,
       enableGuard: !isManagerRoom,
     })
 
@@ -199,7 +208,7 @@ const ChatPage: React.FC = () => {
     chatroomId,
     userId,
     roomAvatar: room?.avatar,
-    id,
+    id: routeId,
     navigate,
     setMessages,
     setIsHistoryLoading,

@@ -5,7 +5,7 @@ module.exports = {
   theme: {
     extend: {
       maxWidth: {
-        app: '448px', // 모바일 기본 (기존 max-w-md)
+        app: '448px', // 모바일 기본
         tablet: '768px', // 태블릿 대응 너비
         desktop: '1024px', // 데스크탑 대응 너비
       },

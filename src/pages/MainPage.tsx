@@ -69,10 +69,10 @@ const MainPage = () => {
         intimacyLevel: closeness,
       },
       {
-        onSuccess: () => {
+        onSuccess: newRoom => {
           setIsSheetOpen(false)
           // 채팅방 생성 완료 후 이동
-          navigate(`/chat/${selectedRoom.id}`, {
+          navigate(`/chat/${newRoom.id}`, {
             state: {
               roomRouteId: selectedRoom.id,
               concept: selectedRoom.name,
