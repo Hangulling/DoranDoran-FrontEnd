@@ -105,7 +105,6 @@ export function Routes() {
           </PrivateRoute>
         }
       />
-      <Route path="/saved" element={<SavedPage />} />
       <Route path="/policy/:id" element={<PolicyPage />} />
       <Route path="/find-email" element={<FindEmailPage />}>
         <Route index element={<Navigate to="name" replace />} />
