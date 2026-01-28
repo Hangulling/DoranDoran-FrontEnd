@@ -76,7 +76,7 @@ const InstaPage = () => {
   }
 
   return (
-    <div className="flex min-h-full flex-col bg-gray-0">
+    <div className="flex min-h-full flex-col bg-gray-0 pb-[calc(50px_+_env(safe-area-inset-bottom))]">
       {/* 이미지 */}
       <div className="w-full">
         {loading ? (
@@ -111,7 +111,7 @@ const InstaPage = () => {
       </div>
 
       {totalCount > 0 && (
-        <footer className="max-w-app md:max-w-tablet lg:max-w-desktop fixed bottom-0 left-0 right-0 h-[50px] bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] border-t border-gray-100 grid grid-cols-3 items-center px-5 py-[14px] mx-auto text-[14px]">
+        <footer className="max-w-app md:max-w-tablet lg:max-w-desktop fixed bottom-0 left-0 right-0 bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] border-t border-gray-100 grid grid-cols-3 items-center px-5 pt-[14px] pb-[calc(14px_+_env(safe-area-inset-bottom))] mx-auto text-[14px]">
           <div className="flex justify-start">
             <button
               onClick={handlePrev}
