@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.10](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.9...v2.1.10) (2026-01-29)
+
+
+### Features
+
+* 신고/문의 기능 추가 ([#235](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/235)) ([2059030](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/205903018c27327f5f3802080723ee079d8c2e0b))
+* 채팅 중지 및 재전송 ([#233](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/233)) ([abae37b](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/abae37b140569bc2e5c33c83c0766b02f531a09c))
+* 컨텐츠 상세 페이지 구현 ([#237](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/237)) ([2a808c5](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/2a808c5686e301f48265d4aaa01ffd3fe1824ccd))
+* 푸시 기능 추가 ([#239](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/239)) ([b63aac4](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/b63aac4f0984a6c76d4317c98d8713345e1f43c0))
+
 ### [2.1.9](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.8...v2.1.9) (2026-01-21)
 
 ### [2.1.8](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.7...v2.1.8) (2026-01-21)
