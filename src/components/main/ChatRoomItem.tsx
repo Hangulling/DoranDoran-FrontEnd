@@ -25,14 +25,28 @@ const ChatRoomItem = ({ room, onClick, isLoading }: ChatRoomItemProps) => {
           className="w-full h-full object-cover"
         />
       </div>
-      <div className="flex flex-col items-start">
-        <span className="text-title text-[16px]">
-          {capitalizeFirstLetter(targetData.roomName)}
-        </span>
+
+      <div className="flex flex-col items-start flex-1 min-w-0">
+        <div className="flex items-center justify-between w-full">
+          <span className="text-title text-[16px]">
+            {capitalizeFirstLetter(targetData.roomName)}
+          </span>
+
+          {/* 보라색 점 표시 */}
+          {room.hasNewMessage && (
+            <div className="w-2 h-2 rounded-full bg-purple-300 mr-2" />
+          )}
+        </div>
         {isLoading ? (
           <Skeleton />
         ) : (
-          <span className="text-gray-800 text-[14px]">{room.message}</span>
+          <span
+            className={`text-[14px] truncate w-full text-left ${
+              room.hasNewMessage ? 'text-gray-800' : 'text-gray-500'
+            }`}
+          >
+            {room.message}
+          </span>
         )}
       </div>
     </button>

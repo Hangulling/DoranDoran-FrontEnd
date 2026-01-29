@@ -243,7 +243,7 @@ export const useChatInteraction = ({
           setMessages(prev =>
             prev.map(msg => {
               if (msg.id === targetMsgId) {
-                if (intimacyData && intimacyData.correctedSentence) {
+                if (intimacyData && intimacyData.corrections) {
                   return {
                     ...msg,
                     correction: intimacyData,

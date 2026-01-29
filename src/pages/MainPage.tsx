@@ -13,22 +13,96 @@ import Carousel from '../components/main/Carousel'
 import Dashboard from '../components/main/Dashboard'
 import InstaContent from '../components/main/InstaContent'
 import { MANAGER_ROOM } from '../constants/mainData'
+import useUnreadStore from '../stores/useUnreadStore'
+import { updateIntimacy } from '../api'
+import { useMutation } from '@tanstack/react-query'
+import type { ChatRoomWithMessage } from '../types/main'
 
 const MainPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const { setUnread } = useUnreadStore()
   const [showCompleteModal, setShowCompleteModal] = useState(false)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [selectedRoom, setSelectedRoom] = useState<{
-    id: number
+    id: number | string
     name: string
   } | null>(null)
+  const [pushData, setPushData] = useState<{
+    chatroomId: string
+    startMessage: string
+  } | null>(null)
+
   const { userId } = useFetchUser()
   const { chatMsg, isLoading } = useFetchChatRooms(userId)
 
+  // 기존 방 생성
   const { mutate: createRoom, isPending: isCreating } = useCreateChatRoom(
     selectedRoom ? String(selectedRoom.id) : ''
   )
+
+  // 푸시 클릭 시 친밀도 업데이트
+  const { mutate: mutateIntimacy, isPending: isUpdating } = useMutation({
+    mutationFn: ({
+      chatroomId,
+      intimacyLevel,
+    }: {
+      chatroomId: string
+      intimacyLevel: number
+    }) => updateIntimacy(chatroomId, { intimacyLevel }),
+    onSuccess: (_, variables) => {
+      setIsSheetOpen(false)
+
+      if (selectedRoom) {
+        navigate(`/chat/${variables.chatroomId}`, {
+          state: {
+            roomRouteId: selectedRoom.id,
+            concept: selectedRoom.name,
+            closeness: variables.intimacyLevel,
+          },
+        })
+      }
+      setPushData(null)
+    },
+    onError: error => {
+      console.error('친밀도 업데이트 실패:', error)
+      setIsSheetOpen(false)
+    },
+  })
+
+  // 푸시 클릭 방 생성
+  useEffect(() => {
+    if (
+      location.state?.fromPush &&
+      location.state?.targetChatroomId &&
+      chatMsg.length > 0
+    ) {
+      const { targetChatroomId, startMessage } = location.state
+
+      // UUID로 방 찾기
+      const targetRoom = chatMsg.find(
+        (room: ChatRoomWithMessage) => room.chatroomId === targetChatroomId
+      )
+
+      if (targetRoom) {
+        // 읽음 처리
+        setUnread(targetChatroomId, false)
+
+        // 시트 열기
+        setSelectedRoom({
+          id: targetRoom.roomRouteId,
+          name: targetRoom.concept,
+        })
+        setPushData({
+          chatroomId: targetChatroomId,
+          startMessage: startMessage,
+        })
+        setIsSheetOpen(true)
+      }
+
+      window.history.replaceState({}, document.title)
+    }
+  }, [location.state, chatMsg, setUnread])
 
   useEffect(() => {
     if (location.state?.showOnboardingModal) {
@@ -41,7 +115,7 @@ const MainPage = () => {
     navigate(`/insta/${externalId}`)
   }
 
-  const handleRoomClick = (id: number, roomName: string) => {
+  const handleRoomClick = (id: number | string, roomName: string) => {
     if (id === MANAGER_ROOM.roomRouteId) {
       navigate(`/manager`, {
         state: {
@@ -52,14 +126,29 @@ const MainPage = () => {
       })
       return
     }
+    // 일반 진입 시 해당 방에 매칭되는 UUID가 있다면 읽음 처리
+    const room = chatMsg.find((r: ChatRoomWithMessage) => r.roomRouteId === id)
+    if (room?.chatroomId) {
+      setUnread(room.chatroomId, false)
+    }
 
     setSelectedRoom({ id, name: roomName })
+    setPushData(null)
     setIsSheetOpen(true)
   }
 
   const handleStartChat = (closeness: number) => {
     if (!selectedRoom || !userId) return
+    // 푸시로 들어온 경우
+    if (pushData) {
+      mutateIntimacy({
+        chatroomId: pushData.chatroomId,
+        intimacyLevel: closeness,
+      })
+      return
+    }
 
+    // 기존
     const chatbotId = getChatBotIdByConcept(selectedRoom.name)
     createRoom(
       {
@@ -154,7 +243,7 @@ const MainPage = () => {
         onClose={() => setIsSheetOpen(false)}
         concept={selectedRoom?.name || 'friend'}
         onStartChat={handleStartChat}
-        isLoading={isCreating}
+        isLoading={isCreating || isUpdating}
       />
 
       {/* 온보딩 완료 모달 */}

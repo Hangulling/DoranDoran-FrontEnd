@@ -19,3 +19,17 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Please add these rules to your existing keep rules in order to suppress warnings.
+# This is generated automatically by the Android Gradle plugin.
+-dontwarn com.facebook.AccessToken$AccessTokenRefreshCallback
+-dontwarn com.facebook.AccessToken
+-dontwarn com.facebook.CallbackManager$Factory
+-dontwarn com.facebook.CallbackManager
+-dontwarn com.facebook.FacebookCallback
+-dontwarn com.facebook.FacebookSdk
+-dontwarn com.facebook.GraphRequest$GraphJSONObjectCallback
+-dontwarn com.facebook.GraphRequest
+-dontwarn com.facebook.GraphRequestAsyncTask
+-dontwarn com.facebook.login.LoginBehavior
+-dontwarn com.facebook.login.LoginManager
