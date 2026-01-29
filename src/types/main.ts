@@ -4,6 +4,8 @@ export interface ChatRoomWithMessage {
   concept: string
   avatar: string
   message?: string
+  chatroomId?: string | null // 푸시로 받는
+  hasNewMessage?: boolean
 }
 
 export interface ChatRoomItemProps {

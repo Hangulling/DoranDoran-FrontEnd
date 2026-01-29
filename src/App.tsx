@@ -5,10 +5,13 @@ import AppLayout from './layouts/AppLayout'
 import { Toaster } from 'react-hot-toast'
 import { App as CapacitorApp } from '@capacitor/app'
 import { useLocation, useNavigate } from 'react-router-dom'
+import usePushNotification from './hooks/usePushNotification'
 
 function App() {
   const navigate = useNavigate()
   const location = useLocation()
+
+  usePushNotification()
 
   useEffect(() => {
     const setupBackButtonListener = async () => {
@@ -29,14 +32,12 @@ function App() {
 
       return listener
     }
-
     const listenerPromise = setupBackButtonListener()
 
-    // 컴포넌트 언마운트 시 리스너 제거
     return () => {
       listenerPromise.then(listener => listener.remove())
     }
-  }, [navigate, location]) // location이 바뀔 때마다 리스너를 갱신하여 최신 경로 감지
+  }, [navigate, location])
 
   return (
     <div className="relative flex flex-col h-dvh mx-auto w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-white">

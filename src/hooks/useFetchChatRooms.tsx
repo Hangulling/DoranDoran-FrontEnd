@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getLastInteractions } from '../api'
@@ -6,6 +6,7 @@ import { MAIN_DATA } from '../constants/mainData'
 import { getDaysDiff } from '../utils/getDaysDiff'
 import { getChatbotValueById } from '../utils/chatbotMap'
 import type { ChatRoomWithMessage } from '../types/main'
+import useUnreadStore from '../stores/useUnreadStore'
 
 const getStatusMessage = (diffDays: number | undefined): string => {
   if (diffDays === undefined) return 'Start your first chat now'
@@ -15,9 +16,10 @@ const getStatusMessage = (diffDays: number | undefined): string => {
 
 export const useFetchChatRooms = (userId: string) => {
   const navigate = useNavigate()
+  const { unreadMap } = useUnreadStore()
 
   const {
-    data: chatMsg = [],
+    data: rawChatMsg = [],
     isLoading,
     isError,
   } = useQuery<ChatRoomWithMessage[]>({
@@ -42,6 +44,8 @@ export const useFetchChatRooms = (userId: string) => {
           ...mockRoom,
           message,
           concept: mockRoom.roomName,
+          // 푸시 알림의 UUID와 매칭
+          chatroomId: serverRoom?.lastRoomId || null,
         }
       })
 
@@ -50,6 +54,14 @@ export const useFetchChatRooms = (userId: string) => {
     enabled: !!userId,
     staleTime: 1000 * 60 * 1, // 1분간 캐시 유지
   })
+
+  const chatMsg = useMemo(() => {
+    return rawChatMsg.map(room => ({
+      ...room,
+      // 안읽음이면 점 표시
+      hasNewMessage: room.chatroomId ? !!unreadMap[room.chatroomId] : false,
+    }))
+  }, [rawChatMsg, unreadMap])
 
   // 에러 처리
   useEffect(() => {
