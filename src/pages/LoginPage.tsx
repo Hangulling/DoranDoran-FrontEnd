@@ -88,7 +88,9 @@ export default function LoginPage() {
     try {
       const r = (await SocialLogin.login({
         provider: 'google',
-        options: {},
+        options: {
+          scopes: ['profile', 'email'],
+        },
       })) as SocialLoginResponse
 
       const idToken = r.result?.idToken
