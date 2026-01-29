@@ -176,7 +176,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
                   Perfect
                 </div>
               )
-            ) : msg.correction && msg.correction.correctedSentence ? (
+            ) : msg.correction && msg.correction.corrections ? (
               // COMPLETE + CORRECTION
               showFeedback && (
                 <CorrectionBubble
