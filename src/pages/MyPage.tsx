@@ -10,7 +10,6 @@ import ToggleSwitch from '../components/common/ToggleSwitch'
 import type { User } from '../types/user'
 
 const items = [
-  { label: 'K-oach Guide', to: '/guide' },
   { label: 'Terms of Service', to: '/policy/service' },
   { label: 'Privacy Policy', to: '/policy/privacy' },
 ]
