@@ -29,6 +29,7 @@ export default function ProfilePage() {
   const handleDelete = async () => {
     try {
       await deleteUser(userId)
+      navigate('/login', { replace: true })
       setOpenDelete(false)
     } catch (error) {
       console.log(error, 'error')
