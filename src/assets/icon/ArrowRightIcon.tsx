@@ -14,7 +14,7 @@ export default function ArrowRightIcon({ className }: ArrowRightIconProps) {
     >
       <path
         d="M6 4L10 8L6 12"
-        stroke="#2C2A2C"
+        stroke="currentColor"
         strokeWidth="1.4"
         strokeLinecap="round"
         strokeLinejoin="round"

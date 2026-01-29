@@ -34,8 +34,8 @@ export const MAIN_DATA: ChatRoomWithMessage[] = [
 
 export const MANAGER_ROOM: ChatRoomWithMessage = {
   roomRouteId: 9,
-  roomName: 'service manager',
-  concept: 'service manager',
+  roomName: 'service admin',
+  concept: 'service admin',
   message: 'Do you need any help?',
   avatar: manager,
 }

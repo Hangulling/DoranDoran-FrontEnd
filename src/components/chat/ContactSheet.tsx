@@ -1,49 +1,169 @@
 import { useState } from 'react'
 import BottomSheet from '../common/BottomSheet'
 import Button from '../common/Button'
+import Input from '../common/Input'
+import CheckIcon from '../../assets/icon/CheckIcon'
+import { useFetchUser } from '../../hooks/useFetchUser'
+import showToast from '../common/CommonToast'
 
 interface ContactSheetProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (content: string) => void
+  onSubmit: (
+    content: string,
+    options?: {
+      replyRequested: boolean
+      replyEmail?: string
+    }
+  ) => void
   category?: string
 }
 
 const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
   const [content, setContent] = useState('')
+  const [replyRequested, setReplyRequested] = useState<'yes' | 'no' | null>(
+    null
+  )
+  const [replyEmail, setReplyEmail] = useState('')
+  const [isFocused, setIsFocused] = useState(false)
+  const { userEmail } = useFetchUser()
+
+  const isReplySelected = replyRequested === 'yes' || replyRequested === 'no'
+  const isEmailValid = replyRequested !== 'yes' || !!replyEmail
+
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value
+
+    if (value.length > 500) {
+      showToast({
+        message: 'Maximum of 500 characters allowed',
+        iconType: 'error',
+        size: 'sheet',
+      })
+      setContent(value.slice(0, 500))
+      return
+    }
+    setContent(value)
+  }
+
+  const handleReplyYes = () => {
+    setReplyRequested('yes')
+    if (userEmail && replyEmail.length === 0) {
+      setReplyEmail(userEmail)
+    }
+  }
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setReplyEmail(e.target.value)
+  }
 
   const handleSubmit = () => {
-    onSubmit(content)
+    onSubmit(content, {
+      replyRequested: replyRequested === 'yes',
+      replyEmail: replyEmail || undefined,
+    })
   }
 
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose} title="Contact us">
-      <div className="flex flex-col gap-4 mt-4 mb-6">
-        <div>
-          <label className="text-[14px] font-medium text-gray-700 mb-1 block">
+      <div className="flex flex-col mt-1">
+        <div className="mb-5">
+          <label className="text-[16px] text-subtitle mb-[6px] block">
             Your Message
           </label>
           <textarea
-            className="w-full h-32 p-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:border-primary-500 resize-none text-[16px]"
+            className={`w-full h-[154px] py-[14px] px-5 rounded-[12px] bg-gray-0 resize-none text-[14px] focus:outline-none ${
+              content || isFocused
+                ? 'gradient-border'
+                : 'border border-gray-100'
+            }`}
             placeholder="Feel free to share here :)"
             value={content}
-            onChange={e => setContent(e.target.value)}
+            onChange={handleContentChange}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
           />
+          <div className="flex justify-end">
+            <span className="text-[14px] text-gray-600">
+              {content.length}/500
+            </span>
+          </div>
         </div>
 
-        <div>
-          <label className="text-[14px] font-medium text-gray-700 mb-1 block">
+        <div className="mb-[30px]">
+          <label className="text-[16px] text-subtitle mb-2 block">
             Receive a reply by email?
           </label>
+
+          <div className="flex flex-col gap-1">
+            {/* YES */}
+            <button className="flex items-center gap-2">
+              <div
+                className="flex items-center gap-2 cursor-pointer py-1"
+                onClick={handleReplyYes}
+              >
+                {replyRequested === 'yes' ? (
+                  <CheckIcon className="w-5 h-5 fill-primary-300 text-gray-0" />
+                ) : (
+                  <div className="w-5 h-5 rounded-full bg-gray-0 ring-1 ring-inset ring-gray-200"></div>
+                )}
+                <span
+                  className={`text-[14px] whitespace-nowrap transition-colors ${
+                    replyRequested === 'yes' ? 'text-gray-800' : 'text-gray-500'
+                  }`}
+                >
+                  Yes, please
+                </span>
+              </div>
+            </button>
+
+            {/* NO */}
+            <button className="flex items-center gap-2">
+              <div
+                className="flex items-center gap-2 cursor-pointer py-1"
+                onClick={() => {
+                  setReplyRequested('no')
+                  setReplyEmail('')
+                }}
+              >
+                {replyRequested === 'no' ? (
+                  <CheckIcon className="w-5 h-5 fill-primary-300 text-gray-0" />
+                ) : (
+                  <div className="w-5 h-5 rounded-full bg-gray-0 ring-1 ring-inset ring-gray-200"></div>
+                )}
+                <span
+                  className={`text-[14px] whitespace-nowrap transition-colors ${
+                    replyRequested === 'no' ? 'text-gray-800' : 'text-gray-500'
+                  }`}
+                >
+                  No, thanks
+                </span>
+              </div>
+            </button>
+          </div>
+
+          <div
+            className={replyRequested === 'yes' ? 'opacity-100' : 'opacity-0'}
+          >
+            <Input
+              type="email"
+              variant="primary"
+              placeholder="Enter your E-mail"
+              clearable
+              value={replyEmail}
+              onChange={handleEmailChange}
+              onClear={() => setReplyEmail('')}
+            />
+          </div>
         </div>
 
         <Button
           variant="primary"
           size="confirm"
           onClick={handleSubmit}
-          disabled={!content}
+          disabled={!content || !isReplySelected || !isEmailValid}
         >
-          Submit
+          Send inquiry
         </Button>
       </div>
     </BottomSheet>

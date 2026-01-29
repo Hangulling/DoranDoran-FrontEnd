@@ -34,7 +34,10 @@ const ReportSheet = ({
         {REPORT_REASONS.map(reason => (
           <button
             key={reason}
-            className="w-full py-[14px] px-5 text-left text-[16px] bg-gray-0 border border-gray-100 rounded-[12px] active:bg-[#F5F5F5] transition-colors"
+            className="w-full py-[14px] px-5 text-left text-[16px] bg-gray-0 border border-gray-100 rounded-[12px] 
+  active:border-primary-200 active:bg-primary-10
+  focus:border-primary-200 focus:bg-primary-10
+  transition-colors"
             onClick={() => handleReportSubmit(reason)}
           >
             {reason}

@@ -25,3 +25,4 @@ dist-ssr
 .env.development
 .env.production
 key0
+API_SPECIFICATION_V3.md

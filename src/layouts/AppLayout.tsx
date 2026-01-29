@@ -14,7 +14,8 @@ const pageTitles: Record<string, string> = {
   '/': '',
   '/signup': 'Sign Up',
   '/login/email': 'Continue with Email',
-  '/archive': 'Archive',
+  '/archive/sentences': 'Sentences',
+  '/archive/words': 'Words',
 }
 
 const chatRoomNames: Record<string, string> = {
@@ -49,6 +50,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     /^\/find-email(?:\/|$)/,
     /^\/find-password(?:\/|$)/,
     /^\/mypage(?:\/|$)/,
+    /^\/insta(?:\/|$)/,
   ]
   const isKnownPath = knownPatterns.some(rx => rx.test(pathname))
   const isUnknownPath = !isKnownPath
@@ -80,9 +82,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const isMain = pathname === '/'
   const isChatPage = pathname.startsWith('/chat')
 
-  const archiveMatch = useMatch('/archive/:id')
-  const onArchive = !!archiveMatch
-  const archiveId = archiveMatch?.params.id
+  const archiveMatch = useMatch('/archive/sentences')
+  const wordMatch = useMatch('/archive/words')
+  const onArchive = !!archiveMatch || !!wordMatch
   const agreementMatch = useMatch('/policy/:id')
   const agreementId = agreementMatch?.params.id
 
@@ -101,15 +103,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     '/login/email',
     '/find-email',
     '/find-password',
-    '/archive',
+    '/archive/sentences',
+    '/archive/words',
     '/mypage/profile',
+    '/insta',
   ]
 
   const isTopNav = topNavPaths.some(path => pathname.startsWith(path))
-
-  // 친밀도 바(채팅에서만)
-  //  const closenessMatch = pathname.match(/^\/chat\/(\d+)$/)
-  //  const closenessId = closenessMatch ? closenessMatch[1] : null
 
   // 북마크(채팅/친밀)
   const chatRoomMatch = pathname.match(/^\/(chat|closeness)\/(\d+)$/)
@@ -117,20 +117,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const showBookmark =
     showBookmarkPaths.includes(pathname) || chatRoomId !== null
 
-  const fromChat = (location.state as { from?: string } | null)?.from === 'chat'
-
   const { selectionMode } = useArchiveStore()
 
   // 타이틀
   let title = ''
   if (selectionMode) {
     title = 'Delete'
-  } else if (onArchive) {
-    title =
-      (fromChat &&
-        archiveId &&
-        (chatRoomNames[archiveId] || `채팅방 ${archiveId}`)) ||
-      'Archive'
   } else if (chatRoomId) {
     title = chatRoomNames[chatRoomId] || `채팅방 ${chatRoomId}`
   } else if (agreementId) {
@@ -145,12 +137,16 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     title = pathname === '/login' ? '' : 'Continue with Email'
   } else if (pathname.startsWith('/mypage')) {
     title = pathname === '/mypage' ? '' : 'My Profile'
+  } else if (pathname.startsWith('/insta')) {
+    title = 'Learning from Instagram'
   } else {
     title = pageTitles[pathname] || '페이지'
   }
 
   return (
-    <div className="relative mx-auto flex h-full w-full max-w-md flex-col overflow-x-hidden pt-[env(safe-area-inset-top)]">
+    <div
+      className={`relative mx-auto flex h-full w-full flex-col overflow-x-hidden ${'max-w-app md:max-w-tablet lg:max-w-desktop transition-all duration-300'} ${isMain ? 'pt-0' : 'pt-[env(safe-area-inset-top)]'}`}
+    >
       {/* 상단 네비게이션 바 */}
       {!hideNavBar && isTopNav && (
         <header className="sticky top-0 shrink-0 z-40 bg-white">

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import ChatFooter from '../components/chat/ChatFooter'
 import type { Message } from '../types/chat'
 import { useModalStore } from '../stores/useUiStateStore'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { MAIN_DATA, MANAGER_ROOM } from '../constants/mainData'
 import ExitModal from '../components/chat/ExitModal'
 import { useUserStore } from '../stores/useUserStore'
@@ -28,6 +28,8 @@ import ToggleSwitch from '../components/common/ToggleSwitch'
 import Button from '../components/common/Button'
 import { useChatSettingStore } from '../stores/useChatSetting'
 import ReportSheet from '../components/chat/ReportSheet'
+import { createSupport } from '../api/support'
+import showToast from '../components/common/CommonToast'
 
 const INACTIVITY_DURATION_MS = 300000
 
@@ -38,6 +40,9 @@ export interface EnrichedMessage extends Message {
   analysisState?: 'pending' | 'complete' // 교정 데이터 로딩
   bookmarkId?: string | null
   isSendFailed?: boolean
+  isCancelled?: boolean
+  targetUserMsgId?: string | null
+  isReported?: boolean
 }
 
 const chatBotIdByRoom = (conceptValue: string): string => {
@@ -58,7 +63,7 @@ const chatBotIdByRoom = (conceptValue: string): string => {
 const ChatPage: React.FC = () => {
   const navigate = useNavigate()
   const { id } = useParams()
-  const chatbotId = chatBotIdByRoom(id ?? '')
+  const location = useLocation()
   const setNoShowAgain = useModalStore(state => state.setNoShowAgain)
   const [messages, setMessages] = useState<EnrichedMessage[]>([]) // 확장
   const [isHistoryLoading, setIsHistoryLoading] = useState(true)
@@ -87,19 +92,28 @@ const ChatPage: React.FC = () => {
   const [tempVocabulary, setTempVocabulary] = useState(isVocabularyEnabled)
   const [tempCorrection, setTempCorrection] = useState(isCorrectionEnabled)
   const [tempTranslation, setTempTranslation] = useState(isTranslationEnabled)
-  const chatroomId = id ? roomsMap[id] : undefined
-  const closenessLevel =
-    useClosenessStore.getState().getCloseness(id ?? '') ?? 1
-  const closenessText = getClosenessAsText(closenessLevel)
+  const chatroomId = id
   const accessToken = sessionStorage.getItem('accessToken') ?? ''
   const isAtBottomRef = useRef(true) // 스크롤 감지
 
-  const isManagerRoom = String(id) === String(MANAGER_ROOM.roomRouteId)
+  const routeId = useMemo(() => {
+    if (location.state?.roomRouteId) {
+      return String(location.state.roomRouteId)
+    }
+    const foundId = Object.keys(roomsMap).find(key => roomsMap[key] === id)
+    return foundId
+  }, [id, location.state, roomsMap])
+
+  const chatbotId = chatBotIdByRoom(routeId ?? '')
+  const closenessLevel =
+    useClosenessStore.getState().getCloseness(routeId ?? '') ?? 1
+  const closenessText = getClosenessAsText(closenessLevel)
+  const isManagerRoom = String(routeId) === String(MANAGER_ROOM.roomRouteId)
 
   const room = useMemo(() => {
     if (isManagerRoom) return MANAGER_ROOM
-    return MAIN_DATA.find(r => String(r.roomRouteId) === String(id))
-  }, [id, isManagerRoom])
+    return MAIN_DATA.find(r => String(r.roomRouteId) === String(routeId))
+  }, [routeId, isManagerRoom])
 
   // 세팅 열기
   const openSettings = () => {
@@ -122,6 +136,7 @@ const ChatPage: React.FC = () => {
     })
   }
 
+  // 북마크
   const { handleChatBubbleBookmark, handleCorrectionBubbleBookmark } =
     useBookmarkManager({
       chatroomId,
@@ -142,17 +157,48 @@ const ChatPage: React.FC = () => {
   }
 
   // 신고 접수
-  const handleReportSubmit = (messageId: string, reason: string) => {
-    console.log('신고 완료 처리:', messageId, reason)
-    // API
-    handleCloseReport()
+  const handleReportSubmit = async (messageId: string, reason: string) => {
+    try {
+      const targetMessage = messages.find(m => m.id === messageId)
+      const messageContent = targetMessage?.text || ''
+
+      await createSupport(
+        {
+          type: 'REPORT',
+          category: reason,
+          content: reason,
+          chatroomId,
+          messageId,
+          messageContent,
+        },
+        {
+          userId, // 헤더에 들어갈 User ID
+        }
+      )
+      showToast({
+        message: 'Thanks for letting us know!',
+        iconType: 'checkRound',
+      })
+      console.log('신고 완료 처리:', messageId, reason)
+
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === messageId ? { ...msg, isReported: true } : msg
+        )
+      )
+    } catch (error) {
+      console.error('신고 요청 실패:', error)
+    } finally {
+      handleCloseReport()
+    }
   }
 
   const { isModalOpen, handleConfirmExit, handleCancelExit, handleGoBack } =
     useChatExit({
       chatroomId,
       userId,
-      routeId: id,
+      routeId: routeId,
+      enableGuard: !isManagerRoom,
     })
 
   const { inactivityError, resetInactivityTimer, stopInactivityTimer } =
@@ -162,7 +208,7 @@ const ChatPage: React.FC = () => {
     chatroomId,
     userId,
     roomAvatar: room?.avatar,
-    id,
+    id: routeId,
     navigate,
     setMessages,
     setIsHistoryLoading,
@@ -172,12 +218,15 @@ const ChatPage: React.FC = () => {
     setGreetingMsg2,
   })
 
+  // 채팅 기능
   const {
     isAiResponding,
     sseError,
     sendError,
     handleSendMessage,
     handleRetry,
+    handleCancel,
+    handleResend,
   } = useChatInteraction({
     chatroomId,
     userId,
@@ -192,6 +241,13 @@ const ChatPage: React.FC = () => {
     setGreetingState,
   })
 
+  // 재전송
+  const handleRetryUserMessage = (msgId: string, content: string) => {
+    // 기존 실패 메시지 삭제
+    setMessages(prev => prev.filter(m => m.id !== msgId))
+    handleSendMessage(content)
+  }
+
   // 스크롤 위치 감지 함수
   const handleScroll = () => {
     if (!chatMainRef.current) return
@@ -199,15 +255,6 @@ const ChatPage: React.FC = () => {
     const isBottom = scrollHeight - scrollTop - clientHeight < 50
     isAtBottomRef.current = isBottom
   }
-
-  useEffect(() => {
-    if (isManagerRoom) {
-      setIsHistoryLoading(false)
-      setIsInitChatReady(true)
-      // 매니저 초기 메시지 설정
-      // setMessages([{ id: 'm1', text: MANAGER_ROOM.message, isSender: false, ... }])
-    }
-  }, [isManagerRoom])
 
   // 키보드 올라올 때 스크롤 보정
   useEffect(() => {
@@ -302,13 +349,13 @@ const ChatPage: React.FC = () => {
   }, [messages])
 
   return (
-    <div className="flex flex-col h-full overflow-hidden relative">
+    <div className="flex flex-col h-full overflow-hidden relative bg-gray-10">
       <ChatHeader
         title={room?.roomName || 'Chat'}
         avatar={room?.avatar}
-        closenessLevel={isManagerRoom ? undefined : closenessLevel}
-        onBack={isManagerRoom ? () => navigate(-1) : handleGoBack}
-        onSettingClick={isManagerRoom ? undefined : openSettings}
+        closenessLevel={closenessLevel}
+        onBack={handleGoBack}
+        onSettingClick={openSettings}
       />
 
       <div
@@ -337,6 +384,8 @@ const ChatPage: React.FC = () => {
           onChatBubbleBookmark={handleChatBubbleBookmark}
           onCorrectionBubbleBookmark={handleCorrectionBubbleBookmark}
           onReport={handleOpenReport}
+          onResend={handleResend}
+          onRetryUserMessage={handleRetryUserMessage}
         />
       </div>
 
@@ -346,6 +395,8 @@ const ChatPage: React.FC = () => {
             inputRef={inputRef}
             onSendMessage={handleSendMessage}
             disabled={isHistoryLoading || !isInitChatReady || isAiResponding}
+            isAiResponding={isAiResponding}
+            onCancel={handleCancel}
           />
         )}
       </footer>

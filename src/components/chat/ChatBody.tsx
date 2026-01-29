@@ -38,6 +38,8 @@ interface ChatBodyProps {
     feedbackEn: string
   ) => void
   onReport: (messageId: string) => void
+  onResend?: (cancelledMsgId: string, targetUserMsgId: string) => void
+  onRetryUserMessage?: (msgId: string, content: string) => void
 }
 
 const ChatBody: React.FC<ChatBodyProps> = props => {
@@ -79,6 +81,8 @@ const ChatBody: React.FC<ChatBodyProps> = props => {
         onChatBubbleBookmark={props.onChatBubbleBookmark}
         onCorrectionBubbleBookmark={props.onCorrectionBubbleBookmark}
         onReport={props.onReport}
+        onResend={props.onResend}
+        onRetryUserMessage={props.onRetryUserMessage}
       />
     </>
   )

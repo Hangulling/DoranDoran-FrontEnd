@@ -1,12 +1,26 @@
-import EmptyBookmark from '../../assets/icon/emptyBookmark.svg?react'
+import BookmarkIcon from '../../assets/icon/BookmarkIcon'
 
-export default function EmptyCard() {
+interface EmptyCardProp {
+  savedType?: string
+}
+
+export default function EmptyCard({ savedType }: EmptyCardProp) {
   return (
     <div className="flex flex-col items-center justify-center h-full min-h-full">
-      <EmptyBookmark />
-      <p className="text-subtitle text-lg text-gray-800 mt-[45px] mb-2">Save Expressions!</p>
-      <p className="text-body text-sm text-gray-600">No saved expressions.</p>
-      <p className="text-body text-sm text-gray-600">Save useful expressions as you learn.</p>
+      <BookmarkIcon
+        className="w-[90px] h-[90px]"
+        bgColor="#F3F1FD"
+        fillColor="#FFFFFF"
+      />
+      <p className="text-subtitle text-lg text-gray-800 mb-2 mt-7">
+        Save {savedType} :)
+      </p>
+      <p className="text-body text-sm text-gray-600">
+        No saved {savedType} yet
+      </p>
+      <p className="text-body text-sm text-gray-600">
+        Save the ones you like as you learn
+      </p>
     </div>
   )
 }

@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState, type JSX, type RefObject } from 'react'
 import { Keyboard } from '@capacitor/keyboard'
+import { Capacitor } from '@capacitor/core'
 import SendIcon from '../../assets/chat/send.svg'
 import ErrorIcon from '../../assets/icon/error.svg'
-import CheckIcon from '../../assets/icon/checkRound.svg'
+import CheckIcon from '../../assets/icon/CheckIcon'
+import PauseIcon from '../../assets/chat/pause.svg'
 
 interface ChatFooterProps {
   inputRef: RefObject<HTMLTextAreaElement | null>
   onSendMessage: (message: string) => void
   disabled?: boolean
+  isAiResponding?: boolean
+  onCancel?: () => void
 }
 
 type IconType = 'error' | 'checkRound'
@@ -24,7 +28,9 @@ const SINGLE_LINE_HEIGHT = 21
 const ToastMessage = ({ message, iconType }: ToastMessageProps) => {
   const iconMap: Record<IconType, JSX.Element> = {
     error: <img src={ErrorIcon} alt="error" />,
-    checkRound: <img src={CheckIcon} alt="check" />,
+    checkRound: (
+      <CheckIcon className="text-gray-700 fill-system-blue-okay m-0.5" />
+    ),
   }
 
   return (
@@ -39,6 +45,8 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   inputRef,
   onSendMessage,
   disabled,
+  isAiResponding,
+  onCancel,
 }) => {
   const [inputValue, setInputValue] = useState('')
   const [textareaHeight, setTextareaHeight] = useState(SINGLE_LINE_HEIGHT)
@@ -56,7 +64,12 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   }, [])
 
   useEffect(() => {
-    Keyboard.setScroll({ isDisabled: true })
+    if (!Capacitor.isNativePlatform()) return
+
+    // 네이티브 앱인 경우에만 실행
+    Keyboard.setScroll({ isDisabled: true }).catch(err =>
+      console.warn('Keyboard setScroll failed:', err)
+    )
 
     const onWillShow = () => {
       setIsKeyboardOpen(true)
@@ -66,12 +79,21 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
       setIsKeyboardOpen(false)
     }
 
-    Keyboard.addListener('keyboardWillShow', onWillShow)
-    Keyboard.addListener('keyboardDidHide', onDidHide)
+    // 리스너 등록
+    const setupListeners = async () => {
+      try {
+        await Keyboard.addListener('keyboardWillShow', onWillShow)
+        await Keyboard.addListener('keyboardDidHide', onDidHide)
+      } catch (err) {
+        console.warn('Keyboard listeners failed:', err)
+      }
+    }
+
+    setupListeners()
 
     return () => {
-      Keyboard.removeAllListeners()
-      Keyboard.setScroll({ isDisabled: false })
+      Keyboard.removeAllListeners().catch(err => console.warn(err))
+      Keyboard.setScroll({ isDisabled: false }).catch(err => console.warn(err))
     }
   }, [])
 
@@ -167,13 +189,22 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
             className="w-full pr-[46px] bg-transparent border-none outline-none focus:ring-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] block p-0 m-0"
           />
 
-          {isSendActive && (
+          {isAiResponding ? (
             <button
-              onClick={handleSendClick}
+              onClick={onCancel}
               className="absolute bottom-[10px] right-4 flex items-center justify-center transition-opacity duration-200"
             >
-              <img src={SendIcon} alt="보내기" />
+              <img src={PauseIcon} alt="중지" />
             </button>
+          ) : (
+            isSendActive && (
+              <button
+                onClick={handleSendClick}
+                className="absolute bottom-[10px] right-4 flex items-center justify-center transition-opacity duration-200"
+              >
+                <img src={SendIcon} alt="보내기" />
+              </button>
+            )
           )}
         </div>
       </div>
