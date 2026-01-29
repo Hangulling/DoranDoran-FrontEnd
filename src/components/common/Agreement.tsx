@@ -104,7 +104,7 @@ export default function Agreement({ value, onChange }: AgreementProps) {
               </span>
             </button>
 
-            {t.required && (
+            {(t.id === 'service' || t.id === 'privacy') && (
               <Link to={`/policy/${id}`}>
                 <Button
                   type="button"

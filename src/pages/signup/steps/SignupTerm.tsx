@@ -22,10 +22,10 @@ export default function SignupTerm() {
   return (
     <div>
       <FormIntro variant="signup">
-        <p>
-          Nice to meet you :)
+        <div>
+          Nice to meet you :{')'}
           <p>Please review the terms.</p>
-        </p>
+        </div>
       </FormIntro>
       <div className="my-2">
         <Agreement value={agreements} onChange={setManyAgreements} />
