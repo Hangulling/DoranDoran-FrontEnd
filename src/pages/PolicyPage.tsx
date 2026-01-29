@@ -13,8 +13,9 @@ export default function PolicyPage() {
   const setOne = useAgreementStore(s => s.setOne)
 
   const handleConfirm = () => {
-    if (id) setOne(id, true)
-    navigate('/signup', { replace: true, state: { fromPolicy: true } })
+    if (!id) return
+    setOne(id, true)
+    navigate('/signup/term', { replace: true, state: { fromPolicy: true } })
   }
 
   const search = new URLSearchParams(location.search)
