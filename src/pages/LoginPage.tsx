@@ -271,7 +271,7 @@ export default function LoginPage() {
       <div className="w-[335px] max-w-md pt-16 pb-[calc(24px+env(safe-area-inset-bottom))] flex flex-col">
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full flex justify-center">
-            <img src={Logoicon} alt="Koach" className="w-[260px]" />
+            <img src={Logoicon} alt="Koach" />
           </div>
         </div>
 
