@@ -4,6 +4,7 @@ import Button from '../common/Button'
 import Input from '../common/Input'
 import CheckIcon from '../../assets/icon/CheckIcon'
 import { useFetchUser } from '../../hooks/useFetchUser'
+import showToast from '../common/CommonToast'
 
 interface ContactSheetProps {
   isOpen: boolean
@@ -29,6 +30,21 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
 
   const isReplySelected = replyRequested === 'yes' || replyRequested === 'no'
   const isEmailValid = replyRequested !== 'yes' || !!replyEmail
+
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value
+
+    if (value.length > 500) {
+      showToast({
+        message: 'Maximum of 500 characters allowed',
+        iconType: 'error',
+        size: 'sheet',
+      })
+      setContent(value.slice(0, 500))
+      return
+    }
+    setContent(value)
+  }
 
   const handleReplyYes = () => {
     setReplyRequested('yes')
@@ -63,8 +79,7 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
             }`}
             placeholder="Feel free to share here :)"
             value={content}
-            maxLength={500}
-            onChange={e => setContent(e.target.value)}
+            onChange={handleContentChange}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           />
