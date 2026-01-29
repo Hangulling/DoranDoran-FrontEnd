@@ -81,6 +81,21 @@ export default function LoginPage() {
       return String(e)
     }
   }
+  const decodeJwtPayload = (token: string) => {
+    try {
+      const payload = token.split('.')[1]
+      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+      const json = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      )
+      return JSON.parse(json) as Record<string, unknown>
+    } catch {
+      return null
+    }
+  }
 
   const handleGoogleNativeLogin = async () => {
     if (!isNativeApp()) return
@@ -88,7 +103,9 @@ export default function LoginPage() {
     try {
       const r = (await SocialLogin.login({
         provider: 'google',
-        options: {},
+        options: {
+          scopes: ['profile', 'email'],
+        },
       })) as SocialLoginResponse
 
       const idToken = r.result?.idToken
@@ -97,7 +114,12 @@ export default function LoginPage() {
         alert('Google 로그인 실패 (앱)')
         return
       }
-
+      if (idToken) {
+        const payload = decodeJwtPayload(idToken)
+        alert(
+          `idToken aud=${String(payload?.aud)}\niss=${String(payload?.iss)}`
+        )
+      }
       const res = await oauthLogin({
         provider: 'google',
         idToken,
@@ -126,6 +148,10 @@ export default function LoginPage() {
         return
       }
 
+      const payload = decodeJwtPayload(idToken)
+      alert(
+        `WEB idToken aud=${String(payload?.aud)}\niss=${String(payload?.iss)}`
+      )
       console.log('[Google] idToken typeof:', typeof idToken)
 
       const res = await oauthLogin({
@@ -271,7 +297,7 @@ export default function LoginPage() {
       <div className="w-[335px] max-w-md pt-16 pb-[calc(24px+env(safe-area-inset-bottom))] flex flex-col">
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full flex justify-center">
-            <img src={Logoicon} alt="Koach" className="w-[260px]" />
+            <img src={Logoicon} alt="Koach" />
           </div>
         </div>
 
