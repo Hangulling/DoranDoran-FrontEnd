@@ -5,6 +5,7 @@ import useArchiveStore from '../stores/useArchiveStore'
 import { useEffect } from 'react'
 import SessionAutoLogout from '../components/common/SessionAutoLogout'
 import { startIdleTimer, stopIdleTimer } from '../utils/idleTimer'
+import { isNativeApp } from '../utils/isNativeApp'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -35,6 +36,7 @@ const showBookmarkPaths = ['/']
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation()
   const pathname = location.pathname
+  const native = isNativeApp()
 
   // 알 수 없는 페이지 (*)
   const knownPatterns = [
@@ -69,7 +71,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   // 비활성 타이머 로직
   useEffect(() => {
-    if (isPublicPage) {
+    if (isPublicPage || native) {
       stopIdleTimer()
     } else {
       startIdleTimer()
@@ -77,7 +79,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     return () => {
       stopIdleTimer()
     }
-  }, [isPublicPage]) // 경로가 바뀔 때마다 실행
+  }, [isPublicPage, native]) // 경로가 바뀔 때마다 실행
 
   const isMain = pathname === '/'
   const isChatPage = pathname.startsWith('/chat')

@@ -93,7 +93,7 @@ export default function MyPage() {
         <MenuRow
           key={item.label}
           label={item.label}
-          onClick={() => navigate(item.to)}
+          onClick={() => navigate(item.to, { state: { hideConfirm: true } })}
         />
       ))}
     </div>

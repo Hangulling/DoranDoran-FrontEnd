@@ -18,7 +18,7 @@ platform :ios do
     # 인증서 동기화 (Match) - 읽기 전용 (배포 시에는 생성하지 않음)
     match(
       type: "appstore",
-      readonly: false,
+      readonly: true,
       api_key: api_key
     )
 		if options[:build_number]

@@ -80,7 +80,7 @@ export default function SignupPage() {
   }, [path])
 
   return (
-    <div className="flex flex-col justify-center items-center max-w-md">
+    <div className="flex flex-col justify-center items-center">
       {path !== '/signup/term' && (
         <ProgressBar currentStep={currentStep} totalSteps={5} />
       )}
