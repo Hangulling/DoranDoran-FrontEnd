@@ -62,12 +62,14 @@ export default function SignupPage() {
   useEffect(() => {
     if (didInitRef.current) return
     didInitRef.current = true
+    const fromPolicy = Boolean(location.state?.fromPolicy)
+    if (fromPolicy) return
 
     resetForm()
     resetAgreements()
     setCanSubmit(false)
     setSubmit(null)
-  }, [resetForm, resetAgreements])
+  }, [resetForm, resetAgreements, location])
 
   useEffect(() => {
     if (path === '/signup/question') {

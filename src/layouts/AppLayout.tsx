@@ -107,6 +107,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     '/archive/words',
     '/mypage/profile',
     '/insta',
+    '/policy/service',
+    '/policy/privacy',
   ]
 
   const isTopNav = topNavPaths.some(path => pathname.startsWith(path))
