@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: read
 
 jobs:
   release:
@@ -30,21 +31,23 @@ jobs:
 
       # Standard Version 실행 (커밋 메시지 분석 -> 버전 업 -> 태그 생성 -> CHANGELOG 생성)
       - name: Run Standard Version
-        run: |
-          # --skip.changelog를 빼면 CHANGELOG.md도 자동으로 만들어줍니다.
-          # package.json 버전업 + git tag 생성까지 여기서 다 합니다.
-          npx standard-version
+        run: npx standard-version
 
-      # 변경된 package.json, CHANGELOG.md, 그리고 새 태그를 원격 저장소에 푸시
+      # 변경사항 푸시
       - name: Push Version Commit and Tag
-        run: |
-          git push --follow-tags origin main
+        run: git push --follow-tags origin main
 
-      # 릴리즈 게시
+      # 최신 버전 정보 추출
+      - name: Get Latest Tag
+        id: get_tag
+        run: echo "TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+
+      # 릴리즈 게시 (태그 이름을 명시적으로 전달)
       - name: Publish Release
         uses: release-drafter/release-drafter@v5
         with:
           publish: true
-          tag: $(git describe --tags --abbrev=0)
+          name: ${{ env.TAG }}
+          tag: ${{ env.TAG }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
