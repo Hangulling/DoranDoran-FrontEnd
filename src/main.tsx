@@ -14,31 +14,31 @@ import {
   API_BASE_URL,
 } from './constants/env'
 
-window.onerror = function (
-  msg: string | Event,
-  src?: string,
-  line?: number,
-  col?: number,
-  err?: unknown
-) {
-  const stack = err instanceof Error ? (err.stack ?? '') : ''
-  alert(
-    `JS Error:\n${String(msg)}\n${String(src)}:${String(line)}:${String(
-      col
-    )}\n${stack}`
-  )
-  return false
-}
+// window.onerror = function (
+//   msg: string | Event,
+//   src?: string,
+//   line?: number,
+//   col?: number,
+//   err?: unknown
+// ) {
+//   const stack = err instanceof Error ? (err.stack ?? '') : ''
+//   alert(
+//     `JS Error:\n${String(msg)}\n${String(src)}:${String(line)}:${String(
+//       col
+//     )}\n${stack}`
+//   )
+//   return false
+// }
 
-window.onunhandledrejection = function (e: PromiseRejectionEvent) {
-  const reason = e.reason as unknown
-  const message =
-    reason instanceof Error
-      ? `${reason.message}\n${reason.stack ?? ''}`
-      : String(reason)
+// window.onunhandledrejection = function (e: PromiseRejectionEvent) {
+//   const reason = e.reason as unknown
+//   const message =
+//     reason instanceof Error
+//       ? `${reason.message}\n${reason.stack ?? ''}`
+//       : String(reason)
 
-  alert(`Promise Error:\n${message}`)
-}
+//   alert(`Promise Error:\n${message}`)
+// }
 
 const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 
