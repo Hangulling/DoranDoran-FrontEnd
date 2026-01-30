@@ -6,11 +6,13 @@ import { useUserStore } from '../../stores/useUserStore'
 import useClosenessStore from '../../stores/useClosenessStore'
 import useRoomIdStore from '../../stores/useRoomIdStore'
 import { useModalStore } from '../../stores/useUiStateStore'
+import { isNativeApp } from '../../utils/isNativeApp'
 
 export default function SessionAutoLogout() {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const openedRef = useRef(false)
+  const native = isNativeApp()
 
   // 정리해야 할 작업
   const preLogoutTask = useAuthCleanupStore(state => state.preLogoutTask)
@@ -61,7 +63,7 @@ export default function SessionAutoLogout() {
     const openModal = () => {
       if (localStorage.getItem('session:manualLogout') === '1') return
       if (openedRef.current) return
-
+      if (native) return
       console.log('세션 만료/비활성 감지됨')
 
       openedRef.current = true
