@@ -28,6 +28,7 @@ export default function SignupQuestion() {
     setMany,
     reset: resetForm,
   } = useSignupFormStore()
+  const agreements = useAgreementStore(s => s.value)
   const [answerError, setAnswerError] = useState<string | null>(null)
   const [openModal, setOpenModal] = useState(false)
   const { setSubmit, setCanSubmit } = useOutletContext<OutletContext>()
@@ -68,6 +69,7 @@ export default function SignupQuestion() {
         signupQuestion: identityQuestion,
         signupAnswer: answer,
         password,
+        marketingOption: agreements.marketing,
       }
 
       const res = await createUser(payload)
