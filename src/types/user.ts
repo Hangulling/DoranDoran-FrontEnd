@@ -10,6 +10,7 @@ export interface CreatePayload {
   password: string // 8-100자
   picture?: string
   info?: string // 최대 100자
+  marketingOption?: boolean
 }
 
 //사용자 정보 응답
