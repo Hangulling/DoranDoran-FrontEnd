@@ -81,21 +81,21 @@ export default function LoginPage() {
       return String(e)
     }
   }
-  // const decodeJwtPayload = (token: string) => {
-  //   try {
-  //     const payload = token.split('.')[1]
-  //     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
-  //     const json = decodeURIComponent(
-  //       atob(base64)
-  //         .split('')
-  //         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-  //         .join('')
-  //     )
-  //     return JSON.parse(json) as Record<string, unknown>
-  //   } catch {
-  //     return null
-  //   }
-  // }
+  const decodeJwtPayload = (token: string) => {
+    try {
+      const payload = token.split('.')[1]
+      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+      const json = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      )
+      return JSON.parse(json) as Record<string, unknown>
+    } catch {
+      return null
+    }
+  }
 
   const handleGoogleNativeLogin = async () => {
     if (!isNativeApp()) return
@@ -114,12 +114,12 @@ export default function LoginPage() {
         alert('Google 로그인 실패 (앱)')
         return
       }
-      // if (idToken) {
-      //   const payload = decodeJwtPayload(idToken)
-      //   alert(
-      //     `idToken aud=${String(payload?.aud)}\niss=${String(payload?.iss)}`
-      //   )
-      // }
+      if (idToken) {
+        const payload = decodeJwtPayload(idToken)
+        alert(
+          `idToken aud=${String(payload?.aud)}\niss=${String(payload?.iss)}`
+        )
+      }
       const res = await oauthLogin({
         provider: 'google',
         idToken,
@@ -132,10 +132,23 @@ export default function LoginPage() {
         localStorage.setItem('last_login', 'google')
         navigate(user.isOnboard ? '/' : '/onboarding')
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status
+        const data = err.response?.data
+
+        console.error('[Native OAuth] axios error:', { status, data, err })
+
+        alert(
+          `Google 로그인 실패 (앱)\nstatus=${status}\n` +
+            `${typeof data === 'string' ? data : JSON.stringify(data)}`
+        )
+        return
+      }
+
       const msg = stringifyError(err)
       console.error('네이티브 로그인 실패', err)
-      alert(`Google 로그인 실패 \n ${msg}`)
+      alert(`Google 로그인 실패 (앱)\n${msg}`)
     }
   }
 
