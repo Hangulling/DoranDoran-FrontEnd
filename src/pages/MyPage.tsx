@@ -8,7 +8,11 @@ import { useNavigate } from 'react-router-dom'
 import BottomSheet from '../components/common/BottomSheet'
 import ToggleSwitch from '../components/common/ToggleSwitch'
 import type { User } from '../types/user'
-import { getUserInterests } from '../api'
+import {
+  getNotificationSetting,
+  getUserInterests,
+  updateNotificationSetting,
+} from '../api'
 import { useUserStore } from '../stores/useUserStore'
 import axios from 'axios'
 
@@ -62,6 +66,28 @@ export default function MyPage() {
     fetchInterests()
   }, [id])
 
+  useEffect(() => {
+    const getNotification = async () => {
+      try {
+        const res = await getNotificationSetting(id)
+        setIsAlert(res.pushEnabled)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    getNotification()
+  }, [])
+
+  const handleNotification = async () => {
+    try {
+      const res = await updateNotificationSetting(id, isAlert)
+      setIsAlert(res.pushEnabled)
+      setOpenAlert(false)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   if (loading) return <div />
   if (!user) return null
 
@@ -83,6 +109,7 @@ export default function MyPage() {
         label="Notification Settings"
         onClick={() => setOpenAlert(true)}
       />
+
       {openAlert && (
         <BottomSheet
           title="Notification Settings"
@@ -95,9 +122,7 @@ export default function MyPage() {
               variant="primary"
               size="xl"
               className="w-full"
-              onClick={() => {
-                setOpenAlert(false)
-              }}
+              onClick={handleNotification}
             >
               Save
             </Button>
