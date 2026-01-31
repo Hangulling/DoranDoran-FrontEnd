@@ -57,7 +57,7 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col justify-center items-center mt-2">
-      <div className="w-[335px] mb-2 mt-3">
+      <div className="w-full max-w-app md:max-w-tablet lg:max-w-desktop px-4 mb-2 mt-3">
         <div className="text-title text-lg text-gray-800">{user.name}</div>
         <div className="text-xs text-gray-400 mt-1 flex items-center gap-3">
           <span>{user.email}</span>
@@ -67,7 +67,7 @@ export default function ProfilePage() {
       </div>
 
       <div className="bg-gray-50 h-2 w-full my-4" />
-      <div className="">
+      <div className="w-full max-w-app md:max-w-tablet lg:max-w-desktop">
         <MenuRow label="Log out" onClick={() => setOpenLogout(true)} />
         <MenuRow label="Delete account" onClick={() => setOpenDelete(true)} />
       </div>

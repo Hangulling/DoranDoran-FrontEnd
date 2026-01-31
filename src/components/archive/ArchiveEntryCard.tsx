@@ -8,7 +8,7 @@ export default function ArchiveEntryCard() {
   const navigate = useNavigate()
 
   return (
-    <div className="w-[335px] flex flex-col gap-3">
+    <div className="flex flex-col gap-3 w-full px-6 max-w-app md:max-w-tablet lg:max-w-desktop">
       {archiveData.map(item => (
         <Button
           key={item.to ?? item.title}
@@ -20,7 +20,7 @@ export default function ArchiveEntryCard() {
             <div className="flex items-center gap-3 min-w-0">
               <BookmarkIcon bgColor={item.bgColor} />
 
-              <div className="">
+              <div>
                 <div className="text-left text-base font-semibold text-gray-700">
                   {item.title}
                 </div>

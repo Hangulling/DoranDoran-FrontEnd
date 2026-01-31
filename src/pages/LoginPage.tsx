@@ -81,21 +81,21 @@ export default function LoginPage() {
       return String(e)
     }
   }
-  const decodeJwtPayload = (token: string) => {
-    try {
-      const payload = token.split('.')[1]
-      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
-      const json = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      )
-      return JSON.parse(json) as Record<string, unknown>
-    } catch {
-      return null
-    }
-  }
+  // const decodeJwtPayload = (token: string) => {
+  //   try {
+  //     const payload = token.split('.')[1]
+  //     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+  //     const json = decodeURIComponent(
+  //       atob(base64)
+  //         .split('')
+  //         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+  //         .join('')
+  //     )
+  //     return JSON.parse(json) as Record<string, unknown>
+  //   } catch {
+  //     return null
+  //   }
+  // }
 
   const handleGoogleNativeLogin = async () => {
     if (!isNativeApp()) return
@@ -114,12 +114,12 @@ export default function LoginPage() {
         alert('Google 로그인 실패 (앱)')
         return
       }
-      if (idToken) {
-        const payload = decodeJwtPayload(idToken)
-        alert(
-          `idToken aud=${String(payload?.aud)}\niss=${String(payload?.iss)}`
-        )
-      }
+      // if (idToken) {
+      //   const payload = decodeJwtPayload(idToken)
+      //   alert(
+      //     `idToken aud=${String(payload?.aud)}\niss=${String(payload?.iss)}`
+      //   )
+      // }
       const res = await oauthLogin({
         provider: 'google',
         idToken,
