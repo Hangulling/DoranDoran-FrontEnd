@@ -8,7 +8,7 @@ export default function ArchiveEntryCard() {
   const navigate = useNavigate()
 
   return (
-    <div className="w-[335px] flex flex-col gap-3">
+    <div className="flex flex-col gap-3">
       {archiveData.map(item => (
         <Button
           key={item.to ?? item.title}

@@ -11,7 +11,7 @@ import { SocialLogin } from '@capgo/capacitor-social-login'
 import {
   GOOGLE_WEB_CLIENT_ID,
   GOOGLE_IOS_CLIENT_ID,
-  API_BASE_URL,
+  // API_BASE_URL,
 } from './constants/env'
 
 // window.onerror = function (
@@ -46,25 +46,25 @@ const urlParams = new URLSearchParams(window.location.search)
 const paramInternal = urlParams.get('internal') === 'true'
 
 const isNative = isNativeApp()
-if (isNative) {
-  alert(
-    [
-      `MODE=${import.meta.env.MODE}`,
-      `VITE_API_BASE_URL=${API_BASE_URL}`,
-      `VITE_USE_MSW=${String(import.meta.env.VITE_USE_MSW)}`,
-      `VITE_MAINTENANCE_MODE=${String(import.meta.env.VITE_MAINTENANCE_MODE)}`,
-      `WEB_CLIENT_ID=${String(GOOGLE_WEB_CLIENT_ID).slice(0, 12)}...`,
-      `IOS_CLIENT_ID=${String(GOOGLE_IOS_CLIENT_ID).slice(0, 12)}...`,
-    ].join('\n')
-  )
-}
+// if (isNative) {
+//   alert(
+//     [
+//       `MODE=${import.meta.env.MODE}`,
+//       `VITE_API_BASE_URL=${API_BASE_URL}`,
+//       `VITE_USE_MSW=${String(import.meta.env.VITE_USE_MSW)}`,
+//       `VITE_MAINTENANCE_MODE=${String(import.meta.env.VITE_MAINTENANCE_MODE)}`,
+//       `WEB_CLIENT_ID=${String(GOOGLE_WEB_CLIENT_ID).slice(0, 12)}...`,
+//       `IOS_CLIENT_ID=${String(GOOGLE_IOS_CLIENT_ID).slice(0, 12)}...`,
+//     ].join('\n')
+//   )
+// }
 
 // ✅ http면 iOS에서 막힐 가능성 큼 -> 바로 경고
-if (isNative && API_BASE_URL.startsWith('http://')) {
-  alert(
-    `⚠️ iOS 앱에서 http API는 막힐 수 있어요 (ATS).\n현재: ${API_BASE_URL}\nhttps로 바꾸는 걸 권장합니다.`
-  )
-}
+// if (isNative && API_BASE_URL.startsWith('http://')) {
+//   alert(
+//     `⚠️ iOS 앱에서 http API는 막힐 수 있어요 (ATS).\n현재: ${API_BASE_URL}\nhttps로 바꾸는 걸 권장합니다.`
+//   )
+// }
 
 if (isNative) {
   if (!GOOGLE_WEB_CLIENT_ID || !GOOGLE_IOS_CLIENT_ID) {
@@ -106,9 +106,9 @@ const prepare = async () => {
 
 const queryClient = new QueryClient()
 
-console.log('✅ isNative:', isNative)
-console.log('✅ GOOGLE_WEB_CLIENT_ID:', GOOGLE_WEB_CLIENT_ID)
-console.log('✅ GOOGLE_IOS_CLIENT_ID:', GOOGLE_IOS_CLIENT_ID)
+// console.log('✅ isNative:', isNative)
+// console.log('✅ GOOGLE_WEB_CLIENT_ID:', GOOGLE_WEB_CLIENT_ID)
+// console.log('✅ GOOGLE_IOS_CLIENT_ID:', GOOGLE_IOS_CLIENT_ID)
 
 prepare().then(() => {
   const container = document.getElementById('root')!

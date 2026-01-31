@@ -1,17 +1,30 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import BottomSheet from '../common/BottomSheet'
 import Button from '../common/Button'
 import showToast from '../common/CommonToast'
 import { ONBOARDING_STEPS } from '../../constants/onboardingData'
+import { updateInterests } from '../../api'
+import { useUserStore } from '../../stores/useUserStore'
 
 interface InterestChipProps {
   label: string
   icon: string
 }
 
-export default function InterestSection() {
+interface InterestSectionProp {
+  initialInterest: string[]
+}
+
+export default function InterestSection({
+  initialInterest,
+}: InterestSectionProp) {
   const [isOpen, setIsOpen] = useState(false)
   const [selected, setSelected] = useState<string[]>([])
+  const { id } = useUserStore()
+
+  useEffect(() => {
+    setSelected(initialInterest)
+  }, [initialInterest])
 
   const interestStep = useMemo(
     () => ONBOARDING_STEPS.find(step => step.id === 4),
@@ -28,17 +41,27 @@ export default function InterestSection() {
 
   const selectedOptions = options.filter(opt => selected.includes(opt.value))
 
-  const handleSave = () => {
-    setIsOpen(false)
-    showToast({
-      message: 'Your changes have been saved',
-      iconType: 'checkRound',
-    })
+  const handleSave = async () => {
+    console.log('[interests] selected(topicKeys):', selected)
+    try {
+      await updateInterests(id, selected)
+      setIsOpen(false)
+      showToast({
+        message: 'Your changes have been saved',
+        iconType: 'checkRound',
+      })
+    } catch (error) {
+      console.log(error)
+      showToast({
+        message: 'Failed to save changes',
+        iconType: 'error', // 너희 토스트 아이콘 타입에 맞게
+      })
+    }
   }
 
   return (
     <div className="w-full">
-      <div className="flex justify-between mx-4 my-2">
+      <div className="flex justify-between mx-4 mt-2 mb-4">
         <div className="text-title text-base text-gray-800">My Interests</div>
         <Button variant="text" onClick={() => setIsOpen(true)}>
           Edit
