@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.16](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.15...v2.1.16) (2026-01-31)
+
+
+### Features
+
+* 마이페이지 api 연결 ([#251](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/251)) ([32a0f0f](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/32a0f0f6257f83b219c083a73dc5870893fb45d1))
+
+
+### Bug Fixes
+
+* 보관함 필터 판별 조건 수정 ([#252](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/252)) ([9a6d918](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/9a6d9186e7853b9d1b4d039b319077173136d344))
+
 ### [2.1.15](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.14...v2.1.15) (2026-01-31)
 
 ### [2.1.14](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.13...v2.1.14) (2026-01-30)
