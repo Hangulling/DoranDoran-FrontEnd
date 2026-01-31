@@ -35,7 +35,16 @@ interface ArchiveState {
 const isWordItem = (b: BookmarkResponse) =>
   (b.aiResponse?.vocabulary?.length ?? 0) > 0
 
-const isSentenceItem = (b: BookmarkResponse) => !!b.aiResponse?.description
+const isSentenceItem = (b: BookmarkResponse) => {
+  const hasVocab = (b.aiResponse?.vocabulary?.length ?? 0) > 0
+  if (hasVocab) return false
+
+  const hasDescription = !!b.aiResponse?.description?.trim()
+  const hasContent =
+    !!(b.content ?? '').trim() || !!(b.correctedContent ?? '').trim()
+
+  return hasDescription || hasContent
+}
 
 const getSelectableIds = (
   items: BookmarkResponse[],
