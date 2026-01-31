@@ -8,7 +8,7 @@ export default function ArchivePage() {
         Saved
       </div>
       <img src={ArchiveLogoImg} />
-      <div className="flex justify-center mt-8">
+      <div className="flex justify-center items-center mt-8">
         <ArchiveEntryCard />
       </div>
     </div>
