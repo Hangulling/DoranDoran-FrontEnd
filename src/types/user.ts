@@ -34,6 +34,17 @@ export interface User {
   updatedAt: string
 }
 
+// 온보딩
+export interface OnboardingPayload {
+  topicKeys?: string[]
+  pushEnabled?: boolean
+  referralSource?: string
+  referralOther?: string
+  koreanLevel?: number
+  purposeKey?: string
+  purposeOther?: string
+}
+
 // 사용자 대시보드 정보
 export interface UserStats {
   streakCount: number

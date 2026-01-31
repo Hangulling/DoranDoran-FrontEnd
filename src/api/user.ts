@@ -4,6 +4,7 @@ import type {
   UpdatePayload,
   UserStatus,
   EmailPayload,
+  OnboardingPayload,
 } from '../types/user'
 import api, { publicApi } from './api'
 import { USER_ENDPOINTS } from './endpoints'
@@ -55,11 +56,9 @@ export const updateStatus = async (
 // 온보딩 상태 업데이트
 export const updateOnboarding = async (
   userId: string,
-  isOnboard: boolean
+  payload?: OnboardingPayload
 ): Promise<void> => {
-  await api.patch(USER_ENDPOINTS.UPDATE_ONBOARDING(userId), {
-    isOnboard,
-  })
+  await api.patch(USER_ENDPOINTS.UPDATE_ONBOARDING(userId), payload || {})
 }
 
 // 문의용 이메일 조회
