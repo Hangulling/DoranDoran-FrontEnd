@@ -10,6 +10,7 @@ import useArchiveStore from '../../stores/useArchiveStore'
 import Button from '../../components/common/Button'
 import CommonModal from '../../components/common/CommonModal'
 import showToast from '../../components/common/CommonToast'
+import EmptyCard from '../../components/archive/EmptyCard'
 
 export default function SentenceArchivePage() {
   const [lang, setLang] = useState<Lang>('KOR')
@@ -17,6 +18,7 @@ export default function SentenceArchivePage() {
   const [selectedTab, setSelectedTab] = useState<Room[]>(['All'])
   const [deleteCount, setDeleteCount] = useState(0)
   const [openModal, setOpenModal] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const {
     items,
@@ -34,7 +36,8 @@ export default function SentenceArchivePage() {
   useEffect(() => {
     setContentType('sentences')
     setActiveRoom(['All'])
-  }, [setContentType, setActiveRoom])
+    setClosenessFilter('all')
+  }, [setContentType, setActiveRoom, setClosenessFilter])
 
   useEffect(() => {
     const getSentencesBookmark = async () => {
@@ -43,6 +46,8 @@ export default function SentenceArchivePage() {
         seedItems(res)
       } catch (error) {
         console.log(error, 'error')
+      } finally {
+        setIsLoading(false)
       }
     }
     getSentencesBookmark()
@@ -69,7 +74,13 @@ export default function SentenceArchivePage() {
 
   const visibleSentenceItems = useMemo(() => {
     return filteredByRoom
-      .filter(b => b.aiResponse?.description)
+      .filter(b => {
+        const hasDescription = !!b.aiResponse?.description?.trim()
+        const hasVocabulary = (b.aiResponse?.vocabulary?.length ?? 0) == 0
+        const hasContent = !!b.correctedContent?.trim()
+
+        return hasDescription || hasVocabulary || hasContent
+      })
       .filter(b => {
         if (closenessFilter === 'all') return true
         const closeness = toCloseness(b.aiResponse?.intimacyLevel ?? '')
@@ -96,6 +107,26 @@ export default function SentenceArchivePage() {
     } catch (error) {
       console.log(error, 'error')
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div>
+        <ArchiveTabs activeTab={selectedTab} onChange={handleChangeTab} />
+      </div>
+    )
+  }
+
+  if (visibleSentenceItems.length === 0) {
+    return (
+      <div>
+        <ArchiveTabs activeTab={selectedTab} onChange={handleChangeTab} />
+
+        <div className="mt-40">
+          <EmptyCard savedType="Sentences" />
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -129,7 +160,7 @@ export default function SentenceArchivePage() {
         </div>
       )}
 
-      <div className="p-3">
+      <div>
         {visibleSentenceItems.map(b => {
           const closeness = toCloseness(b.aiResponse?.intimacyLevel ?? '')
           const description =
@@ -137,7 +168,10 @@ export default function SentenceArchivePage() {
               ? (b.aiResponse?.translation?.english ?? '')
               : (b.aiResponse?.description ?? '')
 
-          const content = b.correctedContent ?? ''
+          const hasDescription = !!description?.trim()
+          const content = hasDescription
+            ? (b.correctedContent ?? '')
+            : (b.content ?? '')
 
           return (
             <SentenceCard

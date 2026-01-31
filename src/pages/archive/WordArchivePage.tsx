@@ -37,7 +37,8 @@ export default function WordArchivePage() {
   useEffect(() => {
     setContentType('words')
     setActiveRoom(['All'])
-  }, [setContentType, setActiveRoom])
+    setClosenessFilter('all')
+  }, [setContentType, setActiveRoom, setClosenessFilter])
 
   useEffect(() => {
     const fetchBookmarks = async () => {
@@ -99,7 +100,7 @@ export default function WordArchivePage() {
     return (
       <div>
         <ArchiveTabs activeTab={selectedTab} onChange={handleChangeTab} />
-        <div className="mt-24">
+        <div className="mt-40">
           <EmptyCard savedType="Words" />
         </div>
       </div>
