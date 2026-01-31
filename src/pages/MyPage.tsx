@@ -68,6 +68,7 @@ export default function MyPage() {
 
   useEffect(() => {
     const getNotification = async () => {
+      if (!id) return
       try {
         const res = await getNotificationSetting(id)
         setIsAlert(res.pushEnabled)
@@ -76,7 +77,7 @@ export default function MyPage() {
       }
     }
     getNotification()
-  }, [])
+  }, [id])
 
   const handleNotification = async () => {
     try {
@@ -92,60 +93,62 @@ export default function MyPage() {
   if (!user) return null
 
   return (
-    <div className="flex flex-col items-center">
-      <ProfileSummary
-        name={user.name}
-        email={user.email}
-        onClick={() => navigate('/mypage/profile')}
-      />
-
-      <div className="bg-gray-50 h-2 w-full my-4" />
-
-      <InterestSection initialInterest={interests} />
-
-      <div className="bg-gray-50 h-2 w-full my-4" />
-
-      <MenuRow
-        label="Notification Settings"
-        onClick={() => setOpenAlert(true)}
-      />
-
-      {openAlert && (
-        <BottomSheet
-          title="Notification Settings"
-          description="Get notified about new messages 
-          and important updates"
-          isOpen={openAlert}
-          onClose={() => setOpenAlert(prev => !prev)}
-          footer={
-            <Button
-              variant="primary"
-              size="xl"
-              className="w-full"
-              onClick={handleNotification}
-            >
-              Save
-            </Button>
-          }
-        >
-          <div className="flex justify-center items-center py-6">
-            <ToggleSwitch
-              checked={isAlert}
-              onClick={() => setIsAlert(prev => !prev)}
-            />
-          </div>
-        </BottomSheet>
-      )}
-
-      <div className="bg-gray-50 h-2 w-full my-4" />
-
-      {items.map(item => (
-        <MenuRow
-          key={item.label}
-          label={item.label}
-          onClick={() => navigate(item.to, { state: { hideConfirm: true } })}
+    <div>
+      <div className="flex flex-col items-center">
+        <ProfileSummary
+          name={user.name}
+          email={user.email}
+          onClick={() => navigate('/mypage/profile')}
         />
-      ))}
+
+        <div className="bg-gray-50 h-2 w-full my-4" />
+
+        <InterestSection initialInterest={interests} />
+
+        <div className="bg-gray-50 h-2 w-full my-4" />
+
+        <MenuRow
+          label="Notification Settings"
+          onClick={() => setOpenAlert(true)}
+        />
+
+        {openAlert && (
+          <BottomSheet
+            title="Notification Settings"
+            description="Get notified about new messages 
+        and important updates"
+            isOpen={openAlert}
+            onClose={() => setOpenAlert(prev => !prev)}
+            footer={
+              <Button
+                variant="primary"
+                size="xl"
+                className="w-full"
+                onClick={handleNotification}
+              >
+                Save
+              </Button>
+            }
+          >
+            <div className="flex justify-center items-center py-6">
+              <ToggleSwitch
+                checked={isAlert}
+                onClick={() => setIsAlert(prev => !prev)}
+              />
+            </div>
+          </BottomSheet>
+        )}
+
+        <div className="bg-gray-50 h-2 w-full my-4" />
+
+        {items.map(item => (
+          <MenuRow
+            key={item.label}
+            label={item.label}
+            onClick={() => navigate(item.to, { state: { hideConfirm: true } })}
+          />
+        ))}
+      </div>
     </div>
   )
 }
