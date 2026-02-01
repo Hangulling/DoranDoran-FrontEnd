@@ -117,6 +117,7 @@ export default function Input({
                 variant="text"
                 size="xs"
                 onClick={() => setShow(s => !s)}
+                className="mr-2"
               >
                 <img src={show ? eye : eyeOff} alt="eye" className="w-5 h-5" />
               </Button>
@@ -158,6 +159,7 @@ export default function Input({
               variant="text"
               size="xs"
               onClick={() => setShow(s => !s)}
+              className="mr-2"
             >
               <img src={show ? eye : eyeOff} alt="eye" className="w-5 h-5" />
             </Button>
