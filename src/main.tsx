@@ -8,71 +8,49 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { isNativeApp } from './utils/isNativeApp.ts'
 import { SocialLogin } from '@capgo/capacitor-social-login'
-import {
-  GOOGLE_WEB_CLIENT_ID,
-  GOOGLE_IOS_CLIENT_ID,
-  // API_BASE_URL,
-} from './constants/env'
-
-// window.onerror = function (
-//   msg: string | Event,
-//   src?: string,
-//   line?: number,
-//   col?: number,
-//   err?: unknown
-// ) {
-//   const stack = err instanceof Error ? (err.stack ?? '') : ''
-//   alert(
-//     `JS Error:\n${String(msg)}\n${String(src)}:${String(line)}:${String(
-//       col
-//     )}\n${stack}`
-//   )
-//   return false
-// }
-
-// window.onunhandledrejection = function (e: PromiseRejectionEvent) {
-//   const reason = e.reason as unknown
-//   const message =
-//     reason instanceof Error
-//       ? `${reason.message}\n${reason.stack ?? ''}`
-//       : String(reason)
-
-//   alert(`Promise Error:\n${message}`)
-// }
+import { GOOGLE_WEB_CLIENT_ID, GOOGLE_IOS_CLIENT_ID } from './constants/env'
 
 const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 
 const urlParams = new URLSearchParams(window.location.search)
 const paramInternal = urlParams.get('internal') === 'true'
+if (paramInternal) {
+  sessionStorage.setItem('isInternalTraffic', 'true')
+}
+
+const isInternalTraffic = sessionStorage.getItem('isInternalTraffic') === 'true'
+const isDev = import.meta.env.DEV
+
+const shouldVerboseLog = isDev || isInternalTraffic
+
+const logError = (title: string, err?: unknown) => {
+  if (shouldVerboseLog) {
+    console.error(title, err)
+  } else {
+    console.error(title)
+  }
+}
+
+const logWarn = (title: string, extra?: unknown) => {
+  if (shouldVerboseLog) {
+    console.warn(title, extra)
+  } else {
+    console.warn(title)
+  }
+}
 
 const isNative = isNativeApp()
-// if (isNative) {
-//   alert(
-//     [
-//       `MODE=${import.meta.env.MODE}`,
-//       `VITE_API_BASE_URL=${API_BASE_URL}`,
-//       `VITE_USE_MSW=${String(import.meta.env.VITE_USE_MSW)}`,
-//       `VITE_MAINTENANCE_MODE=${String(import.meta.env.VITE_MAINTENANCE_MODE)}`,
-//       `WEB_CLIENT_ID=${String(GOOGLE_WEB_CLIENT_ID).slice(0, 12)}...`,
-//       `IOS_CLIENT_ID=${String(GOOGLE_IOS_CLIENT_ID).slice(0, 12)}...`,
-//     ].join('\n')
-//   )
-// }
-
-// ✅ http면 iOS에서 막힐 가능성 큼 -> 바로 경고
-// if (isNative && API_BASE_URL.startsWith('http://')) {
-//   alert(
-//     `⚠️ iOS 앱에서 http API는 막힐 수 있어요 (ATS).\n현재: ${API_BASE_URL}\nhttps로 바꾸는 걸 권장합니다.`
-//   )
-// }
 
 if (isNative) {
   if (!GOOGLE_WEB_CLIENT_ID || !GOOGLE_IOS_CLIENT_ID) {
-    alert(
-      `Google Client ID missing\nweb=${String(
-        GOOGLE_WEB_CLIENT_ID
-      )}\nios=${String(GOOGLE_IOS_CLIENT_ID)}`
-    )
+    if (shouldVerboseLog) {
+      logWarn('Google Client ID missing', {
+        web: GOOGLE_WEB_CLIENT_ID,
+        ios: GOOGLE_IOS_CLIENT_ID,
+      })
+    } else {
+      logWarn('Google Client ID missing')
+    }
   } else {
     try {
       SocialLogin.initialize({
@@ -82,19 +60,12 @@ if (isNative) {
           iOSServerClientId: GOOGLE_WEB_CLIENT_ID,
         },
       })
-      alert('✅ SocialLogin initialized')
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : String(e)
-      alert(`SocialLogin init failed: ${message}`)
+      logError('SocialLogin init failed', e)
     }
   }
 }
 
-if (paramInternal) {
-  sessionStorage.setItem('isInternalTraffic', 'true')
-}
-
-const isDev = import.meta.env.DEV
 const USE_MSW = import.meta.env.VITE_USE_MSW === 'true'
 
 const prepare = async () => {
@@ -105,10 +76,6 @@ const prepare = async () => {
 }
 
 const queryClient = new QueryClient()
-
-// console.log('✅ isNative:', isNative)
-// console.log('✅ GOOGLE_WEB_CLIENT_ID:', GOOGLE_WEB_CLIENT_ID)
-// console.log('✅ GOOGLE_IOS_CLIENT_ID:', GOOGLE_IOS_CLIENT_ID)
 
 prepare().then(() => {
   const container = document.getElementById('root')!
