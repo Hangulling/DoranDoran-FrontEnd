@@ -39,10 +39,10 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
     hasEtc: true,
     options: [
       { value: 'ads', label: 'ads' },
-      { value: 'Instagram contents', label: 'Instagram contents' },
-      { value: 'Instagram reels', label: 'Instagram reels' },
-      { value: 'Facebook contents', label: 'Facebook contents' },
-      { value: 'Recommended by a friend', label: 'Recommended by a friend' },
+      { value: 'instagram_contents', label: 'Instagram contents' },
+      { value: 'instagram_reels', label: 'Instagram reels' },
+      { value: 'facebook_contents', label: 'Facebook contents' },
+      { value: 'friend', label: 'Recommended by a friend' },
     ],
   },
   {
@@ -53,7 +53,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
     hasEtc: false,
     options: [
       {
-        value: 'level1',
+        value: '1',
         label: (
           <span>
             <span className="text-gray-400 text-[12px] mr-[10px]">lv.1</span>
@@ -62,7 +62,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
         ),
       },
       {
-        value: 'level2',
+        value: '2',
         label: (
           <span>
             <span className="text-gray-400 text-[12px] mr-[10px]">lv.2</span>
@@ -71,7 +71,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
         ),
       },
       {
-        value: 'level3',
+        value: '3',
         label: (
           <span>
             <span className="text-gray-400 text-[12px] mr-[10px]">lv.3</span>
@@ -80,7 +80,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
         ),
       },
       {
-        value: 'level4',
+        value: '4',
         label: (
           <span>
             <span className="text-gray-400 text-[12px] mr-[10px]">lv.4</span>
@@ -89,7 +89,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
         ),
       },
       {
-        value: 'level5',
+        value: '5',
         label: (
           <span>
             <span className="text-gray-400 text-[12px] mr-[10px]">lv.5</span>
@@ -108,22 +108,22 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
     hasEtc: true,
     options: [
       {
-        value: 'Casual chats with Korean friends',
+        value: 'casual_chats',
         label: 'Casual chats with Korean friends',
         image: Card1,
       },
       {
-        value: 'Natural phrases for dating',
+        value: 'dating',
         label: 'Natural phrases for dating',
         image: Card2,
       },
       {
-        value: 'Workplace communication',
+        value: 'workplace',
         label: 'Workplace communication',
         image: Card3,
       },
       {
-        value: 'Talking with seniors at school',
+        value: 'school',
         label: 'Talking with seniors at school',
         image: Card4,
       },

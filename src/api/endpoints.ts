@@ -27,7 +27,7 @@ export const USER_ENDPOINTS = {
   // 사용자 상태 업데이트
   UPDATE_STATUS: (userId: string) => `/api/users/${userId}/status`,
 
-  // 온보딩 확인 업데이트
+  // 온보딩 제출 (변경)
   UPDATE_ONBOARDING: (userId: string) => `/api/users/${userId}/onboard`,
 
   // 관심 주제 조회
