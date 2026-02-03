@@ -102,6 +102,13 @@ export function useChatStream<T = unknown>(
       })
 
       eventSource.onerror = event => {
+        // 화면 숨김의 경우 처리 예외
+        if (document.visibilityState === 'hidden') {
+          console.log('Background connection closed.')
+          eventSource.close()
+          return
+        }
+
         if (onErrorRef.current) {
           onErrorRef.current(event)
         }
@@ -139,9 +146,26 @@ export function useChatStream<T = unknown>(
       eventSourceRef.current = eventSource
     }
 
+    // 화면이 다시 보일 때 연결이 끊겨있으면 재연결
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        if (
+          !eventSourceRef.current ||
+          eventSourceRef.current.readyState === EventSource.CLOSED
+        ) {
+          console.log('[SSE] App came to foreground, reconnecting...')
+          connect()
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    // 최초 연결
     connect()
 
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
       if (retryTimeout) clearTimeout(retryTimeout)
       if (eventSourceRef.current) {
         eventSourceRef.current.close()
