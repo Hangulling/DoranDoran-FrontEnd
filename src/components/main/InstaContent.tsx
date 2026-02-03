@@ -84,14 +84,15 @@ const InstaContent = ({ onCardClick }: InstaContentProps) => {
             {/* 이미지 */}
             <div className="h-[90px] w-full overflow-hidden">
               <img
-                src={post.imageUrl}
-                alt={post.title}
+                src={post.coverImageUrl || post.imageUrl || ''}
+                alt={post.title || ''}
                 className="w-full h-full object-cover"
               />
             </div>
+
             {/* 타이틀 */}
-            <div className="flex-1 flex flex-col justify-center px-4 py-[10px]">
-              <span className="text-body text-[14px] truncate-2-lines text-start">
+            <div className="flex-1 flex flex-col justify-center px-[10px] py-[10px]">
+              <span className="text-body text-[14px] line-clamp-2 text-start break-all">
                 {post.title}
               </span>
             </div>

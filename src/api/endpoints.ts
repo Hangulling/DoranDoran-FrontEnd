@@ -225,9 +225,9 @@ export const BOOKMARK_ENDPOINTS = {
 // Home endpoints
 export const HOME_ENDPOINTS = {
   // 게시글 목록 조회
-  GET_POSTS: '/api/home/posts',
+  GET_POSTS: '/api/home/v2/posts',
   // 게시글 상세 조회
-  GET_POST_DETAIL: (externalId: string) => `/api/home/posts/${externalId}`,
+  GET_POST_DETAIL: (externalId: string) => `/api/home/v2/posts/${externalId}`,
 }
 
 // Support endpoints
