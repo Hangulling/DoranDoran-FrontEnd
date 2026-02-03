@@ -11,7 +11,7 @@ export default function MenuRow({ label, onClick }: MenuRowProps) {
     <Button
       variant="text"
       size="xl"
-      className="flex !justify-between"
+      className="w-full max-w-app md:max-w-tablet lg:max-w-desktop px-4 flex !justify-between"
       onClick={onClick}
     >
       <span className="text-body text-sm text-gray-800">{label}</span>

@@ -28,8 +28,8 @@ export default function ArchiveTabs({ activeTab, onChange }: ArchiveTabsProps) {
 
   return (
     <div>
-      <div className="relative ml-5 overflow-x-auto">
-        <div className="flex justify-between gap-1 overflow-x-auto">
+      <div className="relative ml-5 overflow-x-auto ">
+        <div className="flex justify-between gap-4 overflow-x-auto">
           {tabs.map(tab => {
             const isActive = activeTab.includes('All')
               ? tab === 'All' || realTabs.includes(tab)
@@ -40,7 +40,7 @@ export default function ArchiveTabs({ activeTab, onChange }: ArchiveTabsProps) {
               <Button
                 key={tab}
                 disabled={disabled}
-                className={`my-4 rounded-md ${isActive ? 'border border-primary-80 bg-primary-10 text-primary-200 text-subtitle text-sm' : 'bg-gray-50 text-gray-400 text-body text-sm'}  ${disabled && '!text-gray-200'} `}
+                className={`w-full max-w-app md:max-w-tablet lg:max-w-desktop my-4 rounded-md ${isActive ? 'border border-primary-80 bg-primary-10 text-primary-200 text-subtitle text-sm' : 'bg-gray-50 text-gray-400 text-body text-sm'}  ${disabled && '!text-gray-200'} `}
                 variant="tab"
                 size="archive"
                 onClick={() => toggleTab(tab)}
