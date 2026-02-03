@@ -26,11 +26,24 @@ export default function OnboardingContent({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
+    if (isEtcSelected && textareaRef.current) {
+      textareaRef.current.focus()
     }
-  }, [etcText, isEtcSelected])
+  }, [isEtcSelected])
+
+  // 입력창 자동 포커스
+  useEffect(() => {
+    if (isEtcSelected && textareaRef.current) {
+      textareaRef.current.focus()
+
+      setTimeout(() => {
+        textareaRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
+      }, 100)
+    }
+  }, [isEtcSelected])
 
   return (
     <div className="flex flex-col h-full animate-fadeIn">
