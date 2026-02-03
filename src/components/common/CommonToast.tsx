@@ -5,7 +5,7 @@ import CheckIcon from '../../assets/icon/CheckIcon'
 import type { ToastProps } from '../../types/common'
 
 export type IconType = 'error' | 'checkRound'
-export type ToastSize = 'default' | 'sheet'
+export type ToastSize = 'default' | 'sheet' | 'manager'
 
 // 에러 / 체크 아이콘 선택
 const iconMap: Record<IconType, JSX.Element> = {
@@ -18,6 +18,7 @@ const iconMap: Record<IconType, JSX.Element> = {
 const sizeStyles: Record<ToastSize, string> = {
   default: 'mx-5 mb-5',
   sheet: 'mx-1 mb-[72px]',
+  manager: 'mx-1 mb-[calc(92px+env(safe-area-inset-bottom))]',
 }
 
 let toastActive = false

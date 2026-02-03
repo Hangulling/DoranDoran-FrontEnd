@@ -65,7 +65,21 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
   }
 
   return (
-    <BottomSheet isOpen={isOpen} onClose={onClose} title="Contact us">
+    <BottomSheet
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Contact us"
+      footer={
+        <Button
+          variant="primary"
+          size="confirm"
+          onClick={handleSubmit}
+          disabled={!content || !isReplySelected || !isEmailValid}
+        >
+          Send inquiry
+        </Button>
+      }
+    >
       <div className="flex flex-col mt-1">
         <div className="mb-5">
           <label className="text-[16px] text-subtitle mb-[6px] block">
@@ -156,15 +170,6 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
             />
           </div>
         </div>
-
-        <Button
-          variant="primary"
-          size="confirm"
-          onClick={handleSubmit}
-          disabled={!content || !isReplySelected || !isEmailValid}
-        >
-          Send inquiry
-        </Button>
       </div>
     </BottomSheet>
   )
