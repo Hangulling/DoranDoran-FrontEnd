@@ -22,21 +22,12 @@ const usePushNotification = () => {
     }
 
     const initPush = async () => {
-      // 권한 요청
-      let permStatus = await PushNotifications.checkPermissions()
-
-      if (permStatus.receive === 'prompt') {
-        permStatus = await PushNotifications.requestPermissions()
+      // 현재 권한 상태 확인
+      const permStatus = await PushNotifications.checkPermissions()
+      if (permStatus.receive === 'granted') {
+        await PushNotifications.register()
       }
-
-      if (permStatus.receive !== 'granted') {
-        return
-      }
-
-      // FCM 토큰 등록
-      await PushNotifications.register()
     }
-
     initPush()
 
     // 토큰 발급 성공 시 백엔드에 등록

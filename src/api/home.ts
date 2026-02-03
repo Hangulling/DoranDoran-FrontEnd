@@ -1,14 +1,6 @@
+import type { HomePost } from '../types/home'
 import api from './api'
 import { HOME_ENDPOINTS } from './endpoints'
-
-export interface HomePost {
-  externalId: string
-  title: string
-  imageUrl: string
-  description: string
-  permalink: string
-  publishedAt: string
-}
 
 // 게시글 6개 조회
 export const getHomePosts = async (): Promise<HomePost[]> => {
