@@ -15,6 +15,8 @@ import {
 } from '../api'
 import { useUserStore } from '../stores/useUserStore'
 import axios from 'axios'
+import { Capacitor } from '@capacitor/core'
+import { PushNotifications } from '@capacitor/push-notifications'
 
 const items = [
   { label: 'Terms of Service', to: '/policy/service' },
@@ -79,11 +81,35 @@ export default function MyPage() {
     getNotification()
   }, [id])
 
+  // 알림 권한 요청
+  const registerPush = async () => {
+    if (!Capacitor.isNativePlatform()) return
+
+    try {
+      let permStatus = await PushNotifications.checkPermissions()
+
+      if (permStatus.receive === 'prompt') {
+        permStatus = await PushNotifications.requestPermissions()
+      }
+
+      if (permStatus.receive === 'granted') {
+        await PushNotifications.register()
+      }
+    } catch (e) {
+      console.error('Push registration failed in MyPage', e)
+    }
+  }
+
   const handleNotification = async () => {
     try {
       const res = await updateNotificationSetting(id, isAlert)
       setIsAlert(res.pushEnabled)
       setOpenAlert(false)
+
+      if (isAlert) {
+        // 알림 켰을 때 권한 요청
+        await registerPush()
+      }
     } catch (error) {
       console.log(error)
     }

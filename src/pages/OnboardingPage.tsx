@@ -9,6 +9,8 @@ import { useState } from 'react'
 import { ONBOARDING_STEPS } from '../constants/onboardingData'
 import LeftArrowIcon from '../assets/icon/leftArrow.svg?react'
 import type { OnboardingPayload } from '../types/user'
+import { Capacitor } from '@capacitor/core'
+import { PushNotifications } from '@capacitor/push-notifications'
 
 export default function OnboardingPage() {
   const navigate = useNavigate()
@@ -105,6 +107,25 @@ export default function OnboardingPage() {
     return payload
   }
 
+  // 알림 권한 요청
+  const registerPush = async () => {
+    if (!Capacitor.isNativePlatform()) return
+
+    try {
+      let permStatus = await PushNotifications.checkPermissions()
+
+      if (permStatus.receive === 'prompt') {
+        permStatus = await PushNotifications.requestPermissions()
+      }
+
+      if (permStatus.receive === 'granted') {
+        await PushNotifications.register()
+      }
+    } catch (e) {
+      console.error('Push registration failed during onboarding', e)
+    }
+  }
+
   // 완료 처리 (Skip 포함)
   const handleCompleteOnboarding = async (skip: boolean = false) => {
     if (!userId) {
@@ -126,6 +147,11 @@ export default function OnboardingPage() {
 
       await updateOnboarding(userId, payload)
       console.log('온보딩 완료 처리 성공')
+
+      // 권한 요청
+      if (payload.pushEnabled) {
+        await registerPush()
+      }
 
       navigate('/', {
         replace: true,
