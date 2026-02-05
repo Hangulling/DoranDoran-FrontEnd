@@ -9,6 +9,7 @@ interface CreateChatRoomParams {
   concept: string
   chatbotId: string
   intimacyLevel: number
+  topic?: string
 }
 
 export const useCreateChatRoom = (routeId: string) => {
