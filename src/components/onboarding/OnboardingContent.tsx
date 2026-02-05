@@ -144,14 +144,17 @@ export default function OnboardingContent({
                   ref={textareaRef}
                   value={etcText}
                   onChange={e => {
-                    const text = e.target.value
-                    // 80자 제한
-                    if (text.length <= MAX_LENGTH) {
-                      onEtcTextChange?.(text)
+                    const originalText = e.target.value
+                    const filteredText = originalText.replace(
+                      /[^a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\s]/g,
+                      ''
+                    )
+                    if (filteredText.length <= MAX_LENGTH) {
+                      onEtcTextChange?.(filteredText)
                     }
                   }}
                   onClick={e => e.stopPropagation()} // 클릭 시 선택 토글 방지
-                  placeholder={`${isGrid ? 'Please tell us more! (Optional)' : 'Please tell us more!'}`}
+                  placeholder={`${isGrid ? 'Please specify' : 'Please tell us more!'}`}
                   rows={1}
                   className="block w-full py-3 bg-transparent border-b border-gray-100 focus:border-gray-400 focus:outline-none text-[14px] leading-relaxed resize-none placeholder-gray-300 overflow-hidden"
                 />
