@@ -95,6 +95,32 @@ const ManagerChatPage: React.FC = () => {
     }, 500)
   }
 
+  // 하드웨어 뒤로가기
+  useEffect(() => {
+    // 브라우저 히스토리에 가짜 상태를 하나 푸시하여 뒤로가기를 가로챕니다.
+    window.history.pushState(null, '', window.location.href)
+
+    const handlePopState = () => {
+      // 진행 중이고 완료되지 않은 상태라면 모달을 띄웁니다.
+      if (hasProgress && !isCompleted) {
+        setPendingAction('back')
+        setShowLeaveModal(true)
+
+        // 모달이 뜬 상태에서 페이지가 넘어가지 않도록 다시 pushState를 해줍니다.
+        window.history.pushState(null, '', window.location.href)
+      } else {
+        // 진행 사항이 없으면 바로 뒤로 이동합니다.
+        navigate(-1)
+      }
+    }
+
+    window.addEventListener('popstate', handlePopState)
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [hasProgress, isCompleted, navigate])
+
   // 나가기
   const requestLeave = (action: 'back' | 'home') => {
     if (hasProgress && !isCompleted) {
