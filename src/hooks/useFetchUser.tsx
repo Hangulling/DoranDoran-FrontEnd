@@ -17,7 +17,7 @@ export const useFetchUser = () => {
 
   // 데이터 fetching 및 캐싱
   const { data, isError } = useQuery({
-    queryKey: ['userProfile'], // 쿼리 키
+    queryKey: ['userProfile'],
     queryFn: async () => {
       // 사용자 정보 조회
       const userResponse = await getCurrentUser()
@@ -31,12 +31,11 @@ export const useFetchUser = () => {
 
       return { profile, bookmarkCount, stats }
     },
-    staleTime: 1000 * 60 * 10, // 10분간 데이터를 상한 상태로 유지
+    staleTime: 0, // 매번 데이터 호출
     gcTime: 1000 * 60 * 30, // 30분간 캐시 유지
     retry: 1,
   })
 
-  // 데이터가 로드되거나 캐시에서 가져왔을 때 스토어 업데이트
   useEffect(() => {
     if (data) {
       const { profile, bookmarkCount, stats } = data
