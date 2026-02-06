@@ -43,10 +43,9 @@ export default function BottomSheet({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{
-              type: 'spring',
-              damping: 25,
-              stiffness: 300,
-              layout: { duration: 0.3 },
+              type: 'tween',
+              ease: 'easeOut',
+              duration: 0.3,
             }}
             style={{
               height: isExpanded
@@ -91,7 +90,7 @@ export default function BottomSheet({
               {children}
             </div>
 
-            {footer && <div className="shrink-0">{footer}</div>}
+            {footer && <div className="shrink-0 pt-[10px]">{footer}</div>}
           </motion.div>
         </>
       )}

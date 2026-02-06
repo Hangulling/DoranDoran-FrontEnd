@@ -81,11 +81,6 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
     isTransitioning.current = true
     setIsExpanded(false)
     setIsFocused(false)
-
-    setTimeout(() => {
-      isTransitioning.current = false
-      emailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }, 300)
   }
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
