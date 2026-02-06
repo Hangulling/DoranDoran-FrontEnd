@@ -42,6 +42,7 @@ export interface CreateChatroomPayload {
   concept: string // FRIEND, HONEY, COWORKER, SENIOR
   intimacyLevel?: number
   testModel?: 'a' | 'b' | 'c' // 테스트 모델
+  topic?: string
 }
 
 export interface ApiChatRoom {

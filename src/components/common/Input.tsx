@@ -21,6 +21,7 @@ interface InputProps {
   rightElement?: React.ReactNode
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void
+  onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
   onClear?: () => void
 }
@@ -41,6 +42,7 @@ export default function Input({
   rightElement,
   onChange,
   onBlur,
+  onFocus,
   onKeyDown,
   onClear,
 }: InputProps) {
@@ -74,10 +76,13 @@ export default function Input({
     lg: 'w-[335px] h-12',
   } as const
 
-  const handleFocus = () => setIsFocused(true)
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(false)
     onBlur?.(e)
+  }
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(true)
+    onFocus?.(e)
   }
 
   return (

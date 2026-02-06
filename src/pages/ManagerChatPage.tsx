@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MANAGER_DATA, type ManagerStepId } from '../constants/managerData'
 import { MANAGER_ROOM } from '../constants/mainData'
@@ -10,6 +10,7 @@ import { useUserStore } from '../stores/useUserStore'
 import showToast from '../components/common/CommonToast'
 import Restart from '../assets/icon/restart.svg?react'
 import CommonModal from '../components/common/CommonModal'
+import { useBackButton } from '../hooks/useBackButton'
 
 interface ManagerMessage {
   id: string
@@ -66,6 +67,35 @@ const ManagerChatPage: React.FC = () => {
     { label: 'Other inquiries', nextStepId: 'other' as ManagerStepId },
   ]
 
+  const backButtonHandlers = useMemo(
+    () => [
+      {
+        priority: 3,
+        condition: showLeaveModal,
+        callback: () => {
+          setShowLeaveModal(false)
+          setPendingAction(null)
+        },
+      },
+      {
+        priority: 2,
+        condition: isContactSheetOpen,
+        callback: () => setIsContactSheetOpen(false),
+      },
+      {
+        priority: 1,
+        condition: hasProgress && !isCompleted,
+        callback: () => {
+          setPendingAction('back')
+          setShowLeaveModal(true)
+        },
+      },
+    ],
+    [showLeaveModal, isContactSheetOpen, hasProgress, isCompleted]
+  )
+
+  useBackButton(backButtonHandlers)
+
   // 옵션 선택
   const handleOptionClick = (
     optionLabel: string,
@@ -94,28 +124,6 @@ const ManagerChatPage: React.FC = () => {
       ])
     }, 500)
   }
-
-  // 하드웨어 뒤로가기
-  useEffect(() => {
-    window.history.pushState(null, '', window.location.href)
-
-    const handlePopState = () => {
-      if (hasProgress && !isCompleted) {
-        setPendingAction('back')
-        setShowLeaveModal(true)
-
-        window.history.pushState(null, '', window.location.href)
-      } else {
-        navigate(-1)
-      }
-    }
-
-    window.addEventListener('popstate', handlePopState)
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState)
-    }
-  }, [hasProgress, isCompleted, navigate])
 
   // 나가기
   const requestLeave = (action: 'back' | 'home') => {

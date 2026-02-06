@@ -29,7 +29,16 @@ const ReportSheet = ({
   }
 
   return (
-    <BottomSheet isOpen={isOpen} onClose={onClose} title="Report a Reply Issue">
+    <BottomSheet
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Report a Reply Issue"
+      footer={
+        <Button variant="primary" size="confirm" onClick={onClose}>
+          Save
+        </Button>
+      }
+    >
       <div className="flex flex-col items-center w-full mt-1 gap-[10px]">
         {REPORT_REASONS.map(reason => (
           <button
@@ -43,12 +52,6 @@ const ReportSheet = ({
             {reason}
           </button>
         ))}
-      </div>
-
-      <div className="w-full mt-5">
-        <Button variant="bottomSheet" size="bottomSheetText" onClick={onClose}>
-          Back to chat
-        </Button>
       </div>
     </BottomSheet>
   )
