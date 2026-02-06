@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App.tsx'
 import './styles/index.css'
+import React from 'react'
 import MaintenancePage from './pages/MaintenancePage.tsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { GoogleOAuthProvider } from '@react-oauth/google'
@@ -81,22 +82,24 @@ prepare().then(() => {
   const root = ReactDOM.createRoot(container)
 
   root.render(
-    <BrowserRouter>
-      {IS_MAINTENANCE_MODE ? (
-        <Routes>
-          <Route path="*" element={<MaintenancePage />} />
-        </Routes>
-      ) : isNative ? (
-        <QueryClientProvider client={queryClient}>
-          <App />
-        </QueryClientProvider>
-      ) : (
-        <GoogleOAuthProvider clientId={GOOGLE_WEB_CLIENT_ID}>
+    <React.StrictMode>
+      <BrowserRouter>
+        {IS_MAINTENANCE_MODE ? (
+          <Routes>
+            <Route path="*" element={<MaintenancePage />} />
+          </Routes>
+        ) : isNative ? (
           <QueryClientProvider client={queryClient}>
             <App />
           </QueryClientProvider>
-        </GoogleOAuthProvider>
-      )}
-    </BrowserRouter>
+        ) : (
+          <GoogleOAuthProvider clientId={GOOGLE_WEB_CLIENT_ID}>
+            <QueryClientProvider client={queryClient}>
+              <App />
+            </QueryClientProvider>
+          </GoogleOAuthProvider>
+        )}
+      </BrowserRouter>
+    </React.StrictMode>
   )
 })
