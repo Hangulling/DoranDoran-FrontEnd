@@ -13,11 +13,15 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const navigate = useNavigate()
-  const userId = useUserStore(state => state.id)
+  const { id: userId, reset } = useUserStore(state => ({
+    id: state.id,
+    reset: state.reset,
+  }))
 
   const handleLogout = async () => {
     try {
       await logout()
+      reset() // 유저 스토어 초기화
 
       navigate('/login', { replace: true })
       setOpenLogout(false)
