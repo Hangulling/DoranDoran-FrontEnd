@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import BottomSheet from '../common/BottomSheet'
 import Button from '../common/Button'
 
@@ -21,34 +22,54 @@ const ReportSheet = ({
   messageId,
   onReport,
 }: ReportSheetProps) => {
-  const handleReportSubmit = (reason: string) => {
-    if (messageId) {
-      console.log(`${messageId} 신고 접수: ${reason}`)
-      onReport(messageId, reason)
+  const [selectedReason, setSelectedReason] = useState<string | null>(null)
+
+  const handleSave = () => {
+    if (messageId && selectedReason) {
+      onReport(messageId, selectedReason)
+      onClose()
+      setSelectedReason(null)
     }
   }
 
-  return (
-    <BottomSheet isOpen={isOpen} onClose={onClose} title="Report a Reply Issue">
-      <div className="flex flex-col items-center w-full mt-1 gap-[10px]">
-        {REPORT_REASONS.map(reason => (
-          <button
-            key={reason}
-            className="w-full py-[14px] px-5 text-left text-[16px] bg-gray-0 border border-gray-100 rounded-[12px] 
-  active:border-primary-200 active:bg-primary-10
-  focus:border-primary-200 focus:bg-primary-10
-  transition-colors"
-            onClick={() => handleReportSubmit(reason)}
-          >
-            {reason}
-          </button>
-        ))}
-      </div>
+  const handleClose = () => {
+    onClose()
+    setSelectedReason(null)
+  }
 
-      <div className="w-full mt-5">
-        <Button variant="bottomSheet" size="bottomSheetText" onClick={onClose}>
-          Back to chat
+  return (
+    <BottomSheet
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Report a Reply Issue"
+      footer={
+        <Button
+          variant="primary"
+          size="confirm"
+          onClick={handleSave}
+          disabled={!selectedReason}
+        >
+          Save
         </Button>
+      }
+    >
+      <div className="flex flex-col items-center w-full mt-1 gap-[10px] mb-5">
+        {REPORT_REASONS.map(reason => {
+          const isSelected = selectedReason === reason
+          return (
+            <button
+              key={reason}
+              className={`w-full py-[14px] px-5 text-left text-[16px] border rounded-[12px] transition-colors ${
+                isSelected
+                  ? 'border-primary-200 bg-primary-10'
+                  : 'bg-gray-0 border-gray-100'
+              }`}
+              onClick={() => setSelectedReason(reason)}
+            >
+              {reason}
+            </button>
+          )
+        })}
       </div>
     </BottomSheet>
   )

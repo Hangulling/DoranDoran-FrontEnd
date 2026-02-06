@@ -26,11 +26,24 @@ export default function OnboardingContent({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
+    if (isEtcSelected && textareaRef.current) {
+      textareaRef.current.focus()
     }
-  }, [etcText, isEtcSelected])
+  }, [isEtcSelected])
+
+  // 입력창 자동 포커스
+  useEffect(() => {
+    if (isEtcSelected && textareaRef.current) {
+      textareaRef.current.focus()
+
+      setTimeout(() => {
+        textareaRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
+      }, 100)
+    }
+  }, [isEtcSelected])
 
   return (
     <div className="flex flex-col h-full animate-fadeIn">
@@ -131,14 +144,17 @@ export default function OnboardingContent({
                   ref={textareaRef}
                   value={etcText}
                   onChange={e => {
-                    const text = e.target.value
-                    // 80자 제한
-                    if (text.length <= MAX_LENGTH) {
-                      onEtcTextChange?.(text)
+                    const originalText = e.target.value
+                    const filteredText = originalText.replace(
+                      /[^a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\s]/g,
+                      ''
+                    )
+                    if (filteredText.length <= MAX_LENGTH) {
+                      onEtcTextChange?.(filteredText)
                     }
                   }}
                   onClick={e => e.stopPropagation()} // 클릭 시 선택 토글 방지
-                  placeholder={`${isGrid ? 'Please tell us more! (Optional)' : 'Please tell us more!'}`}
+                  placeholder={`${isGrid ? 'Please specify' : 'Please tell us more!'}`}
                   rows={1}
                   className="block w-full py-3 bg-transparent border-b border-gray-100 focus:border-gray-400 focus:outline-none text-[14px] leading-relaxed resize-none placeholder-gray-300 overflow-hidden"
                 />

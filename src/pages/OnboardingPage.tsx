@@ -30,12 +30,11 @@ export default function OnboardingPage() {
 
   const ETC_VALUE = 'Other'
   const isEtcSelected = currentSelections.includes(ETC_VALUE)
-  const isGrid = currentStepData.layout === 'grid'
 
   // 버튼 활성화 조건
   const isNextEnabled =
     currentSelections.length > 0 &&
-    (!isEtcSelected || isGrid || etcText.trim().length > 0)
+    (!isEtcSelected || etcText.trim().length > 0)
 
   // 옵션 선택 핸들러
   const handleSelect = (option: string) => {
@@ -175,11 +174,6 @@ export default function OnboardingPage() {
     }
   }
 
-  // 스킵
-  const handleSkip = () => {
-    handleCompleteOnboarding(true)
-  }
-
   // 다음 버튼
   const handleNextClick = () => {
     if (page < ONBOARDING_STEPS.length - 1) {
@@ -201,15 +195,6 @@ export default function OnboardingPage() {
           {page !== 0 && (
             <button onClick={handleBack}>
               <LeftArrowIcon className="gray-600" />
-            </button>
-          )}
-
-          {page === 4 && (
-            <button
-              onClick={handleSkip}
-              className="text-[14px] text-gray-400 text-body py-2 px-1"
-            >
-              Skip
             </button>
           )}
         </div>

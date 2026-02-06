@@ -10,6 +10,24 @@ export interface NotificationLog {
   sentAt: string
 }
 
+export interface PushNotificationRequest {
+  userId: string
+  title?: string
+  body?: string
+  chatroomId?: string
+  messageId?: string
+}
+
+export interface TestChatroomPushRequest {
+  userId: string
+  chatbotId: string
+  topic: string
+  concept?: string
+  intimacyLevel?: number
+  title?: string
+  body?: string
+}
+
 // FCM 토큰 등록
 export const registerFcmToken = async (
   token: string,
@@ -45,6 +63,21 @@ export const getNotificationLogs = async (
     {
       params: { page, size },
     }
+  )
+  return response.data
+}
+
+// 테스트 푸시 발송
+export const sendTestPush = async (data: PushNotificationRequest) => {
+  const response = await api.post(NOTIFICATION_ENDPOINTS.TEST_PUSH, data)
+  return response.data
+}
+
+// 테스트 채팅방 딥링크 푸시 발송
+export const sendTestChatroomPush = async (data: TestChatroomPushRequest) => {
+  const response = await api.post(
+    NOTIFICATION_ENDPOINTS.TEST_CHATROOM_PUSH,
+    data
   )
   return response.data
 }

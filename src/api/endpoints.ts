@@ -244,4 +244,8 @@ export const NOTIFICATION_ENDPOINTS = {
   SEND: '/api/notifications/send',
   // 푸시 로그 조회
   LOGS: (userId: string) => `/api/notifications/logs?userId=${userId}`,
+  // 푸시 테스트
+  TEST_PUSH: '/api/notifications/test',
+  // 채팅방 딥링크 푸시 테스트
+  TEST_CHATROOM_PUSH: '/api/notifications/test-chatroom-push',
 }
