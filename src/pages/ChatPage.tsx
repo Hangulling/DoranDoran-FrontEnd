@@ -321,7 +321,7 @@ const ChatPage: React.FC = () => {
 
       <div
         ref={chatMainRef}
-        className="flex-1 overflow-y-auto w-full bg-gray-10 relative"
+        className="flex-1 overflow-y-auto w-full bg-gray-10 relative pb-[80px]"
       >
         <div className="px-5 pt-6 pb-4">
           <ChatBody

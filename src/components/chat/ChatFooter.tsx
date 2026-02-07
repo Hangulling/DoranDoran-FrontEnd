@@ -115,9 +115,9 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const isSendActive = !disabled && inputValue.trim().length > 0
 
   return (
-    <div className="z-50 w-full">
+    <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center">
       <div
-        className={`w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom)]`}
+        className={`w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_rgba(0,0,0,0.06)]`}
       >
         {/* 토스트 */}
         <div className="absolute bottom-full w-full left-0 flex justify-center pointer-events-none">
@@ -131,7 +131,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
         </div>
 
         {/* textarea */}
-        <div className="w-full px-5 py-[10px]">
+        <div className="w-full px-5 pt-[10px] pb-[calc(10px+env(safe-area-inset-bottom))]">
           <div className="relative w-full px-4 py-[15px] bg-[#f1f1f1] border-[#f1f1f1] rounded-[22px] overflow-hidden text-14px min-h-[51px]">
             <textarea
               ref={inputRef}
