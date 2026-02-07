@@ -9,6 +9,7 @@ import { useFetchUser } from '../hooks/useFetchUser'
 import { useFetchChatRooms } from '../hooks/useFetchChatRooms'
 import { useCreateChatRoom } from '../hooks/useCreateChatRoom'
 import { getChatBotIdByConcept } from '../utils/chatbotMap'
+import ReactGA from 'react-ga4'
 import Carousel from '../components/main/Carousel'
 import Dashboard from '../components/main/Dashboard'
 import InstaContent from '../components/main/InstaContent'
@@ -17,6 +18,7 @@ import useUnreadStore from '../stores/useUnreadStore'
 import { updateIntimacy } from '../api'
 import { useMutation } from '@tanstack/react-query'
 import type { ChatRoomWithMessage } from '../types/main'
+import { GA_ENABLED, IS_PROD } from '../constants/env'
 
 const MainPage = () => {
   const navigate = useNavigate()
@@ -35,6 +37,16 @@ const MainPage = () => {
 
   const { userId } = useFetchUser()
   const { chatMsg, isLoading } = useFetchChatRooms(userId)
+
+  // view_main GA
+  useEffect(() => {
+    if (IS_PROD && GA_ENABLED && userId) {
+      const entryTimestamp = Math.floor(Date.now() / 1000)
+      ReactGA.event('view_main', {
+        entry_timestamp: entryTimestamp,
+      })
+    }
+  }, [userId])
 
   // 기존 방 생성
   const { mutate: createRoom, isPending: isCreating } = useCreateChatRoom(
@@ -126,6 +138,16 @@ const MainPage = () => {
       })
       return
     }
+
+    // enter_chatroom GA
+    if (IS_PROD && GA_ENABLED) {
+      const entryTimestamp = Math.floor(Date.now() / 1000)
+      ReactGA.event('enter_chatroom', {
+        concept: roomName,
+        entry_timestamp: entryTimestamp,
+      })
+    }
+
     // 일반 진입 시 해당 방에 매칭되는 UUID가 있다면 읽음 처리
     const room = chatMsg.find((r: ChatRoomWithMessage) => r.roomRouteId === id)
     if (room?.chatroomId) {
