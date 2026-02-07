@@ -13,10 +13,8 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const navigate = useNavigate()
-  const { id: userId, reset } = useUserStore(state => ({
-    id: state.id,
-    reset: state.reset,
-  }))
+  const userId = useUserStore(state => state.id)
+  const reset = useUserStore(state => state.reset)
 
   const handleLogout = async () => {
     try {
@@ -33,6 +31,7 @@ export default function ProfilePage() {
   const handleDelete = async () => {
     try {
       await deleteUser(userId)
+      reset()
       navigate('/login', { replace: true })
       setOpenDelete(false)
     } catch (error) {
