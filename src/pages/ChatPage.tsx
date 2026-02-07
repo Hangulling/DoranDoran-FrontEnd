@@ -94,7 +94,6 @@ const ChatPage: React.FC = () => {
   const [tempTranslation, setTempTranslation] = useState(isTranslationEnabled)
   const chatroomId = id
   const accessToken = sessionStorage.getItem('accessToken') ?? ''
-  const isAtBottomRef = useRef(true) // 스크롤 감지
 
   const routeId = useMemo(() => {
     if (location.state?.roomRouteId) {
@@ -248,44 +247,6 @@ const ChatPage: React.FC = () => {
     handleSendMessage(content)
   }
 
-  // 스크롤 위치 감지 함수
-  const handleScroll = () => {
-    if (!chatMainRef.current) return
-    const { scrollTop, scrollHeight, clientHeight } = chatMainRef.current
-    const isBottom = scrollHeight - scrollTop - clientHeight < 50
-    isAtBottomRef.current = isBottom
-  }
-
-  // 키보드 올라올 때 스크롤 보정
-  useEffect(() => {
-    const scrollToBottom = () => {
-      if (chatMainRef.current) {
-        chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
-      }
-    }
-
-    const handleResize = () => {
-      if (isAtBottomRef.current) {
-        scrollToBottom()
-        setTimeout(scrollToBottom, 100)
-      }
-    }
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleResize)
-    } else {
-      window.addEventListener('resize', handleResize)
-    }
-
-    return () => {
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleResize)
-      } else {
-        window.removeEventListener('resize', handleResize)
-      }
-    }
-  }, [])
-
   // 봇/가이드 메시지 도착
   useEffect(() => {
     const checkCompletion = (botMsg: string, guideMsg: string | null) => {
@@ -349,7 +310,7 @@ const ChatPage: React.FC = () => {
   }, [messages])
 
   return (
-    <div className="flex flex-col h-full overflow-hidden relative bg-gray-10">
+    <div className="flex flex-col h-full bg-gray-0">
       <ChatHeader
         title={room?.roomName || 'Chat'}
         avatar={room?.avatar}
@@ -360,46 +321,45 @@ const ChatPage: React.FC = () => {
 
       <div
         ref={chatMainRef}
-        onScroll={handleScroll}
-        className="flex-grow overflow-y-auto px-5 pt-6"
+        className="flex-1 overflow-y-auto w-full bg-gray-10 relative"
       >
-        <ChatBody
-          isHistoryLoading={isHistoryLoading}
-          greetingState={greetingState}
-          roomAvatar={room?.avatar}
-          onInitReady={() => setIsInitChatReady(true)}
-          greetingMsg1={greetingMsg1}
-          greetingMsg2={greetingMsg2}
-          isNewChat={isNewChat}
-          messages={messages}
-          isAiResponding={isAiResponding}
-          sseError={sseError}
-          sendError={sendError}
-          onRetry={handleRetry}
-          inactivityError={inactivityError}
-          chatroomId={chatroomId}
-          isVocabularyEnabled={isVocabularyEnabled}
-          isCorrectionEnabled={isCorrectionEnabled}
-          isTranslationEnabled={isTranslationEnabled}
-          onChatBubbleBookmark={handleChatBubbleBookmark}
-          onCorrectionBubbleBookmark={handleCorrectionBubbleBookmark}
-          onReport={handleOpenReport}
-          onResend={handleResend}
-          onRetryUserMessage={handleRetryUserMessage}
-        />
+        <div className="px-5 pt-6 pb-4">
+          <ChatBody
+            isHistoryLoading={isHistoryLoading}
+            greetingState={greetingState}
+            roomAvatar={room?.avatar}
+            onInitReady={() => setIsInitChatReady(true)}
+            greetingMsg1={greetingMsg1}
+            greetingMsg2={greetingMsg2}
+            isNewChat={isNewChat}
+            messages={messages}
+            isAiResponding={isAiResponding}
+            sseError={sseError}
+            sendError={sendError}
+            onRetry={handleRetry}
+            inactivityError={inactivityError}
+            chatroomId={chatroomId}
+            isVocabularyEnabled={isVocabularyEnabled}
+            isCorrectionEnabled={isCorrectionEnabled}
+            isTranslationEnabled={isTranslationEnabled}
+            onChatBubbleBookmark={handleChatBubbleBookmark}
+            onCorrectionBubbleBookmark={handleCorrectionBubbleBookmark}
+            onReport={handleOpenReport}
+            onResend={handleResend}
+            onRetryUserMessage={handleRetryUserMessage}
+          />
+        </div>
       </div>
 
-      <footer className="shrink-0">
-        {!isManagerRoom && (
-          <ChatFooter
-            inputRef={inputRef}
-            onSendMessage={handleSendMessage}
-            disabled={isHistoryLoading || !isInitChatReady || isAiResponding}
-            isAiResponding={isAiResponding}
-            onCancel={handleCancel}
-          />
-        )}
-      </footer>
+      {!isManagerRoom && (
+        <ChatFooter
+          inputRef={inputRef}
+          onSendMessage={handleSendMessage}
+          disabled={isHistoryLoading || !isInitChatReady || isAiResponding}
+          isAiResponding={isAiResponding}
+          onCancel={handleCancel}
+        />
+      )}
 
       <ExitModal
         open={isModalOpen}
