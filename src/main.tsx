@@ -24,52 +24,55 @@ if (paramInternal) {
 
 const isInternalTraffic = sessionStorage.getItem('isInternalTraffic') === 'true'
 const isDev = import.meta.env.DEV
-
 const shouldVerboseLog = isDev || isInternalTraffic
 
 const logError = (title: string, err?: unknown) => {
-  if (shouldVerboseLog) {
-    console.error(title, err)
-  } else {
-    console.error(title)
-  }
+  if (shouldVerboseLog) console.error(title, err)
+  else console.error(title)
 }
 
 const logWarn = (title: string, extra?: unknown) => {
-  if (shouldVerboseLog) {
-    console.warn(title, extra)
-  } else {
-    console.warn(title)
-  }
+  if (shouldVerboseLog) console.warn(title, extra)
+  else console.warn(title)
 }
 
 const isNative = isNativeApp()
 
-if (isNative) {
-  if (!GOOGLE_WEB_CLIENT_ID || !GOOGLE_IOS_CLIENT_ID) {
+const initSocialLogin = async () => {
+  if (!isNative) return
+
+  try {
     if (shouldVerboseLog) {
-      logWarn('Google Client ID missing', {
-        web: GOOGLE_WEB_CLIENT_ID,
-        ios: GOOGLE_IOS_CLIENT_ID,
+      logWarn('SocialLogin env', {
+        apple: APPLE_CLIENT_ID,
+        googleWeb: GOOGLE_WEB_CLIENT_ID,
+        googleIos: GOOGLE_IOS_CLIENT_ID,
       })
-    } else {
-      logWarn('Google Client ID missing')
     }
-  } else {
-    try {
-      SocialLogin.initialize({
-        google: {
-          webClientId: GOOGLE_WEB_CLIENT_ID,
-          iOSClientId: GOOGLE_IOS_CLIENT_ID,
-          iOSServerClientId: GOOGLE_WEB_CLIENT_ID,
-        },
-        apple: {
-          clientId: APPLE_CLIENT_ID,
-        },
-      })
-    } catch (e: unknown) {
-      logError('SocialLogin init failed', e)
+
+    await SocialLogin.initialize({
+      apple: APPLE_CLIENT_ID ? { clientId: APPLE_CLIENT_ID } : {},
+      ...(GOOGLE_WEB_CLIENT_ID && GOOGLE_IOS_CLIENT_ID
+        ? {
+            google: {
+              webClientId: GOOGLE_WEB_CLIENT_ID,
+              iOSClientId: GOOGLE_IOS_CLIENT_ID,
+              iOSServerClientId: GOOGLE_WEB_CLIENT_ID,
+            },
+          }
+        : {}),
+    })
+
+    if (!GOOGLE_WEB_CLIENT_ID || !GOOGLE_IOS_CLIENT_ID) {
+      logWarn(
+        'Google Client ID missing',
+        shouldVerboseLog
+          ? { web: GOOGLE_WEB_CLIENT_ID, ios: GOOGLE_IOS_CLIENT_ID }
+          : undefined
+      )
     }
+  } catch (e: unknown) {
+    logError('SocialLogin init failed', e)
   }
 }
 
@@ -84,29 +87,33 @@ const prepare = async () => {
 
 const queryClient = new QueryClient()
 
-prepare().then(() => {
-  const container = document.getElementById('root')!
-  const root = ReactDOM.createRoot(container)
+prepare()
+  .then(async () => {
+    await initSocialLogin()
+  })
+  .then(() => {
+    const container = document.getElementById('root')!
+    const root = ReactDOM.createRoot(container)
 
-  root.render(
-    <React.StrictMode>
-      <BrowserRouter>
-        {IS_MAINTENANCE_MODE ? (
-          <Routes>
-            <Route path="*" element={<MaintenancePage />} />
-          </Routes>
-        ) : isNative ? (
-          <QueryClientProvider client={queryClient}>
-            <App />
-          </QueryClientProvider>
-        ) : (
-          <GoogleOAuthProvider clientId={GOOGLE_WEB_CLIENT_ID}>
+    root.render(
+      <React.StrictMode>
+        <BrowserRouter>
+          {IS_MAINTENANCE_MODE ? (
+            <Routes>
+              <Route path="*" element={<MaintenancePage />} />
+            </Routes>
+          ) : isNative ? (
             <QueryClientProvider client={queryClient}>
               <App />
             </QueryClientProvider>
-          </GoogleOAuthProvider>
-        )}
-      </BrowserRouter>
-    </React.StrictMode>
-  )
-})
+          ) : (
+            <GoogleOAuthProvider clientId={GOOGLE_WEB_CLIENT_ID}>
+              <QueryClientProvider client={queryClient}>
+                <App />
+              </QueryClientProvider>
+            </GoogleOAuthProvider>
+          )}
+        </BrowserRouter>
+      </React.StrictMode>
+    )
+  })
