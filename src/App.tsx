@@ -6,12 +6,14 @@ import { Toaster } from 'react-hot-toast'
 import { App as CapacitorApp } from '@capacitor/app'
 import { useLocation, useNavigate } from 'react-router-dom'
 import usePushNotification from './hooks/usePushNotification'
+import { useEmailVerifiedDeepLink } from './hooks/useEmailVerifiedDeepLink'
 
 function App() {
   const navigate = useNavigate()
   const location = useLocation()
 
   usePushNotification()
+  useEmailVerifiedDeepLink()
 
   useEffect(() => {
     const setupBackButtonListener = async () => {
