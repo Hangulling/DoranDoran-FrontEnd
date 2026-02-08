@@ -14,9 +14,10 @@ import { SocialLogin } from '@capgo/capacitor-social-login'
 import showToast from '../components/common/CommonToast'
 import LastLoginBubble from '../components/common/LastLoginBubble'
 import Logoicon from '../assets/auth/koach-logo.svg'
+import AppleLoginIcon from '../assets/auth/appleLogin.svg'
 
 type ErrorKind = 'wrong_email' | 'wrong_password' | 'both' | 'general' | null
-type Provider = 'google' | 'email'
+type Provider = 'google' | 'email' | 'apple'
 
 export default function LoginPage() {
   const [, setError] = useState<ErrorKind>(null)
@@ -149,6 +150,42 @@ export default function LoginPage() {
       const msg = stringifyError(err)
       console.error('네이티브 로그인 실패', err)
       alert(`Google 로그인 실패 (앱)\n${msg}`)
+    }
+  }
+
+  const handleAppleLogin = async () => {
+    if (!isNativeApp()) return
+
+    try {
+      const r = (await SocialLogin.login({
+        provider: 'apple',
+        options: {
+          scopes: ['email', 'name'],
+        },
+      })) as SocialLoginResponse
+
+      const idToken = r.result?.idToken
+
+      if (!idToken) {
+        alert('Apple 로그인 실패 (앱)')
+        return
+      }
+      alert('애플 로그인')
+      const res = await oauthLogin({
+        provider: 'apple',
+        idToken,
+      })
+
+      if (res.success) {
+        const user = res.data.user
+        setStoreId(user.id)
+        setStoreName(user.name)
+        localStorage.setItem('last_login', 'apple')
+        navigate(user.isOnboard ? '/' : '/onboarding')
+      }
+    } catch (error) {
+      console.error(error)
+      alert(`Apple 로그인 실패 (앱)\n${stringifyError(error)}`)
     }
   }
 
@@ -294,7 +331,7 @@ export default function LoginPage() {
   useEffect(() => {
     const stored = localStorage.getItem('last_login') as Provider | null
     console.log(stored)
-    if (stored === 'google' || stored === 'email') {
+    if (stored === 'google' || stored === 'email' || stored === 'apple') {
       setLastLogin(stored)
     }
   }, [])
@@ -346,6 +383,19 @@ export default function LoginPage() {
             />
 
             {lastLogin === 'google' && <LastLoginBubble provider="google" />}
+          </div>
+
+          <div className="my-4">
+            <Button
+              size="xl"
+              className="bg-primary-900"
+              onClick={handleAppleLogin}
+            >
+              <img src={AppleLoginIcon} alt="apple" className="w-7 h-7 mr-2" />
+              <span className="text-subtitle text-base text-white">
+                Continue with Apple
+              </span>
+            </Button>
           </div>
 
           <div className="mt-6 flex justify-center items-center gap-2 text-sm">

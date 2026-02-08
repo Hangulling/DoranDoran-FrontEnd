@@ -3,7 +3,6 @@ import { useLocation, useMatch } from 'react-router-dom'
 import NavBar from '../components/common/NavBar'
 import useArchiveStore from '../stores/useArchiveStore'
 import { useEffect } from 'react'
-import SessionAutoLogout from '../components/common/SessionAutoLogout'
 import { startIdleTimer, stopIdleTimer } from '../utils/idleTimer'
 import { isNativeApp } from '../utils/isNativeApp'
 
@@ -163,8 +162,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           />
         </header>
       )}
-
-      {!isPublicPage && <SessionAutoLogout />}
 
       <main id="app-scroll" className={'flex-grow min-h-0 overflow-y-auto'}>
         {children}

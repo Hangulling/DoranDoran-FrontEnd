@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MANAGER_DATA, type ManagerStepId } from '../constants/managerData'
 import { MANAGER_ROOM } from '../constants/mainData'
@@ -10,6 +10,7 @@ import { useUserStore } from '../stores/useUserStore'
 import showToast from '../components/common/CommonToast'
 import Restart from '../assets/icon/restart.svg?react'
 import CommonModal from '../components/common/CommonModal'
+import { useBackButton } from '../hooks/useBackButton'
 
 interface ManagerMessage {
   id: string
@@ -65,6 +66,35 @@ const ManagerChatPage: React.FC = () => {
     { label: 'Chatbot feedback', nextStepId: 'feedback' as ManagerStepId },
     { label: 'Other inquiries', nextStepId: 'other' as ManagerStepId },
   ]
+
+  const backButtonHandlers = useMemo(
+    () => [
+      {
+        priority: 3,
+        condition: showLeaveModal,
+        callback: () => {
+          setShowLeaveModal(false)
+          setPendingAction(null)
+        },
+      },
+      {
+        priority: 2,
+        condition: isContactSheetOpen,
+        callback: () => setIsContactSheetOpen(false),
+      },
+      {
+        priority: 1,
+        condition: hasProgress && !isCompleted,
+        callback: () => {
+          setPendingAction('back')
+          setShowLeaveModal(true)
+        },
+      },
+    ],
+    [showLeaveModal, isContactSheetOpen, hasProgress, isCompleted]
+  )
+
+  useBackButton(backButtonHandlers)
 
   // 옵션 선택
   const handleOptionClick = (
@@ -123,7 +153,11 @@ const ManagerChatPage: React.FC = () => {
         { userId }
       )
 
-      showToast({ message: 'Email reply request sent', iconType: 'checkRound' })
+      showToast({
+        message: 'Email reply request sent',
+        iconType: 'checkRound',
+        size: 'manager',
+      })
 
       const completedStep = MANAGER_DATA.completed
       const categoryCompletedMsg: string[] =
@@ -196,14 +230,19 @@ const ManagerChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden relative bg-gray-10">
+    <div className="flex flex-col h-full overflow-hidden relative bg-gray-10 pb-[env(safe-area-inset-bottom)]">
       <ChatHeader
         title={MANAGER_ROOM.roomName}
         avatar={MANAGER_ROOM.avatar}
         onBack={() => requestLeave('back')}
       />
 
-      <div ref={chatMainRef} className="flex-grow overflow-y-auto px-5 py-6">
+      <div
+        ref={chatMainRef}
+        className={`flex-grow overflow-y-auto px-5 pt-6 ${
+          isCompleted ? 'pb-[calc(92px+env(safe-area-inset-bottom))]' : 'pb-6'
+        }`}
+      >
         <div className="flex flex-col gap-5">
           {messages.map((message, idx) => {
             // completed 그룹
@@ -298,7 +337,7 @@ const ManagerChatPage: React.FC = () => {
 
       {/* 고정 버튼 */}
       {isCompleted && (
-        <div className="flex flex-row h-18 gap-[10px] py-[10px] px-5 bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] border-t border-gray-100 fixed bottom-0 left-0 right-0 z-10">
+        <div className="flex flex-row gap-[10px] pt-[10px] pb-[calc(10px+env(safe-area-inset-bottom))] px-5 bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] border-t border-gray-100 fixed bottom-0 left-0 right-0 z-10 max-w-app mx-auto">
           <button
             onClick={() => {
               setCurrentStepId('intro')
@@ -319,7 +358,7 @@ const ManagerChatPage: React.FC = () => {
           </button>
           <button
             onClick={() => requestLeave('home')}
-            className="flex-1 bg-primary-10 text-primary-300 border border-primary-300 rounded-[12px] text-[16px] text-subtitle"
+            className="flex-1 h-[52px] bg-primary-10 text-primary-300 border border-primary-300 rounded-[12px] text-[16px] text-subtitle"
           >
             Go Home
           </button>

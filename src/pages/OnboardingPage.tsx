@@ -8,6 +8,9 @@ import Button from '../components/common/Button'
 import { useState } from 'react'
 import { ONBOARDING_STEPS } from '../constants/onboardingData'
 import LeftArrowIcon from '../assets/icon/leftArrow.svg?react'
+import type { OnboardingPayload } from '../types/user'
+import { Capacitor } from '@capacitor/core'
+import { PushNotifications } from '@capacitor/push-notifications'
 
 export default function OnboardingPage() {
   const navigate = useNavigate()
@@ -16,22 +19,22 @@ export default function OnboardingPage() {
   const { page, paginate } = useSlider(ONBOARDING_STEPS.length)
 
   const [selections, setSelections] = useState<Record<number, string[]>>({})
+  const [etcValues, setEtcValues] = useState<Record<number, string>>({})
   const [etcText, setEtcText] = useState('')
 
   const currentStepData = ONBOARDING_STEPS[page]
   const isLastPage = page === ONBOARDING_STEPS.length - 1
 
-  // 현재 단계의 선택된 값들 가져오기
+  // 현재 단계의 선택된 값들
   const currentSelections = selections[page] || []
 
   const ETC_VALUE = 'Other'
   const isEtcSelected = currentSelections.includes(ETC_VALUE)
-  const isGrid = currentStepData.layout === 'grid'
 
   // 버튼 활성화 조건
   const isNextEnabled =
     currentSelections.length > 0 &&
-    (!isEtcSelected || isGrid || etcText.trim().length > 0)
+    (!isEtcSelected || etcText.trim().length > 0)
 
   // 옵션 선택 핸들러
   const handleSelect = (option: string) => {
@@ -56,8 +59,74 @@ export default function OnboardingPage() {
     })
   }
 
-  // 완료 처리
-  const handleCompleteOnboarding = async () => {
+  // Payload
+  const createPayload = (): OnboardingPayload => {
+    const payload: OnboardingPayload = {}
+
+    // Referral Source
+    const referralSelection = selections[0]?.[0]
+    if (referralSelection) {
+      if (referralSelection === ETC_VALUE) {
+        payload.referralSource = 'other'
+        payload.referralOther = etcValues[0] || ''
+      } else {
+        payload.referralSource = referralSelection
+      }
+    }
+
+    // Korean Level
+    const levelSelection = selections[1]?.[0]
+    if (levelSelection) {
+      payload.koreanLevel = Number(levelSelection)
+    }
+
+    // Purpose
+    const purposeSelections = selections[2] || []
+    if (purposeSelections.length > 0) {
+      if (purposeSelections.includes(ETC_VALUE)) {
+        payload.purposeKey = 'other'
+        payload.purposeOther = etcValues[2] || ''
+      } else {
+        payload.purposeKey = purposeSelections[0]
+      }
+    }
+
+    // Topic Keys
+    const topicSelections = selections[3] || []
+    if (topicSelections.length > 0) {
+      payload.topicKeys = topicSelections
+    }
+
+    // Push Enabled
+    const pushSelection = selections[4]?.[0]
+    if (pushSelection) {
+      payload.pushEnabled = pushSelection === 'yes'
+    }
+
+    return payload
+  }
+
+  // 알림 권한 요청
+  const registerPush = async () => {
+    if (!Capacitor.isNativePlatform()) return
+
+    try {
+      let permStatus = await PushNotifications.checkPermissions()
+
+      if (permStatus.receive === 'prompt') {
+        permStatus = await PushNotifications.requestPermissions()
+      }
+
+      if (permStatus.receive === 'granted') {
+        await PushNotifications.register()
+      }
+    } catch (e) {
+      console.error('Push registration failed during onboarding', e)
+    }
+  }
+
+  // 완료 처리 (Skip 포함)
+  const handleCompleteOnboarding = async (skip: boolean = false) => {
     if (!userId) {
       console.error('User ID를 찾을 수 없습니다.')
       navigate('/', { replace: true })
@@ -65,8 +134,24 @@ export default function OnboardingPage() {
     }
 
     try {
-      await updateOnboarding(userId, true)
+      const payload = createPayload()
+
+      if (skip) {
+        payload.pushEnabled = false
+      } else {
+        if (payload.pushEnabled === undefined) {
+          payload.pushEnabled = false
+        }
+      }
+
+      await updateOnboarding(userId, payload)
       console.log('온보딩 완료 처리 성공')
+
+      // 권한 요청
+      if (payload.pushEnabled) {
+        await registerPush()
+      }
+
       navigate('/', {
         replace: true,
         state: { showOnboardingModal: true },
@@ -80,24 +165,25 @@ export default function OnboardingPage() {
   // 뒤로가기
   const handleBack = () => {
     if (page > 0) {
-      // setEtcText('')
+      setEtcValues(prev => ({ ...prev, [page]: etcText }))
+      // 이전 페이지에 저장된 Etc 내용이 있다면 불러오기
+      setEtcText(etcValues[page - 1] || '')
       paginate(-1)
     } else {
       navigate(-1)
     }
   }
 
-  // 스킵
-  const handleSkip = () => {
-    handleCompleteOnboarding()
-  }
-
+  // 다음 버튼
   const handleNextClick = () => {
     if (page < ONBOARDING_STEPS.length - 1) {
-      setEtcText('')
+      // 현재 페이지 Etc 내용 저장 후 이동
+      setEtcValues(prev => ({ ...prev, [page]: etcText }))
+      // 다음 페이지에 저장된 Etc 내용이 있다면 불러오기 (이미 갔던 페이지일 경우)
+      setEtcText(etcValues[page + 1] || '')
       paginate(1)
     } else {
-      handleCompleteOnboarding()
+      handleCompleteOnboarding(false)
     }
   }
 
@@ -109,15 +195,6 @@ export default function OnboardingPage() {
           {page !== 0 && (
             <button onClick={handleBack}>
               <LeftArrowIcon className="gray-600" />
-            </button>
-          )}
-
-          {page === 4 && (
-            <button
-              onClick={handleSkip}
-              className="text-[14px] text-gray-400 text-body py-2 px-1"
-            >
-              Skip
             </button>
           )}
         </div>
@@ -151,7 +228,7 @@ export default function OnboardingPage() {
               disabled={!isNextEnabled}
               onClick={e => {
                 e.stopPropagation()
-                handleCompleteOnboarding()
+                handleCompleteOnboarding(false)
               }}
             >
               Complete

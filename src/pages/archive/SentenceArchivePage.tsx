@@ -117,18 +117,6 @@ export default function SentenceArchivePage() {
     )
   }
 
-  if (visibleSentenceItems.length === 0) {
-    return (
-      <div>
-        <ArchiveTabs activeTab={selectedTab} onChange={handleChangeTab} />
-
-        <div className="mt-40">
-          <EmptyCard savedType="Sentences" />
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div>
       <ArchiveTabs activeTab={selectedTab} onChange={handleChangeTab} />
@@ -160,35 +148,43 @@ export default function SentenceArchivePage() {
         </div>
       )}
 
-      <div>
-        {visibleSentenceItems.map(b => {
-          const closeness = toCloseness(b.aiResponse?.intimacyLevel ?? '')
-          const description =
-            lang === 'ENG'
-              ? (b.aiResponse?.translation?.english ?? '')
-              : (b.aiResponse?.description ?? '')
+      {visibleSentenceItems.length === 0 ? (
+        <div className="mt-40">
+          <EmptyCard savedType="Sentences" />
+        </div>
+      ) : (
+        <div>
+          {visibleSentenceItems.map(b => {
+            const closeness = toCloseness(b.aiResponse?.intimacyLevel ?? '')
+            const description =
+              lang === 'ENG'
+                ? (b.aiResponse?.translation?.english ?? '')
+                : (b.aiResponse?.description ?? '')
 
-          const hasDescription = !!description?.trim()
-          const content = hasDescription
-            ? (b.correctedContent ?? '')
-            : (b.content ?? '')
+            const hasDescription = !!description?.trim()
+            const content = hasDescription
+              ? (b.correctedContent ?? '')
+              : (b.content ?? '')
 
-          return (
-            <SentenceCard
-              key={b.id}
-              id={b.id}
-              selected={selectedIds.has(b.id)}
-              selectionMode={selectionMode}
-              onToggleSelect={toggleSelect}
-              closeness={closeness}
-              content={content}
-              description={description}
-              open={openId === b.id}
-              onToggle={() => setOpenId(prev => (prev === b.id ? null : b.id))}
-            />
-          )
-        })}
-      </div>
+            return (
+              <SentenceCard
+                key={b.id}
+                id={b.id}
+                selected={selectedIds.has(b.id)}
+                selectionMode={selectionMode}
+                onToggleSelect={toggleSelect}
+                closeness={closeness}
+                content={content}
+                description={description}
+                open={openId === b.id}
+                onToggle={() =>
+                  setOpenId(prev => (prev === b.id ? null : b.id))
+                }
+              />
+            )
+          })}
+        </div>
+      )}
 
       {openModal && (
         <CommonModal

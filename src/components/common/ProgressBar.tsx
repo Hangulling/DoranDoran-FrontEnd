@@ -25,7 +25,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
             <div
               className={`h-full bg-primary-300 rounded-full transition-all duration-150 ease-out
                 ${isCompleted ? 'w-full delay-0' : ''} 
-                ${isCurrent ? 'w-1/2 delay-150' : ''} 
+                ${isCurrent ? 'w-full delay-150' : ''} 
                 ${!isCompleted && !isCurrent ? 'w-0 delay-0' : ''}
               `}
             />

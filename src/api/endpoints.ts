@@ -27,7 +27,7 @@ export const USER_ENDPOINTS = {
   // 사용자 상태 업데이트
   UPDATE_STATUS: (userId: string) => `/api/users/${userId}/status`,
 
-  // 온보딩 확인 업데이트
+  // 온보딩 제출 (변경)
   UPDATE_ONBOARDING: (userId: string) => `/api/users/${userId}/onboard`,
 
   // 관심 주제 조회
@@ -225,9 +225,9 @@ export const BOOKMARK_ENDPOINTS = {
 // Home endpoints
 export const HOME_ENDPOINTS = {
   // 게시글 목록 조회
-  GET_POSTS: '/api/home/posts',
+  GET_POSTS: '/api/home/v2/posts',
   // 게시글 상세 조회
-  GET_POST_DETAIL: (externalId: string) => `/api/home/posts/${externalId}`,
+  GET_POST_DETAIL: (externalId: string) => `/api/home/v2/posts/${externalId}`,
 }
 
 // Support endpoints
@@ -244,4 +244,8 @@ export const NOTIFICATION_ENDPOINTS = {
   SEND: '/api/notifications/send',
   // 푸시 로그 조회
   LOGS: (userId: string) => `/api/notifications/logs?userId=${userId}`,
+  // 푸시 테스트
+  TEST_PUSH: '/api/notifications/test',
+  // 채팅방 딥링크 푸시 테스트
+  TEST_CHATROOM_PUSH: '/api/notifications/test-chatroom-push',
 }
