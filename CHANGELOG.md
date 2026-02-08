@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.18](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.17...v2.1.18) (2026-02-08)
+
+
+### Features
+
+* 애플 로그인 버튼 추가  ([#259](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/259)) ([414ceac](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/414ceac15a9b36633a117a9db28347a13ca8723f))
+* 온보딩 제출 api 연결 ([#256](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/256)) ([b1c6e56](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/b1c6e56afc7e51ab5ec2864435fc2cabf9d08c7d))
+
+
+### Bug Fixes
+
+* AOS 구글 오류 수정 ([eb9c21b](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/eb9c21bcdeabe37c66aaa4781a6a79a8a0e0cb84))
+
 ### [2.1.17](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.16...v2.1.17) (2026-02-01)
 
 ### [2.1.16](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.15...v2.1.16) (2026-01-31)
