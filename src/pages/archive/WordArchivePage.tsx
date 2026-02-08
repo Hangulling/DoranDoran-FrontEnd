@@ -96,17 +96,6 @@ export default function WordArchivePage() {
     )
   }
 
-  if (visibleWordItems.length === 0) {
-    return (
-      <div>
-        <ArchiveTabs activeTab={selectedTab} onChange={handleChangeTab} />
-        <div className="mt-40">
-          <EmptyCard savedType="Words" />
-        </div>
-      </div>
-    )
-  }
-
   const handleDelete = async () => {
     try {
       const ids = [...selectedIds]
@@ -140,31 +129,39 @@ export default function WordArchivePage() {
         <TranslateButton value={lang} onChange={setLang} />
       </div>
 
-      <div className="px-3">
-        {visibleWordItems.map(b => {
-          const vocab = b.aiResponse.vocabulary![0]
-          const closeness = toCloseness(b.aiResponse?.intimacyLevel ?? '')
-          const description =
-            lang === 'ENG' ? vocab.explanation : vocab.korExplanation
+      {visibleWordItems.length === 0 ? (
+        <div className="mt-40">
+          <EmptyCard savedType="Words" />
+        </div>
+      ) : (
+        <div className="px-3">
+          {visibleWordItems.map(b => {
+            const vocab = b.aiResponse.vocabulary![0]
+            const closeness = toCloseness(b.aiResponse?.intimacyLevel ?? '')
+            const description =
+              lang === 'ENG' ? vocab.explanation : vocab.korExplanation
 
-          return (
-            <WordCard
-              key={b.id}
-              id={b.id}
-              selected={selectedIds.has(b.id)}
-              selectionMode={selectionMode}
-              onToggleSelect={toggleSelect}
-              closeness={closeness}
-              word={vocab.word}
-              pronunciation={vocab.pronunciation}
-              description={description}
-              content={b.content}
-              open={openId === b.id}
-              onToggle={() => setOpenId(prev => (prev === b.id ? null : b.id))}
-            />
-          )
-        })}
-      </div>
+            return (
+              <WordCard
+                key={b.id}
+                id={b.id}
+                selected={selectedIds.has(b.id)}
+                selectionMode={selectionMode}
+                onToggleSelect={toggleSelect}
+                closeness={closeness}
+                word={vocab.word}
+                pronunciation={vocab.pronunciation}
+                description={description}
+                content={b.content}
+                open={openId === b.id}
+                onToggle={() =>
+                  setOpenId(prev => (prev === b.id ? null : b.id))
+                }
+              />
+            )
+          })}
+        </div>
+      )}
 
       {selectionMode && (
         <div className="flex justify-center items-center">
