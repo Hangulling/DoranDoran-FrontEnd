@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState, type JSX, type RefObject } from 'react'
-import { Keyboard } from '@capacitor/keyboard'
-import { Capacitor } from '@capacitor/core'
 import SendIcon from '../../assets/chat/send.svg'
 import ErrorIcon from '../../assets/icon/error.svg'
 import CheckIcon from '../../assets/icon/CheckIcon'
@@ -53,47 +51,12 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const [isComposing, setIsComposing] = useState(false)
   const [toast, setToast] = useState<ToastMessageProps | null>(null)
   const [isToastVisible, setIsToastVisible] = useState(false)
-  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false)
 
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     return () => {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return
-
-    // 네이티브 앱인 경우에만 실행
-    Keyboard.setScroll({ isDisabled: true }).catch(err =>
-      console.warn('Keyboard setScroll failed:', err)
-    )
-
-    const onWillShow = () => {
-      setIsKeyboardOpen(true)
-    }
-
-    const onDidHide = () => {
-      setIsKeyboardOpen(false)
-    }
-
-    // 리스너 등록
-    const setupListeners = async () => {
-      try {
-        await Keyboard.addListener('keyboardWillShow', onWillShow)
-        await Keyboard.addListener('keyboardDidHide', onDidHide)
-      } catch (err) {
-        console.warn('Keyboard listeners failed:', err)
-      }
-    }
-
-    setupListeners()
-
-    return () => {
-      Keyboard.removeAllListeners().catch(err => console.warn(err))
-      Keyboard.setScroll({ isDisabled: false }).catch(err => console.warn(err))
     }
   }, [])
 
@@ -152,60 +115,59 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const isSendActive = !disabled && inputValue.trim().length > 0
 
   return (
-    <div
-      className={`relative bg-gray-0 shadow-[0_-1px_4px_rgba(0,0,0,0.06)] ${
-        isKeyboardOpen ? 'pb-0' : 'pb-[env(safe-area-inset-bottom)]'
-      }`}
-      style={{ zIndex: 50 }}
-    >
-      {/* 토스트 */}
-      <div className="absolute bottom-full w-full left-0 flex justify-center">
-        {toast && (
-          <div
-            className={`mx-[20px] ${isToastVisible ? 'toast-slide-fade-in' : 'toast-slide-fade-out'}`}
-          >
-            <ToastMessage message={toast.message} iconType={toast.iconType} />
-          </div>
-        )}
-      </div>
-
-      {/* textarea */}
-      <div className="w-full px-5 py-[10px]">
-        <div className="relative w-full px-4 py-[15px] bg-[#f1f1f1] border-[#f1f1f1] rounded-[22px] overflow-hidden text-14px min-h-[51px]">
-          <textarea
-            ref={inputRef}
-            placeholder="Type a message"
-            value={inputValue}
-            onCompositionStart={handleCompositionStart}
-            onCompositionEnd={handleCompositionEnd}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            rows={1}
-            style={{
-              height: textareaHeight,
-              lineHeight: `${LINE_HEIGHT}px`,
-              resize: 'none',
-            }}
-            className="w-full pr-[46px] bg-transparent border-none outline-none focus:ring-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] block p-0 m-0"
-          />
-
-          {isAiResponding ? (
-            <button
-              onClick={onCancel}
-              className="absolute bottom-[10px] right-4 flex items-center justify-center transition-opacity duration-200"
+    <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center">
+      <div
+        className={`w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_rgba(0,0,0,0.06)]`}
+      >
+        {/* 토스트 */}
+        <div className="absolute bottom-full w-full left-0 flex justify-center pointer-events-none">
+          {toast && (
+            <div
+              className={`mx-[20px] ${isToastVisible ? 'toast-slide-fade-in' : 'toast-slide-fade-out'}`}
             >
-              <img src={PauseIcon} alt="중지" />
-            </button>
-          ) : (
-            isSendActive && (
+              <ToastMessage message={toast.message} iconType={toast.iconType} />
+            </div>
+          )}
+        </div>
+
+        {/* textarea */}
+        <div className="w-full px-5 pt-[10px] pb-[calc(10px+env(safe-area-inset-bottom))]">
+          <div className="relative w-full px-4 py-[15px] bg-[#f1f1f1] border-[#f1f1f1] rounded-[22px] overflow-hidden text-14px min-h-[51px]">
+            <textarea
+              ref={inputRef}
+              placeholder="Type a message"
+              value={inputValue}
+              onCompositionStart={handleCompositionStart}
+              onCompositionEnd={handleCompositionEnd}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              rows={1}
+              style={{
+                height: textareaHeight,
+                lineHeight: `${LINE_HEIGHT}px`,
+                resize: 'none',
+              }}
+              className="w-full pr-[46px] bg-transparent border-none outline-none focus:ring-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] block p-0 m-0"
+            />
+
+            {isAiResponding ? (
               <button
-                onClick={handleSendClick}
+                onClick={onCancel}
                 className="absolute bottom-[10px] right-4 flex items-center justify-center transition-opacity duration-200"
               >
-                <img src={SendIcon} alt="보내기" />
+                <img src={PauseIcon} alt="중지" />
               </button>
-            )
-          )}
+            ) : (
+              isSendActive && (
+                <button
+                  onClick={handleSendClick}
+                  className="absolute bottom-[10px] right-4 flex items-center justify-center transition-opacity duration-200"
+                >
+                  <img src={SendIcon} alt="보내기" />
+                </button>
+              )
+            )}
+          </div>
         </div>
       </div>
     </div>
