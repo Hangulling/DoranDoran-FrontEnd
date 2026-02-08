@@ -1,6 +1,28 @@
+import { useState } from 'react'
 import privacyTermImage from '../../assets/auth/privacyTermTable.svg'
+import Button from '../common/Button'
+import CloseIcon from '../../assets/icon/CloseIcon'
+import { PhotoViewer } from '@capacitor-community/photoviewer'
+import TermTable from '../../assets/auth/termTable.png'
+import { isNativeApp } from '../../utils/isNativeApp'
 
 const PrivacyPolicy: React.FC = () => {
+  const [imgOpen, setImgOpen] = useState<boolean>(false)
+
+  const openTable = async () => {
+    if (isNativeApp()) {
+      const url = new URL(TermTable, window.location.href).toString()
+
+      await PhotoViewer.show({
+        images: [{ url, title: 'Entrusted Parties and Tasks' }],
+        mode: 'one',
+      })
+      return
+    }
+
+    setImgOpen(true)
+  }
+
   return (
     <div className="max-w-4xl mx-auto text-gray-800 leading-relaxed">
       <div className="text-2xl text-display mb-3">K-oach Privacy Policy</div>
@@ -439,8 +461,8 @@ const PrivacyPolicy: React.FC = () => {
         <div className="text-display text-base">
           1) Entrusted Parties and Tasks
         </div>
-        <div>
-          <img src={privacyTermImage} />
+        <div className="flex justify-center">
+          <img src={privacyTermImage} onClick={openTable} />
         </div>
         <div>
           If there are changes in the entrusted tasks or entrusted parties, this
@@ -595,6 +617,36 @@ const PrivacyPolicy: React.FC = () => {
           will be made at least 30 days in advance.
         </div>
       </div>
+
+      {imgOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-gray-800/80 flex items-center justify-center p-4"
+          onClick={() => setImgOpen(false)}
+        >
+          <Button
+            variant="text"
+            className="absolute top-4 right-4 w-6 h-6 flex items-center justify-center text-white"
+            onClick={e => {
+              e.stopPropagation()
+              setImgOpen(false)
+            }}
+            aria-label="Close image viewer"
+          >
+            <CloseIcon />
+          </Button>
+
+          <div
+            className="bg-white  p-3 overflow-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <img
+              src={privacyTermImage}
+              alt="Entrusted parties and tasks enlarged"
+              className=" max-h-[85vh] object-contain"
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

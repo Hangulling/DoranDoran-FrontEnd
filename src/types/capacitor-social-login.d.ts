@@ -7,9 +7,16 @@ declare module '@capgo/capacitor-social-login' {
     name?: string
   }
 
+  export interface AppleLoginResult {
+    idToken?: string
+    accessToken?: string
+    email?: string
+    name?: string
+  }
+
   export interface SocialLoginResponse {
     provider: string
-    result: GoogleLoginResult
+    result: GoogleLoginResult | AppleLoginResult
   }
 
   export const SocialLogin: {
@@ -19,10 +26,13 @@ declare module '@capgo/capacitor-social-login' {
         iOSClientId?: string
         iOSServerClientId?: string
       }
+      apple?: {
+        clientId: string
+      }
     }): Promise<void>
 
     login(options: {
-      provider: 'google'
+      provider: 'google' | 'apple'
       options?: {
         scopes?: string[]
       }
