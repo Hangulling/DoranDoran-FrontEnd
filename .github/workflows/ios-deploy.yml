@@ -72,3 +72,10 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
         run: fastlane release build_number:${{ github.run_number }}
+      - name: Print gym log on failure
+        if: failure()
+        run: |
+          echo "===== gym log (last 200 lines) ====="
+          tail -n 200 /Users/runner/Library/Logs/gym/App-App.log || true
+          echo "===== gym log (grep error) ====="
+          grep -n "error:" /Users/runner/Library/Logs/gym/App-App.log | tail -n 50 || true
