@@ -8,7 +8,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { isNativeApp } from './utils/isNativeApp.ts'
 import { SocialLogin } from '@capgo/capacitor-social-login'
-import { GOOGLE_WEB_CLIENT_ID, GOOGLE_IOS_CLIENT_ID } from './constants/env'
+import {
+  GOOGLE_WEB_CLIENT_ID,
+  GOOGLE_IOS_CLIENT_ID,
+  APPLE_CLIENT_ID,
+} from './constants/env'
 
 const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 
@@ -58,6 +62,9 @@ if (isNative) {
           webClientId: GOOGLE_WEB_CLIENT_ID,
           iOSClientId: GOOGLE_IOS_CLIENT_ID,
           iOSServerClientId: GOOGLE_WEB_CLIENT_ID,
+        },
+        apple: {
+          clientId: APPLE_CLIENT_ID,
         },
       })
     } catch (e: unknown) {
