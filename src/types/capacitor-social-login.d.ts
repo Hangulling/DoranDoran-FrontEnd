@@ -27,7 +27,7 @@ declare module '@capgo/capacitor-social-login' {
         iOSServerClientId?: string
       }
       apple?: {
-        clientId: string
+        clientId?: string
       }
     }): Promise<void>
 
