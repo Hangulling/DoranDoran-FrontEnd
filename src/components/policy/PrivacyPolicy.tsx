@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import privacyTermImage from '../../assets/auth/privacyTermTable.svg'
 import Button from '../common/Button'
 import CloseIcon from '../../assets/icon/CloseIcon'
 import { PhotoViewer } from '@capacitor-community/photoviewer'
@@ -462,7 +461,7 @@ const PrivacyPolicy: React.FC = () => {
           1) Entrusted Parties and Tasks
         </div>
         <div className="flex justify-center">
-          <img src={privacyTermImage} onClick={openTable} />
+          <img src={TermTable} onClick={openTable} />
         </div>
         <div>
           If there are changes in the entrusted tasks or entrusted parties, this
@@ -640,7 +639,7 @@ const PrivacyPolicy: React.FC = () => {
             onClick={e => e.stopPropagation()}
           >
             <img
-              src={privacyTermImage}
+              src={TermTable}
               alt="Entrusted parties and tasks enlarged"
               className=" max-h-[85vh] object-contain"
             />
