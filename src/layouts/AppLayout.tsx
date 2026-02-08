@@ -81,7 +81,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }, [isPublicPage, native]) // 경로가 바뀔 때마다 실행
 
   const isMain = pathname === '/'
-  const isChatPage = pathname.startsWith('/chat')
+  const isChatPage =
+    /^\/chat\/\d+/.test(pathname) || pathname.startsWith('/chat/')
 
   const archiveMatch = useMatch('/archive/sentences')
   const wordMatch = useMatch('/archive/words')
@@ -163,16 +164,19 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </header>
       )}
 
-      <main id="app-scroll" className={'flex-grow min-h-0 overflow-y-auto'}>
+      <main
+        id="app-scroll"
+        className={`flex-grow min-h-0 ${isChatPage ? '' : 'overflow-y-auto]'}`}
+      >
         {children}
       </main>
 
       {/* 하단 네비게이션 바 */}
       {!hideNavBar && !isTopNav && (
         <footer
-          className={`sticky bottom-0 shrink-0 z-40 bg-white ${
-            isChatPage ? '' : 'pb-[env(safe-area-inset-bottom)]'
-          }`}
+          className={
+            'sticky bottom-0 shrink-0 z-40 bg-white pb-[env(safe-area-inset-bottom)]'
+          }
         >
           <NavBar
             position="bottom"

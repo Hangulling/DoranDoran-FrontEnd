@@ -41,7 +41,6 @@ export const useUserStore = create<UserState>()(
           streakCount: undefined,
           perfectCount: undefined,
         })
-        sessionStorage.removeItem('user-storage') // persist된 데이터 삭제
       },
     }),
     {

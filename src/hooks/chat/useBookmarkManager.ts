@@ -3,6 +3,7 @@ import type { EnrichedMessage } from '../../pages/ChatPage'
 import type { VocabularyExtractedData } from '../../types/sseEvents'
 import { createBookmark, deleteBookmark } from '../../api/archive'
 import showToast from '../../components/common/CommonToast'
+import type { Closeness } from '../../types/archive'
 
 interface UseBookmarkManagerProps {
   chatroomId: string | undefined
@@ -38,7 +39,7 @@ export const useBookmarkManager = ({
 
       try {
         const aiResponse: {
-          intimacyLevel: string
+          intimacyLevel: Closeness
           description?: string
           translation?: { english: string }
           vocabulary?: {
@@ -48,7 +49,7 @@ export const useBookmarkManager = ({
             korExplanation: string
           }[]
         } = {
-          intimacyLevel: closenessText,
+          intimacyLevel: closenessText as Closeness,
         }
 
         if (options.feedbackKo) {
@@ -58,12 +59,14 @@ export const useBookmarkManager = ({
           aiResponse.translation = { english: options.feedbackEn }
         }
         if (options.vocabularyData && options.vocabularyData.words) {
-          aiResponse.vocabulary = options.vocabularyData.words.map(vocabWord => ({
-            word: vocabWord.word,
-            pronunciation: vocabWord.context.roma,
-            explanation: vocabWord.context.en,
-            korExplanation: vocabWord.context.ko,
-          }))
+          aiResponse.vocabulary = options.vocabularyData.words.map(
+            vocabWord => ({
+              word: vocabWord.word,
+              pronunciation: vocabWord.context.roma,
+              explanation: vocabWord.context.en,
+              korExplanation: vocabWord.context.ko,
+            })
+          )
         }
 
         const requestBody = {
@@ -101,17 +104,24 @@ export const useBookmarkManager = ({
         // 북마크 삭제
         try {
           await deleteBookmark(message.bookmarkId)
-          setMessages(prev => prev.map(m => (m.id === messageId ? { ...m, bookmarkId: null } : m)))
+          setMessages(prev =>
+            prev.map(m => (m.id === messageId ? { ...m, bookmarkId: null } : m))
+          )
           console.log('북마크 삭제 성공')
         } catch (error) {
           console.error('북마크 삭제 실패', error)
         }
       } else {
         // 북마크 추가
-        const newBookmarkId = await handleAddBookmark(messageId, { content, vocabularyData })
+        const newBookmarkId = await handleAddBookmark(messageId, {
+          content,
+          vocabularyData,
+        })
         if (newBookmarkId) {
           setMessages(prev =>
-            prev.map(m => (m.id === messageId ? { ...m, bookmarkId: newBookmarkId } : m))
+            prev.map(m =>
+              m.id === messageId ? { ...m, bookmarkId: newBookmarkId } : m
+            )
           )
         }
       }
@@ -135,7 +145,9 @@ export const useBookmarkManager = ({
         // 북마크 삭제
         try {
           await deleteBookmark(message.bookmarkId)
-          setMessages(prev => prev.map(m => (m.id === messageId ? { ...m, bookmarkId: null } : m)))
+          setMessages(prev =>
+            prev.map(m => (m.id === messageId ? { ...m, bookmarkId: null } : m))
+          )
         } catch (error) {
           console.error('북마크 삭제 실패', error)
         }
@@ -149,7 +161,9 @@ export const useBookmarkManager = ({
         })
         if (newBookmarkId) {
           setMessages(prev =>
-            prev.map(m => (m.id === messageId ? { ...m, bookmarkId: newBookmarkId } : m))
+            prev.map(m =>
+              m.id === messageId ? { ...m, bookmarkId: newBookmarkId } : m
+            )
           )
         }
       }

@@ -23,6 +23,7 @@ export function useChatStream<T = unknown>(
   accessToken?: string,
   onEventReceived?: (eventType: string, data: T) => void,
   onError?: (event: Event) => void,
+  onOpen?: () => void,
   retryKey: number = 0
 ): UseChatStreamResult {
   const eventSourceRef = useRef<EventSource | null>(null)
@@ -73,18 +74,17 @@ export function useChatStream<T = unknown>(
         console.log('[SSE] Connection opened')
         setIsLoading(false)
         setError(null)
+        if (onOpen) onOpen()
         retryCount = 0
         retryDelay = retryDelayInitial
       }
 
       eventSource.onmessage = event => {
         const parsedData = JSON.parse(event.data)
-        // 일반 메시지 콘솔 출력
         console.log('[SSE Message]', parsedData)
 
-        // ref.current를 통해 최신 콜백 호출
         if (onEventReceivedRef.current) {
-          onEventReceivedRef.current('message', parsedData) // 파싱된 데이터 이용?
+          onEventReceivedRef.current('message', parsedData)
         }
       }
 
@@ -92,19 +92,15 @@ export function useChatStream<T = unknown>(
         eventSource.addEventListener(name, (event: MessageEvent) => {
           const parsedData = JSON.parse(event.data)
 
-          // 명명된 이벤트 콘솔 출력 (이벤트 타입과 함께)
           console.log(`[SSE Event: ${name}]`, parsedData)
-          // ref.current를 통해 최신 콜백 호출
           if (onEventReceivedRef.current) {
-            onEventReceivedRef.current(name, parsedData) // 파싱된 데이터 사용
+            onEventReceivedRef.current(name, parsedData)
           }
         })
       })
 
       eventSource.onerror = event => {
-        // 화면 숨김의 경우 처리 예외
         if (document.visibilityState === 'hidden') {
-          console.log('Background connection closed.')
           eventSource.close()
           return
         }
@@ -115,6 +111,10 @@ export function useChatStream<T = unknown>(
         console.error('[SSE Error]', event)
         // 완전히 닫힌 상태일 때만 수동 재연결
         if (eventSource.readyState === EventSource.CLOSED) {
+          if (onErrorRef.current) {
+            onErrorRef.current(event)
+          }
+
           console.log('[SSE] Connection fully closed. Starting manual retry')
 
           if (retryCount < maxRetries) {

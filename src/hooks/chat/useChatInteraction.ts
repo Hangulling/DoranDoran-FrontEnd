@@ -296,6 +296,9 @@ export const useChatInteraction = ({
       setSseError('SSE 연결 중 오류가 발생했습니다.')
       stopInactivityTimer() // 타이머 완전 중지
     },
+    () => {
+      setSseError(null) // 백그라운드에서 돌아와서 재연결 시도 성공 시 에러 지움
+    },
     retryCount
   )
 
