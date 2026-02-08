@@ -170,7 +170,7 @@ export default function LoginPage() {
         alert('Apple 로그인 실패 (앱)')
         return
       }
-      alert('애플 로그인')
+
       const res = await oauthLogin({
         provider: 'apple',
         idToken,
