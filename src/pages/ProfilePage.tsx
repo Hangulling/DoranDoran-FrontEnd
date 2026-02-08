@@ -14,10 +14,12 @@ export default function ProfilePage() {
   const [error, setError] = useState(false)
   const navigate = useNavigate()
   const userId = useUserStore(state => state.id)
+  const reset = useUserStore(state => state.reset)
 
   const handleLogout = async () => {
     try {
       await logout()
+      reset() // 유저 스토어 초기화
 
       navigate('/login', { replace: true })
       setOpenLogout(false)
@@ -29,6 +31,7 @@ export default function ProfilePage() {
   const handleDelete = async () => {
     try {
       await deleteUser(userId)
+      reset()
       navigate('/login', { replace: true })
       setOpenDelete(false)
     } catch (error) {
