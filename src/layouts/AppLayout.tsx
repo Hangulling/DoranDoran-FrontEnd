@@ -166,7 +166,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
       <main
         id="app-scroll"
-        className={`flex-grow min-h-0 ${isChatPage ? '' : 'overflow-y-auto]'}`}
+        className={`flex-grow min-h-0 ${isChatPage ? '' : 'overflow-y-auto'}`}
       >
         {children}
       </main>
