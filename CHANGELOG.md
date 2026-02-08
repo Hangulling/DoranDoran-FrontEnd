@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.32](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.31...v2.1.32) (2026-02-08)
+
+
+### Bug Fixes
+
+* 빌드 오류 수정 ([38c01eb](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/38c01ebdda279211d19bf87dde3ac1de9f9f2f6d))
+
 ### [2.1.31](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.30...v2.1.31) (2026-02-08)
 
 
