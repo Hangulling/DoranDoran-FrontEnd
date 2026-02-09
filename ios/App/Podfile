@@ -26,6 +26,7 @@ target 'App' do
   pod 'FirebaseCore'
   pod 'FirebaseAuth'
   pod 'GoogleSignIn'
+  pod 'Alamofire'
 end
 
 post_install do |installer|
