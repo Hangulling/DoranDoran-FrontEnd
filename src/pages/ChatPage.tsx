@@ -310,7 +310,13 @@ const ChatPage: React.FC = () => {
   }, [messages])
 
   return (
-    <div className="flex flex-col h-full bg-gray-0">
+    <div
+      className="flex flex-col h-full bg-gray-0"
+      style={{
+        height: '100vh',
+        paddingTop: 'env(safe-area-inset-top)',
+      }}
+    >
       <ChatHeader
         title={room?.roomName || 'Chat'}
         avatar={room?.avatar}
