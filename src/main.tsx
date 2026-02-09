@@ -65,6 +65,7 @@ if (isNative) {
         },
         apple: {
           clientId: APPLE_CLIENT_ID,
+          redirectUrl: 'https://api.doran-chat.com/api/auth/oauth/callback',
         },
       })
     } catch (e: unknown) {
