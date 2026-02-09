@@ -31,37 +31,39 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   }
 
   return (
-    <header className="sticky shrink-0 top-0 z-30 bg-gray-0 shadow-[0_1px_4px_rgba(0,0,0,0.06)] h-16 px-5 flex items-center justify-between">
-      <div className="flex flex-row gap-2">
-        {/* 뒤로가기 */}
-        <button onClick={handleBack}>
-          <LeftArrowIcon className="text-gray-600" />
-        </button>
+    <header className="sticky shrink-0 top-0 z-30 bg-gray-0 shadow-[0_1px_4px_rgba(0,0,0,0.06)] px-5 items-center justify-between">
+      <div className="flex items-center justify-between w-full h-16">
+        <div className="flex flex-row gap-2">
+          {/* 뒤로가기 */}
+          <button onClick={handleBack}>
+            <LeftArrowIcon className="text-gray-600" />
+          </button>
 
-        <div className="w-10 h-10 rounded-[12px] overflow-hidden shrink-0 mr-[2px]">
-          <img
-            src={avatar}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
+          <div className="w-10 h-10 rounded-[12px] overflow-hidden shrink-0 mr-[2px]">
+            <img
+              src={avatar}
+              alt={title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          <div className="flex flex-col items-start justify-center">
+            <h1 className="text-title text-[16px]">{capitalizeName(title)}</h1>
+            {closenessLevel !== undefined && (
+              <div className="flex text-[12px] text-primary-400">
+                <span>{getClosenessAsText(closenessLevel)} Mode</span>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="flex flex-col items-start justify-center">
-          <h1 className="text-title text-[16px]">{capitalizeName(title)}</h1>
-          {closenessLevel !== undefined && (
-            <div className="flex text-[12px] text-primary-400">
-              <span>{getClosenessAsText(closenessLevel)} Mode</span>
-            </div>
+        <div className="w-10 flex justify-end">
+          {onSettingClick && (
+            <button onClick={onSettingClick} className="p-2 -mr-2">
+              <SettingIcon />
+            </button>
           )}
         </div>
-      </div>
-
-      <div className="w-10 flex justify-end">
-        {onSettingClick && (
-          <button onClick={onSettingClick} className="p-2 -mr-2">
-            <SettingIcon />
-          </button>
-        )}
       </div>
     </header>
   )

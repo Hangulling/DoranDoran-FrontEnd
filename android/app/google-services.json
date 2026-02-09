@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "29324186506-3qb83lo41fr56f7hfaei5954296l3eht.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.koach.app",
+            "certificate_hash": "88f09d56c811e2a81c49b593650f58bdbf231a83"
+          }
+        },
+        {
           "client_id": "29324186506-sj70obgng613r1t9luv9vrtt16rb2v09.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -45,6 +53,13 @@
             {
               "client_id": "29324186506-c971u3g05h8meusc6133888052r642r0.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "29324186506-vn8a2ium2pgi2tef0c17ishr2dkr4ndj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.koach.app"
+              }
             }
           ]
         }

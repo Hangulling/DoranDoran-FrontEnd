@@ -11,6 +11,7 @@ import { useEmailVerifiedDeepLink } from './hooks/useEmailVerifiedDeepLink'
 function App() {
   const navigate = useNavigate()
   const location = useLocation()
+  const isChatPage = location.pathname.startsWith('/chat/')
 
   usePushNotification()
   useEmailVerifiedDeepLink()
@@ -44,11 +45,20 @@ function App() {
   return (
     <div className="relative flex flex-col h-dvh mx-auto w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-white">
       <Toaster position="bottom-center" />
-      <AppLayout>
-        <Suspense fallback={<LoadingSpinner />}>
-          <Routes />
-        </Suspense>
-      </AppLayout>
+      {isChatPage ? (
+        <>
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes />
+          </Suspense>
+          <div id="chat-footer-portal" />
+        </>
+      ) : (
+        <AppLayout>
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes />
+          </Suspense>
+        </AppLayout>
+      )}
     </div>
   )
 }

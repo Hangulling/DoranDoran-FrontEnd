@@ -51,7 +51,12 @@ const initSocialLogin = async () => {
     }
 
     await SocialLogin.initialize({
-      apple: APPLE_CLIENT_ID ? { clientId: APPLE_CLIENT_ID } : {},
+      apple: APPLE_CLIENT_ID
+        ? {
+            clientId: APPLE_CLIENT_ID,
+            redirectUrl: 'https://api.doran-chat.com/api/auth/oauth/callback', // AOS
+          }
+        : {},
       ...(GOOGLE_WEB_CLIENT_ID && GOOGLE_IOS_CLIENT_ID
         ? {
             google: {
