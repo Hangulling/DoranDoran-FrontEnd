@@ -82,21 +82,21 @@ export default function LoginPage() {
       return String(e)
     }
   }
-  // const decodeJwtPayload = (token: string) => {
-  //   try {
-  //     const payload = token.split('.')[1]
-  //     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
-  //     const json = decodeURIComponent(
-  //       atob(base64)
-  //         .split('')
-  //         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-  //         .join('')
-  //     )
-  //     return JSON.parse(json) as Record<string, unknown>
-  //   } catch {
-  //     return null
-  //   }
-  // }
+  const decodeJwtPayload = (token: string) => {
+    try {
+      const payload = token.split('.')[1]
+      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+      const json = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      )
+      return JSON.parse(json) as Record<string, unknown>
+    } catch {
+      return null
+    }
+  }
 
   const handleGoogleNativeLogin = async () => {
     if (!isNativeApp()) return
@@ -170,7 +170,12 @@ export default function LoginPage() {
         alert('Apple 로그인 실패 (앱)')
         return
       }
-
+      if (idToken) {
+        const payload = decodeJwtPayload(idToken)
+        alert(
+          `idToken aud=${String(payload?.aud)}\niss=${String(payload?.iss)}`
+        )
+      }
       const res = await oauthLogin({
         provider: 'apple',
         idToken,
@@ -184,6 +189,17 @@ export default function LoginPage() {
         navigate(user.isOnboard ? '/' : '/onboarding')
       }
     } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status
+        const data = error.response?.data
+        console.error('[Apple OAuth] axios error:', { status, data, error })
+
+        alert(
+          `Apple 로그인 실패 (서버)\nstatus=${status}\n` +
+            `${typeof data === 'string' ? data : JSON.stringify(data)}`
+        )
+        return
+      }
       console.error(error)
       alert(`Apple 로그인 실패 (앱)\n${stringifyError(error)}`)
     }
