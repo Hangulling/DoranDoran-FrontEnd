@@ -149,7 +149,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   return (
     <div
-      className={`relative mx-auto flex h-full w-full flex-col overflow-x-hidden ${'max-w-app md:max-w-tablet lg:max-w-desktop transition-all duration-300'} ${isMain ? 'pt-0' : 'pt-[env(safe-area-inset-top)]'}`}
+      className={`relative mx-auto flex h-full w-full flex-col overflow-x-hidden ${'max-w-app md:max-w-tablet lg:max-w-desktop transition-all duration-300'} ${isMain || isChatPage ? 'pt-0' : 'pt-[env(safe-area-inset-top)]'}`}
     >
       {/* 상단 네비게이션 바 */}
       {!hideNavBar && isTopNav && (

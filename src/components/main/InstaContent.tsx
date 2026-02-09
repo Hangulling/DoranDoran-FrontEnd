@@ -76,7 +76,6 @@ const InstaContent = ({ onCardClick }: InstaContentProps) => {
                 src={post.coverImageUrl || post.imageUrl || ''}
                 alt={post.title || ''}
                 className="w-full h-full object-cover"
-                loading="lazy"
               />
             </div>
           </button>
