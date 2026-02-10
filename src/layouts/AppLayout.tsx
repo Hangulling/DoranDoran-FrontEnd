@@ -81,8 +81,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }, [isPublicPage, native]) // 경로가 바뀔 때마다 실행
 
   const isMain = pathname === '/'
-  const isChatPage =
-    /^\/chat\/\d+/.test(pathname) || pathname.startsWith('/chat/')
 
   const archiveMatch = useMatch('/archive/sentences')
   const wordMatch = useMatch('/archive/words')
@@ -149,7 +147,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   return (
     <div
-      className={`relative mx-auto flex h-full w-full flex-col overflow-x-hidden ${'max-w-app md:max-w-tablet lg:max-w-desktop transition-all duration-300'} ${isMain || isChatPage ? 'pt-0' : 'pt-[env(safe-area-inset-top)]'}`}
+      className={`relative mx-auto flex h-full w-full flex-col overflow-x-hidden ${'max-w-app md:max-w-tablet lg:max-w-desktop transition-all duration-300'} ${isMain ? 'pt-0' : 'pt-[env(safe-area-inset-top)]'}`}
     >
       {/* 상단 네비게이션 바 */}
       {!hideNavBar && isTopNav && (
@@ -164,10 +162,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </header>
       )}
 
-      <main
-        id="app-scroll"
-        className={`flex-grow min-h-0 ${isChatPage ? '' : 'overflow-y-auto'}`}
-      >
+      <main id="app-scroll" className={'flex-grow min-h-0 overflow-y-auto'}>
         {children}
       </main>
 
