@@ -28,7 +28,7 @@ declare module '@capgo/capacitor-social-login' {
       }
       apple?: {
         clientId?: string
-        // redirectUrl?: string
+        redirectUrl?: string
       }
     }): Promise<void>
 
