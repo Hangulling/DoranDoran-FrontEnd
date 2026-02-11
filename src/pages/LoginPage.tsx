@@ -81,45 +81,43 @@ export default function LoginPage() {
     }
   }
 
-  // ✅ JWT payload 디코드 (기존)
-  const decodeJwtPayload = (token: string) => {
-    try {
-      const payload = token.split('.')[1]
-      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
-      const json = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      )
-      return JSON.parse(json) as Record<string, unknown>
-    } catch {
-      return null
-    }
-  }
+  // const decodeJwtPayload = (token: string) => {
+  //   try {
+  //     const payload = token.split('.')[1]
+  //     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+  //     const json = decodeURIComponent(
+  //       atob(base64)
+  //         .split('')
+  //         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+  //         .join('')
+  //     )
+  //     return JSON.parse(json) as Record<string, unknown>
+  //   } catch {
+  //     return null
+  //   }
+  // }
 
-  // ✅ JWT header/payload 공용 디코더 + header 디코더 추가
-  const decodeJwtPart = (part: string) => {
-    try {
-      const base64 = part.replace(/-/g, '+').replace(/_/g, '/')
-      const json = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      )
-      return JSON.parse(json) as Record<string, unknown>
-    } catch {
-      return null
-    }
-  }
+  // const decodeJwtPart = (part: string) => {
+  //   try {
+  //     const base64 = part.replace(/-/g, '+').replace(/_/g, '/')
+  //     const json = decodeURIComponent(
+  //       atob(base64)
+  //         .split('')
+  //         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+  //         .join('')
+  //     )
+  //     return JSON.parse(json) as Record<string, unknown>
+  //   } catch {
+  //     return null
+  //   }
+  // }
 
-  const decodeJwtHeader = (token: string) => {
-    const headerPart = token.split('.')[0]
-    return headerPart ? decodeJwtPart(headerPart) : null
-  }
+  // const decodeJwtHeader = (token: string) => {
+  //   const headerPart = token.split('.')[0]
+  //   return headerPart ? decodeJwtPart(headerPart) : null
+  // }
 
-  const nowSec = () => Math.floor(Date.now() / 1000)
+  // const nowSec = () => Math.floor(Date.now() / 1000)
 
   const handleGoogleNativeLogin = async () => {
     if (!isNativeApp()) return
@@ -173,8 +171,7 @@ export default function LoginPage() {
         options: { scopes: ['email', 'name'] },
       })) as SocialLoginResponse
 
-      // ✅ 1) 플러그인 원본 결과 확인
-      alert(`[APPLE RESULT]\n${JSON.stringify(r.result)}`)
+      // alert(`[APPLE RESULT]\n${JSON.stringify(r.result)}`)
 
       const idToken = r.result?.idToken
       if (!idToken) {
@@ -182,24 +179,22 @@ export default function LoginPage() {
         return
       }
 
-      // ✅ 2) 서버 검증에 필요한 값들(특히 kid/aud/exp)까지 전부 찍기
-      const header = decodeJwtHeader(idToken)
-      const payload = decodeJwtPayload(idToken)
+      // const header = decodeJwtHeader(idToken)
+      // const payload = decodeJwtPayload(idToken)
 
-      alert(
-        `[APPLE JWT]\n` +
-          `kid=${String(header?.kid)}\n` +
-          `alg=${String(header?.alg)}\n\n` +
-          `iss=${String(payload?.iss)}\n` +
-          `aud=${String(payload?.aud)}\n` +
-          `sub=${String(payload?.sub)}\n` +
-          `exp=${String(payload?.exp)} (now=${nowSec()})\n` +
-          `iat=${String(payload?.iat)}\n` +
-          `nonce=${String(payload?.nonce)}`
-      )
+      // alert(
+      //   `[APPLE JWT]\n` +
+      //     `kid=${String(header?.kid)}\n` +
+      //     `alg=${String(header?.alg)}\n\n` +
+      //     `iss=${String(payload?.iss)}\n` +
+      //     `aud=${String(payload?.aud)}\n` +
+      //     `sub=${String(payload?.sub)}\n` +
+      //     `exp=${String(payload?.exp)} (now=${nowSec()})\n` +
+      //     `iat=${String(payload?.iat)}\n` +
+      //     `nonce=${String(payload?.nonce)}`
+      // )
 
-      // ✅ 3) 서버로 실제 보내는 값 확인(길이만)
-      alert(`[SEND TO SERVER]\nprovider=apple\nidToken.len=${idToken.length}`)
+      // alert(`[SEND TO SERVER]\nprovider=apple\nidToken.len=${idToken.length}`)
 
       const res = await oauthLogin({ provider: 'apple', idToken })
 
