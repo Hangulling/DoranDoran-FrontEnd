@@ -36,9 +36,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (IS_PROD && GA_ENABLED) {
       const yyyyMmDd = new Date().toISOString().slice(0, 10)
-      ReactGA.event('view_login', {
-        date: yyyyMmDd,
-      })
+      ReactGA.event('view_login', { date: yyyyMmDd })
     }
   }, []) // 1회 실행
 
@@ -82,6 +80,8 @@ export default function LoginPage() {
       return String(e)
     }
   }
+
+  // ✅ JWT payload 디코드 (기존)
   const decodeJwtPayload = (token: string) => {
     try {
       const payload = token.split('.')[1]
@@ -98,33 +98,45 @@ export default function LoginPage() {
     }
   }
 
+  // ✅ JWT header/payload 공용 디코더 + header 디코더 추가
+  const decodeJwtPart = (part: string) => {
+    try {
+      const base64 = part.replace(/-/g, '+').replace(/_/g, '/')
+      const json = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      )
+      return JSON.parse(json) as Record<string, unknown>
+    } catch {
+      return null
+    }
+  }
+
+  const decodeJwtHeader = (token: string) => {
+    const headerPart = token.split('.')[0]
+    return headerPart ? decodeJwtPart(headerPart) : null
+  }
+
+  const nowSec = () => Math.floor(Date.now() / 1000)
+
   const handleGoogleNativeLogin = async () => {
     if (!isNativeApp()) return
 
     try {
       const r = (await SocialLogin.login({
         provider: 'google',
-        options: {
-          scopes: ['profile', 'email'],
-        },
+        options: { scopes: ['profile', 'email'] },
       })) as SocialLoginResponse
 
       const idToken = r.result?.idToken
-
       if (!idToken) {
         alert('Google 로그인 실패 (앱)')
         return
       }
-      // if (idToken) {
-      //   const payload = decodeJwtPayload(idToken)
-      //   alert(
-      //     `idToken aud=${String(payload?.aud)}\niss=${String(payload?.iss)}`
-      //   )
-      // }
-      const res = await oauthLogin({
-        provider: 'google',
-        idToken,
-      })
+
+      const res = await oauthLogin({ provider: 'google', idToken })
 
       if (res.success) {
         const user = res.data.user
@@ -137,7 +149,6 @@ export default function LoginPage() {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status
         const data = err.response?.data
-
         console.error('[Native OAuth] axios error:', { status, data, err })
 
         alert(
@@ -159,27 +170,38 @@ export default function LoginPage() {
     try {
       const r = (await SocialLogin.login({
         provider: 'apple',
-        options: {
-          scopes: ['email', 'name'],
-        },
+        options: { scopes: ['email', 'name'] },
       })) as SocialLoginResponse
-      alert(`[APPLE RESULT]\n${JSON.stringify(r.result)}`)
-      const idToken = r.result?.idToken
 
+      // ✅ 1) 플러그인 원본 결과 확인
+      alert(`[APPLE RESULT]\n${JSON.stringify(r.result)}`)
+
+      const idToken = r.result?.idToken
       if (!idToken) {
         alert('Apple 로그인 실패 (앱)')
         return
       }
-      if (idToken) {
-        const payload = decodeJwtPayload(idToken)
-        alert(
-          `idToken aud=${String(payload?.aud)}\niss=${String(payload?.iss)}`
-        )
-      }
-      const res = await oauthLogin({
-        provider: 'apple',
-        idToken,
-      })
+
+      // ✅ 2) 서버 검증에 필요한 값들(특히 kid/aud/exp)까지 전부 찍기
+      const header = decodeJwtHeader(idToken)
+      const payload = decodeJwtPayload(idToken)
+
+      alert(
+        `[APPLE JWT]\n` +
+          `kid=${String(header?.kid)}\n` +
+          `alg=${String(header?.alg)}\n\n` +
+          `iss=${String(payload?.iss)}\n` +
+          `aud=${String(payload?.aud)}\n` +
+          `sub=${String(payload?.sub)}\n` +
+          `exp=${String(payload?.exp)} (now=${nowSec()})\n` +
+          `iat=${String(payload?.iat)}\n` +
+          `nonce=${String(payload?.nonce)}`
+      )
+
+      // ✅ 3) 서버로 실제 보내는 값 확인(길이만)
+      alert(`[SEND TO SERVER]\nprovider=apple\nidToken.len=${idToken.length}`)
+
+      const res = await oauthLogin({ provider: 'apple', idToken })
 
       if (res.success) {
         const user = res.data.user
@@ -214,11 +236,7 @@ export default function LoginPage() {
         return
       }
 
-      const res = await oauthLogin({
-        provider: 'google',
-        idToken,
-      })
-
+      const res = await oauthLogin({ provider: 'google', idToken })
       console.log('[OAuthLogin] res:', res)
 
       if (!res?.success) {
@@ -246,18 +264,11 @@ export default function LoginPage() {
 
         if (IS_PROD && GA_ENABLED) {
           ReactGA.set({ user_id: user.id })
-
           const yyyyMmDd = new Date().toISOString().slice(0, 10)
-          ReactGA.event('login', {
-            date: yyyyMmDd,
-            method: 'oauth_google',
-          })
+          ReactGA.event('login', { date: yyyyMmDd, method: 'oauth_google' })
         }
-        if (user.isOnboard) {
-          navigate('/')
-        } else {
-          navigate('/onboarding')
-        }
+
+        navigate(user.isOnboard ? '/' : '/onboarding')
       }
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
