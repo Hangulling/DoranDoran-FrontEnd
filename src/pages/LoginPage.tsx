@@ -163,7 +163,7 @@ export default function LoginPage() {
           scopes: ['email', 'name'],
         },
       })) as SocialLoginResponse
-
+      alert(`[APPLE RESULT]\n${JSON.stringify(r.result)}`)
       const idToken = r.result?.idToken
 
       if (!idToken) {

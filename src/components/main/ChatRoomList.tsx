@@ -14,14 +14,14 @@ const ChatRoomList = ({
   chatMsg,
   onRoomClick,
 }: ChatRoomListProps) => {
-  const baseData = isLoading ? MAIN_DATA : chatMsg
+  const baseData = chatMsg.length > 0 ? chatMsg : isLoading ? MAIN_DATA : []
 
   const displayData = [...baseData, MANAGER_ROOM]
 
   return (
     <div className="flex w-full flex-col">
       {displayData.map((room, index) => (
-        <React.Fragment key={room.roomRouteId}>
+        <React.Fragment key={room.roomRouteId || index}>
           <ChatRoomItem
             room={room}
             onClick={(id, name) => onRoomClick(Number(id), name)}

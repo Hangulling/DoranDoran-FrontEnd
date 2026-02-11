@@ -49,9 +49,11 @@ export default function BottomSheet({
             }}
             style={{
               height: isExpanded
-                ? 'calc(100% - env(safe-area-inset-top))'
+                ? 'calc(100% - 10px - env(safe-area-inset-top))'
                 : 'auto',
-              top: isExpanded ? 'env(safe-area-inset-top)' : 'auto',
+              top: isExpanded
+                ? 'calc(10px + env(safe-area-inset-top))'
+                : 'auto',
               bottom: 0,
               maxHeight: isExpanded ? 'none' : '75vh',
             }}
