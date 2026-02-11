@@ -19,8 +19,9 @@ export const useFetchChatRooms = (userId: string) => {
   const { unreadMap } = useUnreadStore()
 
   const {
-    data: rawChatMsg = [],
-    isLoading,
+    data: rawChatMsg,
+    isPlaceholderData,
+    isPending,
     isError,
   } = useQuery<ChatRoomWithMessage[]>({
     queryKey: ['chatRooms', userId],
@@ -53,16 +54,26 @@ export const useFetchChatRooms = (userId: string) => {
     },
     enabled: !!userId,
     staleTime: 1000 * 60 * 1, // 1분간 캐시 유지
+    placeholderData: previousData =>
+      previousData ||
+      (MAIN_DATA.map(m => ({
+        ...m,
+        message: '',
+        concept: m.roomName,
+        chatroomId: null,
+        hasNewMessage: false,
+      })) as ChatRoomWithMessage[]),
   })
 
   const chatMsg = useMemo(() => {
-    return rawChatMsg.map(room => ({
+    const data = rawChatMsg || []
+    return data.map(room => ({
       ...room,
-      // 안읽음이면 점 표시
       hasNewMessage: room.chatroomId ? !!unreadMap[room.chatroomId] : false,
     }))
   }, [rawChatMsg, unreadMap])
 
+  const isReallyLoading = isPending || isPlaceholderData
   // 에러 처리
   useEffect(() => {
     if (isError) {
@@ -71,5 +82,5 @@ export const useFetchChatRooms = (userId: string) => {
     }
   }, [isError, navigate])
 
-  return { chatMsg, isLoading }
+  return { chatMsg, isLoading: isReallyLoading }
 }

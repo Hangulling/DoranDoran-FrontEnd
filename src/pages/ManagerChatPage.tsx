@@ -90,8 +90,15 @@ const ManagerChatPage: React.FC = () => {
           setShowLeaveModal(true)
         },
       },
+      {
+        priority: 0,
+        condition: true,
+        callback: () => {
+          navigate('/')
+        },
+      },
     ],
-    [showLeaveModal, isContactSheetOpen, hasProgress, isCompleted]
+    [showLeaveModal, isContactSheetOpen, hasProgress, isCompleted, navigate]
   )
 
   useBackButton(backButtonHandlers)

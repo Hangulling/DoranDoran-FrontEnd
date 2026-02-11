@@ -310,13 +310,7 @@ const ChatPage: React.FC = () => {
   }, [messages])
 
   return (
-    <div
-      className="flex flex-col h-full bg-gray-0"
-      style={{
-        height: '100vh',
-        paddingTop: 'env(safe-area-inset-top)',
-      }}
-    >
+    <div className="flex flex-col h-full bg-gray-0 pt-[env(safe-area-inset-top)]">
       <ChatHeader
         title={room?.roomName || 'Chat'}
         avatar={room?.avatar}
@@ -327,7 +321,7 @@ const ChatPage: React.FC = () => {
 
       <div
         ref={chatMainRef}
-        className="flex-1 overflow-y-auto w-full bg-gray-10 relative pb-[80px]"
+        className="flex-1 w-full bg-gray-10 relative pb-[80px]"
       >
         <div className="px-5 pt-6 pb-4">
           <ChatBody

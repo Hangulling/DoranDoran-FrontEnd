@@ -21,6 +21,7 @@ const SkeletonCard = () => (
 
 const InstaContent = ({ onCardClick }: InstaContentProps) => {
   const [isLoading, setIsLoading] = useState(true)
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({})
   const { homePosts, setHomePosts } = useHomeStore()
 
   useEffect(() => {
@@ -58,11 +59,14 @@ const InstaContent = ({ onCardClick }: InstaContentProps) => {
   return (
     <div className="w-full">
       <div className="no-scrollbar flex w-full gap-x-2 overflow-x-auto">
-        {homePosts.map(post => (
-          <button
-            key={post.externalId}
-            onClick={() => onCardClick && onCardClick(post.externalId)}
-            className="
+        {homePosts.map(post => {
+          const isImageLoaded = loadedImages[post.externalId]
+
+          return (
+            <button
+              key={post.externalId}
+              onClick={() => onCardClick && onCardClick(post.externalId)}
+              className="
               flex-shrink-0 
               relative 
               h-[226px] w-[180px] 
@@ -70,16 +74,31 @@ const InstaContent = ({ onCardClick }: InstaContentProps) => {
               rounded-[12px] overflow-hidden
               transition-transform
             "
-          >
-            <div className="h-full w-full overflow-hidden">
-              <img
-                src={post.coverImageUrl || post.imageUrl || ''}
-                alt={post.title || ''}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </button>
-        ))}
+            >
+              {!isImageLoaded && (
+                <div className="absolute inset-0 z-10">
+                  <SkeletonCard />
+                </div>
+              )}
+
+              <div className="h-full w-full overflow-hidden">
+                <img
+                  src={post.coverImageUrl || post.imageUrl || ''}
+                  alt={post.title || ''}
+                  onLoad={() =>
+                    setLoadedImages(prev => ({
+                      ...prev,
+                      [post.externalId]: true,
+                    }))
+                  }
+                  className={`w-full h-full object-cover transition-opacity duration-300 ${
+                    isImageLoaded ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
+              </div>
+            </button>
+          )
+        })}
       </div>
     </div>
   )

@@ -123,21 +123,19 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
       isExpanded={isExpanded}
       className={isExpanded ? 'h-full transition-all duration-300' : ''}
       footer={
-        !isExpanded && (
-          <Button
-            variant="primary"
-            size="confirm"
-            onClick={() =>
-              onSubmit(content, {
-                replyRequested: replyRequested === 'yes',
-                replyEmail,
-              })
-            }
-            disabled={!isSubmitEnabled}
-          >
-            Send inquiry
-          </Button>
-        )
+        <Button
+          variant="primary"
+          size="confirm"
+          onClick={() =>
+            onSubmit(content, {
+              replyRequested: replyRequested === 'yes',
+              replyEmail,
+            })
+          }
+          disabled={!isSubmitEnabled}
+        >
+          Send inquiry
+        </Button>
       }
     >
       <div
