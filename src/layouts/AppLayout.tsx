@@ -5,6 +5,7 @@ import useArchiveStore from '../stores/useArchiveStore'
 import { useEffect } from 'react'
 import { startIdleTimer, stopIdleTimer } from '../utils/idleTimer'
 import { isNativeApp } from '../utils/isNativeApp'
+import { useBackButton } from '../hooks/useBackButton'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -36,6 +37,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation()
   const pathname = location.pathname
   const native = isNativeApp()
+
+  // 전역 뒤로가기
+  useBackButton([])
 
   // 알 수 없는 페이지 (*)
   const knownPatterns = [
