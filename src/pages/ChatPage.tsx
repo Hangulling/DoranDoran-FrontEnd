@@ -310,7 +310,7 @@ const ChatPage: React.FC = () => {
   }, [messages])
 
   return (
-    <div className="flex flex-col h-full bg-gray-0 pt-[env(safe-area-inset-top)]">
+    <div className="flex flex-col h-full bg-gray-0">
       <ChatHeader
         title={room?.roomName || 'Chat'}
         avatar={room?.avatar}
@@ -321,7 +321,7 @@ const ChatPage: React.FC = () => {
 
       <div
         ref={chatMainRef}
-        className="flex-1 w-full bg-gray-10 relative pb-[80px]"
+        className="flex-1 w-full bg-gray-10 relative pb-20"
       >
         <div className="px-5 pt-6 pb-4">
           <ChatBody
@@ -381,7 +381,7 @@ const ChatPage: React.FC = () => {
           title="Auto-open messages"
           description="Turn this on to view messages instantly."
         >
-          <div className="flex flex-col gap-[20px] mt-[14px] mb-[30px]">
+          <div className="flex flex-col gap-5 mt-[14px] mb-[30px]">
             <div className="flex justify-between items-center">
               <span className="text-[16px]">Vocabulary</span>
               <ToggleSwitch
