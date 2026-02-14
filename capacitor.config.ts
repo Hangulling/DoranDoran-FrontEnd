@@ -23,9 +23,6 @@ const config: CapacitorConfig = {
       resizeOnFullScreen: true,
     },
   },
-  android: {
-    adjustMarginsForEdgeToEdge: 'force',
-  },
 }
 
 export default config
