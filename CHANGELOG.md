@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.36...v3.0.0) (2026-02-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* 캐패시터 버전 업데이트 (#284)
+
+### Features
+
+* 이메일 인증 딥링크 추가  ([#285](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/285)) ([4400ea1](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/4400ea14af79dc6b082c17fe805912eef4f1c741))
+* 캐패시터 버전 업데이트 ([#284](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/284)) ([83421cd](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/83421cd0d89a64d878dd15b09a7598527db71697))
+
 ### [2.1.36](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.35...v2.1.36) (2026-02-11)
 
 ### [2.1.35](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.34...v2.1.35) (2026-02-11)
