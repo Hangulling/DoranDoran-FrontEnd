@@ -69,7 +69,7 @@ const ClosenessSheet = ({
           {/* 친밀도 1 */}
           <button
             type="button"
-            className={`flex flex-col items-center rounded-[8px] border-[1.6px] transition-all duration-200 
+            className={`flex flex-col items-center rounded-lg border-[1.6px] transition-all duration-200 
             ${selectedCloseness === 1 ? 'border-gray-800' : 'border-gray-200'} 
             ${
               selectedCloseness !== null && selectedCloseness !== 1
@@ -85,21 +85,21 @@ const ClosenessSheet = ({
             />
           </button>
 
-          {/* 친밀도 2 */}
+          {/* 친밀도 3 */}
           <button
             type="button"
-            className={`flex flex-col items-center rounded-[8px] border-[1.6px] transition-all duration-200 
-            ${selectedCloseness === 2 ? 'border-gray-800' : 'border-gray-200'}
+            className={`flex flex-col items-center rounded-lg border-[1.6px] transition-all duration-200 
+            ${selectedCloseness === 3 ? 'border-gray-800' : 'border-gray-200'}
             ${
-              selectedCloseness !== null && selectedCloseness !== 2
+              selectedCloseness !== null && selectedCloseness !== 3
                 ? 'opacity-60'
                 : 'opacity-100'
             }`}
-            onClick={() => setSelectedCloseness(2)}
+            onClick={() => setSelectedCloseness(3)}
           >
             <img
               src={conceptImages[1]}
-              alt="Closeness Level 2"
+              alt="Closeness Level 3"
               className="object-contain block"
             />
           </button>

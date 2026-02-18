@@ -2,9 +2,6 @@ import type React from 'react'
 import { useLocation, useMatch } from 'react-router-dom'
 import NavBar from '../components/common/NavBar'
 import useArchiveStore from '../stores/useArchiveStore'
-import { useEffect } from 'react'
-import { startIdleTimer, stopIdleTimer } from '../utils/idleTimer'
-import { isNativeApp } from '../utils/isNativeApp'
 import { useBackButton } from '../hooks/useBackButton'
 
 interface AppLayoutProps {
@@ -36,7 +33,6 @@ const showBookmarkPaths = ['/']
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation()
   const pathname = location.pathname
-  const native = isNativeApp()
 
   // 전역 뒤로가기
   useBackButton([])
@@ -61,28 +57,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const isUnknownPath = !isKnownPath
 
   const skipNavPaths = ['/error', '/onboarding', '/chat']
-
-  // 로그인 필요없는 페이지
-  const isPublicPage =
-    pathname.startsWith('/login') ||
-    pathname.startsWith('/signup') ||
-    pathname.startsWith('/policy') ||
-    pathname.startsWith('/error') ||
-    pathname.startsWith('/find-email') ||
-    pathname.startsWith('/find-password') ||
-    isUnknownPath
-
-  // 비활성 타이머 로직
-  useEffect(() => {
-    if (isPublicPage || native) {
-      stopIdleTimer()
-    } else {
-      startIdleTimer()
-    }
-    return () => {
-      stopIdleTimer()
-    }
-  }, [isPublicPage, native]) // 경로가 바뀔 때마다 실행
 
   const isMain = pathname === '/'
 
@@ -166,7 +140,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </header>
       )}
 
-      <main id="app-scroll" className={'flex-grow min-h-0 overflow-y-auto'}>
+      <main id="app-scroll" className={'grow min-h-0 overflow-y-auto'}>
         {children}
       </main>
 
