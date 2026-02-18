@@ -16,7 +16,7 @@ const iconMap: Record<IconType, JSX.Element> = {
 }
 
 const sizeStyles: Record<ToastSize, string> = {
-  default: 'mx-5 mb-5',
+  default: 'mx-5 mb-[calc(20px+env(safe-area-inset-bottom))',
   sheet: 'mx-1 mb-[72px]',
   manager: 'mx-1 mb-[calc(92px+env(safe-area-inset-bottom))]',
 }
