@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useBackButton } from '../../hooks/useBackButton'
 
 type BottomSheetProps = {
   isOpen: boolean
@@ -24,6 +25,15 @@ export default function BottomSheet({
   isExpanded = false,
   className,
 }: BottomSheetProps) {
+  // 시트 유무에 따라 뒤로가기 상태 다름
+  useBackButton([
+    {
+      priority: 10,
+      condition: isOpen,
+      callback: onClose,
+    },
+  ])
+
   return (
     <AnimatePresence>
       {isOpen && (

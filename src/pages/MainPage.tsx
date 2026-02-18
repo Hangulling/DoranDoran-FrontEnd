@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { StatusBar, Style } from '@capacitor/status-bar'
 
 import ChatRoomList from '../components/main/ChatRoomList'
 import ClosenessSheet from '../components/chat/ClosenessSheet'
@@ -197,40 +196,6 @@ const MainPage = () => {
       }
     )
   }
-
-  useEffect(() => {
-    const setTransparentBar = async () => {
-      try {
-        // 웹뷰를 상태바 밑으로 확장
-        await StatusBar.setOverlaysWebView({ overlay: true })
-
-        await StatusBar.setBackgroundColor({ color: '#00000000' })
-
-        await StatusBar.setStyle({ style: Style.Light })
-      } catch (e) {
-        console.log('StatusBar error', e)
-      }
-    }
-
-    setTransparentBar()
-
-    // 원래대로 복구
-    return () => {
-      const resetStatusBar = async () => {
-        try {
-          // 투명 모드 해제
-          await StatusBar.setOverlaysWebView({ overlay: false })
-          // 원래 앱의 배경색으로 복구
-          await StatusBar.setBackgroundColor({ color: '#FFFFFF' })
-          // 글자색을 원래대로
-          await StatusBar.setStyle({ style: Style.Light })
-        } catch (e) {
-          console.log('StatusBar reset error', e)
-        }
-      }
-      resetStatusBar()
-    }
-  }, [])
 
   return (
     <div>

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useModalStore } from '../../stores/useUiStateStore'
 import { useAuthCleanupStore } from '../../stores/useAuthCleanupStore'
@@ -6,6 +6,7 @@ import { leaveChatroom, updateUser } from '../../api'
 import { useUserMsgStore } from '../../stores/useUserMsgStore'
 import ReactGA from 'react-ga4'
 import { GA_ENABLED, IS_PROD } from '../../constants/env'
+import { useBackButton } from '../useBackButton'
 
 interface UseChatExitProps {
   chatroomId: string | undefined
@@ -22,12 +23,11 @@ export const useChatExit = ({
 }: UseChatExitProps) => {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const hasLeftRef = useRef(false) // 중복 나가기 방지
+  const hasLeftRef = useRef(false)
 
   const noShowAgain = useModalStore(state => state.noShowAgain)
   const setPreLogoutTask = useAuthCleanupStore(state => state.setPreLogoutTask)
 
-  // 공통 채팅방 나가기
   const performLeaveChatroom = useCallback(async () => {
     if (!chatroomId || !userId) return
 
@@ -40,63 +40,69 @@ export const useChatExit = ({
       useUserMsgStore.getState().clearUserMsgs()
     } catch (error) {
       console.error('채팅방 나가기 실패:', error)
-      throw error
     }
   }, [chatroomId, userId, routeId])
 
   const handleConfirmExit = useCallback(async () => {
-    if (!chatroomId) {
-      console.error('채팅방 ID가 없어 나갈 수 없습니다.')
-      setIsModalOpen(false)
-      return
-    }
-
     if (hasLeftRef.current) return
     hasLeftRef.current = true
 
-    // leave_chatroom
+    // GA_leave_chatroom
     if (IS_PROD && GA_ENABLED && userId) {
-      const leaveTimestamp = Math.floor(Date.now() / 1000)
       ReactGA.event('leave_chatroom', {
         chatroom_id: chatroomId,
-        leave_timestamp: leaveTimestamp,
+        leave_timestamp: Math.floor(Date.now() / 1000),
       })
     }
 
-    // 다시 보지 않기 설정
+    // 다시 보지 않기 설정 저장
     if (noShowAgain) {
-      try {
-        await updateUser(userId, { exitModalDoNotShowAgain: true })
-      } catch (e) {
+      updateUser(userId, { exitModalDoNotShowAgain: true }).catch(e =>
         console.error('사용자 설정 업데이트 실패:', e)
-      }
+      )
     }
 
-    try {
-      await performLeaveChatroom()
-      setIsModalOpen(false)
-      navigate('/', { replace: true })
-    } catch (error) {
-      console.error('채팅방 나가기 중 오류 발생:', error)
-      hasLeftRef.current = false
-      setIsModalOpen(false)
-    }
+    await performLeaveChatroom()
+    setIsModalOpen(false)
+    navigate('/', { replace: true })
   }, [chatroomId, userId, noShowAgain, navigate, performLeaveChatroom])
 
   const handleCancelExit = useCallback(() => {
     setIsModalOpen(false)
   }, [])
 
-  // 뒤로 가기
   const handleGoBack = useCallback(() => {
+    if (!enableGuard) {
+      navigate(-1)
+      return
+    }
+
     if (noShowAgain) {
-      // 다시 보지 않기 설정이 되어있으면 바로 나가기 처리
       handleConfirmExit()
     } else {
-      // 설정이 안 되어있으면 모달 열기
       setIsModalOpen(true)
     }
-  }, [noShowAgain, handleConfirmExit])
+  }, [enableGuard, noShowAgain, handleConfirmExit, navigate])
+
+  // 하드웨어 뒤로가기
+  useBackButton([
+    {
+      priority: 20,
+      condition: isModalOpen,
+      callback: handleCancelExit,
+    },
+    {
+      priority: 10,
+      condition: !isModalOpen && enableGuard,
+      callback: () => {
+        if (noShowAgain) {
+          handleConfirmExit()
+        } else {
+          setIsModalOpen(true)
+        }
+      },
+    },
+  ])
 
   // 자동 로그아웃 시 정리
   useEffect(() => {
@@ -111,87 +117,8 @@ export const useChatExit = ({
     } else {
       setPreLogoutTask(null)
     }
-
-    return () => {
-      setPreLogoutTask(null)
-    }
-  }, [chatroomId, userId, setPreLogoutTask, performLeaveChatroom, hasLeftRef])
-
-  // 브라우저 뒤로가기(popstate) / 탭 닫기(beforeunload)
-  useEffect(() => {
-    if (!enableGuard) return
-
-    window.history.pushState(null, '', window.location.href)
-
-    // OS 뒤로가기
-    const handlePopState = async () => {
-      if (hasLeftRef.current) return
-
-      if (noShowAgain) {
-        // 다시 보지 않기
-        hasLeftRef.current = true
-        try {
-          await performLeaveChatroom()
-        } catch (e) {
-          console.error('Failed to leave chatroom (noShowAgain):', e)
-        }
-        navigate('/')
-      } else {
-        setIsModalOpen(true)
-        window.history.pushState(null, '', window.location.href)
-      }
-    }
-    window.addEventListener('popstate', handlePopState)
-
-    // 탭 닫기 / 새로고침
-    const handleUnload = () => {
-      if (hasLeftRef.current) return
-
-      // 새로고침인지 확인
-      const navigationEntries = performance.getEntriesByType('navigation')
-      if (navigationEntries.length > 0) {
-        const navEntry = navigationEntries[0] as PerformanceNavigationTiming
-        if (navEntry.type === 'reload') {
-          console.log('[ChatPage] Refresh detected. NOT leaving chatroom.')
-          return
-        }
-      }
-
-      // 탭 닫기
-      if (chatroomId && userId) {
-        const accessToken = sessionStorage.getItem('accessToken')
-        if (!accessToken) return
-
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-        const url = `${API_BASE_URL}/api/chat/chatrooms/${chatroomId}/leave?userId=${userId}`
-
-        try {
-          fetch(url, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${accessToken}` },
-            keepalive: true, // 페이지가 닫혀도 요청
-          })
-        } catch (e) {
-          console.error('Failed to send keepalive fetch:', e)
-        }
-      }
-    }
-    window.addEventListener('beforeunload', handleUnload)
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState)
-      window.removeEventListener('beforeunload', handleUnload)
-    }
-  }, [
-    chatroomId,
-    userId,
-    navigate,
-    noShowAgain,
-    routeId,
-    performLeaveChatroom,
-    hasLeftRef,
-    enableGuard,
-  ])
+    return () => setPreLogoutTask(null)
+  }, [chatroomId, userId, setPreLogoutTask, performLeaveChatroom])
 
   return {
     isModalOpen,
