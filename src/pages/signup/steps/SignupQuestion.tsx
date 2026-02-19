@@ -75,9 +75,11 @@ export default function SignupQuestion() {
       const res = await createUser(payload)
       if (import.meta.env.DEV) console.log('🎉 회원가입 성공:', res)
 
-      resetForm()
-      resetAgreements()
       navigate('/login', { replace: true })
+      setTimeout(() => {
+        resetForm()
+        resetAgreements()
+      }, 0)
     } catch (e: unknown) {
       const isAxios = axios.isAxiosError(e)
       const status = isAxios ? e.response?.status : undefined

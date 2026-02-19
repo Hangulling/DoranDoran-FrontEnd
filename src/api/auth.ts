@@ -29,15 +29,17 @@ export async function login(data: LoginRequest) {
 }
 
 export async function oauthLogin(data: OAuthLoginRequest) {
-  const res = await publicApi.post<OAuthLoginResponse>(AUTH_ENDPOINTS.OAUTH_LOGIN, data)
+  const res = await publicApi.post<OAuthLoginResponse>(
+    AUTH_ENDPOINTS.OAUTH_LOGIN,
+    data
+  )
   const { data: resData } = res.data
-  const { accessToken, refreshToken } = resData
+  const { accessToken, refreshToken, needSignup } = resData
 
-  if (accessToken) {
+  if (!needSignup && accessToken) {
     sessionStorage.setItem('accessToken', accessToken)
   }
-
-  if (refreshToken) {
+  if (!needSignup && refreshToken) {
     sessionStorage.setItem('refreshToken', refreshToken)
   }
   return res.data
@@ -74,7 +76,8 @@ export async function checkEmailExists(email: string): Promise<boolean> {
   const url = USER_ENDPOINTS.CHECK_EMAIL(encoded)
   const res = await api.get(url, { timeout: 15000 })
   const payload = res.data
-  const value = typeof payload === 'boolean' ? payload : (payload?.data ?? payload)
+  const value =
+    typeof payload === 'boolean' ? payload : (payload?.data ?? payload)
   return value === true
 }
 
@@ -119,7 +122,9 @@ export async function requestEmailVerification(data: VerificationRequest) {
 }
 
 export async function resetPasswordRequest(email: string) {
-  const res = await publicApi.post(AUTH_ENDPOINTS.PASSWORD_RESET_REQUEST, { email })
+  const res = await publicApi.post(AUTH_ENDPOINTS.PASSWORD_RESET_REQUEST, {
+    email,
+  })
   return res.data
 }
 
