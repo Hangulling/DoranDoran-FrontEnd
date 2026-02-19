@@ -57,11 +57,11 @@ jobs:
       - name: Link GoogleService-Info.plist and Configure Info.plist
         run: ruby scripts/add-google-service.rb
 
-      # ✅ Gemfile 기준: ios/App/Gemfile
       - name: Setup Ruby (Bundler)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
+          bundler: 2.4.19
           bundler-cache: true
           bundler-working-directory: ios/App
 
