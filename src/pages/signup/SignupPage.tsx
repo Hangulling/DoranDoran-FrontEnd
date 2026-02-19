@@ -16,6 +16,8 @@ export default function SignupPage() {
   const resetAgreements = useAgreementStore(s => s.reset)
   const navigate = useNavigate()
 
+  const fromOAuth = Boolean(location.state?.fromOAuth)
+
   const stepMap: Record<string, number> = {
     '/signup/name': 1,
     '/signup/birthdate': 2,
@@ -27,6 +29,19 @@ export default function SignupPage() {
   const currentStep = stepMap[path]
 
   const handleConfirm = () => {
+    if (fromOAuth) {
+      submit?.()
+      if (!canSubmit) return
+      if (path === '/signup/term') {
+        navigate('/signup/birthdate', {
+          replace: true,
+          state: location.state,
+        })
+      }
+
+      return
+    }
+
     if (path === '/signup/term') {
       submit?.()
       if (canSubmit) {
@@ -72,16 +87,24 @@ export default function SignupPage() {
   }, [resetForm, resetAgreements, location])
 
   useEffect(() => {
-    if (path === '/signup/question') {
-      setLabel('Complete')
+    if (fromOAuth) {
+      if (path === '/signup/birthdate') {
+        setLabel('Complete')
+      } else {
+        setLabel('Next')
+      }
     } else {
-      setLabel('Next')
+      if (path === '/signup/question') {
+        setLabel('Complete')
+      } else {
+        setLabel('Next')
+      }
     }
-  }, [path])
+  }, [path, fromOAuth])
 
   return (
     <div className="flex flex-col justify-center items-center">
-      {path !== '/signup/term' && (
+      {!fromOAuth && path !== '/signup/term' && (
         <ProgressBar currentStep={currentStep} totalSteps={5} />
       )}
       <Outlet context={{ setSubmit, setCanSubmit }} />

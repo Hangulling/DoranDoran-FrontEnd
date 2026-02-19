@@ -8,16 +8,34 @@ import {
   isValidCalendarDate,
   validateBirthDate,
 } from '../../../utils/validations'
-import { useOutletContext } from 'react-router-dom'
+import { useLocation, useNavigate, useOutletContext } from 'react-router-dom'
+import { oauthLogin } from '../../../api/auth'
+import { useUserStore } from '../../../stores/useUserStore'
+import type { OAuthLoginResponse } from '../../../types/auth'
+import axios from 'axios'
+
+type Provider = 'google' | 'apple'
 
 type OutletContext = {
   setCanSubmit: (v: boolean) => void
+  setSubmit: (fn: () => void) => void
 }
 
 export default function SignupBirthDate() {
   const { birthDate, setMany } = useSignupFormStore()
   const [birthDateError, setBirthDateError] = useState<string | null>(null)
-  const { setCanSubmit } = useOutletContext<OutletContext>()
+  const [, setSubmitError] = useState<string | null>(null)
+
+  const { setCanSubmit, setSubmit } = useOutletContext<OutletContext>()
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const setStoreId = useUserStore(s => s.setId)
+  const setStoreName = useUserStore(s => s.setName)
+
+  const fromOAuth = Boolean(location.state?.fromOAuth)
+  const idToken = location.state?.idToken as string | undefined
+  const provider = location.state?.provider as Provider | undefined
 
   const birthDateDisplay = birthDate.replace(
     /^(\d{4})(\d{0,2})(\d{0,2})$/,
@@ -27,7 +45,6 @@ export default function SignupBirthDate() {
   const handleBirthDateChange = (v: string) => {
     const digits = v.replace(/\D/g, '').slice(0, 8)
     setMany({ birthDate: digits })
-
     if (birthDateError) setBirthDateError(null)
   }
 
@@ -45,6 +62,58 @@ export default function SignupBirthDate() {
   useEffect(() => {
     setCanSubmit(isBirthDateValid)
   }, [isBirthDateValid, setCanSubmit])
+
+  useEffect(() => {
+    setSubmit(() => {
+      if (!fromOAuth) return
+      ;(async () => {
+        if (!idToken || !provider) {
+          navigate('/login', { replace: true })
+          return
+        }
+
+        try {
+          const res = (await oauthLogin({
+            provider,
+            idToken,
+            confirmSignup: true,
+          })) as OAuthLoginResponse
+
+          if (!res?.success) return
+
+          const user = res.data?.user
+          if (!user) return
+
+          setStoreId(user.id)
+          setStoreName(user.name)
+          localStorage.setItem('last_login', provider)
+
+          navigate(user.isOnboard ? '/' : '/onboarding', { replace: true })
+        } catch (e: unknown) {
+          const isAxios = axios.isAxiosError(e)
+          const status = isAxios ? e.response?.status : undefined
+          const code = status ?? 503
+          const msg = isAxios
+            ? e.response?.data?.message || 'Sign up failed.'
+            : 'Sign up failed.'
+          setSubmitError(msg)
+
+          if (status && status >= 400 && status < 500) {
+            return
+          }
+          navigate('/error', { replace: true, state: { code, from: 'signup' } })
+        }
+      })()
+    })
+  }, [
+    setSubmit,
+    fromOAuth,
+    idToken,
+    provider,
+    navigate,
+    setStoreId,
+    setStoreName,
+  ])
 
   return (
     <div>
