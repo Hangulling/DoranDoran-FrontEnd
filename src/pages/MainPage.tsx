@@ -19,6 +19,7 @@ import ReactGA from 'react-ga4'
 import { GA_ENABLED, IS_PROD } from '../constants/env'
 import type { ChatRoomWithMessage } from '../types/main'
 import type { AxiosError } from 'axios'
+import { getRouteIdByConcept } from '../utils/conceptMap'
 
 interface ApiError {
   success?: boolean
@@ -56,12 +57,12 @@ const MainPage = () => {
   }, [userId])
 
   // 일반 방 생성
-  const { mutate: createRoom } = useCreateChatRoom(
+  const { mutate: createRoom, isPending: isCreatingRoom } = useCreateChatRoom(
     selectedRoom ? String(selectedRoom.id) : ''
   )
 
   // 인사말 생성 및 친밀도 설정
-  const { mutate: mutateGreeting } = useMutation({
+  const { mutate: mutateGreeting, isPending: isSettingGreeting } = useMutation({
     mutationFn: ({
       chatroomId,
       intimacyLevel,
@@ -71,7 +72,7 @@ const MainPage = () => {
       intimacyLevel: number
       startMessage?: string
     }) => {
-      console.group('🚀 [Mutation] postStartGreeting 시작')
+      console.group('postStartGreeting 시작')
       console.log('Target ID:', chatroomId)
       console.log('Intimacy:', intimacyLevel)
       console.log('Message:', startMessage)
@@ -85,10 +86,11 @@ const MainPage = () => {
     onSuccess: (_, variables) => {
       setIsSheetOpen(false)
       // 최종 이동
+      const targetRouteId = getRouteIdByConcept(selectedRoom?.name || 'friend')
       if (variables.chatroomId) {
         navigate(`/chat/${variables.chatroomId}`, {
           state: {
-            roomRouteId: 0,
+            roomRouteId: targetRouteId,
             concept: selectedRoom?.name,
             closeness: variables.intimacyLevel,
           },
@@ -109,14 +111,15 @@ const MainPage = () => {
   })
 
   // 딥링크 방 생성
-  const { mutateAsync: createRoomByDeepLink } = useMutation({
-    mutationFn: (params: {
-      chatbotId: string
-      topic?: string
-      concept?: string
-      userId?: string
-    }) => getDeepLinkChatroom(params),
-  })
+  const { mutateAsync: createRoomByDeepLink, isPending: isCreatingDeepLink } =
+    useMutation({
+      mutationFn: (params: {
+        chatbotId: string
+        topic?: string
+        concept?: string
+        userId?: string
+      }) => getDeepLinkChatroom(params),
+    })
 
   // 푸시 클릭 로직
   useEffect(() => {
@@ -174,7 +177,7 @@ const MainPage = () => {
       return
     }
 
-    // enter_chatroom_GA
+    // enter_chatroom GA
     if (IS_PROD && GA_ENABLED) {
       const entryTimestamp = Math.floor(Date.now() / 1000)
       ReactGA.event('enter_chatroom', {
@@ -290,6 +293,7 @@ const MainPage = () => {
         onClose={() => setIsSheetOpen(false)}
         concept={selectedRoom?.name || 'friend'}
         onStartChat={handleStartChat}
+        isLoading={isCreatingRoom || isCreatingDeepLink || isSettingGreeting}
       />
 
       {/* 온보딩 완료 모달 */}
