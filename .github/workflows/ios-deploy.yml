@@ -74,7 +74,7 @@ jobs:
           bundler-cache: true
 
       - name: Install Fastlane
-        run: gem install fastlane
+        run: gem install fastlane -N --no-document --force
 
       - name: Run Fastlane (workflow_dispatch lane 선택)
         if: github.event_name == 'workflow_dispatch'
