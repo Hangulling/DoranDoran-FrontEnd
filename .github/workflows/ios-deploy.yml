@@ -63,7 +63,10 @@ jobs:
           ruby-version: '3.2'
           bundler: 2.4.19
           bundler-cache: true
-          bundler-working-directory: ios/App
+
+      - name: Install Ruby Gems
+        working-directory: ios/App
+        run: bundle install
 
       - name: Pod install (repo update)
         working-directory: ios/App
