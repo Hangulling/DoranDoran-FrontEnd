@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.9](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.0.8...v3.0.9) (2026-02-19)
+
+
+### Features
+
+* 애플 회원가입 시 입력 추가  ([#298](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/298)) ([d904c50](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/d904c508e870e29946439fd51d7b9703d4fd8aae))
+
+
+### Bug Fixes
+
+* ios 강제 차단 방지 ([#297](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/297)) ([a11240f](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/a11240f866eac2100627cb4147c23b45731cd27a))
+
 ### [3.0.8](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.0.7...v3.0.8) (2026-02-19)
 
 
