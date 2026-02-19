@@ -65,6 +65,10 @@ export function useChatStream<T = unknown>(
     const connect = () => {
       const sseUrl = getSseUrl(chatroomId, userId)
 
+      alert(
+        `[토큰 확인]\n토큰: ${accessToken ? accessToken.substring(0, 10) + '...' : '없음(비어있음)'}`
+      )
+
       // 새 연결을 맺기 전 이전 컨트롤러가 있다면 취소
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
