@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.1](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.0.0...v3.0.1) (2026-02-19)
+
+
+### Features
+
+* 푸시 클릭시 채팅방 생성 ([#287](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/287)) ([6a7a5fa](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/6a7a5fa59cc33a84a1adb2c5502df0d5fe2ea61c))
+
 ## [3.0.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v2.1.36...v3.0.0) (2026-02-18)
 
 
