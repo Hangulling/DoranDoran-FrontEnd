@@ -1,5 +1,5 @@
 import Button from './Button'
-import googleIcon from '../../assets/auth/googleLogin.svg'
+import googleIcon from '../../assets/auth/googleLogin.png'
 
 type GoogleLoginButtonProps = {
   onClick?: () => void
