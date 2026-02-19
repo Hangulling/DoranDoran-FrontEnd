@@ -74,8 +74,9 @@ jobs:
 
       - name: Run Fastlane (workflow_dispatch lane 선택)
         if: github.event_name == 'workflow_dispatch'
-        working-directory: ios/App
+        working-directory: ios
         env:
+          BUNDLE_GEMFILE: App/Gemfile
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
@@ -94,8 +95,9 @@ jobs:
 
       - name: Run Fastlane (push to main이면 release 기본)
         if: github.event_name == 'push'
-        working-directory: ios/App
+        working-directory: ios
         env:
+          BUNDLE_GEMFILE: App/Gemfile
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
