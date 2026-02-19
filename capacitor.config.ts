@@ -10,6 +10,9 @@ const config: CapacitorConfig = {
   //   cleartext: true,
   // },
   plugins: {
+    CapacitorHttp: {
+      enabled: true,
+    },
     SocialLogin: {
       providers: {
         google: true,
