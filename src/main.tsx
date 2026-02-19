@@ -16,15 +16,8 @@ import {
 
 const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 
-const urlParams = new URLSearchParams(window.location.search)
-const paramInternal = urlParams.get('internal') === 'true'
-if (paramInternal) {
-  sessionStorage.setItem('isInternalTraffic', 'true')
-}
-
-const isInternalTraffic = sessionStorage.getItem('isInternalTraffic') === 'true'
 const isDev = import.meta.env.DEV
-const shouldVerboseLog = isDev || isInternalTraffic
+const shouldVerboseLog = isDev
 
 const logError = (title: string, err?: unknown) => {
   if (shouldVerboseLog) console.error(title, err)

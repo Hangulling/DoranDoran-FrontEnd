@@ -23,3 +23,18 @@ const CLOSENESS_TEXT_MAP: Record<number, string> = {
 export function getClosenessAsText(level: number): string {
   return CLOSENESS_TEXT_MAP[level]
 }
+
+export const getRouteIdByConcept = (conceptName: string): number => {
+  switch (conceptName.toLowerCase()) {
+    case 'friend':
+      return 1
+    case 'honey':
+      return 2
+    case 'coworker':
+      return 3
+    case 'senior':
+      return 4
+    default:
+      return 1
+  }
+}

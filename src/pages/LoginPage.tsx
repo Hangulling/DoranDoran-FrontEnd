@@ -359,7 +359,7 @@ export default function LoginPage() {
   }, [])
 
   return (
-    <div className="min-h-screen flex justify-center bg-white">
+    <div className="h-full flex justify-center bg-white">
       <div className="w-[335px] max-w-md pt-16 pb-[calc(24px+env(safe-area-inset-bottom))] flex flex-col">
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full flex justify-center">

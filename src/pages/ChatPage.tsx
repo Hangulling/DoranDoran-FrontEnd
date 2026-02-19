@@ -104,8 +104,11 @@ const ChatPage: React.FC = () => {
   }, [id, location.state, roomsMap])
 
   const chatbotId = chatBotIdByRoom(routeId ?? '')
+
   const closenessLevel =
-    useClosenessStore.getState().getCloseness(routeId ?? '') ?? 1
+    location.state?.closeness ??
+    useClosenessStore.getState().getCloseness(routeId ?? '') ??
+    1
   const closenessText = getClosenessAsText(closenessLevel)
   const isManagerRoom = String(routeId) === String(MANAGER_ROOM.roomRouteId)
 
@@ -247,12 +250,32 @@ const ChatPage: React.FC = () => {
     handleSendMessage(content)
   }
 
+  // view_chatroom GA
+  useEffect(() => {
+    if (IS_PROD && GA_ENABLED && chatroomId && userId) {
+      const sessionKey = `viewed_chatroom_${chatroomId}`
+      const alreadyViewed = sessionStorage.getItem(sessionKey)
+
+      // alreadyViewed가 'true'가 아닐 때만 이벤트 전송
+      if (alreadyViewed !== 'true') {
+        const yyyyMmDd = new Date().toISOString().slice(0, 10)
+        ReactGA.event('view_chatroom', {
+          chatroom_id: chatroomId,
+          date: yyyyMmDd,
+        })
+        // 이벤트 전송 후 sessionStorage에 플래그 설정
+        sessionStorage.setItem(sessionKey, 'true')
+      }
+    }
+  }, [chatroomId, userId])
+
   // 봇/가이드 메시지 도착
   useEffect(() => {
     const checkCompletion = (botMsg: string, guideMsg: string | null) => {
       // 'loading' 상태는 isNewChat == true일 때만 설정됨
       if (greetingState !== 'loading') return // 중복 실행 방지
 
+      // send_greeting_message GA
       if (IS_PROD && GA_ENABLED && chatroomId) {
         ReactGA.event('send_greeting_message', {
           chatroom_id: chatroomId,
