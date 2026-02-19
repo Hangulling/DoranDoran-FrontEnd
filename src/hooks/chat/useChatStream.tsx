@@ -76,6 +76,8 @@ export function useChatStream<T = unknown>(
         headers: {
           Authorization: accessToken ? `Bearer ${accessToken}` : '',
           Accept: 'text/event-stream',
+          'Cache-Control': 'no-cache', // ios 강제 차단 방지
+          Connection: 'keep-alive',
         },
         signal: abortControllerRef.current.signal,
         async onopen(response) {
