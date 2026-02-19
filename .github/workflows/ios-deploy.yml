@@ -21,6 +21,7 @@ on:
 jobs:
   build-ios:
     runs-on: macos-14
+
     steps:
       - uses: actions/checkout@v4
 
@@ -62,7 +63,7 @@ jobs:
         with:
           ruby-version: '3.2'
           bundler-cache: true
-        working-directory: ios
+          bundler-working-directory: ios
 
       - name: Pod install (repo update)
         working-directory: ios/App
