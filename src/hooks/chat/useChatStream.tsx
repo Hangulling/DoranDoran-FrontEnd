@@ -119,9 +119,29 @@ export function useChatStream<T = unknown>(
         },
         onerror(err) {
           console.error('[SSE Error]', err)
-          alert(
-            `[SSE 에러]\n이름: ${err?.name}\n메시지: ${err?.message}\n전체: ${JSON.stringify(err)}`
-          )
+          // ios 디버그
+          let errorDetails = ''
+          if (err instanceof Error) {
+            errorDetails = `Type: Error\nName: ${err.name}\nMessage: ${err.message}\nStack: ${err.stack}`
+          } else if (err instanceof Event) {
+            // XMLHttpRequest나 Fetch 실패 시 Event 객체로 넘어오는 경우
+            errorDetails = `Type: Event\nType: ${err.type}\nTarget: ${err.target ? err.target.constructor.name : 'unknown'}`
+          } else if (typeof err === 'object' && err !== null) {
+            try {
+              // 객체의 모든 key를 순회
+              const props = Object.getOwnPropertyNames(err).map(
+                key => `${key}: ${err[key]}`
+              )
+              errorDetails = `Type: Object\nProps:\n${props.join('\n')}`
+            } catch {
+              errorDetails = 'Object (Could not parse)'
+            }
+          } else {
+            errorDetails = `Type: ${typeof err}\nValue: ${String(err)}`
+          }
+
+          // 상세 알림창 띄우기
+          alert(`[SSE 에러]\n\n${errorDetails}`)
 
           if (onErrorRef.current) {
             onErrorRef.current(err)
