@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { getSseUrl } from '../../api'
-import { EventSourcePolyfill } from 'event-source-polyfill'
+import { fetchEventSource } from '@microsoft/fetch-event-source'
+import { App } from '@capacitor/app'
 
 const eventNames = [
   'intimacy_analysis',
@@ -22,26 +23,30 @@ export function useChatStream<T = unknown>(
   userId?: string,
   accessToken?: string,
   onEventReceived?: (eventType: string, data: T) => void,
-  onError?: (event: Event) => void,
+  onError?: (event: Event | unknown) => void,
   onOpen?: () => void,
   retryKey: number = 0
 ): UseChatStreamResult {
-  const eventSourceRef = useRef<EventSource | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
   const onEventReceivedRef = useRef(onEventReceived)
   const onErrorRef = useRef(onError)
+  const onOpenRef = useRef(onOpen)
 
   useLayoutEffect(() => {
     onEventReceivedRef.current = onEventReceived
   }, [onEventReceived])
 
-  // 콜백 prop이 변경될 때마다 ref를 업데이트
   useLayoutEffect(() => {
     onErrorRef.current = onError
   }, [onError])
+
+  useLayoutEffect(() => {
+    onOpenRef.current = onOpen
+  }, [onOpen])
 
   useEffect(() => {
     if (!chatroomId) {
@@ -50,126 +55,122 @@ export function useChatStream<T = unknown>(
       return
     }
 
-    // 연결 시도 시작: 로딩 true, 에러 null
     setIsLoading(true)
     setError(null)
 
     let retryCount = 0
     const maxRetries = 5
-    let retryTimeout: ReturnType<typeof setTimeout> | null = null
     const retryDelayInitial = 3000
-    let retryDelay = retryDelayInitial
 
     const connect = () => {
       const sseUrl = getSseUrl(chatroomId, userId)
-      const eventSource = new EventSourcePolyfill(sseUrl, {
+
+      // 새 연결을 맺기 전 이전 컨트롤러가 있다면 취소
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+      abortControllerRef.current = new AbortController()
+
+      fetchEventSource(sseUrl, {
+        method: 'GET',
         headers: {
           Authorization: accessToken ? `Bearer ${accessToken}` : '',
+          Accept: 'text/event-stream',
         },
-        heartbeatTimeout: 3600000, // 1시간
-      })
-
-      // 연결 성공 시 리셋
-      eventSource.onopen = () => {
-        console.log('[SSE] Connection opened')
-        setIsLoading(false)
-        setError(null)
-        if (onOpen) onOpen()
-        retryCount = 0
-        retryDelay = retryDelayInitial
-      }
-
-      eventSource.onmessage = event => {
-        const parsedData = JSON.parse(event.data)
-        console.log('[SSE Message]', parsedData)
-
-        if (onEventReceivedRef.current) {
-          onEventReceivedRef.current('message', parsedData)
-        }
-      }
-
-      eventNames.forEach(name => {
-        eventSource.addEventListener(name, (event: MessageEvent) => {
-          const parsedData = JSON.parse(event.data)
-
-          console.log(`[SSE Event: ${name}]`, parsedData)
-          if (onEventReceivedRef.current) {
-            onEventReceivedRef.current(name, parsedData)
-          }
-        })
-      })
-
-      eventSource.onerror = event => {
-        if (document.visibilityState === 'hidden') {
-          eventSource.close()
-          return
-        }
-
-        if (onErrorRef.current) {
-          onErrorRef.current(event)
-        }
-        console.error('[SSE Error]', event)
-        // 완전히 닫힌 상태일 때만 수동 재연결
-        if (eventSource.readyState === EventSource.CLOSED) {
-          if (onErrorRef.current) {
-            onErrorRef.current(event)
-          }
-
-          console.log('[SSE] Connection fully closed. Starting manual retry')
-
-          if (retryCount < maxRetries) {
-            setIsLoading(true)
-            retryTimeout = setTimeout(() => {
-              retryCount++
-              const jitter = Math.random() * 1000
-              const nextDelay = Math.min(retryDelay * 2, 30000)
-              retryDelay = nextDelay + jitter
-
-              console.log(
-                `[SSE] 재접속 시도 중 (Attempt ${retryCount}, Delay: ${Math.round(retryDelay)}ms)`
-              )
-              connect()
-            }, retryDelay)
-          } else {
-            console.error('[SSE] 재접속 시도 최대 횟수 초과')
-            setError(new Error('SSE connection failed after max retries'))
+        signal: abortControllerRef.current.signal,
+        async onopen(response) {
+          if (response.ok) {
+            console.log('[SSE] Connection opened')
             setIsLoading(false)
-          }
-        } else {
-          console.log(
-            '[SSE] EventSource is attempting to reconnect automatically.'
-          )
-          setIsLoading(true)
-        }
-      }
+            setError(null)
 
-      eventSourceRef.current = eventSource
+            if (onOpenRef.current) {
+              onOpenRef.current()
+            }
+
+            retryCount = 0
+          } else {
+            throw new Error(`Failed to connect: ${response.status}`)
+          }
+        },
+        onmessage(msg) {
+          if (!msg.data) return // 빈 하트비트 메시지 등 무시
+
+          const parsedData = JSON.parse(msg.data)
+
+          // 커스텀 이벤트인 경우
+          if (msg.event && eventNames.includes(msg.event)) {
+            console.log(`[SSE Event: ${msg.event}]`, parsedData)
+            if (onEventReceivedRef.current) {
+              onEventReceivedRef.current(msg.event, parsedData)
+            }
+          }
+          // 일반 메시지인 경우
+          else if (!msg.event || msg.event === 'message') {
+            console.log('[SSE Message]', parsedData)
+            if (onEventReceivedRef.current) {
+              onEventReceivedRef.current('message', parsedData)
+            }
+          }
+        },
+        onclose() {
+          console.log('[SSE] Connection closed by server.')
+        },
+        onerror(err) {
+          console.error('[SSE Error]', err)
+          if (onErrorRef.current) {
+            onErrorRef.current(err)
+          }
+
+          retryCount++
+          if (retryCount >= maxRetries) {
+            console.error('[SSE] 재접속 시도 최대 횟수 초과')
+            setError(
+              err instanceof Error
+                ? err
+                : new Error('SSE connection failed after max retries')
+            )
+            setIsLoading(false)
+            throw err
+          }
+
+          setIsLoading(true)
+          const jitter = Math.random() * 1000
+          return (
+            Math.min(retryDelayInitial * Math.pow(2, retryCount), 30000) +
+            jitter
+          )
+        },
+      })
     }
 
-    // 화면이 다시 보일 때 연결이 끊겨있으면 재연결
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        if (
-          !eventSourceRef.current ||
-          eventSourceRef.current.readyState === EventSource.CLOSED
-        ) {
+    // 백그라운드/포그라운드 상태 감지
+    const appStateListenerPromise = App.addListener(
+      'appStateChange',
+      ({ isActive }) => {
+        if (isActive) {
           console.log('[SSE] App came to foreground, reconnecting...')
           connect()
+        } else {
+          console.log('[SSE] App went to background, aborting connection...')
+          if (abortControllerRef.current) {
+            abortControllerRef.current.abort()
+            abortControllerRef.current = null
+          }
         }
       }
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
+    )
 
     // 최초 연결
     connect()
 
+    // 컴포넌트 언마운트 시 정리
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      if (retryTimeout) clearTimeout(retryTimeout)
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close()
-        eventSourceRef.current = null
+      appStateListenerPromise.then(listener => listener.remove())
+
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+        abortControllerRef.current = null
       }
     }
   }, [chatroomId, userId, accessToken, retryKey])
