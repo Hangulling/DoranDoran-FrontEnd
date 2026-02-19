@@ -21,7 +21,6 @@ on:
 jobs:
   build-ios:
     runs-on: macos-14
-
     steps:
       - uses: actions/checkout@v4
 
@@ -58,12 +57,13 @@ jobs:
       - name: Link GoogleService-Info.plist and Configure Info.plist
         run: ruby scripts/add-google-service.rb
 
+      # ✅ Gemfile 기준: ios/App/Gemfile
       - name: Setup Ruby (Bundler)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
           bundler-cache: true
-          bundler-working-directory: ios
+          bundler-working-directory: ios/App
 
       - name: Pod install (repo update)
         working-directory: ios/App
@@ -71,7 +71,7 @@ jobs:
 
       - name: Run Fastlane (workflow_dispatch lane 선택)
         if: github.event_name == 'workflow_dispatch'
-        working-directory: ios
+        working-directory: ios/App
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
@@ -91,7 +91,7 @@ jobs:
 
       - name: Run Fastlane (push to main이면 release 기본)
         if: github.event_name == 'push'
-        working-directory: ios
+        working-directory: ios/App
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
@@ -105,6 +105,5 @@ jobs:
         run: |
           echo "===== gym log (last 250 lines) ====="
           tail -n 250 /Users/runner/Library/Logs/gym/App-App.log || true
-
           echo "===== signing/entitlement lines (filtered) ====="
           egrep -n "Provisioning|entitlement|codesign|CodeSign|Signing|requires a provisioning|No profile|error:" /Users/runner/Library/Logs/gym/App-App.log | tail -n 150 || true
