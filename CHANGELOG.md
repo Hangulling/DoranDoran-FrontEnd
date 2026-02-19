@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.11](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.0.10...v3.0.11) (2026-02-19)
+
+
+### Bug Fixes
+
+* Merge pull request [#302](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/302) from Hangulling/feature/chat ([8d9750c](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/8d9750cc8638b1cdd56f4ee82ae0fb0af70a7f15))
+
 ### [3.0.10](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.0.9...v3.0.10) (2026-02-19)
 
 
