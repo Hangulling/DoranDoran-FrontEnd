@@ -8,16 +8,23 @@ import { useFetchUser } from '../hooks/useFetchUser'
 import { useFetchChatRooms } from '../hooks/useFetchChatRooms'
 import { useCreateChatRoom } from '../hooks/useCreateChatRoom'
 import { getChatBotIdByConcept } from '../utils/chatbotMap'
-import ReactGA from 'react-ga4'
 import Carousel from '../components/main/Carousel'
 import Dashboard from '../components/main/Dashboard'
 import InstaContent from '../components/main/InstaContent'
 import { MANAGER_ROOM } from '../constants/mainData'
 import useUnreadStore from '../stores/useUnreadStore'
-import { updateIntimacy } from '../api'
+import { getDeepLinkChatroom, postStartGreeting } from '../api'
 import { useMutation } from '@tanstack/react-query'
-import type { ChatRoomWithMessage } from '../types/main'
+import ReactGA from 'react-ga4'
 import { GA_ENABLED, IS_PROD } from '../constants/env'
+import type { ChatRoomWithMessage } from '../types/main'
+import type { AxiosError } from 'axios'
+import { getRouteIdByConcept } from '../utils/conceptMap'
+
+interface ApiError {
+  success?: boolean
+  error?: string
+}
 
 const MainPage = () => {
   const navigate = useNavigate()
@@ -30,8 +37,10 @@ const MainPage = () => {
     name: string
   } | null>(null)
   const [pushData, setPushData] = useState<{
-    chatroomId: string
-    startMessage: string
+    chatroomId?: string
+    startMessage?: string
+    targetChatbotId?: string
+    targetTopic?: string
   } | null>(null)
 
   const { userId } = useFetchUser()
@@ -47,74 +56,104 @@ const MainPage = () => {
     }
   }, [userId])
 
-  // 기존 방 생성
-  const { mutate: createRoom, isPending: isCreating } = useCreateChatRoom(
+  // 일반 방 생성
+  const { mutate: createRoom, isPending: isCreatingRoom } = useCreateChatRoom(
     selectedRoom ? String(selectedRoom.id) : ''
   )
 
-  // 푸시 클릭 시 친밀도 업데이트
-  const { mutate: mutateIntimacy, isPending: isUpdating } = useMutation({
+  // 인사말 생성 및 친밀도 설정
+  const { mutate: mutateGreeting, isPending: isSettingGreeting } = useMutation({
     mutationFn: ({
       chatroomId,
       intimacyLevel,
+      startMessage,
     }: {
       chatroomId: string
       intimacyLevel: number
-    }) => updateIntimacy(chatroomId, { intimacyLevel }),
+      startMessage?: string
+    }) => {
+      console.group('postStartGreeting 시작')
+      console.log('Target ID:', chatroomId)
+      console.log('Intimacy:', intimacyLevel)
+      console.log('Message:', startMessage)
+      console.groupEnd()
+
+      return postStartGreeting(chatroomId, {
+        intimacyLevel,
+        startMessage,
+      })
+    },
     onSuccess: (_, variables) => {
       setIsSheetOpen(false)
-
-      if (selectedRoom) {
+      // 최종 이동
+      const targetRouteId = getRouteIdByConcept(selectedRoom?.name || 'friend')
+      if (variables.chatroomId) {
         navigate(`/chat/${variables.chatroomId}`, {
           state: {
-            roomRouteId: selectedRoom.id,
-            concept: selectedRoom.name,
+            roomRouteId: targetRouteId,
+            concept: selectedRoom?.name,
             closeness: variables.intimacyLevel,
           },
         })
       }
       setPushData(null)
     },
-    onError: error => {
-      console.error('친밀도 업데이트 실패:', error)
+    onError: (error: AxiosError<ApiError>) => {
+      console.error('Error Status:', error.response?.status)
+      console.error(
+        'Error Data:',
+        JSON.stringify(error.response?.data, null, 2)
+      )
+      console.groupEnd()
+
       setIsSheetOpen(false)
     },
   })
 
-  // 푸시 클릭 방 생성
+  // 딥링크 방 생성
+  const { mutateAsync: createRoomByDeepLink, isPending: isCreatingDeepLink } =
+    useMutation({
+      mutationFn: (params: {
+        chatbotId: string
+        topic?: string
+        concept?: string
+        userId?: string
+      }) => getDeepLinkChatroom(params),
+    })
+
+  // 푸시 클릭 로직
   useEffect(() => {
-    if (
-      location.state?.fromPush &&
-      location.state?.targetChatroomId &&
-      chatMsg.length > 0
-    ) {
-      const { targetChatroomId, startMessage } = location.state
+    if (location.state?.fromPush) {
+      const {
+        targetChatroomId,
+        targetChatbotId,
+        targetTopic,
+        targetConcept,
+        startMessage,
+      } = location.state
 
-      // UUID로 방 찾기
-      const targetRoom = chatMsg.find(
-        (room: ChatRoomWithMessage) => room.chatroomId === targetChatroomId
-      )
-
-      if (targetRoom) {
-        // 읽음 처리
-        setUnread(targetChatroomId, false)
-
-        // 시트 열기
+      if (targetConcept) {
         setSelectedRoom({
-          id: targetRoom.roomRouteId,
-          name: targetRoom.concept,
+          id: 0,
+          name: targetConcept,
         })
+
+        // 사용할 데이터 저장
         setPushData({
           chatroomId: targetChatroomId,
           startMessage: startMessage,
+          targetChatbotId: targetChatbotId,
+          targetTopic: targetTopic,
         })
+
         setIsSheetOpen(true)
       }
 
       window.history.replaceState({}, document.title)
     }
-  }, [location.state, chatMsg, setUnread])
+  }, [location.state])
 
+  // 온보딩 완료 모달
   useEffect(() => {
     if (location.state?.showOnboardingModal) {
       setShowCompleteModal(true)
@@ -147,7 +186,6 @@ const MainPage = () => {
       })
     }
 
-    // 일반 진입 시 해당 방에 매칭되는 UUID가 있다면 읽음 처리
     const room = chatMsg.find((r: ChatRoomWithMessage) => r.roomRouteId === id)
     if (room?.chatroomId) {
       setUnread(room.chatroomId, false)
@@ -158,18 +196,44 @@ const MainPage = () => {
     setIsSheetOpen(true)
   }
 
-  const handleStartChat = (closeness: number) => {
+  // 시작 버튼 클릭 핸들러
+  const handleStartChat = async (closeness: number) => {
+    console.log('선택된 친밀도 값:', closeness)
+
     if (!selectedRoom || !userId) return
+
     // 푸시로 들어온 경우
     if (pushData) {
-      mutateIntimacy({
-        chatroomId: pushData.chatroomId,
-        intimacyLevel: closeness,
-      })
+      try {
+        let targetId = pushData.chatroomId
+
+        if (!targetId && pushData.targetChatbotId) {
+          const roomData = await createRoomByDeepLink({
+            chatbotId: pushData.targetChatbotId,
+            topic: pushData.targetTopic,
+            concept: selectedRoom.name.toUpperCase(),
+            userId: userId,
+          })
+          targetId = roomData.id
+        }
+
+        if (targetId) {
+          // 읽음 처리 및 인사말 생성 요청
+          setUnread(targetId, false)
+          mutateGreeting({
+            chatroomId: targetId,
+            intimacyLevel: closeness,
+            startMessage: pushData.startMessage,
+          })
+        }
+      } catch (error) {
+        console.error('딥링크 방 진입 실패:', error)
+        setIsSheetOpen(false) // 에러 시 시트 닫기
+      }
       return
     }
 
-    // 기존
+    // 일반 방 생성
     const chatbotId = getChatBotIdByConcept(selectedRoom.name)
     createRoom(
       {
@@ -181,7 +245,6 @@ const MainPage = () => {
       {
         onSuccess: newRoom => {
           setIsSheetOpen(false)
-          // 채팅방 생성 완료 후 이동
           navigate(`/chat/${newRoom.id}`, {
             state: {
               roomRouteId: selectedRoom.id,
@@ -230,7 +293,7 @@ const MainPage = () => {
         onClose={() => setIsSheetOpen(false)}
         concept={selectedRoom?.name || 'friend'}
         onStartChat={handleStartChat}
-        isLoading={isCreating || isUpdating}
+        isLoading={isCreatingRoom || isCreatingDeepLink || isSettingGreeting}
       />
 
       {/* 온보딩 완료 모달 */}

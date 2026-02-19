@@ -146,3 +146,29 @@ export async function createTestChatRoom(
   const res = await api.post(CHAT_ENDPOINTS.CREATE, data)
   return res.data
 }
+
+// 딥링크로 채팅방 생성
+export async function getDeepLinkChatroom(params: {
+  chatbotId: string
+  topic?: string
+  concept?: string
+  intimacyLevel?: number | null
+  userId?: string
+}): Promise<ApiChatRoom> {
+  const res = await api.get(CHAT_ENDPOINTS.DEEPLINK_CHATROOM(), {
+    params,
+  })
+  return res.data
+}
+
+// 딥링크 채팅방 생성 후 친밀도 및 그리팅 설정
+export async function postStartGreeting(
+  chatroomId: string,
+  data: {
+    intimacyLevel: number
+    startMessage?: string
+  }
+): Promise<ApiChatRoom> {
+  const res = await api.post(CHAT_ENDPOINTS.START_GREETING(chatroomId), data)
+  return res.data
+}

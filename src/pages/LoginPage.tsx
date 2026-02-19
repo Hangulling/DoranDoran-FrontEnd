@@ -13,8 +13,10 @@ import { type SocialLoginResponse } from '@capgo/capacitor-social-login'
 import { SocialLogin } from '@capgo/capacitor-social-login'
 import showToast from '../components/common/CommonToast'
 import LastLoginBubble from '../components/common/LastLoginBubble'
-import Logoicon from '../assets/auth/koach-logo.svg'
-import AppleLoginIcon from '../assets/auth/appleLogin.svg'
+import Logoicon from '../assets/auth/koach-logo.png'
+import AppleLoginIcon from '../assets/auth/appleLogin.png'
+import type { User } from '../types/user'
+import type { OAuthLoginResponse } from '../types/auth'
 
 type ErrorKind = 'wrong_email' | 'wrong_password' | 'both' | 'general' | null
 type Provider = 'google' | 'email' | 'apple'
@@ -32,13 +34,12 @@ export default function LoginPage() {
   const googleLoginContainerRef = useRef<HTMLDivElement | null>(null)
   const isNative = isNativeApp()
 
-  // 페이지 뷰
   useEffect(() => {
     if (IS_PROD && GA_ENABLED) {
       const yyyyMmDd = new Date().toISOString().slice(0, 10)
       ReactGA.event('view_login', { date: yyyyMmDd })
     }
-  }, []) // 1회 실행
+  }, [])
 
   const mapAuthError = ({
     status,
@@ -81,43 +82,34 @@ export default function LoginPage() {
     }
   }
 
-  // const decodeJwtPayload = (token: string) => {
-  //   try {
-  //     const payload = token.split('.')[1]
-  //     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
-  //     const json = decodeURIComponent(
-  //       atob(base64)
-  //         .split('')
-  //         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-  //         .join('')
-  //     )
-  //     return JSON.parse(json) as Record<string, unknown>
-  //   } catch {
-  //     return null
-  //   }
-  // }
+  const finishLogin = (user: User, provider: Provider) => {
+    setStoreId(user.id)
+    setStoreName(user.name)
+    localStorage.setItem('last_login', provider)
+    navigate(user.isOnboard ? '/' : '/onboarding')
+  }
 
-  // const decodeJwtPart = (part: string) => {
-  //   try {
-  //     const base64 = part.replace(/-/g, '+').replace(/_/g, '/')
-  //     const json = decodeURIComponent(
-  //       atob(base64)
-  //         .split('')
-  //         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-  //         .join('')
-  //     )
-  //     return JSON.parse(json) as Record<string, unknown>
-  //   } catch {
-  //     return null
-  //   }
-  // }
+  const handleNeedSignupOrLogin = (
+    res: OAuthLoginResponse,
+    idToken: string,
+    provider: Provider
+  ) => {
+    if (!res?.success) return
 
-  // const decodeJwtHeader = (token: string) => {
-  //   const headerPart = token.split('.')[0]
-  //   return headerPart ? decodeJwtPart(headerPart) : null
-  // }
+    const { needSignup, oauthUserInfo, user, accessToken } = res.data ?? {}
 
-  // const nowSec = () => Math.floor(Date.now() / 1000)
+    if (needSignup && oauthUserInfo) {
+      navigate('/signup/term', {
+        replace: true,
+        state: { fromOAuth: true, oauthUserInfo, idToken, provider },
+      })
+      return
+    }
+
+    if (user && accessToken) {
+      finishLogin(user, provider)
+    }
+  }
 
   const handleGoogleNativeLogin = async () => {
     if (!isNativeApp()) return
@@ -135,14 +127,7 @@ export default function LoginPage() {
       }
 
       const res = await oauthLogin({ provider: 'google', idToken })
-
-      if (res.success) {
-        const user = res.data.user
-        setStoreId(user.id)
-        setStoreName(user.name)
-        localStorage.setItem('last_login', 'google')
-        navigate(user.isOnboard ? '/' : '/onboarding')
-      }
+      handleNeedSignupOrLogin(res, idToken, 'google')
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status
@@ -156,9 +141,7 @@ export default function LoginPage() {
         return
       }
 
-      const msg = stringifyError(err)
-      console.error('네이티브 로그인 실패', err)
-      alert(`Google 로그인 실패 (앱)\n${msg}`)
+      alert(`Google 로그인 실패 (앱)\n${stringifyError(err)}`)
     }
   }
 
@@ -171,41 +154,15 @@ export default function LoginPage() {
         options: { scopes: ['email', 'name'] },
       })) as SocialLoginResponse
 
-      // alert(`[APPLE RESULT]\n${JSON.stringify(r.result)}`)
-
       const idToken = r.result?.idToken
       if (!idToken) {
         alert('Apple 로그인 실패 (앱)')
         return
       }
 
-      // const header = decodeJwtHeader(idToken)
-      // const payload = decodeJwtPayload(idToken)
-
-      // alert(
-      //   `[APPLE JWT]\n` +
-      //     `kid=${String(header?.kid)}\n` +
-      //     `alg=${String(header?.alg)}\n\n` +
-      //     `iss=${String(payload?.iss)}\n` +
-      //     `aud=${String(payload?.aud)}\n` +
-      //     `sub=${String(payload?.sub)}\n` +
-      //     `exp=${String(payload?.exp)} (now=${nowSec()})\n` +
-      //     `iat=${String(payload?.iat)}\n` +
-      //     `nonce=${String(payload?.nonce)}`
-      // )
-
-      // alert(`[SEND TO SERVER]\nprovider=apple\nidToken.len=${idToken.length}`)
-
       const res = await oauthLogin({ provider: 'apple', idToken })
-
-      if (res.success) {
-        const user = res.data.user
-        setStoreId(user.id)
-        setStoreName(user.name)
-        localStorage.setItem('last_login', 'apple')
-        navigate(user.isOnboard ? '/' : '/onboarding')
-      }
-    } catch (error) {
+      handleNeedSignupOrLogin(res, idToken, 'apple')
+    } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status
         const data = error.response?.data
@@ -217,7 +174,6 @@ export default function LoginPage() {
         )
         return
       }
-      console.error(error)
       alert(`Apple 로그인 실패 (앱)\n${stringifyError(error)}`)
     }
   }
@@ -251,20 +207,7 @@ export default function LoginPage() {
         return
       }
 
-      const user = res?.data?.user
-      if (user) {
-        setStoreId(user.id)
-        setStoreName(user.name)
-        localStorage.setItem('last_login', 'google')
-
-        if (IS_PROD && GA_ENABLED) {
-          ReactGA.set({ user_id: user.id })
-          const yyyyMmDd = new Date().toISOString().slice(0, 10)
-          ReactGA.event('login', { date: yyyyMmDd, method: 'oauth_google' })
-        }
-
-        navigate(user.isOnboard ? '/' : '/onboarding')
-      }
+      handleNeedSignupOrLogin(res, idToken, 'google')
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status
@@ -352,14 +295,13 @@ export default function LoginPage() {
 
   useEffect(() => {
     const stored = localStorage.getItem('last_login') as Provider | null
-    console.log(stored)
     if (stored === 'google' || stored === 'email' || stored === 'apple') {
       setLastLogin(stored)
     }
   }, [])
 
   return (
-    <div className="min-h-screen flex justify-center bg-white">
+    <div className="h-full flex justify-center bg-white">
       <div className="w-[335px] max-w-md pt-16 pb-[calc(24px+env(safe-area-inset-bottom))] flex flex-col">
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full flex justify-center">
@@ -413,7 +355,7 @@ export default function LoginPage() {
               className="bg-primary-900"
               onClick={handleAppleLogin}
             >
-              <img src={AppleLoginIcon} alt="apple" className="w-7 h-7 mr-2" />
+              <img src={AppleLoginIcon} alt="apple" className="w-7 h-7 mr-4" />
               <span className="text-subtitle text-base text-white">
                 Continue with Apple
               </span>

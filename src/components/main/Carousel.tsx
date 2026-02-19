@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { wrap } from 'framer-motion'
-import img1 from '../../assets/main/carousel1.png'
-import img2 from '../../assets/main/carousel2.png'
-import img3 from '../../assets/main/carousel3.png'
+import img1 from '../../assets/main/carousel1.webp'
+import img2 from '../../assets/main/carousel2.webp'
+import img3 from '../../assets/main/carousel3.webp'
 
 const IMAGES = [img1, img2, img3]
 

@@ -156,6 +156,13 @@ export const CHAT_ENDPOINTS = {
   // 테스트
   LAST_INTERACTIONS_TEST: (userId: string, testModel: 'a' | 'b' | 'c') =>
     `/api/chat/chatrooms/last-interactions?userId=${userId}&limit=4&testModel=${testModel}`,
+
+  // 딥링크로 채팅방 생성
+  DEEPLINK_CHATROOM: () => `/api/deeplink/chatroom/create`,
+
+  // 딥링크 그리팅 메시지
+  START_GREETING: (chatroomId: string) =>
+    `/api/chat/chatrooms/${chatroomId}/start-greeting`,
 }
 
 // Bookmark Endpoints

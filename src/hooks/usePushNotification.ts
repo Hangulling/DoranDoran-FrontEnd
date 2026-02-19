@@ -74,23 +74,22 @@ const usePushNotification = () => {
       'pushNotificationActionPerformed',
       (notification: ActionPerformed) => {
         const data = notification.notification.data
+        console.log('📦 Push Payload:', JSON.stringify(data, null, 2))
 
-        const { chatroomId, startMessage } = data
-
-        if (chatroomId) {
-          setUnread(chatroomId, false)
+        if (data.chatbotId && data.topic) {
           navigate('/', {
             state: {
               fromPush: true,
-              targetChatroomId: chatroomId, // UUID
-              startMessage: startMessage,
+              targetChatbotId: data.chatbotId,
+              targetTopic: data.topic,
+              targetConcept: data.concept || 'FRIEND',
+              startMessage: data.startMessage,
             },
           })
         }
       }
     )
 
-    // 클린업
     return () => {
       registerListener.then(l => l.remove())
       errorListener.then(l => l.remove())
