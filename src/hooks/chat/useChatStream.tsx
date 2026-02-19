@@ -75,9 +75,8 @@ export function useChatStream<T = unknown>(
         method: 'GET',
         headers: {
           Authorization: accessToken ? `Bearer ${accessToken}` : '',
-          Accept: 'text/event-stream',
+          Accept: 'text/event-stream; charset=utf-8',
           'Cache-Control': 'no-cache', // ios 강제 차단 방지
-          Connection: 'keep-alive',
         },
         signal: abortControllerRef.current.signal,
         async onopen(response) {
@@ -120,6 +119,10 @@ export function useChatStream<T = unknown>(
         },
         onerror(err) {
           console.error('[SSE Error]', err)
+          alert(
+            `[SSE 에러]\n이름: ${err?.name}\n메시지: ${err?.message}\n전체: ${JSON.stringify(err)}`
+          )
+
           if (onErrorRef.current) {
             onErrorRef.current(err)
           }
