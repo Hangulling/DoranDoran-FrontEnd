@@ -12,7 +12,11 @@ function App() {
 
   return (
     <div className="relative flex flex-col h-dvh mx-auto w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-white">
-      <Toaster position="bottom-center" />
+      <Toaster
+        containerStyle={{
+          bottom: 'env(safe-area-inset-bottom)',
+        }}
+      />
       {
         <AppLayout>
           <Suspense fallback={<LoadingSpinner />}>

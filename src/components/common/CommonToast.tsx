@@ -16,9 +16,9 @@ const iconMap: Record<IconType, JSX.Element> = {
 }
 
 const sizeStyles: Record<ToastSize, string> = {
-  default: 'mx-5 mb-[calc(20px+env(safe-area-inset-bottom))',
-  sheet: 'mx-1 mb-[72px]',
-  manager: 'mx-1 mb-[calc(92px+env(safe-area-inset-bottom))]',
+  default: 'mx-5 mb-[82px]',
+  sheet: 'mx-1 mb-18',
+  manager: 'mx-1 mb-23',
 }
 
 let toastActive = false
@@ -32,7 +32,7 @@ const showToast = ({ message, iconType, size = 'default' }: ToastProps) => {
     t => (
       <div className="w-full max-w-app md:max-w-tablet lg:max-w-desktop">
         <div
-          className={`flex items-start bg-[rgba(44,42,44,0.85)] px-4 py-[14px] rounded-[12px] gap-3
+          className={`flex items-start bg-[rgba(44,42,44,0.85)] px-4 py-[14px] rounded-xl gap-3
 					${sizeStyles[size]}
           ${t.visible ? 'animate-fade-in-up' : 'toast-slide-fade-out'}
         `}
