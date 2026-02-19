@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.3](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.0.2...v3.0.3) (2026-02-19)
+
+
+### Bug Fixes
+
+* iOS 배포 워크플로우를 bundler 기반으로 전환 ([389f5f8](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/389f5f89d20ba05f2573547a2f1616010e8f6ba2))
+
 ### [3.0.2](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.0.1...v3.0.2) (2026-02-19)
 
 
