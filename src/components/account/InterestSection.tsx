@@ -19,11 +19,13 @@ export default function InterestSection({
   initialInterest,
 }: InterestSectionProp) {
   const [isOpen, setIsOpen] = useState(false)
+  const [toggleSelected, setToggleSelected] = useState<string[]>([])
   const [selected, setSelected] = useState<string[]>([])
   const { id } = useUserStore()
 
   useEffect(() => {
     setSelected(initialInterest)
+    setToggleSelected(initialInterest)
   }, [initialInterest])
 
   const interestStep = useMemo(
@@ -34,7 +36,7 @@ export default function InterestSection({
   const options = interestStep?.options ?? []
 
   const toggle = (value: string) => {
-    setSelected(prev =>
+    setToggleSelected(prev =>
       prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
     )
   }
@@ -42,10 +44,10 @@ export default function InterestSection({
   const selectedOptions = options.filter(opt => selected.includes(opt.value))
 
   const handleSave = async () => {
-    console.log('[interests] selected(topicKeys):', selected)
     try {
-      await updateInterests(id, selected)
+      await updateInterests(id, toggleSelected)
       setIsOpen(false)
+      setSelected(toggleSelected)
       showToast({
         message: 'Your changes have been saved',
         iconType: 'checkRound',
@@ -54,7 +56,7 @@ export default function InterestSection({
       console.log(error)
       showToast({
         message: 'Failed to save changes',
-        iconType: 'error', // 너희 토스트 아이콘 타입에 맞게
+        iconType: 'error',
       })
     }
   }
@@ -96,7 +98,7 @@ export default function InterestSection({
         >
           <div className="flex flex-col gap-2 overflow-y-auto max-h-[390px]">
             {options.map(opt => {
-              const isSelected = selected.includes(opt.value)
+              const isSelected = toggleSelected.includes(opt.value)
 
               return (
                 <Button

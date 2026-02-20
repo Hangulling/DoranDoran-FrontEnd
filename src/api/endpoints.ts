@@ -52,8 +52,8 @@ export const USER_ENDPOINTS = {
   // 비밀번호 재설정
   PASSWORD_RESET: '/api/users/password/reset',
 
-  // 회원탈퇴(소프트 삭제)
-  DELETE: (userId: string) => `/api/users/${userId}`,
+  // 회원탈퇴
+  DELETE: (userId: string) => `/api/users/${userId}/hard`,
 
   // 헬스체크
   HEALTH: '/api/users/health',

@@ -13,6 +13,7 @@ import {
   GOOGLE_IOS_CLIENT_ID,
   APPLE_CLIENT_ID,
 } from './constants/env'
+import { tokenService } from './api/tokenService.ts'
 
 const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 
@@ -87,6 +88,7 @@ const queryClient = new QueryClient()
 
 prepare()
   .then(async () => {
+    await tokenService.hydrate()
     await initSocialLogin()
   })
   .then(() => {
