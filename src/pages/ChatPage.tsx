@@ -93,7 +93,7 @@ const ChatPage: React.FC = () => {
   const [tempCorrection, setTempCorrection] = useState(isCorrectionEnabled)
   const [tempTranslation, setTempTranslation] = useState(isTranslationEnabled)
   const chatroomId = id
-  const accessToken = sessionStorage.getItem('accessToken') ?? ''
+  const accessToken = localStorage.getItem('accessToken') ?? ''
 
   const routeId = useMemo(() => {
     if (location.state?.roomRouteId) {
