@@ -90,27 +90,34 @@ export default function SignupBirthDate() {
 
           navigate(user.isOnboard ? '/' : '/onboarding', { replace: true })
         } catch (e: unknown) {
-          const isAxios = axios.isAxiosError(e)
-          const status = isAxios ? e.response?.status : undefined
-          const code = status ?? 503
-          const msg = isAxios
-            ? e.response?.data?.message || 'Sign up failed.'
-            : 'Sign up failed.'
+          if (axios.isAxiosError(e)) {
+            const status = e.response?.status
+            const data = e.response?.data
 
-          alert(`
-                  OAuth Signup Error  
-                  status: ${status}
-                  message: ${msg}
-                  provider: ${provider}
-                `)
+            alert(
+              [
+                'OAuth Signup Error',
+                `status: ${status}`,
+                `provider: ${provider}`,
+                `message: ${data?.message ?? e.message}`,
+                `data: ${JSON.stringify(data)}`,
+              ].join('\n')
+            )
 
-          setSubmitError(msg)
-
-          if (status && status >= 400 && status < 500) {
+            setSubmitError(data?.message || 'Sign up failed.')
+            if (status && status >= 400 && status < 500) return
+            navigate('/error', {
+              replace: true,
+              state: { code: status ?? 503, from: 'signup' },
+            })
             return
           }
 
-          navigate('/error', { replace: true, state: { code, from: 'signup' } })
+          alert(`Unknown Error: ${String(e)}`)
+          navigate('/error', {
+            replace: true,
+            state: { code: 503, from: 'signup' },
+          })
         }
       })()
     })
