@@ -15,9 +15,12 @@ import { tokenService } from './tokenService'
 let currentUserId: string | null = null
 
 export async function login(data: LoginRequest) {
-  const res = await api.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, data)
-  const { data: resData } = res.data
-  const { accessToken, refreshToken } = resData
+  const res = await publicApi.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, data)
+  const payload = res.data
+  const resData = payload?.data ?? payload
+
+  const accessToken = resData?.accessToken
+  const refreshToken = resData?.refreshToken
 
   await tokenService.setTokens({ accessToken, refreshToken })
   await tokenService.setManualLogout(false)
@@ -30,8 +33,19 @@ export async function oauthLogin(data: OAuthLoginRequest) {
     AUTH_ENDPOINTS.OAUTH_LOGIN,
     data
   )
-  const { data: resData } = res.data
-  const { accessToken, refreshToken, needSignup } = resData
+
+  const payload = res.data
+  const resData = payload?.data ?? payload
+
+  const accessToken = resData?.accessToken
+  const refreshToken = resData?.refreshToken
+  const needSignup = resData?.needSignup
+
+  console.log('[oauthLogin parsed]', {
+    needSignup,
+    hasAccess: !!accessToken,
+    hasRefresh: !!refreshToken,
+  })
 
   if (!needSignup) {
     await tokenService.setTokens({ accessToken, refreshToken })
@@ -49,6 +63,7 @@ export async function logout() {
     if (import.meta.env.DEV) {
       console.log('🔒 로그아웃 성공:', res.data.message)
     }
+    console.log('[after setTokens]', tokenService.access, tokenService.refresh)
     return res.data
   } catch (error) {
     console.error('🚨 로그아웃 요청 중 오류 발생:', error)
