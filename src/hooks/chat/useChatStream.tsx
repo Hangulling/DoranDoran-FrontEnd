@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { getSseUrl } from '../../api'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { App } from '@capacitor/app'
+import { tokenService } from '../../api/tokenService'
 
 const eventNames = [
   'intimacy_analysis',
@@ -64,6 +65,7 @@ export function useChatStream<T = unknown>(
 
     const connect = () => {
       const sseUrl = getSseUrl(chatroomId, userId)
+      const currentToken = tokenService.access || accessToken
 
       alert(
         `[토큰 확인]\n토큰: ${accessToken ? accessToken.substring(0, 10) + '...' : '없음(비어있음)'}`
@@ -78,7 +80,7 @@ export function useChatStream<T = unknown>(
       fetchEventSource(sseUrl, {
         method: 'GET',
         headers: {
-          Authorization: accessToken ? `Bearer ${accessToken}` : '',
+          Authorization: currentToken ? `Bearer ${currentToken}` : '',
           Accept: 'text/event-stream; charset=utf-8',
           'Cache-Control': 'no-cache', // ios 강제 차단 방지
         },
