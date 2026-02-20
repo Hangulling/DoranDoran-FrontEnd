@@ -67,23 +67,29 @@ export function useChatStream<T = unknown>(
       const sseUrl = getSseUrl(chatroomId, userId)
       const currentToken = tokenService.access || accessToken
 
-      alert(
-        `[토큰 확인]\n토큰: ${accessToken ? accessToken.substring(0, 10) + '...' : '없음(비어있음)'}`
-      )
-
       // 새 연결을 맺기 전 이전 컨트롤러가 있다면 취소
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
       }
       abortControllerRef.current = new AbortController()
 
+      const fetchHeaders: Record<string, string> = {
+        Accept: 'text/event-stream; charset=utf-8',
+        'Cache-Control': 'no-cache',
+      }
+
+      if (currentToken) {
+        fetchHeaders['Authorization'] = `Bearer ${currentToken}`
+      }
+
+      // 헤더 확인
+      alert(
+        `[헤더]\n\nURL: ${sseUrl.substring(0, 40)}...\n\nHeaders:\n${JSON.stringify(fetchHeaders, null, 2)}`
+      )
+
       fetchEventSource(sseUrl, {
         method: 'GET',
-        headers: {
-          Authorization: currentToken ? `Bearer ${currentToken}` : '',
-          Accept: 'text/event-stream; charset=utf-8',
-          'Cache-Control': 'no-cache', // ios 강제 차단 방지
-        },
+        headers: fetchHeaders,
         signal: abortControllerRef.current.signal,
         async onopen(response) {
           if (response.ok) {
