@@ -8,12 +8,26 @@ import { isNativeApp } from '../../utils/isNativeApp'
 const PrivacyPolicy: React.FC = () => {
   const [imgOpen, setImgOpen] = useState<boolean>(false)
 
+  const blobToDataUrl = (blob: Blob) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onloadend = () => resolve(String(reader.result))
+      reader.onerror = reject
+      reader.readAsDataURL(blob)
+    })
+
   const openTable = async () => {
     if (isNativeApp()) {
-      const url = new URL(TermTable, window.location.href).toString()
+      const assetUrl = new URL(TermTable, window.location.origin).toString()
+
+      const res = await fetch(assetUrl)
+      if (!res.ok) throw new Error(`Failed to load asset: ${res.status}`)
+
+      const blob = await res.blob()
+      const dataUrl = await blobToDataUrl(blob)
 
       await PhotoViewer.show({
-        images: [{ url, title: 'Entrusted Parties and Tasks' }],
+        images: [{ url: dataUrl, title: 'Entrusted Parties and Tasks' }],
         mode: 'one',
       })
       return
