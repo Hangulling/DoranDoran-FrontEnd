@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.19](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.0.18...v3.0.19) (2026-02-20)
+
+
+### Bug Fixes
+
+* ios WebView 관련 UI 동작 이슈 개선 ([#321](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/321)) ([990ba42](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/990ba42a3619f7489c94652e5742299a78556466))
+
 ### [3.0.18](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.0.17...v3.0.18) (2026-02-20)
 
 
