@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, HashRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './styles/index.css'
 import React from 'react'
@@ -31,6 +31,8 @@ const logWarn = (title: string, extra?: unknown) => {
 }
 
 const isNative = isNativeApp()
+
+const Router = isNative ? HashRouter : BrowserRouter
 
 const initSocialLogin = async () => {
   if (!isNative) return
@@ -97,7 +99,7 @@ prepare()
 
     root.render(
       <React.StrictMode>
-        <BrowserRouter>
+        <Router>
           {IS_MAINTENANCE_MODE ? (
             <Routes>
               <Route path="*" element={<MaintenancePage />} />
@@ -113,7 +115,7 @@ prepare()
               </QueryClientProvider>
             </GoogleOAuthProvider>
           )}
-        </BrowserRouter>
+        </Router>
       </React.StrictMode>
     )
   })
