@@ -55,6 +55,11 @@ export function useChatStream<T = unknown>(
       return
     }
 
+    if (!accessToken) {
+      console.log('[SSE] 토큰을 기다리는 중입니다')
+      return
+    }
+
     setIsLoading(true)
     setError(null)
 
