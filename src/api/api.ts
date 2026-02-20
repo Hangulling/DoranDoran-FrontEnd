@@ -4,6 +4,7 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios'
 import { AUTH_ENDPOINTS } from './endpoints'
+import { tokenService } from './tokenService'
 
 const API_BASE_URL = (
   import.meta.env.VITE_API_BASE_URL || 'https://api.doran-chat.com'
@@ -21,30 +22,12 @@ export const publicApi = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-const tokenService = {
-  get access() {
-    return sessionStorage.getItem('accessToken') || ''
-  },
-  set access(v: string) {
-    sessionStorage.setItem('accessToken', v)
-  },
-  get refresh() {
-    return sessionStorage.getItem('refreshToken') || ''
-  },
-  set refresh(v: string) {
-    sessionStorage.setItem('refreshToken', v)
-  },
-  clear() {
-    sessionStorage.removeItem('accessToken')
-    sessionStorage.removeItem('refreshToken')
-  },
-}
-
 function emitAuthEvent(
   type: 'auth:expired' | 'auth:logout' | 'auth:inactive',
   detail?: unknown
 ) {
-  const manualLogout = sessionStorage.getItem('session:manualLogout') === '1'
+  const manualLogout = tokenService.manualLogout
+
   if (manualLogout && (type === 'auth:expired' || type === 'auth:inactive')) {
     return
   }
@@ -120,14 +103,16 @@ async function refreshAccessToken(): Promise<string | null> {
 
     if (!newAccess) throw new Error('No new access token')
 
-    tokenService.access = newAccess
-    if (newRefresh) tokenService.refresh = newRefresh
+    await tokenService.setTokens({
+      accessToken: newAccess,
+      refreshToken: newRefresh,
+    })
 
     if (import.meta.env.DEV) console.log('♻️ AccessToken 재발급 완료')
     return newAccess
   } catch (e) {
     if (import.meta.env.DEV) console.error('❌ 토큰 재발급 실패:', e)
-    tokenService.clear()
+    await tokenService.clearTokens()
     emitAuthEvent('auth:expired', { reason: 'refresh_failed' })
     return null
   }
@@ -196,13 +181,13 @@ function installResponseInterceptor(instance: AxiosInstance) {
       }
 
       if (status === 401 && originalRequest?._retry && !isAuthEndpoint) {
-        tokenService.clear()
+        await tokenService.clearTokens()
         emitAuthEvent('auth:expired', { reason: 'final_401_after_retry', url })
         return Promise.reject(error)
       }
 
       if (status === 401 && !tokenService.refresh && !isAuthEndpoint) {
-        tokenService.clear()
+        await tokenService.clearTokens()
         emitAuthEvent('auth:expired', { reason: 'no_refresh_token', url })
         return Promise.reject(error)
       }
