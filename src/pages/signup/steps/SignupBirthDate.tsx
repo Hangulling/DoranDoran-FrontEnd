@@ -96,11 +96,20 @@ export default function SignupBirthDate() {
           const msg = isAxios
             ? e.response?.data?.message || 'Sign up failed.'
             : 'Sign up failed.'
+
+          alert(`
+                  OAuth Signup Error  
+                  status: ${status}
+                  message: ${msg}
+                  provider: ${provider}
+                `)
+
           setSubmitError(msg)
 
           if (status && status >= 400 && status < 500) {
             return
           }
+
           navigate('/error', { replace: true, state: { code, from: 'signup' } })
         }
       })()
