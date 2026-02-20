@@ -10,6 +10,7 @@ import type {
 } from '../types/auth'
 import api, { publicApi } from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
+import { tokenService } from './tokenService'
 
 let currentUserId: string | null = null
 
@@ -18,13 +19,9 @@ export async function login(data: LoginRequest) {
   const { data: resData } = res.data
   const { accessToken, refreshToken } = resData
 
-  if (accessToken) {
-    sessionStorage.setItem('accessToken', accessToken)
-  }
+  await tokenService.setTokens({ accessToken, refreshToken })
+  await tokenService.setManualLogout(false)
 
-  if (refreshToken) {
-    sessionStorage.setItem('refreshToken', refreshToken)
-  }
   return res.data
 }
 
@@ -36,17 +33,16 @@ export async function oauthLogin(data: OAuthLoginRequest) {
   const { data: resData } = res.data
   const { accessToken, refreshToken, needSignup } = resData
 
-  if (!needSignup && accessToken) {
-    sessionStorage.setItem('accessToken', accessToken)
+  if (!needSignup) {
+    await tokenService.setTokens({ accessToken, refreshToken })
+    await tokenService.setManualLogout(false)
   }
-  if (!needSignup && refreshToken) {
-    sessionStorage.setItem('refreshToken', refreshToken)
-  }
+
   return res.data
 }
 
 export async function logout() {
-  sessionStorage.setItem('session:manualLogout', '1')
+  await tokenService.setManualLogout(true)
 
   try {
     const res = await api.post(AUTH_ENDPOINTS.LOGOUT)
@@ -58,16 +54,9 @@ export async function logout() {
     console.error('🚨 로그아웃 요청 중 오류 발생:', error)
     throw error
   } finally {
-    sessionStorage.removeItem('accessToken')
-    sessionStorage.removeItem('refreshToken')
-    sessionStorage.removeItem('currentUserId')
+    await tokenService.clearTokens()
+    await tokenService.clearCurrentUserId()
     currentUserId = null
-    try {
-      sessionStorage.setItem('session:logout', String(Date.now()))
-    } catch {
-      console.warn('Failed to set logout flag')
-    }
-    setTimeout(() => localStorage.removeItem('session:manualLogout'), 1500)
   }
 }
 
@@ -90,7 +79,7 @@ export async function getCurrentUser() {
     }
     currentUserId = res.data.data.id
     if (currentUserId) {
-      sessionStorage.setItem('currentUserId', currentUserId)
+      await tokenService.setCurrentUserId(currentUserId)
     }
     return res.data
   } catch (e) {

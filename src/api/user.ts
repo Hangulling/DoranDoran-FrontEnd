@@ -117,7 +117,7 @@ export const passwordReset = async (email: string): Promise<void> => {
   await api.post(USER_ENDPOINTS.PASSWORD_RESET, { email })
 }
 
-// 계정 비활성화 (소프트 삭제)
+// 계정 비활성화
 export const deleteUser = async (userId: string): Promise<void> => {
   await api.delete(USER_ENDPOINTS.DELETE(userId))
 }
