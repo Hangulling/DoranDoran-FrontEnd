@@ -135,27 +135,58 @@ export function useChatStream<T = unknown>(
           console.error('[SSE Error]', err)
           // ios 디버그
           let errorDetails = ''
+
           if (err instanceof Error) {
-            errorDetails = `Type: Error\nName: ${err.name}\nMessage: ${err.message}\nStack: ${err.stack}`
+            errorDetails += `[Type: Error]\nName: ${err.name}\nMessage: ${err.message}\nStack: ${err.stack || 'none'}`
           } else if (err instanceof Event) {
-            // XMLHttpRequest나 Fetch 실패 시 Event 객체로 넘어오는 경우
-            errorDetails = `Type: Event\nType: ${err.type}\nTarget: ${err.target ? err.target.constructor.name : 'unknown'}`
+            const targetObj = err.target as {
+              constructor?: { name?: string }
+            } | null
+            errorDetails += `[Type: Event]\nType: ${err.type}\nBubbles: ${err.bubbles}\nCancelable: ${err.cancelable}\nTarget: ${targetObj?.constructor?.name || 'unknown'}`
+          } else if (err instanceof Response) {
+            errorDetails += `[Type: Response]\nStatus: ${err.status}\nStatusText: ${err.statusText}\nURL: ${err.url}\nRedirected: ${err.redirected}`
           } else if (typeof err === 'object' && err !== null) {
+            const errObj = err as Record<string, unknown> & {
+              constructor?: { name?: string }
+            }
+            errorDetails += `[Type: Object (${errObj.constructor?.name || 'unknown'})]\n`
+
             try {
-              // 객체의 모든 key를 순회
-              const props = Object.getOwnPropertyNames(err).map(
-                key => `${key}: ${err[key]}`
+              const cache = new Set()
+              const jsonString = JSON.stringify(
+                errObj,
+                (_, value) => {
+                  if (typeof value === 'object' && value !== null) {
+                    if (cache.has(value)) return '[Circular]'
+                    cache.add(value)
+                  }
+                  return value
+                },
+                2
               )
-              errorDetails = `Type: Object\nProps:\n${props.join('\n')}`
+              errorDetails += `JSON Dump: ${jsonString.substring(0, 300)}...\n`
             } catch {
-              errorDetails = 'Object (Could not parse)'
+              errorDetails += `JSON Dump Failed.\n`
+            }
+
+            try {
+              const propDump: string[] = []
+              for (const propKey in errObj) {
+                if (typeof errObj[propKey] !== 'function') {
+                  propDump.push(`${propKey}: ${String(errObj[propKey])}`)
+                }
+              }
+              errorDetails += `Props:\n${propDump.slice(0, 10).join('\n')}...`
+            } catch {
+              errorDetails += 'Prop iteration failed.'
             }
           } else {
-            errorDetails = `Type: ${typeof err}\nValue: ${String(err)}`
+            errorDetails += `[Type: ${typeof err}]\nValue: ${String(err)}`
           }
 
-          // 상세 알림창 띄우기
-          alert(`[SSE 에러]\n\n${errorDetails}`)
+          alert(
+            `[🚨 SSE 연결 실패 디버깅]\n\n${errorDetails.substring(0, 800)}`
+          )
 
           if (onErrorRef.current) {
             onErrorRef.current(err)
