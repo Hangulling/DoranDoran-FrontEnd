@@ -21,6 +21,22 @@ type OutletContext = {
   setSubmit: (fn: () => void) => void
 }
 
+function decodeJwtPayload(token: string) {
+  try {
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    )
+    return JSON.parse(jsonPayload)
+  } catch {
+    return null
+  }
+}
+
 export default function SignupBirthDate() {
   const { birthDate, setMany } = useSignupFormStore()
   const [birthDateError, setBirthDateError] = useState<string | null>(null)
@@ -73,6 +89,18 @@ export default function SignupBirthDate() {
         }
 
         try {
+          const payload = decodeJwtPayload(idToken)
+          alert(
+            [
+              'Before confirmSignup',
+              `provider=${provider}`,
+              `iss=${payload?.iss}`,
+              `aud=${payload?.aud}`,
+              `exp=${payload?.exp}`,
+              `email=${payload?.email ?? '(none)'}`,
+            ].join('\n')
+          )
+
           const res = (await oauthLogin({
             provider,
             idToken,
@@ -90,18 +118,35 @@ export default function SignupBirthDate() {
 
           navigate(user.isOnboard ? '/' : '/onboarding', { replace: true })
         } catch (e: unknown) {
-          const isAxios = axios.isAxiosError(e)
-          const status = isAxios ? e.response?.status : undefined
-          const code = status ?? 503
-          const msg = isAxios
-            ? e.response?.data?.message || 'Sign up failed.'
-            : 'Sign up failed.'
-          setSubmitError(msg)
+          if (axios.isAxiosError(e)) {
+            const status = e.response?.status
+            const data = e.response?.data
 
-          if (status && status >= 400 && status < 500) {
+            alert(
+              [
+                'OAuth Signup Error',
+                `status: ${status}`,
+                `provider: ${provider}`,
+                `message: ${data?.message ?? e.message}`,
+                `data: ${JSON.stringify(data)}`,
+              ].join('\n')
+            )
+
+            setSubmitError(data?.message || 'Sign up failed.')
+            if (status && status >= 400 && status < 500) return
+
+            navigate('/error', {
+              replace: true,
+              state: { code: status ?? 503, from: 'signup' },
+            })
             return
           }
-          navigate('/error', { replace: true, state: { code, from: 'signup' } })
+
+          alert(`Unknown Error: ${String(e)}`)
+          navigate('/error', {
+            replace: true,
+            state: { code: 503, from: 'signup' },
+          })
         }
       })()
     })
