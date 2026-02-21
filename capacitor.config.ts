@@ -5,10 +5,10 @@ const config: CapacitorConfig = {
   appId: 'com.koach.app',
   appName: 'K-oach',
   webDir: 'dist',
-  // server: {
-  //   url: 'http://localhost:3000',
-  //   cleartext: true,
-  // },
+  server: {
+    iosScheme: 'https',
+    androidScheme: 'https',
+  },
   plugins: {
     SocialLogin: {
       providers: {
