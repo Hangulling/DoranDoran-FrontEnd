@@ -65,7 +65,12 @@ export function useChatStream<T = unknown>(
     const retryDelayInitial = 3000
 
     const connect = () => {
-      const sseUrl = getSseUrl(chatroomId, userId)
+      const baseUrl = getSseUrl(chatroomId, userId)
+
+      // iOS CORS 실패 캐싱 무력화 (Cache-Busting)
+      const sseUrl =
+        baseUrl + (baseUrl.includes('?') ? '&' : '?') + `cb=${Date.now()}`
+
       const currentToken = tokenService.access || accessToken
 
       if (isConnectingRef.current) return // 이미 연결 시도 중이면 중복 실행 방지
@@ -184,9 +189,7 @@ export function useChatStream<T = unknown>(
             errorDetails += `[Type: ${typeof err}]\nValue: ${String(err)}`
           }
 
-          alert(
-            `[🚨 SSE 연결 실패 디버깅]\n\n${errorDetails.substring(0, 800)}`
-          )
+          alert(`[SSE 연결 실패 디버깅]\n\n${errorDetails.substring(0, 800)}`)
 
           if (onErrorRef.current) {
             onErrorRef.current(err)
