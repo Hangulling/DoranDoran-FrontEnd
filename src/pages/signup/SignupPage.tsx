@@ -31,44 +31,40 @@ export default function SignupPage() {
   const currentStep = stepMap[path]
 
   const handleConfirm = () => {
+    if (!canSubmit) return
+
     if (fromOAuth) {
-      submit?.()
-      if (!canSubmit) return
       if (path === '/signup/term') {
+        submit?.()
         navigate('/signup/birthdate', {
           replace: true,
           state: location.state,
         })
+        return
+      }
+
+      if (path === '/signup/birthdate') {
+        submit?.()
+        return
       }
 
       return
     }
-
     if (path === '/signup/term') {
       submit?.()
-      if (canSubmit) {
-        navigate('/signup/name')
-      }
+      navigate('/signup/name')
     } else if (path === '/signup/name') {
       submit?.()
-      if (canSubmit) {
-        navigate('/signup/birthdate')
-      }
+      navigate('/signup/birthdate')
     } else if (path === '/signup/birthdate') {
       submit?.()
-      if (canSubmit) {
-        navigate('/signup/email')
-      }
+      navigate('/signup/email')
     } else if (path === '/signup/email') {
       submit?.()
-      if (canSubmit) {
-        navigate('/signup/password')
-      }
+      navigate('/signup/password')
     } else if (path === '/signup/password') {
       submit?.()
-      if (canSubmit) {
-        navigate('/signup/question')
-      }
+      navigate('/signup/question')
     } else if (path === '/signup/question') {
       submit?.()
     }

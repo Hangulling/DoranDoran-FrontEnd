@@ -81,6 +81,7 @@ export default function SignupBirthDate() {
 
   useEffect(() => {
     setSubmit(() => {
+      if (!isBirthDateValid) return
       if (!fromOAuth) return
       ;(async () => {
         if (!idToken || !provider) {
@@ -152,9 +153,11 @@ export default function SignupBirthDate() {
     })
   }, [
     setSubmit,
+    isBirthDateValid,
     fromOAuth,
     idToken,
     provider,
+    birthDate,
     navigate,
     setStoreId,
     setStoreName,
