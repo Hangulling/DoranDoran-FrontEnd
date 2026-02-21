@@ -36,6 +36,7 @@ export function useChatStream<T = unknown>(
   const onEventReceivedRef = useRef(onEventReceived)
   const onErrorRef = useRef(onError)
   const onOpenRef = useRef(onOpen)
+  const isConnectingRef = useRef(false) // 연결 상태 플래그
 
   useLayoutEffect(() => {
     onEventReceivedRef.current = onEventReceived
@@ -67,6 +68,9 @@ export function useChatStream<T = unknown>(
       const sseUrl = getSseUrl(chatroomId, userId)
       const currentToken = tokenService.access || accessToken
 
+      if (isConnectingRef.current) return // 이미 연결 시도 중이면 중복 실행 방지
+      isConnectingRef.current = true
+
       // 새 연결을 맺기 전 이전 컨트롤러가 있다면 취소
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
@@ -81,11 +85,6 @@ export function useChatStream<T = unknown>(
       if (currentToken) {
         fetchHeaders['Authorization'] = `Bearer ${currentToken}`
       }
-
-      // 헤더 확인
-      alert(
-        `[헤더]\n\nURL: ${sseUrl.substring(0, 40)}...\n\nHeaders:\n${JSON.stringify(fetchHeaders, null, 2)}`
-      )
 
       fetchEventSource(sseUrl, {
         method: 'GET',
@@ -107,6 +106,7 @@ export function useChatStream<T = unknown>(
           }
         },
         onmessage(msg) {
+          isConnectingRef.current = false
           if (!msg.data) return // 빈 하트비트 메시지 등 무시
 
           const parsedData = JSON.parse(msg.data)
@@ -127,9 +127,11 @@ export function useChatStream<T = unknown>(
           }
         },
         onclose() {
+          isConnectingRef.current = false
           console.log('[SSE] Connection closed by server.')
         },
         onerror(err) {
+          isConnectingRef.current = false
           console.error('[SSE Error]', err)
           // ios 디버그
           let errorDetails = ''
@@ -194,6 +196,7 @@ export function useChatStream<T = unknown>(
             abortControllerRef.current.abort()
             abortControllerRef.current = null
           }
+          isConnectingRef.current = false
         }
       }
     )
@@ -209,6 +212,7 @@ export function useChatStream<T = unknown>(
         abortControllerRef.current.abort()
         abortControllerRef.current = null
       }
+      isConnectingRef.current = false
     }
   }, [chatroomId, userId, accessToken, retryKey])
 
