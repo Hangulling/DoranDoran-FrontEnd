@@ -24,14 +24,22 @@ jobs:
         with:
           node-version: 22.x
 
+      - name: Calculate Next Version
+        id: release_drafter
+        uses: release-drafter/release-drafter@v5
+        with:
+          config-name: release-drafter.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Configure Git
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
 
-      # Standard Version 실행 (커밋 메시지 분석 -> 버전 업 -> 태그 생성 -> CHANGELOG 생성)
       - name: Run Standard Version
-        run: npx standard-version
+        run: |
+          npx standard-version --release-as ${{ steps.release_drafter.outputs.resolved_version }}
 
       # 변경사항 푸시
       - name: Push Version Commit and Tag
