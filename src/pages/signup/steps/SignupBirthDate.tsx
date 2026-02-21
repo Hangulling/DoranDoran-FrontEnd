@@ -13,6 +13,7 @@ import { oauthLogin } from '../../../api/auth'
 import { useUserStore } from '../../../stores/useUserStore'
 import type { OAuthLoginResponse } from '../../../types/auth'
 import axios from 'axios'
+import { tokenService } from '../../../api/tokenService'
 
 type Provider = 'google' | 'apple'
 
@@ -56,6 +57,11 @@ export default function SignupBirthDate() {
   const birthDateDisplay = birthDate.replace(
     /^(\d{4})(\d{0,2})(\d{0,2})$/,
     (_, y, m, d) => [y, m, d].filter(Boolean).join('-')
+  )
+
+  const birthDateFormatted = birthDate.replace(
+    /^(\d{4})(\d{2})(\d{2})$/,
+    '$1-$2-$3'
   )
 
   const handleBirthDateChange = (v: string) => {
@@ -106,6 +112,7 @@ export default function SignupBirthDate() {
             provider,
             idToken,
             confirmSignup: true,
+            birthDate: birthDateFormatted,
           })) as OAuthLoginResponse
 
           if (!res?.success) return
@@ -115,7 +122,7 @@ export default function SignupBirthDate() {
 
           setStoreId(user.id)
           setStoreName(user.name)
-          localStorage.setItem('last_login', provider)
+          await tokenService.setLastLogin(provider)
 
           navigate(user.isOnboard ? '/' : '/onboarding', { replace: true })
         } catch (e: unknown) {

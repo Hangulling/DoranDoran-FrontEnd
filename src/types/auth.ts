@@ -58,6 +58,7 @@ export interface OAuthLoginRequest {
   provider: string
   idToken: string
   confirmSignup?: boolean
+  birthDate?: string
 }
 
 export interface OAuthUserInfo {
