@@ -65,12 +65,7 @@ export function useChatStream<T = unknown>(
     const retryDelayInitial = 3000
 
     const connect = () => {
-      const baseUrl = getSseUrl(chatroomId, userId)
-
-      // iOS CORS 실패 캐싱 무력화 (Cache-Busting)
-      const sseUrl =
-        baseUrl + (baseUrl.includes('?') ? '&' : '?') + `cb=${Date.now()}`
-
+      const sseUrl = getSseUrl(chatroomId, userId)
       const currentToken = tokenService.access || accessToken
 
       if (isConnectingRef.current) return // 이미 연결 시도 중이면 중복 실행 방지
