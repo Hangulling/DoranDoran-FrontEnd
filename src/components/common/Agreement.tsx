@@ -105,7 +105,7 @@ export default function Agreement({ value, onChange }: AgreementProps) {
             </button>
 
             {(t.id === 'service' || t.id === 'privacy') && (
-              <Link to={`/policy/${id}`}>
+              <Link to={`/policy/${id}`} state={{ backTo: '/signup/term' }}>
                 <Button
                   type="button"
                   variant="text"
