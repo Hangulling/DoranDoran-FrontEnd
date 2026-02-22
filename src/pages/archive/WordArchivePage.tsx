@@ -167,10 +167,9 @@ export default function WordArchivePage() {
         <div className="flex justify-center items-center">
           <Button
             variant="text"
-            className={`w-full max-w-app md:max-w-tablet lg:max-w-desktop h-11 bg-white fixed bottom-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] pt-3 mb-6 ${
+            className={`w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-white fixed bottom-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] ${
               selectedIds.size > 0 ? 'text-system-red' : 'text-system-red-02'
             } active:text-orange-600 hover:text-orange-600`}
-            size="xl"
             onClick={() => {
               setDeleteCount(selectedIds.size)
               setOpenModal(true)
