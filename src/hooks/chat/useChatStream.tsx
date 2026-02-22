@@ -83,11 +83,16 @@ export function useChatStream<T = unknown>(
       // Preflight(OPTIONS) 우회를 위해 토큰을 헤더 대신 URL에 파라미터로 붙임
       if (currentToken) {
         const separator = sseUrl.includes('?') ? '&' : '?'
-        // 서버에서 토큰을 읽을 파라미터명
-        sseUrl += `${separator}token=${currentToken}`
+        //	토큰을 URL 인코딩
+        sseUrl += `${separator}token=${encodeURIComponent(currentToken)}`
       }
       // iOS 강제 캐싱 방지용
-      sseUrl += `&cb=${Date.now()}`
+      sseUrl += `${sseUrl.includes('?') ? '&' : '?'}cb=${Date.now()}`
+
+      console.log(
+        '[SSE] Connecting to:',
+        sseUrl.replace(/token=[^&]+/, 'token=***')
+      )
 
       // EventSourcePolyfill 초기화
       const es = new EventSourcePolyfill(sseUrl, {

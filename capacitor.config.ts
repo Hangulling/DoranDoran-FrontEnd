@@ -8,6 +8,7 @@ const config: CapacitorConfig = {
   server: {
     iosScheme: 'https',
     androidScheme: 'https',
+    allowNavigation: ['api.doran-chat.com', '*.doran-chat.com'],
   },
   plugins: {
     SocialLogin: {
