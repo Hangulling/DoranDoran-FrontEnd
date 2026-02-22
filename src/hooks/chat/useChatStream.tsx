@@ -1,8 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { getSseUrl } from '../../api'
-import { EventSourcePolyfill } from 'event-source-polyfill'
+import { Capacitor } from '@capacitor/core'
 import { App } from '@capacitor/app'
+import { EventSourcePolyfill } from 'event-source-polyfill'
+import { getSseUrl } from '../../api'
 import { tokenService } from '../../api/tokenService'
+import { useWebSocket } from './useWebSocket'
 
 const eventNames = [
   'intimacy_analysis',
@@ -19,14 +21,16 @@ export interface UseChatStreamResult {
   error: Error | null
 }
 
-export function useChatStream<T = unknown>(
+// 1. 기존 SSE 로직 (안드로이드, 웹 용)
+function useChatStreamOverSse<T = unknown>(
   chatroomId: string,
   userId?: string,
   accessToken?: string,
   onEventReceived?: (eventType: string, data: T) => void,
   onError?: (event: Event | unknown) => void,
   onOpen?: () => void,
-  retryKey: number = 0
+  retryKey: number = 0,
+  enabled: boolean = true // 활성화 플래그 추가
 ): UseChatStreamResult {
   const eventSourceRef = useRef<EventSourcePolyfill | null>(null)
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -52,7 +56,7 @@ export function useChatStream<T = unknown>(
   }, [onOpen])
 
   useEffect(() => {
-    if (!chatroomId) {
+    if (!enabled || !chatroomId) {
       setIsLoading(false)
       setError(null)
       return
@@ -66,7 +70,7 @@ export function useChatStream<T = unknown>(
     const retryDelayInitial = 3000
 
     const connect = () => {
-      let sseUrl = getSseUrl(chatroomId, userId)
+      const sseUrl = getSseUrl(chatroomId, userId)
       const currentToken = tokenService.access || accessToken
 
       if (isConnectingRef.current) return
@@ -79,13 +83,7 @@ export function useChatStream<T = unknown>(
         clearTimeout(retryTimeoutRef.current)
       }
 
-      // iOS 강제 캐싱 방지용 찌꺼기 값 추가 (CORS 실패 캐싱 무력화용)
-      const separator = sseUrl.includes('?') ? '&' : '?'
-      sseUrl += `${separator}cb=${Date.now()}`
-
-      // ✨ 다시 헤더에 토큰을 담도록 원복
       const fetchHeaders: Record<string, string> = {
-        // Polyfill 환경에서도 캐시 컨트롤 추가
         'Cache-Control': 'no-cache',
       }
 
@@ -93,7 +91,6 @@ export function useChatStream<T = unknown>(
         fetchHeaders['Authorization'] = `Bearer ${currentToken}`
       }
 
-      // EventSourcePolyfill 초기화
       const es = new EventSourcePolyfill(sseUrl, {
         headers: fetchHeaders, // 헤더 주입
         heartbeatTimeout: 60000,
@@ -151,58 +148,6 @@ export function useChatStream<T = unknown>(
         console.error('[SSE Error]', err)
 
         es.close()
-
-        let errorDetails = ''
-
-        if (err instanceof Error) {
-          errorDetails += `[Type: Error]\nName: ${err.name}\nMessage: ${err.message}\nStack: ${err.stack || 'none'}`
-        } else if (err instanceof Event) {
-          const targetObj = err.target as {
-            constructor?: { name?: string }
-          } | null
-          errorDetails += `[Type: Event]\nType: ${err.type}\nBubbles: ${err.bubbles}\nCancelable: ${err.cancelable}\nTarget: ${targetObj?.constructor?.name || 'unknown'}`
-        } else if (err instanceof Response) {
-          errorDetails += `[Type: Response]\nStatus: ${err.status}\nStatusText: ${err.statusText}\nURL: ${err.url}\nRedirected: ${err.redirected}`
-        } else if (typeof err === 'object' && err !== null) {
-          const errObj = err as Record<string, unknown> & {
-            constructor?: { name?: string }
-          }
-          errorDetails += `[Type: Object (${errObj.constructor?.name || 'unknown'})]\n`
-
-          try {
-            const cache = new Set()
-            const jsonString = JSON.stringify(
-              errObj,
-              (_, value) => {
-                if (typeof value === 'object' && value !== null) {
-                  if (cache.has(value)) return '[Circular]'
-                  cache.add(value)
-                }
-                return value
-              },
-              2
-            )
-            errorDetails += `JSON Dump: ${jsonString.substring(0, 300)}...\n`
-          } catch {
-            errorDetails += `JSON Dump Failed.\n`
-          }
-
-          try {
-            const propDump: string[] = []
-            for (const propKey in errObj) {
-              if (typeof errObj[propKey] !== 'function') {
-                propDump.push(`${propKey}: ${String(errObj[propKey])}`)
-              }
-            }
-            errorDetails += `Props:\n${propDump.slice(0, 10).join('\n')}...`
-          } catch {
-            errorDetails += 'Prop iteration failed.'
-          }
-        } else {
-          errorDetails += `[Type: ${typeof err}]\nValue: ${String(err)}`
-        }
-
-        alert(`[SSE 연결 실패 디버깅]\n\n${errorDetails.substring(0, 800)}`)
 
         if (onErrorRef.current) {
           onErrorRef.current(err)
@@ -268,7 +213,45 @@ export function useChatStream<T = unknown>(
       }
       isConnectingRef.current = false
     }
-  }, [chatroomId, userId, accessToken, retryKey])
+  }, [chatroomId, userId, accessToken, retryKey, enabled])
 
   return { isLoading, error }
+}
+
+export function useChatStream<T = unknown>(
+  chatroomId: string,
+  userId?: string,
+  accessToken?: string,
+  onEventReceived?: (eventType: string, data: T) => void,
+  onError?: (event: Event | unknown) => void,
+  onOpen?: () => void,
+  retryKey: number = 0
+): UseChatStreamResult {
+  // iOS 네이티브 앱인지 확인
+  const isIos =
+    Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios'
+
+  const wsResult = useWebSocket(
+    chatroomId,
+    userId,
+    accessToken,
+    onEventReceived,
+    onError,
+    onOpen,
+    retryKey,
+    isIos // iOS일 때만 WebSocket 활성화
+  )
+
+  const sseResult = useChatStreamOverSse(
+    chatroomId,
+    userId,
+    accessToken,
+    onEventReceived,
+    onError,
+    onOpen,
+    retryKey,
+    !isIos // iOS가 아닐 때만 SSE 활성화
+  )
+
+  return isIos ? wsResult : sseResult
 }
