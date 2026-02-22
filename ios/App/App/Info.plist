@@ -90,10 +90,34 @@
 
         <key>NSPhotoLibraryAddUsageDescription</key>
         <string>이미지를 저장하기 위해 사진 라이브러리에 접근합니다.</string>
+
 		<key>NSAppTransportSecurity</key>
-		<dict>
-				<key>NSAllowsArbitraryLoads</key>
-				<true/>
-		</dict>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>com.koach.app</key>
+            <dict>
+                <key>NSIncludesSubdomains</key>
+                <true/>
+                <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+                <true/>
+                <key>NSTemporaryExceptionMinimumTLSVersion</key>
+                <string>TLSv1.2</string>
+            </dict>
+        </dict>
+    </dict>
+    
+    <key>NSAllowsArbitraryLoadsInWebContent</key>
+    <true/>
+    
+    <key>NSURLSessionConfiguration</key>
+    <dict>
+        <key>HTTPMaximumConnectionsPerHost</key>
+        <integer>10</integer>
+    </dict>
 </dict>
 </plist>

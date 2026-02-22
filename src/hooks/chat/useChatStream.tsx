@@ -21,7 +21,7 @@ export interface UseChatStreamResult {
   error: Error | null
 }
 
-// 1. 기존 SSE 로직 (안드로이드, 웹 용)
+// SSE 로직 (Android, Web)
 function useChatStreamOverSse<T = unknown>(
   chatroomId: string,
   userId?: string,
@@ -30,7 +30,7 @@ function useChatStreamOverSse<T = unknown>(
   onError?: (event: Event | unknown) => void,
   onOpen?: () => void,
   retryKey: number = 0,
-  enabled: boolean = true // 활성화 플래그 추가
+  enabled: boolean = true
 ): UseChatStreamResult {
   const eventSourceRef = useRef<EventSourcePolyfill | null>(null)
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -57,6 +57,7 @@ function useChatStreamOverSse<T = unknown>(
 
   useEffect(() => {
     if (!enabled || !chatroomId) {
+      console.log('[SSE] Disabled or no chatroomId')
       setIsLoading(false)
       setError(null)
       return
@@ -73,7 +74,12 @@ function useChatStreamOverSse<T = unknown>(
       const sseUrl = getSseUrl(chatroomId, userId)
       const currentToken = tokenService.access || accessToken
 
-      if (isConnectingRef.current) return
+      console.log('[SSE] 연결 시도:', sseUrl)
+
+      if (isConnectingRef.current) {
+        console.log('[SSE] 이미 연결 중')
+        return
+      }
       isConnectingRef.current = true
 
       if (eventSourceRef.current) {
@@ -92,14 +98,14 @@ function useChatStreamOverSse<T = unknown>(
       }
 
       const es = new EventSourcePolyfill(sseUrl, {
-        headers: fetchHeaders, // 헤더 주입
+        headers: fetchHeaders,
         heartbeatTimeout: 60000,
       })
 
       eventSourceRef.current = es
 
       es.onopen = () => {
-        console.log('[SSE] Connection opened')
+        console.log('[SSE] 연결 성공')
         setIsLoading(false)
         setError(null)
         isConnectingRef.current = false
@@ -116,12 +122,12 @@ function useChatStreamOverSse<T = unknown>(
 
         try {
           const parsedData = JSON.parse(msg.data)
-          console.log('[SSE Message]', parsedData)
+          console.log('[SSE] Message:', parsedData)
           if (onEventReceivedRef.current) {
             onEventReceivedRef.current('message', parsedData)
           }
         } catch (e) {
-          console.error('SSE JSON 파싱 실패', e)
+          console.error('[SSE] JSON 파싱 실패', e)
         }
       }
 
@@ -133,19 +139,19 @@ function useChatStreamOverSse<T = unknown>(
 
           try {
             const parsedData = JSON.parse(msg.data)
-            console.log(`[SSE Event: ${eventName}]`, parsedData)
+            console.log(`[SSE] Event [${eventName}]:`, parsedData)
             if (onEventReceivedRef.current) {
               onEventReceivedRef.current(eventName, parsedData)
             }
           } catch (e) {
-            console.error(`SSE 커스텀 이벤트 JSON 파싱 실패: ${eventName}`, e)
+            console.error(`[SSE] JSON 파싱 실패 [${eventName}]`, e)
           }
         })
       })
 
       es.onerror = (err: unknown) => {
         isConnectingRef.current = false
-        console.error('[SSE Error]', err)
+        console.error('[SSE] 에러:', err)
 
         es.close()
 
@@ -155,7 +161,7 @@ function useChatStreamOverSse<T = unknown>(
 
         retryCount++
         if (retryCount >= maxRetries) {
-          console.error('[SSE] 재접속 시도 최대 횟수 초과')
+          console.error('[SSE] 최대 재연결 횟수 도달')
           setError(
             err instanceof Error
               ? err
@@ -171,7 +177,7 @@ function useChatStreamOverSse<T = unknown>(
           Math.min(retryDelayInitial * Math.pow(2, retryCount), 30000) + jitter
 
         console.log(
-          `[SSE] ${delay}ms 후 재연결 시도... (시도 횟수: ${retryCount})`
+          `[SSE] ${Math.round(delay)}ms 후 재연결... (${retryCount}/${maxRetries})`
         )
         retryTimeoutRef.current = setTimeout(() => {
           connect()
@@ -183,10 +189,10 @@ function useChatStreamOverSse<T = unknown>(
       'appStateChange',
       ({ isActive }) => {
         if (isActive) {
-          console.log('[SSE] App came to foreground, reconnecting...')
+          console.log('[SSE] 포그라운드 복귀, 재연결')
           connect()
         } else {
-          console.log('[SSE] App went to background, aborting connection...')
+          console.log('[SSE] 백그라운드 전환, 연결 종료')
           if (eventSourceRef.current) {
             eventSourceRef.current.close()
             eventSourceRef.current = null
@@ -218,6 +224,7 @@ function useChatStreamOverSse<T = unknown>(
   return { isLoading, error }
 }
 
+// iOS는 WebSocket, 나머지는 SSE
 export function useChatStream<T = unknown>(
   chatroomId: string,
   userId?: string,
@@ -227,9 +234,12 @@ export function useChatStream<T = unknown>(
   onOpen?: () => void,
   retryKey: number = 0
 ): UseChatStreamResult {
-  // iOS 네이티브 앱인지 확인
   const isIos =
     Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios'
+
+  console.log('[useChatStream] Platform:', Capacitor.getPlatform())
+  console.log('[useChatStream] isNative:', Capacitor.isNativePlatform())
+  console.log('[useChatStream] Using:', isIos ? 'WebSocket' : 'SSE')
 
   const wsResult = useWebSocket(
     chatroomId,
@@ -239,7 +249,7 @@ export function useChatStream<T = unknown>(
     onError,
     onOpen,
     retryKey,
-    isIos // iOS일 때만 WebSocket 활성화
+    isIos
   )
 
   const sseResult = useChatStreamOverSse(
@@ -250,7 +260,7 @@ export function useChatStream<T = unknown>(
     onError,
     onOpen,
     retryKey,
-    !isIos // iOS가 아닐 때만 SSE 활성화
+    !isIos
   )
 
   return isIos ? wsResult : sseResult
