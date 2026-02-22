@@ -17,6 +17,7 @@ import Logoicon from '../assets/auth/koach-logo.png'
 import AppleLoginIcon from '../assets/auth/appleLogin.png'
 import type { User } from '../types/user'
 import type { OAuthLoginResponse } from '../types/auth'
+import { tokenService } from '../api/tokenService'
 
 type ErrorKind = 'wrong_email' | 'wrong_password' | 'both' | 'general' | null
 type Provider = 'google' | 'email' | 'apple'
@@ -82,14 +83,16 @@ export default function LoginPage() {
     }
   }
 
-  const finishLogin = (user: User, provider: Provider) => {
+  const finishLogin = async (user: User, provider: Provider) => {
     setStoreId(user.id)
     setStoreName(user.name)
-    localStorage.setItem('last_login', provider)
+
+    await tokenService.setLastLogin(provider)
+
     navigate(user.isOnboard ? '/' : '/onboarding')
   }
 
-  const handleNeedSignupOrLogin = (
+  const handleNeedSignupOrLogin = async (
     res: OAuthLoginResponse,
     idToken: string,
     provider: Provider
@@ -294,10 +297,8 @@ export default function LoginPage() {
   }, [location.state, navigate, location.pathname])
 
   useEffect(() => {
-    const stored = localStorage.getItem('last_login') as Provider | null
-    if (stored === 'google' || stored === 'email' || stored === 'apple') {
-      setLastLogin(stored)
-    }
+    const stored = tokenService.lastLogin
+    if (stored) setLastLogin(stored)
   }, [])
 
   return (
