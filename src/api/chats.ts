@@ -10,6 +10,7 @@ import type {
 } from '../types/chat'
 import api from './api'
 import { CHAT_ENDPOINTS } from './endpoints'
+import { tokenService } from './tokenService'
 
 // 채팅방 생성(또는 기존 채팅방 조회)
 export async function createChatRoom(
@@ -117,6 +118,19 @@ export function getSseUrl(chatroomId: string, userId?: string): string {
   }
 
   return url.toString()
+}
+
+// WebSocket
+export function getWebSocketUrl(
+  chatroomId: string,
+  userId?: string,
+  token?: string
+): string {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin
+  const wsBaseUrl = baseUrl.replace(/^http/, 'ws')
+  const jwtToken = token || tokenService.access || undefined
+  const path = CHAT_ENDPOINTS.WEBSOCKET_CHAT(chatroomId, userId, jwtToken)
+  return `${wsBaseUrl}${path}`
 }
 
 // 마지막 채팅 시간
