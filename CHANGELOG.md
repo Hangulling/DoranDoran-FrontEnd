@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.5.0...v3.6.0) (2026-02-22)
+
+
+### Features
+
+* ios 전용 webSocket 추가 ([#341](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/341)) ([b5b6a34](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/b5b6a345e4b5e688bb8fd9671ea891b6200e4c2e))
+
 ## [3.5.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.4.0...v3.5.0) (2026-02-22)
 
 
