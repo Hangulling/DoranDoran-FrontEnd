@@ -37,7 +37,7 @@ export function useChatStream<T = unknown>(
   const onEventReceivedRef = useRef(onEventReceived)
   const onErrorRef = useRef(onError)
   const onOpenRef = useRef(onOpen)
-  const isConnectingRef = useRef(false) // 연결 상태 플래그
+  const isConnectingRef = useRef(false)
 
   useLayoutEffect(() => {
     onEventReceivedRef.current = onEventReceived
@@ -69,10 +69,9 @@ export function useChatStream<T = unknown>(
       let sseUrl = getSseUrl(chatroomId, userId)
       const currentToken = tokenService.access || accessToken
 
-      if (isConnectingRef.current) return // 이미 연결 시도 중이면 중복 실행 방지
+      if (isConnectingRef.current) return
       isConnectingRef.current = true
 
-      // 새 연결을 맺기 전 이전 연결 및 타이머가 있다면 취소
       if (eventSourceRef.current) {
         eventSourceRef.current.close()
       }
@@ -80,34 +79,33 @@ export function useChatStream<T = unknown>(
         clearTimeout(retryTimeoutRef.current)
       }
 
-      // Preflight(OPTIONS) 우회를 위해 토큰을 헤더 대신 URL에 파라미터로 붙임
-      if (currentToken) {
-        const separator = sseUrl.includes('?') ? '&' : '?'
-        //	토큰을 URL 인코딩
-        sseUrl += `${separator}token=${encodeURIComponent(currentToken)}`
-      }
-      // iOS 강제 캐싱 방지용
-      sseUrl += `${sseUrl.includes('?') ? '&' : '?'}cb=${Date.now()}`
+      // iOS 강제 캐싱 방지용 찌꺼기 값 추가 (CORS 실패 캐싱 무력화용)
+      const separator = sseUrl.includes('?') ? '&' : '?'
+      sseUrl += `${separator}cb=${Date.now()}`
 
-      console.log(
-        '[SSE] Connecting to:',
-        sseUrl.replace(/token=[^&]+/, 'token=***')
-      )
+      // ✨ 다시 헤더에 토큰을 담도록 원복
+      const fetchHeaders: Record<string, string> = {
+        // Polyfill 환경에서도 캐시 컨트롤 추가
+        'Cache-Control': 'no-cache',
+      }
+
+      if (currentToken) {
+        fetchHeaders['Authorization'] = `Bearer ${currentToken}`
+      }
 
       // EventSourcePolyfill 초기화
       const es = new EventSourcePolyfill(sseUrl, {
-        headers: {},
-        heartbeatTimeout: 60000, // 연결 끊김 감지 타임아웃
+        headers: fetchHeaders, // 헤더 주입
+        heartbeatTimeout: 60000,
       })
 
       eventSourceRef.current = es
 
-      // 연결 성공 시
       es.onopen = () => {
         console.log('[SSE] Connection opened')
         setIsLoading(false)
         setError(null)
-        isConnectingRef.current = false // 완료되었으므로 false
+        isConnectingRef.current = false
 
         if (onOpenRef.current) {
           onOpenRef.current()
@@ -115,7 +113,6 @@ export function useChatStream<T = unknown>(
         retryCount = 0
       }
 
-      // 일반 메시지 수신
       es.onmessage = (msg: MessageEvent) => {
         isConnectingRef.current = false
         if (!msg.data) return
@@ -131,7 +128,6 @@ export function useChatStream<T = unknown>(
         }
       }
 
-      // 커스텀 이벤트 수신
       eventNames.forEach(eventName => {
         es.addEventListener(eventName, (e: Event) => {
           const msg = e as MessageEvent
@@ -150,14 +146,12 @@ export function useChatStream<T = unknown>(
         })
       })
 
-      // 에러 발생
       es.onerror = (err: unknown) => {
         isConnectingRef.current = false
         console.error('[SSE Error]', err)
 
         es.close()
 
-        // iOS 디버그
         let errorDetails = ''
 
         if (err instanceof Error) {
@@ -214,7 +208,6 @@ export function useChatStream<T = unknown>(
           onErrorRef.current(err)
         }
 
-        // 재연결
         retryCount++
         if (retryCount >= maxRetries) {
           console.error('[SSE] 재접속 시도 최대 횟수 초과')
@@ -224,7 +217,7 @@ export function useChatStream<T = unknown>(
               : new Error('SSE connection failed after max retries')
           )
           setIsLoading(false)
-          return // 최대 횟수 초과 시 재연결 중단
+          return
         }
 
         setIsLoading(true)
@@ -241,7 +234,6 @@ export function useChatStream<T = unknown>(
       }
     }
 
-    // 백그라운드/포그라운드 상태 감지
     const appStateListenerPromise = App.addListener(
       'appStateChange',
       ({ isActive }) => {
@@ -262,10 +254,8 @@ export function useChatStream<T = unknown>(
       }
     )
 
-    // 최초 연결
     connect()
 
-    // 컴포넌트 언마운트 시 정리
     return () => {
       appStateListenerPromise.then(listener => listener.remove())
 
