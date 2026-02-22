@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import LeftArrowIcon from '../../assets/icon/leftArrow.svg?react'
 import HomeIcon from '../../assets/icon/home.svg?react'
 import MyIcon from '../../assets/icon/my.svg?react'
@@ -18,6 +18,7 @@ const NavBar: React.FC<NavBarProps & { position?: 'top' | 'bottom' }> = ({
   position = 'bottom',
 }) => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { goBack, isChatPage } = useNavBar()
 
   const {
@@ -58,7 +59,7 @@ const NavBar: React.FC<NavBarProps & { position?: 'top' | 'bottom' }> = ({
         ${isChatPage ? '' : positionStyle}`}
       >
         {position === 'bottom' ? (
-          <div className="flex w-full justify-between items-center px-[40px] h-full">
+          <div className="flex w-full justify-between items-center px-10 h-full">
             <button
               onClick={() => navigate('/archive')}
               className={iconColor('/archive')}
