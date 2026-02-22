@@ -149,6 +149,16 @@ export const CHAT_ENDPOINTS = {
   MESSAGE_STREAM: (chatroomId: string, userId?: string) =>
     `/api/chat/stream/${chatroomId}${userId ? `?userId=${userId}` : ''}`,
 
+  // WebSocket - iOS
+  WEBSOCKET_CHAT: (chatroomId: string, userId?: string, token?: string) => {
+    const params = new URLSearchParams()
+    if (userId) params.append('userId', userId)
+    if (token) params.append('token', token)
+
+    const queryString = params.toString()
+    return `/ws/chat/${chatroomId}${queryString ? `?${queryString}` : ''}`
+  },
+
   // 마지막 채팅 시간
   LAST_INTERACTIONS: (userId: string) =>
     `/api/chat/chatrooms/last-interactions?userId=${userId}&limit=4`,
