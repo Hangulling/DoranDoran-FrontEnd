@@ -126,7 +126,8 @@ export function getWebSocketUrl(
   userId?: string,
   token?: string
 ): string {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin
+  let baseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin
+  baseUrl = baseUrl.replace(/\/$/, '')
   const wsBaseUrl = baseUrl.replace(/^http/, 'ws')
   const jwtToken = token || tokenService.access || undefined
   const path = CHAT_ENDPOINTS.WEBSOCKET_CHAT(chatroomId, userId, jwtToken)
