@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.7.4](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.7.3...v3.7.4) (2026-02-24)
+
+
+### Bug Fixes
+
+* 뒤로가기 흰화면 오류 수정 ([deb5034](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/deb5034851f63bbae5c1cee89ff104a7434e3b84))
+
 ### [3.7.3](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.7.2...v3.7.3) (2026-02-24)
 
 ### [3.7.2](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.7.1...v3.7.2) (2026-02-24)
