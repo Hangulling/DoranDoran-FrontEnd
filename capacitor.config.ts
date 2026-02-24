@@ -6,6 +6,9 @@ const config: CapacitorConfig = {
   appName: 'K-oach',
   webDir: 'dist',
   plugins: {
+    PushNotifications: {
+      presentationOptions: ['badge', 'sound', 'alert'],
+    },
     SocialLogin: {
       providers: {
         google: true,
