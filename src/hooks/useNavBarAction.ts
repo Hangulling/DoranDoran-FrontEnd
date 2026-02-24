@@ -39,7 +39,10 @@ export function useNavBar() {
     if (policyMatch) {
       const backTo = location.state?.backTo as string | undefined
       if (backTo) {
-        navigate(backTo, { replace: true, state: { fromPolicy: true } })
+        navigate(backTo, {
+          replace: true,
+          state: { ...(location.state ?? {}), fromPolicy: true },
+        })
         return
       }
       navigate(-1)
