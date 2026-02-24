@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { App } from '@capacitor/app'
-import { getWebSocketUrl } from '../../api'
+//import { getWebSocketUrl } from '../../api'
 import { tokenService } from '../../api/tokenService'
 
 export function useWebSocket<T>(
@@ -63,7 +63,8 @@ export function useWebSocket<T>(
           return
         }
 
-        const url = getWebSocketUrl(chatroomId, userId, token)
+        // const url = getWebSocketUrl(chatroomId, userId, token)
+        const url = 'wss://ws.postman-echo.com/raw'
         console.log('[WebSocket] 연결 시도')
         console.log('[WebSocket] chatroomId:', chatroomId)
         console.log('[WebSocket] userId:', userId)
