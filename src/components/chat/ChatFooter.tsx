@@ -115,7 +115,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const isSendActive = !disabled && inputValue.trim().length > 0
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center">
+    <div className="absolute inset-x-0 bottom-0 z-50 flex justify-center">
       <div
         className={`w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_rgba(0,0,0,0.06)]`}
       >
