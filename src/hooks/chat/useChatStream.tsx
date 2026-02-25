@@ -99,7 +99,7 @@ function useChatStreamOverSse<T = unknown>(
 
       const es = new EventSourcePolyfill(sseUrl, {
         headers: fetchHeaders,
-        heartbeatTimeout: 60000,
+        heartbeatTimeout: 3600000,
       })
 
       eventSourceRef.current = es
