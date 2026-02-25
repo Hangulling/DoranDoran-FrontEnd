@@ -110,8 +110,8 @@ export default function Agreement({ value, onChange }: AgreementProps) {
               <Link
                 to={`/policy/${id}`}
                 state={{
-                  backTo: '/signup/term',
                   ...(location.state ?? {}),
+                  backTo: '/signup/term',
                 }}
               >
                 <Button
