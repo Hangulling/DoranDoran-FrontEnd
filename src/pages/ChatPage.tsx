@@ -333,7 +333,7 @@ const ChatPage: React.FC = () => {
   }, [messages])
 
   return (
-    <div className="flex flex-col h-full bg-gray-0">
+    <div className="flex flex-col h-dvh bg-gray-0">
       <ChatHeader
         title={room?.roomName || 'Chat'}
         avatar={room?.avatar}
