@@ -207,6 +207,7 @@ function useChatStreamOverSse<T = unknown>(
 
     connect()
 
+    // 컴포넌트 언마운트 시 정리
     return () => {
       appStateListenerPromise.then(listener => listener.remove())
 
