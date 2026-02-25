@@ -32,7 +32,7 @@ const ToastMessage = ({ message, iconType }: ToastMessageProps) => {
   }
 
   return (
-    <div className="flex items-start mb-[20px] bg-[rgba(15,16,16,0.8)] px-[14px] py-[16px] rounded-[12px] gap-[8px]">
+    <div className="flex items-start mb-5 bg-[rgba(15,16,16,0.8)] px-3.5 py-4 rounded-xl gap-2">
       {iconType && iconMap[iconType]}
       <span className="text-subtitle text-[14px] text-white">{message}</span>
     </div>
@@ -123,7 +123,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
         <div className="absolute bottom-full w-full left-0 flex justify-center pointer-events-none">
           {toast && (
             <div
-              className={`mx-[20px] ${isToastVisible ? 'toast-slide-fade-in' : 'toast-slide-fade-out'}`}
+              className={`mx-5 ${isToastVisible ? 'toast-slide-fade-in' : 'toast-slide-fade-out'}`}
             >
               <ToastMessage message={toast.message} iconType={toast.iconType} />
             </div>
@@ -131,8 +131,8 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
         </div>
 
         {/* textarea */}
-        <div className="w-full px-5 pt-[10px] pb-[calc(10px+env(safe-area-inset-bottom))]">
-          <div className="relative w-full px-4 py-[15px] bg-[#f1f1f1] border-[#f1f1f1] rounded-[22px] overflow-hidden text-14px min-h-[51px]">
+        <div className="w-full px-5 pt-2.5 pb-[calc(10px+env(safe-area-inset-bottom))]">
+          <div className="relative w-full px-4 py-3.75 bg-[#f1f1f1] border-[#f1f1f1] rounded-[22px] overflow-hidden text-14px min-h-[51px]">
             <textarea
               ref={inputRef}
               placeholder="Type a message"
@@ -141,19 +141,20 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
               onCompositionEnd={handleCompositionEnd}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
+              disabled={disabled}
               rows={1}
               style={{
                 height: textareaHeight,
                 lineHeight: `${LINE_HEIGHT}px`,
                 resize: 'none',
               }}
-              className="w-full pr-[46px] bg-transparent border-none outline-none focus:ring-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] block p-0 m-0"
+              className="w-full pr-11.5 bg-transparent border-none outline-none focus:ring-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] block p-0 m-0"
             />
 
             {isAiResponding ? (
               <button
                 onClick={onCancel}
-                className="absolute bottom-[10px] right-4 flex items-center justify-center transition-opacity duration-200"
+                className="absolute bottom-2.5 right-4 flex items-center justify-center transition-opacity duration-200"
               >
                 <img src={PauseIcon} alt="중지" />
               </button>
@@ -161,7 +162,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
               isSendActive && (
                 <button
                   onClick={handleSendClick}
-                  className="absolute bottom-[10px] right-4 flex items-center justify-center transition-opacity duration-200"
+                  className="absolute bottom-2.5 right-4 flex items-center justify-center transition-opacity duration-200"
                 >
                   <img src={SendIcon} alt="보내기" />
                 </button>
