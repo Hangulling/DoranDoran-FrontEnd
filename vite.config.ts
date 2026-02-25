@@ -7,29 +7,7 @@ export default defineConfig({
   server: {
     port: 3000, // 3000번 포트 고정
   },
-  build: {
+   build: {
     outDir: 'dist',
-    rollupOptions: {
-      output: {
-        manualChunks: id => {
-          if (id.includes('node_modules')) {
-            if (
-              id.includes('react') ||
-              id.includes('react-dom') ||
-              id.includes('react-router')
-            ) {
-              return 'vendor-react'
-            }
-            if (id.includes('@capacitor')) {
-              return 'vendor-capacitor'
-            }
-            if (id.includes('zustand')) {
-              return 'vendor-store'
-            }
-            return 'vendor'
-          }
-        },
-      },
-    },
   },
 })
