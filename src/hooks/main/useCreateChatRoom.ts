@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
-import { createChatRoom } from '../api'
-import useRoomIdStore from '../stores/useRoomIdStore'
-import useClosenessStore from '../stores/useClosenessStore'
-import showToast from '../components/common/CommonToast'
+import { createChatRoom } from '../../api'
+import useRoomIdStore from '../../stores/useRoomIdStore'
+import useClosenessStore from '../../stores/useClosenessStore'
+import showToast from '../../components/common/CommonToast'
 
 interface CreateChatRoomParams {
   userId: string
