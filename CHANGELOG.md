@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.9.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.8.0...v3.9.0) (2026-02-25)
+
+
+### Features
+
+* 푸시 컨셉별 아이콘 추가 ([#353](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/353)) ([acd25a6](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/acd25a66a58ec571cb62a28de5fe0a8c4b1046d4))
+
+
+### Bug Fixes
+
+* 뒤로가기 클릭시 화면 오류 수정 ([62b5026](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/62b5026d5858c27dc6780c941a4e9d6417379b60))
+
 ## [3.8.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.7.4...v3.8.0) (2026-02-24)
 
 ### [3.7.4](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.7.3...v3.7.4) (2026-02-24)
