@@ -49,11 +49,11 @@ export default function OnboardingContent({
     <div className="flex flex-col h-full animate-fadeIn">
       {/* 타이틀 */}
       <div className="shrink-0">
-        <div className="mb-[30px]">
+        <div className="mb-7.5">
           <h2 className="text-[24px] text-display whitespace-pre-wrap mb-1">
             {stepData.title}
           </h2>
-          <p className="text-body text-gray-300 text-[14px] min-h-[21px]">
+          <p className="text-body text-gray-300 text-[14px] min-h-5.25">
             {stepData.description}
           </p>
         </div>
@@ -64,8 +64,8 @@ export default function OnboardingContent({
         <div
           className={
             isGrid
-              ? 'grid grid-cols-2 gap-[10px]' // Grid 모드
-              : 'flex flex-col gap-[10px]' // List 모드
+              ? 'grid grid-cols-2 gap-2.5' // Grid 모드
+              : 'flex flex-col gap-2.5' // List 모드
           }
         >
           {stepData.options.map(optionItem => {
@@ -77,7 +77,7 @@ export default function OnboardingContent({
                 key={value}
                 onClick={() => onSelect(value)}
                 className={`
-                relative rounded-[12px] transition-all duration-200 overflow-hidden border
+                relative rounded-xl transition-all duration-200 overflow-hidden border
                 ${
                   isSelected
                     ? 'bg-primary-10 border-primary-200'
@@ -85,8 +85,8 @@ export default function OnboardingContent({
                 }
                 ${
                   isGrid
-                    ? 'flex flex-col items-start justify-center h-[102px] gap-1 px-5 py-[14px]'
-                    : 'w-full min-h-[49px] px-5 flex items-center justify-start gap-[10px] py-[14px]'
+                    ? 'flex flex-col items-start justify-center h-25.5 gap-1 px-5 py-3.5'
+                    : 'w-full min-h-12.25 px-5 flex items-center justify-start gap-2.5 py-3.5'
                 }
               `}
               >
@@ -125,7 +125,7 @@ export default function OnboardingContent({
           <div
             onClick={() => onSelect(ETC_VALUE)}
             className={`
-            w-full mt-[10px] py-[14px] rounded-xl border transition-all duration-200 cursor-pointer overflow-hidden
+            w-full mt-2.5 py-3.5 rounded-xl border transition-all duration-200 cursor-pointer overflow-hidden
              ${
                isEtcSelected
                  ? 'bg-primary-10 border-primary-200'

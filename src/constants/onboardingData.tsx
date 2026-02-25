@@ -56,7 +56,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
         value: '1',
         label: (
           <span>
-            <span className="text-gray-400 text-[12px] mr-[10px]">lv.1</span>
+            <span className="text-gray-400 text-[12px] mr-2.5">lv.1</span>
             Just getting started
           </span>
         ),
@@ -65,7 +65,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
         value: '2',
         label: (
           <span>
-            <span className="text-gray-400 text-[12px] mr-[10px]">lv.2</span>
+            <span className="text-gray-400 text-[12px] mr-2.5">lv.2</span>
             Know some basic words
           </span>
         ),
@@ -74,7 +74,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
         value: '3',
         label: (
           <span>
-            <span className="text-gray-400 text-[12px] mr-[10px]">lv.3</span>
+            <span className="text-gray-400 text-[12px] mr-2.5">lv.3</span>
             Can hold simple conversations
           </span>
         ),
@@ -83,7 +83,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
         value: '4',
         label: (
           <span>
-            <span className="text-gray-400 text-[12px] mr-[10px]">lv.4</span>
+            <span className="text-gray-400 text-[12px] mr-2.5">lv.4</span>
             Comfortable with many topics
           </span>
         ),
@@ -92,7 +92,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
         value: '5',
         label: (
           <span>
-            <span className="text-gray-400 text-[12px] mr-[10px]">lv.5</span>
+            <span className="text-gray-400 text-[12px] mr-2.5">lv.5</span>
             Comfortable discussing specific topics
           </span>
         ),

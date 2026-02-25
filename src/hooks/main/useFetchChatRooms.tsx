@@ -1,12 +1,12 @@
 import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { getLastInteractions } from '../api'
-import { MAIN_DATA } from '../constants/mainData'
-import { getDaysDiff } from '../utils/getDaysDiff'
-import { getChatbotValueById } from '../utils/chatbotMap'
-import type { ChatRoomWithMessage } from '../types/main'
-import useUnreadStore from '../stores/useUnreadStore'
+import { getLastInteractions } from '../../api'
+import { MAIN_DATA } from '../../constants/mainData'
+import { getDaysDiff } from '../../utils/getDaysDiff'
+import { getChatbotValueById } from '../../utils/chatbotMap'
+import type { ChatRoomWithMessage } from '../../types/main'
+import useUnreadStore from '../../stores/useUnreadStore'
 
 const getStatusMessage = (diffDays: number | undefined): string => {
   if (diffDays === undefined) return 'Start your first chat now'

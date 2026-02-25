@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
 import { useSlider } from '../hooks/useSlider'
-import { updateOnboarding } from '../api'
 import { useUserStore } from '../stores/useUserStore'
 import OnboardingContent from '../components/onboarding/OnboardingContent'
 import ProgressBar from '../components/common/ProgressBar'
@@ -9,15 +8,16 @@ import { useState } from 'react'
 import { ONBOARDING_STEPS } from '../constants/onboardingData'
 import LeftArrowIcon from '../assets/icon/leftArrow.svg?react'
 import type { OnboardingPayload } from '../types/user'
-import { Capacitor } from '@capacitor/core'
-import { PushNotifications } from '@capacitor/push-notifications'
+import { useCompleteOnboarding } from '../hooks/useCompleteOnboarding'
+
+const ETC_VALUE = 'Other'
 
 export default function OnboardingPage() {
   const navigate = useNavigate()
   const userId = useUserStore(state => state.id)
+  const { completeOnboarding } = useCompleteOnboarding(userId)
 
   const { page, paginate } = useSlider(ONBOARDING_STEPS.length)
-
   const [selections, setSelections] = useState<Record<number, string[]>>({})
   const [etcValues, setEtcValues] = useState<Record<number, string>>({})
   const [etcText, setEtcText] = useState('')
@@ -27,10 +27,7 @@ export default function OnboardingPage() {
 
   // 현재 단계의 선택된 값들
   const currentSelections = selections[page] || []
-
-  const ETC_VALUE = 'Other'
   const isEtcSelected = currentSelections.includes(ETC_VALUE)
-
   // 버튼 활성화 조건
   const isNextEnabled =
     currentSelections.length > 0 &&
@@ -64,101 +61,41 @@ export default function OnboardingPage() {
     const payload: OnboardingPayload = {}
 
     // Referral Source
-    const referralSelection = selections[0]?.[0]
-    if (referralSelection) {
-      if (referralSelection === ETC_VALUE) {
-        payload.referralSource = 'other'
+    if (selections[0]?.[0]) {
+      payload.referralSource =
+        selections[0][0] === ETC_VALUE ? 'other' : selections[0][0]
+      if (payload.referralSource === 'other')
         payload.referralOther = etcValues[0] || ''
-      } else {
-        payload.referralSource = referralSelection
-      }
     }
 
     // Korean Level
-    const levelSelection = selections[1]?.[0]
-    if (levelSelection) {
-      payload.koreanLevel = Number(levelSelection)
-    }
+    if (selections[1]?.[0]) payload.koreanLevel = Number(selections[1][0])
 
     // Purpose
-    const purposeSelections = selections[2] || []
-    if (purposeSelections.length > 0) {
-      if (purposeSelections.includes(ETC_VALUE)) {
-        payload.purposeKey = 'other'
+    if (selections[2]?.length) {
+      payload.purposeKey = selections[2].includes(ETC_VALUE)
+        ? 'other'
+        : selections[2][0]
+      if (payload.purposeKey === 'other')
         payload.purposeOther = etcValues[2] || ''
-      } else {
-        payload.purposeKey = purposeSelections[0]
-      }
     }
 
     // Topic Keys
-    const topicSelections = selections[3] || []
-    if (topicSelections.length > 0) {
-      payload.topicKeys = topicSelections
-    }
+    if (selections[3]?.length) payload.topicKeys = selections[3]
 
     // Push Enabled
-    const pushSelection = selections[4]?.[0]
-    if (pushSelection) {
-      payload.pushEnabled = pushSelection === 'yes'
-    }
+    if (selections[4]?.[0]) payload.pushEnabled = selections[4][0] === 'yes'
 
     return payload
   }
 
-  // 알림 권한 요청
-  const registerPush = async () => {
-    if (!Capacitor.isNativePlatform()) return
-
-    try {
-      let permStatus = await PushNotifications.checkPermissions()
-
-      if (permStatus.receive === 'prompt') {
-        permStatus = await PushNotifications.requestPermissions()
-      }
-
-      if (permStatus.receive === 'granted') {
-        await PushNotifications.register()
-      }
-    } catch (e) {
-      console.error('Push registration failed during onboarding', e)
-    }
-  }
-
-  // 완료 처리 (Skip 포함)
-  const handleCompleteOnboarding = async (skip: boolean = false) => {
-    if (!userId) {
-      console.error('User ID를 찾을 수 없습니다.')
-      navigate('/', { replace: true })
-      return
-    }
-
-    try {
-      const payload = createPayload()
-
-      if (skip) {
-        payload.pushEnabled = false
-      } else {
-        if (payload.pushEnabled === undefined) {
-          payload.pushEnabled = false
-        }
-      }
-
-      await updateOnboarding(userId, payload)
-      console.log('온보딩 완료 처리 성공')
-
-      // 권한 요청
-      if (payload.pushEnabled) {
-        await registerPush()
-      }
-
-      navigate('/', {
-        replace: true,
-        state: { showOnboardingModal: true },
-      })
-    } catch (error) {
-      console.error('온보딩 완료 처리 실패', error)
-      navigate('/', { replace: true })
+  const handleAction = (isCompleting: boolean) => {
+    if (isCompleting) {
+      completeOnboarding(createPayload(), false)
+    } else {
+      setEtcValues(prev => ({ ...prev, [page]: etcText }))
+      setEtcText(etcValues[page + 1] || '')
+      paginate(1)
     }
   }
 
@@ -171,19 +108,6 @@ export default function OnboardingPage() {
       paginate(-1)
     } else {
       navigate(-1)
-    }
-  }
-
-  // 다음 버튼
-  const handleNextClick = () => {
-    if (page < ONBOARDING_STEPS.length - 1) {
-      // 현재 페이지 Etc 내용 저장 후 이동
-      setEtcValues(prev => ({ ...prev, [page]: etcText }))
-      // 다음 페이지에 저장된 Etc 내용이 있다면 불러오기 (이미 갔던 페이지일 경우)
-      setEtcText(etcValues[page + 1] || '')
-      paginate(1)
-    } else {
-      handleCompleteOnboarding(false)
     }
   }
 
@@ -218,35 +142,20 @@ export default function OnboardingPage() {
 
       {/* 버튼 */}
       <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center pb-[env(safe-area-inset-bottom)]">
-        <div className="w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] h-18 px-5 py-[10px]">
-          {isLastPage ? (
-            <Button
-              type="submit"
-              className="bg-gray-800"
-              variant="primary"
-              size="confirm"
-              disabled={!isNextEnabled}
-              onClick={e => {
-                e.stopPropagation()
-                handleCompleteOnboarding(false)
-              }}
-            >
-              Complete
-            </Button>
-          ) : (
-            <Button
-              className="bg-gray-800"
-              variant="primary"
-              size="confirm"
-              disabled={!isNextEnabled}
-              onClick={e => {
-                e.stopPropagation()
-                handleNextClick()
-              }}
-            >
-              Next
-            </Button>
-          )}
+        <div className="w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] h-18 px-5 py-2.5">
+          <Button
+            type={isLastPage ? 'submit' : 'button'}
+            className="bg-gray-800"
+            variant="primary"
+            size="confirm"
+            disabled={!isNextEnabled}
+            onClick={e => {
+              e.stopPropagation()
+              handleAction(isLastPage)
+            }}
+          >
+            {isLastPage ? 'Complete' : 'Next'}
+          </Button>
         </div>
       </div>
     </div>
