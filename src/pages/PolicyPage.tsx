@@ -9,13 +9,12 @@ export default function PolicyPage() {
   const navigate = useNavigate()
 
   const location = useLocation()
-  const path = location.pathname
   const setOne = useAgreementStore(s => s.setOne)
 
   const handleConfirm = () => {
     if (!id) return
     setOne(id, true)
-    navigate('/signup/term', { replace: true, state: { fromPolicy: true } })
+    navigate(-1)
   }
 
   const search = new URLSearchParams(location.search)
@@ -25,7 +24,7 @@ export default function PolicyPage() {
   return (
     <div className="bg-white">
       <div className="max-w-4xl mx-auto px-6 py-10 pb-28 text-gray-800 leading-relaxed">
-        {path === '/policy/privacy' ? <PrivacyPolicy /> : <ServicePolicy />}
+        {id === 'privacy' ? <PrivacyPolicy /> : <ServicePolicy />}
       </div>
 
       {!hideConfirm && (
