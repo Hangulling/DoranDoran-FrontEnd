@@ -56,6 +56,8 @@ export default function SignupQuestion() {
   }
 
   const handleConfirmModal = async () => {
+    alert('Start button clicked')
+
     setOpenModal(false)
     setSubmitError(null)
 
@@ -72,24 +74,36 @@ export default function SignupQuestion() {
         marketingOption: agreements.marketing,
       }
 
-      const res = await createUser(payload)
-      if (import.meta.env.DEV) console.log('🎉 회원가입 성공:', res)
+      alert('Sending request...\n' + JSON.stringify(payload))
 
-      resetForm()
-      resetAgreements()
+      const res = await createUser(payload)
+
+      alert('SUCCESS:\n' + JSON.stringify(res))
+
       navigate('/login', { replace: true })
+      setTimeout(() => {
+        resetForm()
+        resetAgreements()
+      }, 0)
     } catch (e: unknown) {
       const isAxios = axios.isAxiosError(e)
       const status = isAxios ? e.response?.status : undefined
+      const data = isAxios ? e.response?.data : undefined
       const code = status ?? 503
       const msg = isAxios
         ? e.response?.data?.message || 'Sign up failed.'
         : 'Sign up failed.'
-      setSubmitError(msg)
+
+      alert(
+        `ERROR 발생\n\nstatus: ${status}\ncode: ${code}\nmessage: ${msg}\ndata: ${JSON.stringify(
+          data
+        )}`
+      )
 
       if (status && status >= 400 && status < 500) {
         return
       }
+
       navigate('/error', { replace: true, state: { code, from: 'signup' } })
     }
   }

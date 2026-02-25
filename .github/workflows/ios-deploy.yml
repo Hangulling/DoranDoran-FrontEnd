@@ -54,32 +54,29 @@ jobs:
           npm run build
           npx cap sync ios
 
-      - name: Install CocoaPods
-        run: sudo gem install cocoapods
-
-      - name: Pod install (repo update)
-        working-directory: ios/App
-        run: pod install --repo-update
-
-      - name: Install xcodeproj gem
-        run: gem install xcodeproj
-
       - name: Link GoogleService-Info.plist and Configure Info.plist
         run: ruby scripts/add-google-service.rb
 
-      - name: Setup Ruby
+      - name: Setup Ruby (Bundler)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
+          bundler: 2.4.19
           bundler-cache: true
 
-      - name: Install Fastlane
-        run: gem install fastlane
+      - name: Install Ruby Gems
+        working-directory: ios/App
+        run: bundle install
+
+      - name: Pod install (repo update)
+        working-directory: ios/App
+        run: bundle exec pod install --repo-update
 
       - name: Run Fastlane (workflow_dispatch lane 선택)
         if: github.event_name == 'workflow_dispatch'
         working-directory: ios
         env:
+          BUNDLE_GEMFILE: App/Gemfile
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
@@ -87,12 +84,12 @@ jobs:
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
         run: |
           if [ "${{ inputs.lane }}" = "generate_certs" ]; then
-            fastlane generate_certs
+            bundle exec fastlane generate_certs
           else
             if [ -n "${{ inputs.build_number }}" ]; then
-              fastlane release build_number:${{ inputs.build_number }}
+              bundle exec fastlane release build_number:${{ inputs.build_number }}
             else
-              fastlane release build_number:${{ github.run_number }}
+              bundle exec fastlane release build_number:${{ github.run_number }}
             fi
           fi
 
@@ -100,18 +97,18 @@ jobs:
         if: github.event_name == 'push'
         working-directory: ios
         env:
+          BUNDLE_GEMFILE: App/Gemfile
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-        run: fastlane release build_number:${{ github.run_number }}
+        run: bundle exec fastlane release build_number:${{ github.run_number }}
 
       - name: Print gym log on failure
         if: failure()
         run: |
           echo "===== gym log (last 250 lines) ====="
           tail -n 250 /Users/runner/Library/Logs/gym/App-App.log || true
-
           echo "===== signing/entitlement lines (filtered) ====="
           egrep -n "Provisioning|entitlement|codesign|CodeSign|Signing|requires a provisioning|No profile|error:" /Users/runner/Library/Logs/gym/App-App.log | tail -n 150 || true

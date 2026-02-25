@@ -5,11 +5,10 @@ const config: CapacitorConfig = {
   appId: 'com.koach.app',
   appName: 'K-oach',
   webDir: 'dist',
-  // server: {
-  //   url: 'http://localhost:3000',
-  //   cleartext: true,
-  // },
   plugins: {
+    PushNotifications: {
+      presentationOptions: ['badge', 'sound', 'alert'],
+    },
     SocialLogin: {
       providers: {
         google: true,
@@ -19,7 +18,7 @@ const config: CapacitorConfig = {
       },
     },
     Keyboard: {
-      resize: KeyboardResize.Native,
+      resize: KeyboardResize.None,
       resizeOnFullScreen: true,
     },
   },

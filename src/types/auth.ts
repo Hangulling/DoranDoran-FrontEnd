@@ -9,11 +9,13 @@ export interface LoginResponse {
   success: boolean
   message: string
   data: {
-    accessToken: string
-    refreshToken: string
-    tokenType: 'Bearer'
+    accessToken?: string
+    refreshToken?: string
+    tokenType?: 'Bearer'
     expiresIn: number
-    user: User
+    user?: User
+    needSignup?: boolean
+    oauthUserInfo?: OAuthUserInfo
   }
 }
 
@@ -55,6 +57,17 @@ export interface VerificationRequest {
 export interface OAuthLoginRequest {
   provider: string
   idToken: string
+  confirmSignup?: boolean
+  birthDate?: string
+}
+
+export interface OAuthUserInfo {
+  email: string
+  firstName: string
+  lastName: string
+  name: string
+  picture: string | null
+  provider: string
 }
 
 export type OAuthLoginResponse = LoginResponse

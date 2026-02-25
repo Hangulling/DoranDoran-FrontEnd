@@ -10,6 +10,7 @@ import type {
 } from '../types/chat'
 import api from './api'
 import { CHAT_ENDPOINTS } from './endpoints'
+import { tokenService } from './tokenService'
 
 // 채팅방 생성(또는 기존 채팅방 조회)
 export async function createChatRoom(
@@ -109,7 +110,7 @@ export async function leaveChatroom(
 
 // SSE(실시간 메시지 스트림)
 export function getSseUrl(chatroomId: string, userId?: string): string {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+  const baseUrl = import.meta.env.VITE_API_BASE_URL
   const url = new URL(`${baseUrl}${CHAT_ENDPOINTS.MESSAGE_STREAM(chatroomId)}`)
 
   if (userId) {
@@ -117,6 +118,20 @@ export function getSseUrl(chatroomId: string, userId?: string): string {
   }
 
   return url.toString()
+}
+
+// WebSocket
+export function getWebSocketUrl(
+  chatroomId: string,
+  userId?: string,
+  token?: string
+): string {
+  let baseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin
+  baseUrl = baseUrl.replace(/\/$/, '')
+  const wsBaseUrl = baseUrl.replace(/^http/, 'ws')
+  const jwtToken = token || tokenService.access || undefined
+  const path = CHAT_ENDPOINTS.WEBSOCKET_CHAT(chatroomId, userId, jwtToken)
+  return `${wsBaseUrl}${path}`
 }
 
 // 마지막 채팅 시간

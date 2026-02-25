@@ -8,6 +8,7 @@ import { login } from '../api/auth'
 import { useUserStore } from '../stores/useUserStore'
 
 import showToast from '../components/common/CommonToast'
+import { tokenService } from '../api/tokenService'
 
 type ErrorKind = 'wrong_email' | 'wrong_password' | 'both' | 'general' | null
 
@@ -111,7 +112,7 @@ export default function LoginEmailPage() {
         setStoreId(user.id)
         setStoreName(user.name)
 
-        localStorage.setItem('last_login', 'email')
+        await tokenService.setLastLogin('email')
 
         // 온보딩 확인 여부에 따라 라우팅
         if (user.isOnboard) {

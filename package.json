@@ -12,6 +12,7 @@
     "typecheck": "tsc -p tsconfig.ci.json --noEmit"
   },
   "dependencies": {
+    "@capacitor-community/fcm": "^8.1.0",
     "@capacitor-community/photoviewer": "^7.1.0",
     "@capacitor-community/text-to-speech": "^6.1.0",
     "@capacitor/android": "^8.0.0",
@@ -19,6 +20,7 @@
     "@capacitor/core": "^8.0.0",
     "@capacitor/ios": "^8.0.0",
     "@capacitor/keyboard": "^8.0.0",
+    "@capacitor/preferences": "^8.0.1",
     "@capacitor/push-notifications": "^8.0.0",
     "@capacitor/status-bar": "^8.0.0",
     "@capgo/capacitor-social-login": "^7.20.0",

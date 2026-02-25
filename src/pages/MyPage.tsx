@@ -101,8 +101,10 @@ export default function MyPage() {
   }
 
   const handleNotification = async () => {
+    if (!user?.id) return
+
     try {
-      const res = await updateNotificationSetting(id, isAlert)
+      const res = await updateNotificationSetting(user.id, isAlert)
       setIsAlert(res.pushEnabled)
       setOpenAlert(false)
 

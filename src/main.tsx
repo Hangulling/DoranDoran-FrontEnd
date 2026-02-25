@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, HashRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './styles/index.css'
 import React from 'react'
@@ -13,6 +13,7 @@ import {
   GOOGLE_IOS_CLIENT_ID,
   APPLE_CLIENT_ID,
 } from './constants/env'
+import { tokenService } from './api/tokenService.ts'
 
 const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 
@@ -30,6 +31,8 @@ const logWarn = (title: string, extra?: unknown) => {
 }
 
 const isNative = isNativeApp()
+
+const Router = isNative ? HashRouter : BrowserRouter
 
 const initSocialLogin = async () => {
   if (!isNative) return
@@ -87,6 +90,7 @@ const queryClient = new QueryClient()
 
 prepare()
   .then(async () => {
+    await tokenService.hydrate()
     await initSocialLogin()
   })
   .then(() => {
@@ -95,7 +99,7 @@ prepare()
 
     root.render(
       <React.StrictMode>
-        <BrowserRouter>
+        <Router>
           {IS_MAINTENANCE_MODE ? (
             <Routes>
               <Route path="*" element={<MaintenancePage />} />
@@ -111,7 +115,7 @@ prepare()
               </QueryClientProvider>
             </GoogleOAuthProvider>
           )}
-        </BrowserRouter>
+        </Router>
       </React.StrictMode>
     )
   })

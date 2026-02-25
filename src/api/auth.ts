@@ -10,62 +10,68 @@ import type {
 } from '../types/auth'
 import api, { publicApi } from './api'
 import { AUTH_ENDPOINTS, USER_ENDPOINTS } from './endpoints'
+import { tokenService } from './tokenService'
 
 let currentUserId: string | null = null
 
 export async function login(data: LoginRequest) {
-  const res = await api.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, data)
-  const { data: resData } = res.data
-  const { accessToken, refreshToken } = resData
+  const res = await publicApi.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, data)
+  const payload = res.data
+  const resData = payload?.data ?? payload
 
-  if (accessToken) {
-    sessionStorage.setItem('accessToken', accessToken)
-  }
+  const accessToken = resData?.accessToken
+  const refreshToken = resData?.refreshToken
 
-  if (refreshToken) {
-    sessionStorage.setItem('refreshToken', refreshToken)
-  }
+  await tokenService.setTokens({ accessToken, refreshToken })
+  await tokenService.setManualLogout(false)
+
   return res.data
 }
 
 export async function oauthLogin(data: OAuthLoginRequest) {
-  const res = await publicApi.post<OAuthLoginResponse>(AUTH_ENDPOINTS.OAUTH_LOGIN, data)
-  const { data: resData } = res.data
-  const { accessToken, refreshToken } = resData
+  const res = await publicApi.post<OAuthLoginResponse>(
+    AUTH_ENDPOINTS.OAUTH_LOGIN,
+    data
+  )
 
-  if (accessToken) {
-    sessionStorage.setItem('accessToken', accessToken)
+  const payload = res.data
+  const resData = payload?.data ?? payload
+
+  const accessToken = resData?.accessToken
+  const refreshToken = resData?.refreshToken
+  const needSignup = resData?.needSignup
+
+  console.log('[oauthLogin parsed]', {
+    needSignup,
+    hasAccess: !!accessToken,
+    hasRefresh: !!refreshToken,
+  })
+
+  if (!needSignup) {
+    await tokenService.setTokens({ accessToken, refreshToken })
+    await tokenService.setManualLogout(false)
   }
 
-  if (refreshToken) {
-    sessionStorage.setItem('refreshToken', refreshToken)
-  }
   return res.data
 }
 
 export async function logout() {
-  sessionStorage.setItem('session:manualLogout', '1')
+  await tokenService.setManualLogout(true)
 
   try {
     const res = await api.post(AUTH_ENDPOINTS.LOGOUT)
     if (import.meta.env.DEV) {
       console.log('🔒 로그아웃 성공:', res.data.message)
     }
+    console.log('[after setTokens]', tokenService.access, tokenService.refresh)
     return res.data
   } catch (error) {
     console.error('🚨 로그아웃 요청 중 오류 발생:', error)
     throw error
   } finally {
-    sessionStorage.removeItem('accessToken')
-    sessionStorage.removeItem('refreshToken')
-    sessionStorage.removeItem('currentUserId')
+    await tokenService.clearTokens()
+    await tokenService.clearCurrentUserId()
     currentUserId = null
-    try {
-      sessionStorage.setItem('session:logout', String(Date.now()))
-    } catch {
-      console.warn('Failed to set logout flag')
-    }
-    setTimeout(() => localStorage.removeItem('session:manualLogout'), 1500)
   }
 }
 
@@ -74,7 +80,8 @@ export async function checkEmailExists(email: string): Promise<boolean> {
   const url = USER_ENDPOINTS.CHECK_EMAIL(encoded)
   const res = await api.get(url, { timeout: 15000 })
   const payload = res.data
-  const value = typeof payload === 'boolean' ? payload : (payload?.data ?? payload)
+  const value =
+    typeof payload === 'boolean' ? payload : (payload?.data ?? payload)
   return value === true
 }
 
@@ -87,7 +94,7 @@ export async function getCurrentUser() {
     }
     currentUserId = res.data.data.id
     if (currentUserId) {
-      sessionStorage.setItem('currentUserId', currentUserId)
+      await tokenService.setCurrentUserId(currentUserId)
     }
     return res.data
   } catch (e) {
@@ -119,7 +126,9 @@ export async function requestEmailVerification(data: VerificationRequest) {
 }
 
 export async function resetPasswordRequest(email: string) {
-  const res = await publicApi.post(AUTH_ENDPOINTS.PASSWORD_RESET_REQUEST, { email })
+  const res = await publicApi.post(AUTH_ENDPOINTS.PASSWORD_RESET_REQUEST, {
+    email,
+  })
   return res.data
 }
 

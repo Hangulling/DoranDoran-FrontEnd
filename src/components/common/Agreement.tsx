@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import Button from './Button'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import CheckIcon from '../../assets/icon/CheckIcon'
 import ArrowRightIcon from '../../assets/icon/ArrowRightIcon'
 
@@ -13,6 +13,8 @@ interface AgreementProps {
 }
 
 export default function Agreement({ value, onChange }: AgreementProps) {
+  const location = useLocation()
+
   const allChecked = useMemo(
     () => value.service && value.privacy && value.ageLimit && value.marketing,
     [value.service, value.privacy, value.ageLimit, value.marketing]
@@ -105,7 +107,13 @@ export default function Agreement({ value, onChange }: AgreementProps) {
             </button>
 
             {(t.id === 'service' || t.id === 'privacy') && (
-              <Link to={`/policy/${id}`}>
+              <Link
+                to={`/policy/${id}`}
+                state={{
+                  backTo: '/signup/term',
+                  ...(location.state ?? {}),
+                }}
+              >
                 <Button
                   type="button"
                   variant="text"
