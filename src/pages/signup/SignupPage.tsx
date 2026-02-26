@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import ProgressBar from '../../components/common/ProgressBar'
 import { useAgreementStore } from '../../stores/useAgreementStore'
 import { useSignupFormStore } from '../../stores/useSignupStore'
-// import { useKeyboard } from '../../hooks/useKeyboard'
+import { useKeyboard } from '../../hooks/useKeyboard'
+import { Capacitor } from '@capacitor/core'
+import { isNativeApp } from '../../utils/isNativeApp'
 
 export default function SignupPage() {
   const { reset: resetForm } = useSignupFormStore()
@@ -16,8 +18,8 @@ export default function SignupPage() {
   const [submit, setSubmit] = useState<(() => void) | null>(null)
   const resetAgreements = useAgreementStore(s => s.reset)
   const navigate = useNavigate()
-  // const keyboardHeight = useKeyboard()
-
+  const isIOSApp = isNativeApp() && Capacitor.getPlatform() === 'ios'
+  const keyboardHeight = useKeyboard(isIOSApp)
   const fromOAuth = Boolean(location.state?.fromOAuth)
 
   const stepMap: Record<string, number> = {
@@ -108,9 +110,11 @@ export default function SignupPage() {
       <Outlet context={{ setSubmit, setCanSubmit }} />
       <div
         className="fixed inset-x-0 bottom-0 z-10 flex justify-center"
-        // style={{
-        //   transform: `translateY(-${keyboardHeight}px)`,
-        // }}
+        style={
+          isIOSApp
+            ? { transform: `translateY(-${keyboardHeight}px)` }
+            : undefined
+        }
       >
         <div className="w-full max-w-md bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)]">
           <Button

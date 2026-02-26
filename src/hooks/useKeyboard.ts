@@ -3,7 +3,7 @@ import { Keyboard } from '@capacitor/keyboard'
 import { Capacitor } from '@capacitor/core'
 import type { PluginListenerHandle } from '@capacitor/core'
 
-export function useKeyboard() {
+export function useKeyboard(enable: boolean) {
   const [height, setHeight] = useState<number>(0)
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export function useKeyboard() {
       handles.forEach(h => h.remove())
       handles = []
     }
-  }, [])
+  }, [enable])
 
   return height
 }
