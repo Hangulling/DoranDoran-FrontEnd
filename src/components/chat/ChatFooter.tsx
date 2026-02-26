@@ -132,7 +132,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
 
         {/* textarea */}
         <div className="w-full px-5 pt-2.5 pb-[calc(10px+env(safe-area-inset-bottom))]">
-          <div className="relative w-full px-4 py-3.75 bg-[#f1f1f1] border-[#f1f1f1] rounded-[22px] overflow-hidden text-14px min-h-[51px]">
+          <div className="relative w-full px-4 py-3.75 bg-[#f1f1f1] border-[#f1f1f1] rounded-[22px] overflow-hidden text-14px min-h-12.75">
             <textarea
               ref={inputRef}
               placeholder="Type a message"
