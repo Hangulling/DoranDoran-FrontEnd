@@ -17,7 +17,15 @@ export default function SignupTerm() {
     agreements.service && agreements.privacy && agreements.ageLimit
 
   useEffect(() => {
-    window.scrollTo(0, 0)
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0)
+
+      const se = document.scrollingElement as HTMLElement | null
+      if (se) se.scrollTop = 0
+
+      document.documentElement.scrollTop = 0
+      document.body.scrollTop = 0
+    })
   }, [location.key])
 
   useEffect(() => {
