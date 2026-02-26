@@ -141,7 +141,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
               onCompositionEnd={handleCompositionEnd}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              // disabled={disabled}
+              disabled={disabled}
               rows={1}
               style={{
                 height: textareaHeight,
