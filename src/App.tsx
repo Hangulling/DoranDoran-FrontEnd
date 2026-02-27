@@ -11,7 +11,10 @@ function App() {
   useEmailVerifiedDeepLink()
 
   return (
-    <div className="relative flex flex-col h-dvh mx-auto w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-white">
+    <div
+      id="app-scroll"
+      className="relative flex flex-col h-dvh mx-auto w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-white"
+    >
       <Toaster
         containerStyle={{
           bottom: 'env(safe-area-inset-bottom)',
