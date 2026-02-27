@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.11.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.10.5...v3.11.0) (2026-02-27)
+
+
+### Features
+
+* 이미지 모달 커스텀 전환 및 에러/키보드 UX 개선 ([#367](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/367)) ([c93d3a9](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/c93d3a904d7d3965432b0c2cdd1381700457723c))
+
 ### [3.10.5](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.10.4...v3.10.5) (2026-02-26)
 
 
