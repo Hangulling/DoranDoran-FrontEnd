@@ -11,7 +11,6 @@ import GoogleLoginButton from '../components/common/GoogleLoginButton'
 import { isNativeApp } from '../utils/isNativeApp'
 import { type SocialLoginResponse } from '@capgo/capacitor-social-login'
 import { SocialLogin } from '@capgo/capacitor-social-login'
-import showToast from '../components/common/CommonToast'
 import LastLoginBubble from '../components/common/LastLoginBubble'
 import Logoicon from '../assets/auth/koach-logo.png'
 import AppleLoginIcon from '../assets/auth/appleLogin.png'
@@ -41,6 +40,13 @@ export default function LoginPage() {
       ReactGA.event('view_login', { date: yyyyMmDd })
     }
   }, [])
+
+  const goErrorPage = (errorCode?: number, from?: string) => {
+    navigate('/error', {
+      replace: true,
+      state: { errorCode: errorCode ?? 503, from: from ?? 'login' },
+    })
+  }
 
   const mapAuthError = ({
     status,
@@ -72,15 +78,6 @@ export default function LoginPage() {
     if (isPasswordError) return { type: 'wrong_password' }
 
     return { type: 'both', msg: 'Email error + Password error' }
-  }
-
-  const stringifyError = (e: unknown) => {
-    try {
-      if (e instanceof Error) return `${e.name}: ${e.message}`
-      return JSON.stringify(e)
-    } catch {
-      return String(e)
-    }
   }
 
   const finishLogin = async (user: User, provider: Provider) => {
@@ -125,7 +122,7 @@ export default function LoginPage() {
 
       const idToken = r.result?.idToken
       if (!idToken) {
-        alert('Google 로그인 실패 (앱)')
+        goErrorPage(400, 'google_native_login')
         return
       }
 
@@ -135,16 +132,17 @@ export default function LoginPage() {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status
         const data = err.response?.data
-        console.error('[Native OAuth] axios error:', { status, data, err })
-
-        alert(
-          `Google 로그인 실패 (앱)\nstatus=${status}\n` +
-            `${typeof data === 'string' ? data : JSON.stringify(data)}`
-        )
+        console.error('[Native Google OAuth] axios error:', {
+          status,
+          data,
+          err,
+        })
+        goErrorPage(status, 'google_native_login')
         return
       }
 
-      alert(`Google 로그인 실패 (앱)\n${stringifyError(err)}`)
+      console.error('[Native Google OAuth] unknown error:', err)
+      goErrorPage(503, 'google_native_login')
     }
   }
 
@@ -159,25 +157,27 @@ export default function LoginPage() {
 
       const idToken = r.result?.idToken
       if (!idToken) {
-        alert('Apple 로그인 실패 (앱)')
+        goErrorPage(400, 'apple_native_login')
         return
       }
 
       const res = await oauthLogin({ provider: 'apple', idToken })
       handleNeedSignupOrLogin(res, idToken, 'apple')
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        const status = error.response?.status
-        const data = error.response?.data
-        console.error('[Apple OAuth] axios error:', { status, data, error })
-
-        alert(
-          `Apple 로그인 실패 (서버)\nstatus=${status}\n` +
-            `${typeof data === 'string' ? data : JSON.stringify(data)}`
-        )
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status
+        const data = err.response?.data
+        console.error('[Native Apple OAuth] axios error:', {
+          status,
+          data,
+          err,
+        })
+        goErrorPage(status, 'apple_native_login')
         return
       }
-      alert(`Apple 로그인 실패 (앱)\n${stringifyError(error)}`)
+
+      console.error('[Native Apple OAuth] unknown error:', err)
+      goErrorPage(503, 'apple_native_login')
     }
   }
 
@@ -187,6 +187,7 @@ export default function LoginPage() {
       if (!idToken) {
         setError('general')
         setErrorMsg('Google 로그인에 실패했습니다.')
+        goErrorPage(400, 'google_web_oauth')
         return
       }
 
@@ -221,10 +222,7 @@ export default function LoginPage() {
         }
 
         if (!status || status >= 500) {
-          navigate('/error', {
-            replace: true,
-            state: { code: status ?? 503, from: 'oauth_login' },
-          })
+          goErrorPage(status ?? 503, 'oauth_login')
           return
         }
 
@@ -244,12 +242,10 @@ export default function LoginPage() {
             method: 'oauth_google',
           })
         }
-      } else {
-        navigate('/error', {
-          replace: true,
-          state: { code: 500, from: 'oauth_login' },
-        })
+        return
       }
+
+      goErrorPage(500, 'oauth_login')
     }
   }
 
@@ -257,6 +253,9 @@ export default function LoginPage() {
     console.error('🚨 Google OAuth 로그인 실패')
     setError('general')
     setErrorMsg('Google 로그인에 실패했습니다.')
+
+    // 정책: 에러 페이지로
+    goErrorPage(400, 'google_web_oauth_error')
 
     if (IS_PROD && GA_ENABLED) {
       ReactGA.event('fail_login', {
@@ -287,11 +286,6 @@ export default function LoginPage() {
   useEffect(() => {
     const toastState = location.state?.toast
     if (!toastState) return
-
-    showToast({
-      message: toastState.message,
-      iconType: toastState.iconType,
-    })
 
     navigate(location.pathname, { replace: true })
   }, [location.state, navigate, location.pathname])

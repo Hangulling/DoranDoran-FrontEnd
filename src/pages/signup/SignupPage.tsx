@@ -103,7 +103,7 @@ export default function SignupPage() {
   }, [path, fromOAuth])
 
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex flex-col justify-center items-center pb-20">
       {!fromOAuth && path !== '/signup/term' && (
         <ProgressBar currentStep={currentStep} totalSteps={5} />
       )}
