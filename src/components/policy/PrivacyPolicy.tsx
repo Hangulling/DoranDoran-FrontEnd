@@ -622,7 +622,7 @@ const PrivacyPolicy: React.FC = () => {
         >
           <Button
             variant="text"
-            className="absolute top-4 right-4 w-6 h-6 flex items-center justify-center text-white"
+            className="absolute top-16 right-4 w-6 h-6 flex items-center justify-center text-white"
             onClick={e => {
               e.stopPropagation()
               setImgOpen(false)

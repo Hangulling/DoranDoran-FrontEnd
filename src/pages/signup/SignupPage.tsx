@@ -103,7 +103,7 @@ export default function SignupPage() {
   }, [path, fromOAuth])
 
   return (
-    <div className="flex flex-col justify-center items-center pb-20">
+    <div className="flex flex-col justify-center items-center">
       {!fromOAuth && path !== '/signup/term' && (
         <ProgressBar currentStep={currentStep} totalSteps={5} />
       )}
@@ -116,7 +116,10 @@ export default function SignupPage() {
             : undefined
         }
       >
-        <div className="w-full max-w-md bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)]">
+        <div
+          className="w-full max-w-md bg-white px-4 pt
+        -3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)]"
+        >
           <Button
             onClick={handleConfirm}
             variant="primary"

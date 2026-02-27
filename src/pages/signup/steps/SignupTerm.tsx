@@ -13,19 +13,13 @@ export default function SignupTerm() {
   const setManyAgreements = useAgreementStore(s => s.setMany)
   const { setCanSubmit } = useOutletContext<OutletContext>()
   const location = useLocation()
+
   const requiredAgreed =
     agreements.service && agreements.privacy && agreements.ageLimit
 
   useEffect(() => {
-    requestAnimationFrame(() => {
-      window.scrollTo(0, 0)
-
-      const se = document.scrollingElement as HTMLElement | null
-      if (se) se.scrollTop = 0
-
-      document.documentElement.scrollTop = 0
-      document.body.scrollTop = 0
-    })
+    const el = document.getElementById('app-scroll')
+    if (el) el.scrollTop = 0
   }, [location.key])
 
   useEffect(() => {
