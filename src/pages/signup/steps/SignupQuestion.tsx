@@ -56,8 +56,6 @@ export default function SignupQuestion() {
   }
 
   const handleConfirmModal = async () => {
-    alert('Start button clicked')
-
     setOpenModal(false)
     setSubmitError(null)
 
@@ -74,11 +72,7 @@ export default function SignupQuestion() {
         marketingOption: agreements.marketing,
       }
 
-      alert('Sending request...\n' + JSON.stringify(payload))
-
-      const res = await createUser(payload)
-
-      alert('SUCCESS:\n' + JSON.stringify(res))
+      await createUser(payload)
 
       navigate('/login', { replace: true })
       setTimeout(() => {
@@ -88,23 +82,16 @@ export default function SignupQuestion() {
     } catch (e: unknown) {
       const isAxios = axios.isAxiosError(e)
       const status = isAxios ? e.response?.status : undefined
-      const data = isAxios ? e.response?.data : undefined
-      const code = status ?? 503
-      const msg = isAxios
-        ? e.response?.data?.message || 'Sign up failed.'
-        : 'Sign up failed.'
-
-      alert(
-        `ERROR 발생\n\nstatus: ${status}\ncode: ${code}\nmessage: ${msg}\ndata: ${JSON.stringify(
-          data
-        )}`
-      )
+      const errorCode = status ?? 503
 
       if (status && status >= 400 && status < 500) {
         return
       }
 
-      navigate('/error', { replace: true, state: { code, from: 'signup' } })
+      navigate('/error', {
+        replace: true,
+        state: { errorCode: errorCode, from: 'signup' },
+      })
     }
   }
 

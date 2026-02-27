@@ -3,6 +3,9 @@ import Button from '../../components/common/Button'
 import { useEffect, useRef, useState } from 'react'
 import ProgressBar from '../../components/common/ProgressBar'
 import { useFindEmailStore } from '../../stores/useFindEmailStore'
+import { isNativeApp } from '../../utils/isNativeApp'
+import { Capacitor } from '@capacitor/core'
+import { useKeyboard } from '../../hooks/useKeyboard'
 
 export default function FindEmailPage() {
   const [label, setLabel] = useState<string>('')
@@ -12,6 +15,8 @@ export default function FindEmailPage() {
   const location = useLocation()
   const path = location.pathname
   const navigate = useNavigate()
+  const isIOSApp = isNativeApp() && Capacitor.getPlatform() === 'ios'
+  const keyboardHeight = useKeyboard(isIOSApp)
 
   const step: Record<string, number> = {
     '/find-email/form': 1,
@@ -76,6 +81,11 @@ export default function FindEmailPage() {
             size="xl"
             className="bg-gray-800 w-full"
             disabled={isResultPage ? false : !canSubmit}
+            style={
+              isIOSApp
+                ? { transform: `translateY(-${keyboardHeight}px)` }
+                : undefined
+            }
           >
             {label}
           </Button>

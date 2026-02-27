@@ -1,40 +1,20 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Button from '../common/Button'
 import CloseIcon from '../../assets/icon/CloseIcon'
-import { PhotoViewer } from '@capacitor-community/photoviewer'
 import TermTable from '../../assets/auth/termTable.png'
-import { isNativeApp } from '../../utils/isNativeApp'
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
 const PrivacyPolicy: React.FC = () => {
   const [imgOpen, setImgOpen] = useState<boolean>(false)
 
-  const blobToDataUrl = (blob: Blob) =>
-    new Promise<string>((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onloadend = () => resolve(String(reader.result))
-      reader.onerror = reject
-      reader.readAsDataURL(blob)
-    })
-
-  const openTable = async () => {
-    if (isNativeApp()) {
-      const assetUrl = new URL(TermTable, window.location.origin).toString()
-
-      const res = await fetch(assetUrl)
-      if (!res.ok) throw new Error(`Failed to load asset: ${res.status}`)
-
-      const blob = await res.blob()
-      const dataUrl = await blobToDataUrl(blob)
-
-      await PhotoViewer.show({
-        images: [{ url: dataUrl, title: 'Entrusted Parties and Tasks' }],
-        mode: 'one',
-      })
-      return
+  useEffect(() => {
+    if (!imgOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
     }
-
-    setImgOpen(true)
-  }
+  }, [imgOpen])
 
   return (
     <div className="max-w-4xl mx-auto text-gray-800 leading-relaxed">
@@ -475,7 +455,11 @@ const PrivacyPolicy: React.FC = () => {
           1) Entrusted Parties and Tasks
         </div>
         <div className="flex justify-center">
-          <img src={TermTable} onClick={openTable} />
+          <img
+            src={TermTable}
+            alt="policyTerm"
+            onClick={() => setImgOpen(true)}
+          />
         </div>
         <div>
           If there are changes in the entrusted tasks or entrusted parties, this
@@ -652,11 +636,27 @@ const PrivacyPolicy: React.FC = () => {
             className="bg-white  p-3 overflow-auto"
             onClick={e => e.stopPropagation()}
           >
-            <img
-              src={TermTable}
-              alt="Entrusted parties and tasks enlarged"
-              className=" max-h-[85vh] object-contain"
-            />
+            <TransformWrapper
+              minScale={1}
+              maxScale={4}
+              doubleClick={{ mode: 'zoomIn' }}
+              wheel={{ disabled: true }}
+            >
+              <TransformComponent
+                wrapperStyle={{
+                  width: '100%',
+                  height: '100%',
+                  touchAction: 'none',
+                }}
+              >
+                <img
+                  src={TermTable}
+                  alt="Entrusted parties and tasks enlarged"
+                  className=" max-h-[85vh] object-contain select-none"
+                  draggable={false}
+                />
+              </TransformComponent>
+            </TransformWrapper>
           </div>
         </div>
       )}

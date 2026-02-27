@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@capacitor-community/fcm": "^8.1.0",
-    "@capacitor-community/photoviewer": "^8.0.0",
     "@capacitor-community/text-to-speech": "^8.0.0",
     "@capacitor/android": "^8.0.0",
     "@capacitor/app": "^8.0.0",
@@ -42,6 +41,7 @@
     "react-hot-toast": "^2.6.0",
     "react-intersection-observer": "^10.0.0",
     "react-router-dom": "^7.13.0",
+    "react-zoom-pan-pinch": "^3.7.0",
     "vite-plugin-env-compatible": "^2.0.1",
     "vite-plugin-svgr": "^4.5.0",
     "zustand": "^5.0.8"
