@@ -13,7 +13,7 @@ function App() {
   return (
     <div
       id="app-scroll"
-      className="relative flex flex-col h-dvh mx-auto w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-white"
+      className="relative flex flex-col mx-auto w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-white"
     >
       <Toaster
         containerStyle={{
