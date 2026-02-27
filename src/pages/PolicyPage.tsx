@@ -14,7 +14,16 @@ export default function PolicyPage() {
   const handleConfirm = () => {
     if (!id) return
     setOne(id, true)
-    navigate(-1)
+    const backTo =
+      (location.state?.backTo as string | undefined) ?? '/signup/term'
+
+    navigate(backTo, {
+      replace: true,
+      state: {
+        ...(location.state ?? {}),
+        fromPolicy: true,
+      },
+    })
   }
 
   const search = new URLSearchParams(location.search)
