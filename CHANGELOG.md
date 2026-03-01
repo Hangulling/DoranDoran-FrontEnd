@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.11.4](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.11.3...v3.11.4) (2026-03-01)
+
+
+### Bug Fixes
+
+* 버튼 cta 수정 ([#376](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/376)) ([4e8cf70](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/4e8cf709c7f8bb457af1b6ba251fe5781cd754c4))
+
 ### [3.11.3](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.11.2...v3.11.3) (2026-02-27)
 
 
