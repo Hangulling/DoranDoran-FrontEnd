@@ -103,23 +103,17 @@ export default function SignupPage() {
   }, [path, fromOAuth])
 
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex h-full min-h-0 w-full flex-col">
       {!fromOAuth && path !== '/signup/term' && (
         <ProgressBar currentStep={currentStep} totalSteps={5} />
       )}
-      <Outlet context={{ setSubmit, setCanSubmit }} />
-      <div
-        className="fixed inset-x-0 bottom-0 z-10 flex justify-center"
-        // style={
-        //   isIOSApp
-        //     ? { transform: `translateY(-${keyboardHeight}px)` }
-        //     : undefined
-        // }
-      >
-        <div
-          className="w-full max-w-md bg-white px-4 pt
-        -3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)]"
-        >
+
+      <div className="flex-1 flex justify-center min-h-0 w-full">
+        <Outlet context={{ setSubmit, setCanSubmit }} />
+      </div>
+
+      <div className="w-full bg-white">
+        <div className="mx-auto w-full max-w-md px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)]">
           <Button
             onClick={handleConfirm}
             variant="primary"
