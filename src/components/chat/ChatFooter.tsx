@@ -3,6 +3,8 @@ import SendIcon from '../../assets/chat/send.svg'
 import ErrorIcon from '../../assets/icon/error.svg'
 import CheckIcon from '../../assets/icon/CheckIcon'
 import PauseIcon from '../../assets/chat/pause.svg'
+import { useKeyboard } from '../../hooks/useKeyboard'
+import { Capacitor } from '@capacitor/core'
 
 interface ChatFooterProps {
   inputRef: RefObject<HTMLTextAreaElement | null>
@@ -53,6 +55,8 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const [isToastVisible, setIsToastVisible] = useState(false)
 
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const isIOSApp = Capacitor.getPlatform() === 'ios'
+  const keyboardHeight = useKeyboard(isIOSApp)
 
   useEffect(() => {
     return () => {
@@ -115,7 +119,12 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const isSendActive = !disabled && inputValue.trim().length > 0
 
   return (
-    <div className="absolute inset-x-0 bottom-0 z-50 flex justify-center">
+    <div
+      className="fixed inset-x-0 bottom-0 z-50 flex justify-center"
+      style={{
+        transform: isIOSApp ? `translateY(-${keyboardHeight}px)` : 'none',
+      }}
+    >
       <div
         className={`w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_rgba(0,0,0,0.06)]`}
       >
