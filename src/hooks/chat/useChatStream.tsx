@@ -74,10 +74,10 @@ function useChatStreamOverSse<T = unknown>(
       const sseUrl = getSseUrl(chatroomId, userId)
       const currentToken = tokenService.access || accessToken
 
-      console.log('[SSE] 연결 시도:', sseUrl)
+      //  console.log('[SSE] 연결 시도:', sseUrl)
 
       if (isConnectingRef.current) {
-        console.log('[SSE] 이미 연결 중')
+        //  console.log('[SSE] 이미 연결 중')
         return
       }
       isConnectingRef.current = true
@@ -105,7 +105,7 @@ function useChatStreamOverSse<T = unknown>(
       eventSourceRef.current = es
 
       es.onopen = () => {
-        console.log('[SSE] 연결 성공')
+        //  console.log('[SSE] 연결 성공')
         setIsLoading(false)
         setError(null)
         isConnectingRef.current = false
@@ -122,7 +122,7 @@ function useChatStreamOverSse<T = unknown>(
 
         try {
           const parsedData = JSON.parse(msg.data)
-          console.log('[SSE] Message:', parsedData)
+          //  console.log('[SSE] Message:', parsedData)
           if (onEventReceivedRef.current) {
             onEventReceivedRef.current('message', parsedData)
           }
@@ -139,7 +139,7 @@ function useChatStreamOverSse<T = unknown>(
 
           try {
             const parsedData = JSON.parse(msg.data)
-            console.log(`[SSE] Event [${eventName}]:`, parsedData)
+            //  console.log(`[SSE] Event [${eventName}]:`, parsedData)
             if (onEventReceivedRef.current) {
               onEventReceivedRef.current(eventName, parsedData)
             }
@@ -151,7 +151,6 @@ function useChatStreamOverSse<T = unknown>(
 
       es.onerror = (err: unknown) => {
         isConnectingRef.current = false
-        console.error('[SSE] 에러:', err)
 
         es.close()
 
@@ -161,11 +160,10 @@ function useChatStreamOverSse<T = unknown>(
 
         retryCount++
         if (retryCount >= maxRetries) {
-          console.error('[SSE] 최대 재연결 횟수 도달')
           setError(
             err instanceof Error
               ? err
-              : new Error('SSE connection failed after max retries')
+              : new Error('[SSE] 최대 재연결 횟수 도달')
           )
           setIsLoading(false)
           return
@@ -176,9 +174,9 @@ function useChatStreamOverSse<T = unknown>(
         const delay =
           Math.min(retryDelayInitial * Math.pow(2, retryCount), 30000) + jitter
 
-        console.log(
-          `[SSE] ${Math.round(delay)}ms 후 재연결... (${retryCount}/${maxRetries})`
-        )
+        // console.log(
+        //   `[SSE] 재연결... (${retryCount}/${maxRetries})`
+        // )
         retryTimeoutRef.current = setTimeout(() => {
           connect()
         }, delay)
@@ -189,10 +187,10 @@ function useChatStreamOverSse<T = unknown>(
       'appStateChange',
       ({ isActive }) => {
         if (isActive) {
-          console.log('[SSE] 포그라운드 복귀, 재연결')
+          //  console.log('[SSE] 포그라운드 복귀, 재연결')
           connect()
         } else {
-          console.log('[SSE] 백그라운드 전환, 연결 종료')
+          //  console.log('[SSE] 백그라운드 전환, 연결 종료')
           if (eventSourceRef.current) {
             eventSourceRef.current.close()
             eventSourceRef.current = null
@@ -237,10 +235,6 @@ export function useChatStream<T = unknown>(
 ): UseChatStreamResult {
   const isIos =
     Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios'
-
-  console.log('[useChatStream] Platform:', Capacitor.getPlatform())
-  console.log('[useChatStream] isNative:', Capacitor.isNativePlatform())
-  console.log('[useChatStream] Using:', isIos ? 'WebSocket' : 'SSE')
 
   const wsResult = useWebSocket(
     chatroomId,

@@ -31,7 +31,6 @@ export function useWebSocket<T>(
 
   useEffect(() => {
     if (!enabled || !chatroomId || !userId) {
-      console.log('[WebSocket] ⚠️ Disabled:', { enabled, chatroomId, userId })
       setIsLoading(false)
       return
     }
@@ -43,7 +42,7 @@ export function useWebSocket<T>(
 
     const connect = () => {
       if (isUnmounted || isAppBackground) {
-        console.log('[WebSocket] ⚠️ Skip connect (unmounted or background)')
+        //  console.log('[WebSocket] ⚠️ Skip connect (unmounted or background)')
         return
       }
 
@@ -57,44 +56,33 @@ export function useWebSocket<T>(
         const token = tokenService.access || accessToken
 
         if (!token) {
-          console.error('[WebSocket] No token available')
           setError(new Error('Authentication token not found'))
           setIsLoading(false)
           return
         }
 
         const url = getWebSocketUrl(chatroomId, userId, token)
-        console.log('[WebSocket] 연결 시도')
-        console.log('[WebSocket] chatroomId:', chatroomId)
-        console.log('[WebSocket] userId:', userId)
-        console.log('[WebSocket] URL:', url.replace(/token=[^&]+/, 'token=***'))
+        //  console.log('[WebSocket] 연결 시도')
 
         ws = new WebSocket(url)
 
         ws.onopen = () => {
-          console.log('[WebSocket] 연결 성공!')
-          console.log('[WebSocket] ReadyState:', ws?.readyState, '(1=OPEN)')
+          //  console.log('[WebSocket] 연결 성공')
           setIsLoading(false)
           retryCountRef.current = 0
           onOpenRef.current?.()
         }
 
         ws.onmessage = event => {
-          console.log('[WebSocket] 원본 메시지:', event.data)
-          console.log('[WebSocket] 데이터 타입:', typeof event.data)
-
           try {
             const message = JSON.parse(event.data)
-            console.log('[WebSocket] 파싱된 메시지:', message)
+            //  console.log('[WebSocket] 파싱된 메시지:', message)
 
             // event 필드 확인
             if (!message.event) {
               console.warn('[WebSocket] 메시지에 event 필드 없음:', message)
-              console.warn('[WebSocket] 메시지 구조:', Object.keys(message))
               return
             }
-
-            console.log(`[WebSocket] Event: ${message.event}`)
 
             // data 필드 확인 (없으면 빈 객체)
             const eventData = message.data !== undefined ? message.data : {}
@@ -103,69 +91,28 @@ export function useWebSocket<T>(
               onEventReceivedRef.current(message.event, eventData as T)
             }
           } catch (e) {
-            console.error('[WebSocket] JSON 파싱 실패!')
             console.error('[WebSocket] 에러:', e)
-            console.error('[WebSocket] 원본 데이터:', event.data)
-            console.error('[WebSocket] 데이터 길이:', event.data?.length)
-            console.error(
-              '[WebSocket] 첫 100자:',
-              event.data?.substring(0, 100)
-            )
           }
         }
 
         ws.onerror = event => {
-          console.error('[WebSocket] 에러 발생')
-          console.error('[WebSocket] Event:', event)
-          console.error('[WebSocket] Event type:', event.type)
-          console.error('[WebSocket] ReadyState:', ws?.readyState)
-
-          const states = ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED']
-          console.error('[WebSocket] State:', states[ws?.readyState ?? 3])
-
           setError(new Error('WebSocket connection error'))
           onErrorRef.current?.(event)
         }
 
         ws.onclose = event => {
-          console.log('[WebSocket] 연결 종료')
-          console.log('[WebSocket] Code:', event.code)
-          console.log('[WebSocket] Reason:', event.reason || '(없음)')
-          console.log('[WebSocket] WasClean:', event.wasClean)
-
-          const closeCodes: Record<number, string> = {
-            1000: 'Normal Closure',
-            1001: 'Going Away',
-            1002: 'Protocol Error',
-            1003: 'Unsupported Data',
-            1006: 'Abnormal Closure (연결 실패)',
-            1007: 'Invalid frame payload data',
-            1008: 'Policy Violation (권한 없음)',
-            1009: 'Message too big',
-            1011: 'Server error',
-          }
-          console.log('[WebSocket] 의미:', closeCodes[event.code] || 'Unknown')
-
-          // 1008 = 채팅방 접근 권한 없음
           if (event.code === 1008) {
-            console.error('[WebSocket] 채팅방 접근 권한 없음')
-            setError(new Error('채팅방 접근 권한이 없습니다'))
+            setError(new Error('채팅방 접근 권한 없음'))
             setIsLoading(false)
             return
           }
 
-          // 정상 종료가 아니면 재연결
           if (!isUnmounted && !isAppBackground && event.code !== 1000) {
             scheduleReconnect()
           }
         }
       } catch (err) {
-        console.error('[WebSocket] Setup error:', err)
-        console.error(
-          '[WebSocket] Error:',
-          err instanceof Error ? err.message : String(err)
-        )
-
+        console.error('[WebSocket] 에러:', err)
         setError(
           err instanceof Error ? err : new Error('WebSocket setup error')
         )
@@ -174,16 +121,13 @@ export function useWebSocket<T>(
     }
 
     const scheduleReconnect = () => {
-      if (isUnmounted || isAppBackground) {
-        console.log('[WebSocket] Skip reconnect (unmounted or background)')
-        return
-      }
+      if (isUnmounted || isAppBackground) return
 
       if (retryCountRef.current < maxRetries) {
         const delay = Math.min(3000 * Math.pow(2, retryCountRef.current), 30000)
-        console.log(
-          `[WebSocket] ${delay}ms 후 재연결... (${retryCountRef.current + 1}/${maxRetries})`
-        )
+        // console.log(
+        //   `[WebSocket] 재연결... (${retryCountRef.current + 1}/${maxRetries})`
+        // )
 
         reconnectTimeout = setTimeout(() => {
           retryCountRef.current += 1
@@ -198,7 +142,6 @@ export function useWebSocket<T>(
 
     const cleanup = () => {
       if (ws) {
-        console.log('[WebSocket] 기존 연결 정리 (state:', ws.readyState, ')')
         if (
           ws.readyState === WebSocket.OPEN ||
           ws.readyState === WebSocket.CONNECTING
@@ -213,19 +156,19 @@ export function useWebSocket<T>(
       }
     }
 
-    console.log('[WebSocket] 최초 연결 시작')
+    //  console.log('[WebSocket] 최초 연결 시작')
     connect()
 
     const appStateListener = App.addListener(
       'appStateChange',
       ({ isActive }) => {
         if (isActive) {
-          console.log('[WebSocket] 포그라운드 복귀 → 재연결')
+          //  console.log('[WebSocket] 포그라운드 복귀')
           isAppBackground = false
           retryCountRef.current = 0
           connect()
         } else {
-          console.log('[WebSocket] 백그라운드 전환 → 연결 종료')
+          //  console.log('[WebSocket] 백그라운드 전환')
           isAppBackground = true
           cleanup()
         }
