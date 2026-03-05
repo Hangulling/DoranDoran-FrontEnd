@@ -10,8 +10,10 @@
     "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write .",
     "typecheck": "tsc -p tsconfig.ci.json --noEmit",
-    "cap:sync:ios": "powershell -NoProfile -Command \"Copy-Item capacitor.config.ios.ts capacitor.config.ts -Force\"; npm run build; npx cap sync ios",
-    "cap:sync:android": "powershell -NoProfile -Command \"Copy-Item capacitor.config.android.ts capacitor.config.ts -Force\"; npm run build; npx cap sync android",
+    "cap:copy:ios": "powershell -NoProfile -Command \"Copy-Item capacitor.config.ios.ts capacitor.config.ts -Force\" && npm run build && npx cap copy ios",
+    "cap:copy:android": "powershell -NoProfile -Command \"Copy-Item capacitor.config.android.ts capacitor.config.ts -Force\" && npm run build && npx cap copy android",
+    "cap:sync:ios": "powershell -NoProfile -Command \"Copy-Item capacitor.config.ios.ts capacitor.config.ts -Force\" && npm run build && npx cap sync ios",
+    "cap:sync:android": "powershell -NoProfile -Command \"Copy-Item capacitor.config.android.ts capacitor.config.ts -Force\" && npm run build && npx cap sync android",
     "cap:open:ios": "npx cap open ios",
     "cap:open:android": "npx cap open android"
   },
