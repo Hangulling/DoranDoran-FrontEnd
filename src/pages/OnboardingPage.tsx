@@ -9,9 +9,7 @@ import { ONBOARDING_STEPS } from '../constants/onboardingData'
 import LeftArrowIcon from '../assets/icon/leftArrow.svg?react'
 import type { OnboardingPayload } from '../types/user'
 import { useCompleteOnboarding } from '../hooks/useCompleteOnboarding'
-import { Capacitor } from '@capacitor/core'
-import { isNativeApp } from '../utils/isNativeApp'
-import { useKeyboard } from '../hooks/useKeyboard'
+import { useIOSKeyboard } from '../hooks/useIOSKeyboard'
 
 const ETC_VALUE = 'Other'
 
@@ -25,8 +23,7 @@ export default function OnboardingPage() {
   const [etcValues, setEtcValues] = useState<Record<number, string>>({})
   const [etcText, setEtcText] = useState('')
 
-  const isIOSApp = isNativeApp() && Capacitor.getPlatform() === 'ios'
-  const keyboardHeight = useKeyboard(isIOSApp)
+  const { isIOSApp, keyboardHeight } = useIOSKeyboard()
 
   const currentStepData = ONBOARDING_STEPS[page]
   const isLastPage = page === ONBOARDING_STEPS.length - 1

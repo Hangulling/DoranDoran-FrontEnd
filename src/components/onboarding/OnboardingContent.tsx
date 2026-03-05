@@ -1,8 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { OnboardingStepData } from '../../constants/onboardingData'
-import { Capacitor } from '@capacitor/core'
-import { useKeyboard } from '../../hooks/useKeyboard'
-import { isNativeApp } from '../../utils/isNativeApp'
+import { useIOSKeyboard } from '../../hooks/useIOSKeyboard'
 
 interface OnboardingContentProps {
   stepData: OnboardingStepData
@@ -28,8 +26,7 @@ export default function OnboardingContent({
   // textarea 높이 조절
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const isIOSApp = isNativeApp() && Capacitor.getPlatform() === 'ios'
-  const keyboardHeight = useKeyboard(isIOSApp)
+  const { isIOSApp, keyboardHeight } = useIOSKeyboard()
 
   // 입력창 자동 포커스 및 스크롤
   useEffect(() => {

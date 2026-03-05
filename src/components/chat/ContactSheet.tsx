@@ -6,9 +6,7 @@ import CheckIcon from '../../assets/icon/CheckIcon'
 import { useFetchUser } from '../../hooks/useFetchUser'
 import showToast from '../common/CommonToast'
 import { Keyboard } from '@capacitor/keyboard'
-import { useKeyboard } from '../../hooks/useKeyboard'
-import { Capacitor } from '@capacitor/core'
-import { isNativeApp } from '../../utils/isNativeApp'
+import { useIOSKeyboard } from '../../hooks/useIOSKeyboard'
 
 interface ContactSheetProps {
   isOpen: boolean
@@ -37,9 +35,7 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
   const isTransitioning = useRef(false)
 
   const { userEmail } = useFetchUser()
-
-  const isIOSApp = isNativeApp() && Capacitor.getPlatform() === 'ios'
-  const keyboardHeight = useKeyboard(isOpen)
+  const { isIOSApp, keyboardHeight } = useIOSKeyboard()
 
   useEffect(() => {
     Keyboard.setScroll({ isDisabled: true })
