@@ -9,9 +9,7 @@ import { useUserStore } from '../stores/useUserStore'
 
 import showToast from '../components/common/CommonToast'
 import { tokenService } from '../api/tokenService'
-import { isNativeApp } from '../utils/isNativeApp'
-import { Capacitor } from '@capacitor/core'
-import { useKeyboard } from '../hooks/useKeyboard'
+import { useIOSKeyboard } from '../hooks/useIOSKeyboard'
 
 type ErrorKind = 'wrong_email' | 'wrong_password' | 'both' | 'general' | null
 
@@ -22,8 +20,7 @@ export default function LoginEmailPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const navigate = useNavigate()
   const location = useLocation()
-  const isIOSApp = isNativeApp() && Capacitor.getPlatform() === 'ios'
-  const keyboardHeight = useKeyboard(isIOSApp)
+  const { isIOSApp, keyboardHeight } = useIOSKeyboard()
 
   const canSubmit = useMemo(() => {
     return email.trim().length > 0 && password.trim().length > 0
