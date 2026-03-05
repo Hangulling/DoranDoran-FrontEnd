@@ -7,6 +7,8 @@ import { useFetchUser } from '../../hooks/useFetchUser'
 import showToast from '../common/CommonToast'
 import { Keyboard } from '@capacitor/keyboard'
 import { useKeyboard } from '../../hooks/useKeyboard'
+import { Capacitor } from '@capacitor/core'
+import { isNativeApp } from '../../utils/isNativeApp'
 
 interface ContactSheetProps {
   isOpen: boolean
@@ -36,6 +38,7 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
 
   const { userEmail } = useFetchUser()
 
+  const isIOSApp = isNativeApp() && Capacitor.getPlatform() === 'ios'
   const keyboardHeight = useKeyboard(isOpen)
 
   useEffect(() => {
@@ -120,6 +123,11 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
             })
           }
           disabled={!isSubmitEnabled}
+          style={
+            isIOSApp
+              ? { transform: `translateY(-${keyboardHeight}px)` }
+              : undefined
+          }
         >
           Send inquiry
         </Button>
