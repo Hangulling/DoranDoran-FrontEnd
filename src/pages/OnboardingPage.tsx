@@ -133,7 +133,12 @@ export default function OnboardingPage() {
       </header>
 
       {/* 컨텐츠 */}
-      <div className="flex-1 w-full max-w-app md:max-w-tablet lg:max-w-desktop overflow-y-auto pb-4">
+      <div
+        className="flex-1 w-full max-w-app md:max-w-tablet lg:max-w-desktop overflow-y-auto"
+        style={{
+          paddingBottom: `calc(88px + ${isIOSApp ? keyboardHeight : 0}px)`,
+        }}
+      >
         <OnboardingContent
           stepData={currentStepData}
           selectedValues={currentSelections}
@@ -145,7 +150,14 @@ export default function OnboardingPage() {
 
       {/* 버튼 */}
       <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center pb-[env(safe-area-inset-bottom)]">
-        <div className="w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] h-18 px-5 py-2.5">
+        <div
+          className="w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] h-18 px-5 py-2.5"
+          style={
+            isIOSApp
+              ? { transform: `translateY(-${keyboardHeight}px)` }
+              : undefined
+          }
+        >
           <Button
             type={isLastPage ? 'submit' : 'button'}
             className="bg-gray-800"
@@ -156,11 +168,6 @@ export default function OnboardingPage() {
               e.stopPropagation()
               handleAction(isLastPage)
             }}
-            style={
-              isIOSApp
-                ? { transform: `translateY(-${keyboardHeight}px)` }
-                : undefined
-            }
           >
             {isLastPage ? 'Complete' : 'Next'}
           </Button>
