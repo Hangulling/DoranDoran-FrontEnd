@@ -11,14 +11,16 @@ import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { registerFcmToken } from '../api/notification'
 import useUnreadStore from '../stores/useUnreadStore'
+import { useUserStore } from '../stores/useUserStore'
 
 const usePushNotification = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { setUnread } = useUnreadStore() // 확인 유무
+  const { id: userId } = useUserStore()
 
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) {
+    if (!Capacitor.isNativePlatform() || !userId) {
       return
     }
 
@@ -105,7 +107,7 @@ const usePushNotification = () => {
       receivedListener.then(l => l.remove())
       actionPerformedListener.then(l => l.remove())
     }
-  }, [navigate, queryClient, setUnread])
+  }, [navigate, queryClient, setUnread, userId])
 }
 
 export default usePushNotification

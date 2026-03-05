@@ -6,7 +6,7 @@ import CheckIcon from '../../assets/icon/CheckIcon'
 import { useFetchUser } from '../../hooks/useFetchUser'
 import showToast from '../common/CommonToast'
 import { Keyboard } from '@capacitor/keyboard'
-import { useKeyboardHeight } from '../../hooks/chat/useKeyboardHeight'
+import { useKeyboard } from '../../hooks/useKeyboard'
 
 interface ContactSheetProps {
   isOpen: boolean
@@ -35,7 +35,8 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
   const isTransitioning = useRef(false)
 
   const { userEmail } = useFetchUser()
-  const keyboardHeight = useKeyboardHeight()
+
+  const keyboardHeight = useKeyboard(isOpen)
 
   useEffect(() => {
     Keyboard.setScroll({ isDisabled: true })
@@ -43,28 +44,14 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
   }, [])
 
   useEffect(() => {
-    if (!window.visualViewport) return
-
-    const handleResize = () => {
-      if (isTransitioning.current) return
-
-      const vh = window.innerHeight
-      const vvHeight = window.visualViewport?.height || vh
-
-      // 키보드 내려감
-      if (vvHeight > vh * 0.9) {
-        setIsExpanded(false)
-        setIsFocused(false)
-        if (document.activeElement instanceof HTMLElement) {
-          document.activeElement.blur()
-        }
+    if (keyboardHeight === 0) {
+      setIsExpanded(false)
+      setIsFocused(false)
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur()
       }
     }
-
-    window.visualViewport.addEventListener('resize', handleResize)
-    return () =>
-      window.visualViewport?.removeEventListener('resize', handleResize)
-  }, [])
+  }, [keyboardHeight])
 
   // Textarea 포커스
   const handleTextareaFocus = () => {
@@ -73,7 +60,7 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
     setIsFocused(true)
     setTimeout(() => {
       isTransitioning.current = false
-    }, 400)
+    })
   }
 
   // Email 포커스
@@ -143,11 +130,11 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
         style={{ paddingBottom: keyboardHeight }}
       >
         <div className="mb-5">
-          <label className="text-[16px] text-subtitle mb-[6px] block">
+          <label className="text-[16px] text-subtitle mb-1.5 block">
             Your Message
           </label>
           <textarea
-            className={`w-full py-[14px] px-5 rounded-[12px] bg-gray-0 resize-none text-[14px] focus:outline-none transition-all h-[154px]
+            className={`w-full py-3.5 px-5 rounded-xl bg-gray-0 resize-none text-[14px] focus:outline-none transition-all h-38.5
             ${content || isFocused ? 'gradient-border' : 'border border-gray-100'}`}
             ref={textareaRef}
             placeholder="Feel free to share here :)"
@@ -162,7 +149,7 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
           </div>
         </div>
 
-        <div className="mb-[30px]" ref={selectionRef}>
+        <div className="mb-7.5" ref={selectionRef}>
           <label className="text-[16px] text-subtitle mb-2 block">
             Receive a reply by email?
           </label>
