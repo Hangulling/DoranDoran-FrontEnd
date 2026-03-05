@@ -108,6 +108,11 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
       title="Contact us"
       isExpanded={isExpanded}
       className={isExpanded ? 'h-full transition-all duration-300' : ''}
+      footerStyle={
+        isIOSApp && keyboardHeight > 0
+          ? { transform: `translateY(-${keyboardHeight}px)` }
+          : undefined
+      }
       footer={
         <Button
           variant="primary"
@@ -119,11 +124,6 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
             })
           }
           disabled={!isSubmitEnabled}
-          style={
-            isIOSApp && keyboardHeight > 0
-              ? { transform: `translateY(-${keyboardHeight}px)` }
-              : undefined
-          }
         >
           Send inquiry
         </Button>
