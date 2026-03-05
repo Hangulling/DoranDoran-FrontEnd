@@ -22,6 +22,7 @@ export default function BottomSheet({
   children,
   footer,
   closeOnOverlayClick = true,
+  isExpanded = false,
   className,
 }: BottomSheetProps) {
   // 시트 유무에 따라 뒤로가기 상태 다름
@@ -57,21 +58,25 @@ export default function BottomSheet({
               duration: 0.3,
             }}
             style={{
-              height: 'auto',
-              top: 'auto',
+              height: isExpanded
+                ? 'calc(100% - 10px - env(safe-area-inset-top))'
+                : 'auto',
+              top: isExpanded
+                ? 'calc(10px + env(safe-area-inset-top))'
+                : 'auto',
               bottom: 0,
-              maxHeight: '75vh',
+              maxHeight: isExpanded ? 'none' : '75vh',
             }}
             className={`fixed inset-x-0 bottom-0 z-50 flex flex-col bg-white px-5 pb-[calc(10px+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.14)] rounded-t-2xl ${className || ''}`}
             drag="y"
             dragConstraints={{
               top: 0,
-              bottom: 10000,
+              bottom: isExpanded ? 0 : 10000,
             }}
-            dragElastic={0.05}
+            dragElastic={isExpanded ? 0 : 0.05}
             dragSnapToOrigin
             onDragEnd={(_, info) => {
-              {
+              if (!isExpanded) {
                 if (info.offset.y > 100 || info.velocity.y > 500) {
                   onClose()
                 }
