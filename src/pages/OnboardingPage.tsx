@@ -134,10 +134,13 @@ export default function OnboardingPage() {
 
       {/* 컨텐츠 */}
       <div
-        className="flex-1 w-full max-w-app md:max-w-tablet lg:max-w-desktop overflow-y-auto pb-22"
+        className="flex-1 w-full max-w-app md:max-w-tablet lg:max-w-desktop overflow-y-auto"
         style={{
-          marginBottom: isIOSApp ? `${keyboardHeight}px` : 0,
-          transition: 'margin-bottom 0.2s ease-out',
+          paddingBottom:
+            isIOSApp && keyboardHeight > 0
+              ? `${keyboardHeight + 88}px`
+              : '88px',
+          transition: isIOSApp ? 'padding-bottom 0.2s ease-out' : undefined,
         }}
       >
         <OnboardingContent
@@ -150,15 +153,19 @@ export default function OnboardingPage() {
       </div>
 
       {/* 버튼 */}
-      <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center pb-[env(safe-area-inset-bottom)] pointer-events-none">
-        <div
-          className="w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] h-18 px-5 py-2.5 pointer-events-auto"
-          style={
-            isIOSApp
-              ? { transform: `translateY(-${keyboardHeight}px)` }
-              : undefined
-          }
-        >
+      <div
+        className="fixed inset-x-0 bottom-0 z-10 flex justify-center pb-[env(safe-area-inset-bottom)] pointer-events-none"
+        style={
+          isIOSApp && keyboardHeight > 0
+            ? {
+                bottom: `${keyboardHeight}px`,
+                paddingBottom: 0,
+                transition: 'all 0.2s ease-out',
+              }
+            : undefined
+        }
+      >
+        <div className="w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] h-18 px-5 py-2.5 pointer-events-auto">
           <Button
             type={isLastPage ? 'submit' : 'button'}
             className="bg-gray-800"

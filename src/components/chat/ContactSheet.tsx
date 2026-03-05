@@ -106,8 +106,8 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
         <div
           className="w-full bg-gray-0 transition-transform duration-200"
           style={
-            isIOSApp
-              ? { transform: `translateY(-${keyboardHeight}px)` }
+            isIOSApp && keyboardHeight > 0
+              ? { paddingBottom: `${keyboardHeight}px` }
               : undefined
           }
         >
