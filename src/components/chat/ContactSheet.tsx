@@ -27,7 +27,6 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
   )
   const [replyEmail, setReplyEmail] = useState('')
   const [isFocused, setIsFocused] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(false)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const emailRef = useRef<HTMLDivElement>(null)
@@ -44,7 +43,6 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
 
   useEffect(() => {
     if (keyboardHeight === 0) {
-      setIsExpanded(false)
       setIsFocused(false)
       if (document.activeElement instanceof HTMLElement) {
         document.activeElement.blur()
@@ -55,7 +53,6 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
   // Textarea 포커스
   const handleTextareaFocus = () => {
     isTransitioning.current = true
-    setIsExpanded(true)
     setIsFocused(true)
     setTimeout(() => {
       isTransitioning.current = false
@@ -65,7 +62,6 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
   // Email 포커스
   const handleEmailFocus = () => {
     isTransitioning.current = true
-    setIsExpanded(false)
     setIsFocused(false)
   }
 
@@ -106,31 +102,33 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
       isOpen={isOpen}
       onClose={onClose}
       title="Contact us"
-      isExpanded={isExpanded}
-      className={isExpanded ? 'h-full transition-all duration-300' : ''}
       footer={
-        <Button
-          variant="primary"
-          size="confirm"
-          onClick={() =>
-            onSubmit(content, {
-              replyRequested: replyRequested === 'yes',
-              replyEmail,
-            })
-          }
-          disabled={!isSubmitEnabled}
+        <div
+          className="w-full bg-gray-0 transition-transform duration-200"
           style={
             isIOSApp
               ? { transform: `translateY(-${keyboardHeight}px)` }
               : undefined
           }
         >
-          Send inquiry
-        </Button>
+          <Button
+            variant="primary"
+            size="confirm"
+            onClick={() =>
+              onSubmit(content, {
+                replyRequested: replyRequested === 'yes',
+                replyEmail,
+              })
+            }
+            disabled={!isSubmitEnabled}
+          >
+            Send inquiry
+          </Button>
+        </div>
       }
     >
       <div
-        className={`flex flex-col mt-1 ${isExpanded ? 'h-full' : ''}`}
+        className={`flex flex-col mt-1`}
         style={{ paddingBottom: keyboardHeight }}
       >
         <div className="mb-5">
@@ -178,7 +176,6 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
               onClick={() => {
                 setReplyRequested('no')
                 setReplyEmail('')
-                setIsExpanded(false)
               }}
             >
               {replyRequested === 'no' ? (
