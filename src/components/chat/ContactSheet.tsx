@@ -104,10 +104,10 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
       title="Contact us"
       footer={
         <div
-          className="w-full bg-gray-0 transition-transform duration-200"
+          className="w-full bg-gray-0 transition-transform duration-200 relative"
           style={
             isIOSApp && keyboardHeight > 0
-              ? { paddingBottom: `${keyboardHeight}px` }
+              ? { transform: `translateY(-${keyboardHeight}px)` }
               : undefined
           }
         >
@@ -129,7 +129,10 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
     >
       <div
         className={`flex flex-col mt-1`}
-        style={{ paddingBottom: keyboardHeight }}
+        style={{
+          paddingBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : 0,
+          transition: 'padding-bottom 0.2s ease-out',
+        }}
       >
         <div className="mb-5">
           <label className="text-[16px] text-subtitle mb-1.5 block">

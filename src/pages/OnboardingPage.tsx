@@ -136,11 +136,10 @@ export default function OnboardingPage() {
       <div
         className="flex-1 w-full max-w-app md:max-w-tablet lg:max-w-desktop overflow-y-auto"
         style={{
-          paddingBottom:
-            isIOSApp && keyboardHeight > 0
-              ? `${keyboardHeight + 88}px`
-              : '88px',
-          transition: isIOSApp ? 'padding-bottom 0.2s ease-out' : undefined,
+          paddingBottom: '88px',
+          marginBottom:
+            isIOSApp && keyboardHeight > 0 ? `${keyboardHeight}px` : 0,
+          transition: 'margin-bottom 0.2s ease-out',
         }}
       >
         <OnboardingContent
