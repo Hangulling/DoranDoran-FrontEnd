@@ -111,7 +111,7 @@ export default function SignupPage() {
 
       <div className="w-full bg-white">
         <div
-          className="mx-auto w-full max-w-md px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)]"
+          className="mx-auto w-full max-w-md px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)]"
           style={
             isIOSApp
               ? { transform: `translateY(-${keyboardHeight}px)` }
