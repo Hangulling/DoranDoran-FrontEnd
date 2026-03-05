@@ -9,6 +9,7 @@ type BottomSheetProps = {
   description?: string
   children: ReactNode
   footer?: ReactNode
+  footerStyle?: React.CSSProperties
   closeOnOverlayClick?: boolean
   isExpanded?: boolean
   className?: string
@@ -21,6 +22,7 @@ export default function BottomSheet({
   description,
   children,
   footer,
+  footerStyle,
   closeOnOverlayClick = true,
   isExpanded = false,
   className,
@@ -103,7 +105,12 @@ export default function BottomSheet({
             </div>
 
             {footer && (
-              <div className="shrink-0 py-2.5 bg-gray-0 px-5">{footer}</div>
+              <div
+                className="shrink-0 py-2.5 bg-gray-0 px-5"
+                style={footerStyle}
+              >
+                {footer}
+              </div>
             )}
           </motion.div>
         </>
