@@ -61,7 +61,7 @@ export default function Dropdown({
 
       {isOpen && (
         <BottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)}>
-          <div className="flex flex-col items-center px-4">
+          <div className="flex flex-col items-center px-4 pb-5">
             {options.map(option => (
               <Button
                 key={option.value}

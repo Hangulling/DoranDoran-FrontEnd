@@ -109,28 +109,24 @@ const ContactSheet = ({ isOpen, onClose, onSubmit }: ContactSheetProps) => {
       isExpanded={isExpanded}
       className={isExpanded ? 'h-full transition-all duration-300' : ''}
       footer={
-        <div
-          className="w-full bg-gray-0 relative transition-transform duration-200"
+        <Button
+          variant="primary"
+          size="confirm"
+          onClick={() =>
+            onSubmit(content, {
+              replyRequested: replyRequested === 'yes',
+              replyEmail,
+            })
+          }
+          disabled={!isSubmitEnabled}
           style={
             isIOSApp && keyboardHeight > 0
               ? { transform: `translateY(-${keyboardHeight}px)` }
               : undefined
           }
         >
-          <Button
-            variant="primary"
-            size="confirm"
-            onClick={() =>
-              onSubmit(content, {
-                replyRequested: replyRequested === 'yes',
-                replyEmail,
-              })
-            }
-            disabled={!isSubmitEnabled}
-          >
-            Send inquiry
-          </Button>
-        </div>
+          Send inquiry
+        </Button>
       }
     >
       <div

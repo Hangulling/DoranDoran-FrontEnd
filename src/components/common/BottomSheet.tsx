@@ -67,7 +67,7 @@ export default function BottomSheet({
               bottom: 0,
               maxHeight: isExpanded ? 'none' : '75vh',
             }}
-            className={`fixed inset-x-0 bottom-0 z-50 flex flex-col bg-white px-5 pb-[calc(10px+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.14)] rounded-t-2xl ${className || ''}`}
+            className={`fixed inset-x-0 bottom-0 z-50 flex flex-col bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgba(0,0,0,0.14)] rounded-t-2xl ${className || ''}`}
             drag="y"
             dragConstraints={{
               top: 0,
@@ -86,7 +86,7 @@ export default function BottomSheet({
             <div className="mx-auto my-6 h-1.25 w-11.5 rounded-full bg-gray-800 shrink-0" />
 
             {(title || description) && (
-              <div className="mb-4 text-center shrink-0">
+              <div className="mb-4 text-center shrink-0 px-5">
                 {title && (
                   <h2 className="text-title text-lg text-gray-800">{title}</h2>
                 )}
@@ -98,11 +98,13 @@ export default function BottomSheet({
               </div>
             )}
 
-            <div className="flex-auto min-h-0 overflow-y-auto outline-none overscroll-contain">
+            <div className="flex-auto min-h-0 overflow-y-auto outline-none overscroll-contain px-5">
               {children}
             </div>
 
-            {footer && <div className="shrink-0 pt-2.5">{footer}</div>}
+            {footer && (
+              <div className="shrink-0 py-2.5 bg-gray-0 px-5">{footer}</div>
+            )}
           </motion.div>
         </>
       )}
