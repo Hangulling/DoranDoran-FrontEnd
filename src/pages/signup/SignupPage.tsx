@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import ProgressBar from '../../components/common/ProgressBar'
 import { useAgreementStore } from '../../stores/useAgreementStore'
 import { useSignupFormStore } from '../../stores/useSignupStore'
-// import { useKeyboard } from '../../hooks/useKeyboard'
-// import { Capacitor } from '@capacitor/core'
-// import { isNativeApp } from '../../utils/isNativeApp'
+import { useKeyboard } from '../../hooks/useKeyboard'
+import { Capacitor } from '@capacitor/core'
+import { isNativeApp } from '../../utils/isNativeApp'
 
 export default function SignupPage() {
   const { reset: resetForm } = useSignupFormStore()
@@ -18,8 +18,8 @@ export default function SignupPage() {
   const [submit, setSubmit] = useState<(() => void) | null>(null)
   const resetAgreements = useAgreementStore(s => s.reset)
   const navigate = useNavigate()
-  // const isIOSApp = isNativeApp() && Capacitor.getPlatform() === 'ios'
-  // const keyboardHeight = useKeyboard(isIOSApp)
+  const isIOSApp = isNativeApp() && Capacitor.getPlatform() === 'ios'
+  const keyboardHeight = useKeyboard(isIOSApp)
   const fromOAuth = Boolean(location.state?.fromOAuth)
 
   const stepMap: Record<string, number> = {
@@ -120,6 +120,11 @@ export default function SignupPage() {
             size="xl"
             className="w-full"
             disabled={!canSubmit}
+            style={
+              isIOSApp
+                ? { transform: `translateY(-${keyboardHeight}px)` }
+                : undefined
+            }
           >
             {label}
           </Button>

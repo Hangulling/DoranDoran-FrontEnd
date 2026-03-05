@@ -3,9 +3,9 @@ import Button from '../../components/common/Button'
 import { useEffect, useState } from 'react'
 import { usePasswordResetStore } from '../../stores/usePasswordResetStore'
 import ProgressBar from '../../components/common/ProgressBar'
-// import { isNativeApp } from '../../utils/isNativeApp'
-// import { Capacitor } from '@capacitor/core'
-// import { useKeyboard } from '../../hooks/useKeyboard'
+import { isNativeApp } from '../../utils/isNativeApp'
+import { Capacitor } from '@capacitor/core'
+import { useKeyboard } from '../../hooks/useKeyboard'
 
 export default function FindPasswordPage() {
   const [label, setLabel] = useState<string | null>(null)
@@ -15,8 +15,8 @@ export default function FindPasswordPage() {
   const [canSubmit, setCanSubmit] = useState(false)
   const [submit, setSubmit] = useState<(() => void) | null>(null)
   const reset = usePasswordResetStore(s => s.reset)
-  // const isIOSApp = isNativeApp() && Capacitor.getPlatform() === 'ios'
-  // const keyboardHeight = useKeyboard(isIOSApp)
+  const isIOSApp = isNativeApp() && Capacitor.getPlatform() === 'ios'
+  const keyboardHeight = useKeyboard(isIOSApp)
 
   const stepMap: Record<string, number> = {
     '/find-password/email': 1,
@@ -67,11 +67,11 @@ export default function FindPasswordPage() {
             variant="primary"
             size="xl"
             className="bg-gray-800 w-full"
-            // style={
-            //   isIOSApp
-            //     ? { transform: `translateY(-${keyboardHeight}px)` }
-            //     : undefined
-            // }
+            style={
+              isIOSApp
+                ? { transform: `translateY(-${keyboardHeight}px)` }
+                : undefined
+            }
           >
             {label}
           </Button>
