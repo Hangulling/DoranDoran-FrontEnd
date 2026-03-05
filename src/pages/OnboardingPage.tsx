@@ -9,6 +9,7 @@ import { ONBOARDING_STEPS } from '../constants/onboardingData'
 import LeftArrowIcon from '../assets/icon/leftArrow.svg?react'
 import type { OnboardingPayload } from '../types/user'
 import { useCompleteOnboarding } from '../hooks/useCompleteOnboarding'
+import { useIOSKeyboard } from '../hooks/useIOSKeyboard'
 
 const ETC_VALUE = 'Other'
 
@@ -21,6 +22,8 @@ export default function OnboardingPage() {
   const [selections, setSelections] = useState<Record<number, string[]>>({})
   const [etcValues, setEtcValues] = useState<Record<number, string>>({})
   const [etcText, setEtcText] = useState('')
+
+  const { isIOSApp, keyboardHeight } = useIOSKeyboard()
 
   const currentStepData = ONBOARDING_STEPS[page]
   const isLastPage = page === ONBOARDING_STEPS.length - 1
@@ -153,6 +156,11 @@ export default function OnboardingPage() {
               e.stopPropagation()
               handleAction(isLastPage)
             }}
+            style={
+              isIOSApp
+                ? { transform: `translateY(-${keyboardHeight}px)` }
+                : undefined
+            }
           >
             {isLastPage ? 'Complete' : 'Next'}
           </Button>

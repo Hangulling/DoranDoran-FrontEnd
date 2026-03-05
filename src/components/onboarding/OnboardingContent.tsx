@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { OnboardingStepData } from '../../constants/onboardingData'
+import { useIOSKeyboard } from '../../hooks/useIOSKeyboard'
 
 interface OnboardingContentProps {
   stepData: OnboardingStepData
@@ -25,13 +26,9 @@ export default function OnboardingContent({
   // textarea 높이 조절
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  useEffect(() => {
-    if (isEtcSelected && textareaRef.current) {
-      textareaRef.current.focus()
-    }
-  }, [isEtcSelected])
+  const { isIOSApp, keyboardHeight } = useIOSKeyboard()
 
-  // 입력창 자동 포커스
+  // 입력창 자동 포커스 및 스크롤
   useEffect(() => {
     if (isEtcSelected && textareaRef.current) {
       textareaRef.current.focus()
@@ -59,7 +56,10 @@ export default function OnboardingContent({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-18 scrollbar-hide">
+      <div
+        className="flex-1 overflow-y-auto pb-18 scrollbar-hide"
+        style={isIOSApp ? { paddingBottom: `${keyboardHeight}px` } : undefined}
+      >
         {/* 옵션 목록 */}
         <div
           className={
