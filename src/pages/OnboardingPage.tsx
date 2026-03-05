@@ -137,9 +137,6 @@ export default function OnboardingPage() {
         className="flex-1 w-full max-w-app md:max-w-tablet lg:max-w-desktop overflow-y-auto"
         style={{
           paddingBottom: '88px',
-          marginBottom:
-            isIOSApp && keyboardHeight > 0 ? `${keyboardHeight}px` : 0,
-          transition: 'margin-bottom 0.2s ease-out',
         }}
       >
         <OnboardingContent
@@ -153,13 +150,12 @@ export default function OnboardingPage() {
 
       {/* 버튼 */}
       <div
-        className="fixed inset-x-0 bottom-0 z-10 flex justify-center pb-[env(safe-area-inset-bottom)] pointer-events-none"
+        className="fixed inset-x-0 bottom-0 z-10 flex justify-center pb-[env(safe-area-inset-bottom)] pointer-events-none transition-all duration-200"
         style={
           isIOSApp && keyboardHeight > 0
             ? {
                 bottom: `${keyboardHeight}px`,
                 paddingBottom: 0,
-                transition: 'all 0.2s ease-out',
               }
             : undefined
         }
