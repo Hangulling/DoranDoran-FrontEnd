@@ -235,18 +235,20 @@ export default function LoginEmailPage() {
           </div>
 
           <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center">
-            <div className="w-full max-w-md bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)]">
+            <div
+              className="w-full max-w-md bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)]"
+              style={
+                isIOSApp
+                  ? { transform: `translateY(-${keyboardHeight}px)` }
+                  : undefined
+              }
+            >
               <Button
                 onClick={handleLogin}
                 variant="primary"
                 size="xl"
                 className="w-full"
                 disabled={!canSubmit}
-                style={
-                  isIOSApp
-                    ? { transform: `translateY(-${keyboardHeight}px)` }
-                    : undefined
-                }
               >
                 Login
               </Button>

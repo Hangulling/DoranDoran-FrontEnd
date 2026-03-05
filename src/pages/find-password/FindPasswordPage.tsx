@@ -57,18 +57,20 @@ export default function FindPasswordPage() {
 
       <Outlet context={{ setSubmit, setCanSubmit }} />
       <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center">
-        <div className="w-full max-w-md bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-1px_2px_0_rgba(0,0,0,0.08)]">
+        <div
+          className="w-full max-w-md bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-1px_2px_0_rgba(0,0,0,0.08)]"
+          style={
+            isIOSApp
+              ? { transform: `translateY(-${keyboardHeight}px)` }
+              : undefined
+          }
+        >
           <Button
             onClick={handleConfirm}
             disabled={!canSubmit}
             variant="primary"
             size="xl"
             className="bg-gray-800 w-full"
-            style={
-              isIOSApp
-                ? { transform: `translateY(-${keyboardHeight}px)` }
-                : undefined
-            }
           >
             {label}
           </Button>

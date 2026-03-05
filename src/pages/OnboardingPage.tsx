@@ -134,9 +134,10 @@ export default function OnboardingPage() {
 
       {/* 컨텐츠 */}
       <div
-        className="flex-1 w-full max-w-app md:max-w-tablet lg:max-w-desktop overflow-y-auto"
+        className="flex-1 w-full max-w-app md:max-w-tablet lg:max-w-desktop overflow-y-auto pb-22"
         style={{
-          paddingBottom: `calc(88px + ${isIOSApp ? keyboardHeight : 0}px)`,
+          marginBottom: isIOSApp ? `${keyboardHeight}px` : 0,
+          transition: 'margin-bottom 0.2s ease-out',
         }}
       >
         <OnboardingContent
@@ -149,9 +150,9 @@ export default function OnboardingPage() {
       </div>
 
       {/* 버튼 */}
-      <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center pb-[env(safe-area-inset-bottom)]">
+      <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center pb-[env(safe-area-inset-bottom)] pointer-events-none">
         <div
-          className="w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] h-18 px-5 py-2.5"
+          className="w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] h-18 px-5 py-2.5 pointer-events-auto"
           style={
             isIOSApp
               ? { transform: `translateY(-${keyboardHeight}px)` }

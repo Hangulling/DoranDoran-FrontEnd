@@ -22,7 +22,6 @@ export default function BottomSheet({
   children,
   footer,
   closeOnOverlayClick = true,
-  isExpanded = false,
   className,
 }: BottomSheetProps) {
   // 시트 유무에 따라 뒤로가기 상태 다름
@@ -58,32 +57,28 @@ export default function BottomSheet({
               duration: 0.3,
             }}
             style={{
-              height: isExpanded
-                ? 'calc(100% - 10px - env(safe-area-inset-top))'
-                : 'auto',
-              top: isExpanded
-                ? 'calc(10px + env(safe-area-inset-top))'
-                : 'auto',
+              height: 'auto',
+              top: 'auto',
               bottom: 0,
-              maxHeight: isExpanded ? 'none' : '75vh',
+              maxHeight: '75vh',
             }}
             className={`fixed inset-x-0 bottom-0 z-50 flex flex-col bg-white px-5 pb-[calc(10px+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.14)] rounded-t-2xl ${className || ''}`}
             drag="y"
             dragConstraints={{
               top: 0,
-              bottom: isExpanded ? 0 : 10000,
+              bottom: 10000,
             }}
-            dragElastic={isExpanded ? 0 : 0.05}
+            dragElastic={0.05}
             dragSnapToOrigin
             onDragEnd={(_, info) => {
-              if (!isExpanded) {
+              {
                 if (info.offset.y > 100 || info.velocity.y > 500) {
                   onClose()
                 }
               }
             }}
           >
-            <div className="mx-auto my-6 h-[5px] w-[46px] rounded-full bg-gray-800 shrink-0" />
+            <div className="mx-auto my-6 h-1.25 w-11.5 rounded-full bg-gray-800 shrink-0" />
 
             {(title || description) && (
               <div className="mb-4 text-center shrink-0">
@@ -102,7 +97,7 @@ export default function BottomSheet({
               {children}
             </div>
 
-            {footer && <div className="shrink-0 pt-[10px]">{footer}</div>}
+            {footer && <div className="shrink-0 pt-2.5">{footer}</div>}
           </motion.div>
         </>
       )}
