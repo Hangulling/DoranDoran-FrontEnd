@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.13.12](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.13.11...v3.13.12) (2026-03-06)
+
+
+### Bug Fixes
+
+* ios 빌드 오류 수정 ([90b9d0c](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/90b9d0cd5e392ca141d737f8eb91852b122b4200))
+
 ### [3.13.11](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.13.10...v3.13.11) (2026-03-06)
 
 
