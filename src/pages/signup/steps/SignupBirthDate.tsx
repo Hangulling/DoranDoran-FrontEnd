@@ -14,6 +14,8 @@ import { useUserStore } from '../../../stores/useUserStore'
 import type { OAuthLoginResponse } from '../../../types/auth'
 import axios from 'axios'
 import { tokenService } from '../../../api/tokenService'
+import { GA_ENABLED, IS_PROD } from '../../../constants/env'
+import ReactGA from 'react-ga4'
 
 type Provider = 'google' | 'apple'
 
@@ -91,6 +93,12 @@ export default function SignupBirthDate() {
 
           const user = res.data?.user
           if (!user) return
+
+          if (IS_PROD && GA_ENABLED) {
+            ReactGA.event('sign_up', {
+              method: provider,
+            })
+          }
 
           setStoreId(user.id)
           setStoreName(user.name)

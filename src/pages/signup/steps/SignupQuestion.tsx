@@ -10,6 +10,8 @@ import CommonModal from '../../../components/common/CommonModal'
 import { createUser } from '../../../api'
 import axios from 'axios'
 import { useAgreementStore } from '../../../stores/useAgreementStore'
+import { GA_ENABLED, IS_PROD } from '../../../constants/env'
+import ReactGA from 'react-ga4'
 
 type OutletContext = {
   setSubmit: (fn: () => void) => void
@@ -73,6 +75,12 @@ export default function SignupQuestion() {
       }
 
       await createUser(payload)
+
+      if (IS_PROD && GA_ENABLED) {
+        ReactGA.event('sign_up', {
+          method: 'email',
+        })
+      }
 
       navigate('/login', { replace: true })
       setTimeout(() => {

@@ -36,8 +36,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (IS_PROD && GA_ENABLED) {
-      const yyyyMmDd = new Date().toISOString().slice(0, 10)
-      ReactGA.event('view_login', { date: yyyyMmDd })
+      ReactGA.event('page_view', {
+        page: 'login',
+      })
     }
   }, [])
 
@@ -81,6 +82,12 @@ export default function LoginPage() {
   }
 
   const finishLogin = async (user: User, provider: Provider) => {
+    if (IS_PROD && GA_ENABLED) {
+      ReactGA.event('login', {
+        method: provider,
+      })
+    }
+
     setStoreId(user.id)
     setStoreName(user.name)
 
@@ -107,7 +114,7 @@ export default function LoginPage() {
     }
 
     if (user && accessToken) {
-      finishLogin(user, provider)
+      await finishLogin(user, provider)
     }
   }
 
@@ -122,12 +129,29 @@ export default function LoginPage() {
 
       const idToken = r.result?.idToken
       if (!idToken) {
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.event('fail_login', {
+            error_type: 'missing_id_token',
+            method: 'google',
+          })
+        }
         goErrorPage(400, 'google_native_login')
         return
       }
 
       const res = await oauthLogin({ provider: 'google', idToken })
-      handleNeedSignupOrLogin(res, idToken, 'google')
+
+      if (!res?.success) {
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.event('fail_login', {
+            error_type: 'oauth_google_login_failed',
+            method: 'google',
+          })
+        }
+        return
+      }
+
+      await handleNeedSignupOrLogin(res, idToken, 'google')
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status
@@ -137,11 +161,27 @@ export default function LoginPage() {
           data,
           err,
         })
+
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.event('fail_login', {
+            error_type: `status_${status ?? 503}`,
+            method: 'google',
+          })
+        }
+
         goErrorPage(status, 'google_native_login')
         return
       }
 
       console.error('[Native Google OAuth] unknown error:', err)
+
+      if (IS_PROD && GA_ENABLED) {
+        ReactGA.event('fail_login', {
+          error_type: 'unknown_google_native_error',
+          method: 'google',
+        })
+      }
+
       goErrorPage(503, 'google_native_login')
     }
   }
@@ -157,12 +197,29 @@ export default function LoginPage() {
 
       const idToken = r.result?.idToken
       if (!idToken) {
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.event('fail_login', {
+            error_type: 'missing_id_token',
+            method: 'apple',
+          })
+        }
         goErrorPage(400, 'apple_native_login')
         return
       }
 
       const res = await oauthLogin({ provider: 'apple', idToken })
-      handleNeedSignupOrLogin(res, idToken, 'apple')
+
+      if (!res?.success) {
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.event('fail_login', {
+            error_type: 'oauth_apple_login_failed',
+            method: 'apple',
+          })
+        }
+        return
+      }
+
+      await handleNeedSignupOrLogin(res, idToken, 'apple')
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status
@@ -172,11 +229,27 @@ export default function LoginPage() {
           data,
           err,
         })
+
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.event('fail_login', {
+            error_type: `status_${status ?? 503}`,
+            method: 'apple',
+          })
+        }
+
         goErrorPage(status, 'apple_native_login')
         return
       }
 
       console.error('[Native Apple OAuth] unknown error:', err)
+
+      if (IS_PROD && GA_ENABLED) {
+        ReactGA.event('fail_login', {
+          error_type: 'unknown_apple_native_error',
+          method: 'apple',
+        })
+      }
+
       goErrorPage(503, 'apple_native_login')
     }
   }
@@ -187,6 +260,14 @@ export default function LoginPage() {
       if (!idToken) {
         setError('general')
         setErrorMsg('Google 로그인에 실패했습니다.')
+
+        if (IS_PROD && GA_ENABLED) {
+          ReactGA.event('fail_login', {
+            error_type: 'missing_id_token',
+            method: 'google',
+          })
+        }
+
         goErrorPage(400, 'google_web_oauth')
         return
       }
@@ -205,13 +286,13 @@ export default function LoginPage() {
         if (IS_PROD && GA_ENABLED) {
           ReactGA.event('fail_login', {
             error_type: mapped.type ?? 'unknown_oauth_error',
-            method: 'oauth_google',
+            method: 'google',
           })
         }
         return
       }
 
-      handleNeedSignupOrLogin(res, idToken, 'google')
+      await handleNeedSignupOrLogin(res, idToken, 'google')
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status
@@ -222,6 +303,13 @@ export default function LoginPage() {
         }
 
         if (!status || status >= 500) {
+          if (IS_PROD && GA_ENABLED) {
+            ReactGA.event('fail_login', {
+              error_type: `status_${status ?? 503}`,
+              method: 'google',
+            })
+          }
+
           goErrorPage(status ?? 503, 'oauth_login')
           return
         }
@@ -239,10 +327,17 @@ export default function LoginPage() {
         if (IS_PROD && GA_ENABLED) {
           ReactGA.event('fail_login', {
             error_type: mapped.type ?? 'unknown_oauth_catch_error',
-            method: 'oauth_google',
+            method: 'google',
           })
         }
         return
+      }
+
+      if (IS_PROD && GA_ENABLED) {
+        ReactGA.event('fail_login', {
+          error_type: 'unknown_google_web_error',
+          method: 'google',
+        })
       }
 
       goErrorPage(500, 'oauth_login')
@@ -254,15 +349,14 @@ export default function LoginPage() {
     setError('general')
     setErrorMsg('Google 로그인에 실패했습니다.')
 
-    // 정책: 에러 페이지로
-    goErrorPage(400, 'google_web_oauth_error')
-
     if (IS_PROD && GA_ENABLED) {
       ReactGA.event('fail_login', {
         error_type: 'oauth_google_error',
-        method: 'oauth_google',
+        method: 'google',
       })
     }
+
+    goErrorPage(400, 'google_web_oauth_error')
   }
 
   const handleCustomGoogleClick = () => {
