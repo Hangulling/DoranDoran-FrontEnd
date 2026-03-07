@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.14.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.13.12...v3.14.0) (2026-03-07)
+
 ### [3.13.12](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.13.11...v3.13.12) (2026-03-06)
 
 
