@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import ReactGA from 'react-ga4'
+import { GA_ENABLED, IS_PROD } from '../../constants/env'
 import ArchiveTabs from '../../components/archive/ArchiveTabs'
 import ClosenessSelect from '../../components/archive/ClosenessSelect'
 import TranslateButton from '../../components/archive/TranslateButton'
@@ -88,6 +90,19 @@ export default function WordArchivePage() {
     })
   }, [wordItems, closenessFilter])
 
+  const handleToggleWordCard = (bookmarkId: string, word: string) => {
+    const nextOpen = openId !== bookmarkId
+
+    setOpenId(prev => (prev === bookmarkId ? null : bookmarkId))
+
+    if (nextOpen && IS_PROD && GA_ENABLED) {
+      ReactGA.event('word_explanation_saved_click', {
+        bookmark_id: bookmarkId,
+        word,
+      })
+    }
+  }
+
   if (isLoading) {
     return (
       <div>
@@ -154,9 +169,7 @@ export default function WordArchivePage() {
                 description={description}
                 content={b.content}
                 open={openId === b.id}
-                onToggle={() =>
-                  setOpenId(prev => (prev === b.id ? null : b.id))
-                }
+                onToggle={() => handleToggleWordCard(b.id, vocab.word)}
               />
             )
           })}

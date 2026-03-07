@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import ReactGA from 'react-ga4'
+import { GA_ENABLED, IS_PROD } from '../../constants/env'
 import ArchiveTabs from '../../components/archive/ArchiveTabs'
 import ClosenessSelect from '../../components/archive/ClosenessSelect'
 import SentenceCard from '../../components/archive/SentenceCard'
@@ -88,6 +90,18 @@ export default function SentenceArchivePage() {
       })
   }, [filteredByRoom, closenessFilter])
 
+  const handleToggleSentenceCard = (bookmarkId: string) => {
+    const nextOpen = openId !== bookmarkId
+
+    setOpenId(prev => (prev === bookmarkId ? null : bookmarkId))
+
+    if (nextOpen && IS_PROD && GA_ENABLED) {
+      ReactGA.event('ment_explanation_saved_click', {
+        bookmark_id: bookmarkId,
+      })
+    }
+  }
+
   const handleDelete = async () => {
     try {
       const ids = [...selectedIds]
@@ -176,9 +190,7 @@ export default function SentenceArchivePage() {
                 content={content}
                 description={description}
                 open={openId === b.id}
-                onToggle={() =>
-                  setOpenId(prev => (prev === b.id ? null : b.id))
-                }
+                onToggle={() => handleToggleSentenceCard(b.id)}
               />
             )
           })}
