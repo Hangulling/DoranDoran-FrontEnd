@@ -3,6 +3,7 @@ import { createChatRoom } from '../../api'
 import useRoomIdStore from '../../stores/useRoomIdStore'
 import useClosenessStore from '../../stores/useClosenessStore'
 import showToast from '../../components/common/CommonToast'
+import { sendGAEvent } from '../../utils/ga'
 
 interface CreateChatRoomParams {
   userId: string
@@ -20,10 +21,17 @@ export const useCreateChatRoom = (routeId: string) => {
     mutationFn: (params: CreateChatRoomParams) => createChatRoom(params),
 
     onSuccess: (newRoom, variables) => {
-      // set_intimacy_level
+      // 상태 업데이트
       addRoomMapping(routeId, newRoom.id)
       setChatbotId(routeId, variables.chatbotId)
       setCloseness(routeId, variables.intimacyLevel)
+
+      // GA_set_intimacy_level
+      sendGAEvent('set_intimacy_level', {
+        chatroom_id: newRoom.id,
+        concept: variables.concept,
+        intimacy_level: variables.intimacyLevel,
+      })
     },
 
     onError: error => {
