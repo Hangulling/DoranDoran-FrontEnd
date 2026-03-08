@@ -10,6 +10,7 @@ import type {
 } from '../../types/sseEvents'
 import { cancelMessage, getMessage, sendMessage } from '../../api'
 import { useUserMsgStore } from '../../stores/useUserMsgStore'
+import { sendGAEvent } from '../../utils/ga'
 
 interface UseChatInteractionProps {
   chatroomId: string | undefined
@@ -160,6 +161,12 @@ export const useChatInteraction = ({
         contentType: 'text',
       })
 
+      // GA_send_user_message
+      sendGAEvent('send_user_message', {
+        chatroom_id: chatroomId,
+        user_message: text,
+      })
+
       useUserMsgStore.getState().addUserMsg({
         id: response.id,
         content: response.content,
@@ -219,6 +226,12 @@ export const useChatInteraction = ({
 
           setIsAiResponding(false) // 로딩 종료
 
+          // GA_send_ai_reply
+          sendGAEvent('send_ai_reply', {
+            chatroom_id: chatroomId,
+            intimacy_message: conversationData.content,
+          })
+
           lastAiMsgIdRef.current = conversationData.messageId
 
           const newAiMessage: EnrichedMessage = {
@@ -236,6 +249,14 @@ export const useChatInteraction = ({
         }
         case 'intimacy_analysis': {
           const intimacyData = data as IntimacyAnalysisData
+
+          // GA_send_ai_intimacy
+          sendGAEvent('send_ai_intimacy', {
+            chatroom_id: chatroomId,
+            ai_message: intimacyData.corrections
+              ? intimacyData.correctedSentence
+              : '',
+          })
 
           const targetMsgId = lastUserMsgIdRef.current
           if (!targetMsgId) break
@@ -276,6 +297,7 @@ export const useChatInteraction = ({
       }
     },
     [
+      chatroomId,
       roomAvatar,
       isNewChat,
       resetInactivityTimer,

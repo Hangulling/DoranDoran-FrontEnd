@@ -4,9 +4,8 @@ import { useModalStore } from '../../stores/useUiStateStore'
 import { useAuthCleanupStore } from '../../stores/useAuthCleanupStore'
 import { leaveChatroom, updateUser } from '../../api'
 import { useUserMsgStore } from '../../stores/useUserMsgStore'
-import ReactGA from 'react-ga4'
-import { GA_ENABLED, IS_PROD } from '../../constants/env'
 import { useBackButton } from '../useBackButton'
+import { sendGAEvent } from '../../utils/ga'
 
 interface UseChatExitProps {
   chatroomId: string | undefined
@@ -48,8 +47,8 @@ export const useChatExit = ({
     hasLeftRef.current = true
 
     // GA_leave_chatroom
-    if (IS_PROD && GA_ENABLED && userId) {
-      ReactGA.event('leave_chatroom', {
+    if (userId) {
+      sendGAEvent('leave_chatroom', {
         chatroom_id: chatroomId,
         leave_timestamp: Math.floor(Date.now() / 1000),
       })
