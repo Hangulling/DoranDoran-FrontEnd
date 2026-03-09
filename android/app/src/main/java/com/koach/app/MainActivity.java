@@ -2,6 +2,7 @@ package com.koach.app;
 
 import android.os.Bundle;
 import android.content.Intent;
+import androidx.core.splashscreen.SplashScreen;
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginHandle;
@@ -14,6 +15,8 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
+				SplashScreen.installSplashScreen(this);
+        androidx.activity.EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
     }
 
