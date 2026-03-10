@@ -1,11 +1,29 @@
 import ReactGA from 'react-ga4'
+import {
+  GA_ENABLED,
+  GA_ID,
+  GA_INTERNAL_EMAILS,
+  IS_PROD,
+} from '../constants/env'
 
-const GA_ID = import.meta.env.VITE_GA_ID
-const GA_ENABLED = import.meta.env.VITE_GA_ENABLED === 'true'
+// 내부 유저 판별
+const INTERNAL_EMAIL_LIST = GA_INTERNAL_EMAILS
+  ? GA_INTERNAL_EMAILS.split(',').map((email: string) => email.trim())
+  : []
+
+let isInternalUser = false
+
+export const setGAUserContext = (email?: string) => {
+  if (email && INTERNAL_EMAIL_LIST.includes(email)) {
+    isInternalUser = true
+  } else {
+    isInternalUser = false
+  }
+}
 
 // GA 초기화 함수
 export const initGA = () => {
-  if (import.meta.env.PROD && GA_ENABLED && GA_ID) {
+  if (IS_PROD && GA_ENABLED && GA_ID) {
     ReactGA.initialize(GA_ID)
   }
 }
@@ -20,7 +38,7 @@ export const sendGAEvent = (
   eventName: string,
   params?: Record<string, string | number | boolean | undefined | null>
 ) => {
-  if (import.meta.env.PROD && GA_ENABLED) {
+  if (IS_PROD && GA_ENABLED && !isInternalUser) {
     ReactGA.event(eventName, params)
   }
 }
