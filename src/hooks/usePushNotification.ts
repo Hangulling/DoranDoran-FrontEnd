@@ -9,7 +9,10 @@ import type {
 import { Capacitor } from '@capacitor/core'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import { registerFcmToken } from '../api/notification'
+import {
+  markSingleNotificationAsRead,
+  registerFcmToken,
+} from '../api/notification'
 import useUnreadStore from '../stores/useUnreadStore'
 import { useUserStore } from '../stores/useUserStore'
 
@@ -68,8 +71,8 @@ const usePushNotification = () => {
     const receivedListener = PushNotifications.addListener(
       'pushNotificationReceived',
       (notification: PushNotificationSchema) => {
-        console.log('Foreground Push received:', notification)
         const data = notification.data
+        console.log('Foreground Push received:', JSON.stringify(data, null, 2))
         if (data?.chatroomId) {
           // 안 읽음 상태
           setUnread(data.chatroomId, true)
@@ -83,9 +86,18 @@ const usePushNotification = () => {
     // 푸시 알림 클릭 시 동작
     const actionPerformedListener = PushNotifications.addListener(
       'pushNotificationActionPerformed',
-      (notification: ActionPerformed) => {
+      async (notification: ActionPerformed) => {
         const data = notification.notification.data
         console.log('📦 Push Payload:', JSON.stringify(data, null, 2))
+
+        // 읽음 처리
+        if (data?.id) {
+          try {
+            await markSingleNotificationAsRead(Number(data.id))
+          } catch (error) {
+            console.error('푸시 읽음 처리 실패:', error)
+          }
+        }
 
         if (data.chatbotId && data.topic) {
           navigate('/', {

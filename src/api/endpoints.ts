@@ -257,12 +257,14 @@ export const SUPPORT_ENDPOINTS = {
 export const NOTIFICATION_ENDPOINTS = {
   // FCM 토큰 등록
   REGISTER: '/api/notifications/register',
-  // 푸시 발송 (내부 테스트용 등)
-  SEND: '/api/notifications/send',
-  // 푸시 로그 조회
-  LOGS: (userId: string) => `/api/notifications/logs?userId=${userId}`,
-  // 푸시 테스트
-  TEST_PUSH: '/api/notifications/test',
-  // 채팅방 딥링크 푸시 테스트
-  TEST_CHATROOM_PUSH: '/api/notifications/test-chatroom-push',
+
+  // 안읽음 푸시 조회
+  UNREAD_LIST: (page: number = 0, size: number = 20) =>
+    `/api/notifications/unread?page=${page}&size=${size}`,
+
+  // 안읽음 푸시 일괄/전체 읽음 처리
+  MARK_READ_BULK: '/api/notifications/unread/mark-read',
+
+  // 안읽음 푸시 단건 읽음 처리
+  MARK_READ_SINGLE: (id: number) => `/api/notifications/unread/${id}/mark-read`,
 }
