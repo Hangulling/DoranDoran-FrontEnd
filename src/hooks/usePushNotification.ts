@@ -47,14 +47,12 @@ const usePushNotification = () => {
             // iOS일 경우 APNs 토큰을 FCM 토큰으로 교체
             const res = await FCM.getToken()
             fcmToken = res.token
-            console.log('Converted FCM Token for iOS:', fcmToken)
           }
 
           const platform = Capacitor.getPlatform() === 'ios' ? 'ios' : 'android'
           await registerFcmToken(fcmToken, platform)
-          console.log('Final Token registered to server:', fcmToken)
         } catch (error) {
-          console.error('Failed to register FCM token:', error)
+          console.error('FCM 토큰 발급 실패:', error)
         }
       }
     )
@@ -63,7 +61,7 @@ const usePushNotification = () => {
     const errorListener = PushNotifications.addListener(
       'registrationError',
       (error: unknown) => {
-        console.error('Registration error: ', error)
+        console.error('FCM 토큰 발급 실패: ', error)
       }
     )
 
@@ -88,7 +86,7 @@ const usePushNotification = () => {
       'pushNotificationActionPerformed',
       async (notification: ActionPerformed) => {
         const data = notification.notification.data
-        console.log('📦 Push Payload:', JSON.stringify(data, null, 2))
+        console.log('Push Payload:', JSON.stringify(data, null, 2))
 
         // 읽음 처리
         if (data?.id) {
