@@ -1,31 +1,27 @@
 import api from './api'
 import { NOTIFICATION_ENDPOINTS } from './endpoints'
 
-export interface NotificationLog {
-  deeplink: string
-  universalLink: string
-  chatroomId: string
-  messageId: string
+export interface UnreadNotification {
+  id: number
+  pushType: 'CHATROOM_CREATE' | 'NEW_MESSAGE'
+  chatbotId: string | null
+  chatroomId: string | null
+  messageId: string | null
+  concept: string
+  topic: string
   startMessage: string
+  title: string
+  body: string
   sentAt: string
 }
 
-export interface PushNotificationRequest {
-  userId: string
-  title?: string
-  body?: string
-  chatroomId?: string
-  messageId?: string
-}
-
-export interface TestChatroomPushRequest {
-  userId: string
-  chatbotId: string
-  topic: string
-  concept?: string
-  intimacyLevel?: number
-  title?: string
-  body?: string
+export interface UnreadNotificationResponse {
+  content: UnreadNotification[]
+  totalElements: number
+  totalPages: number
+  number: number
+  size: number
+  unreadCount: number
 }
 
 // FCM 토큰 등록
@@ -40,44 +36,28 @@ export const registerFcmToken = async (
   return response.data
 }
 
-// 푸시 발송 (테스트/내부용)
-export const sendPushNotification = async (payload: {
-  userId: string
-  title: string
-  body: string
-  chatroomId: string
-  messageId: string
-}) => {
-  const response = await api.post(NOTIFICATION_ENDPOINTS.SEND, payload)
-  return response.data
-}
-
-// 푸시 발송 로그 조회
-export const getNotificationLogs = async (
-  userId: string,
+// 안읽음 푸시 조회
+export const getUnreadNotifications = async (
   page: number = 0,
   size: number = 20
 ) => {
-  const response = await api.get<NotificationLog[]>(
-    NOTIFICATION_ENDPOINTS.LOGS(userId),
-    {
-      params: { page, size },
-    }
-  )
+  const response = await api.get<{
+    success: boolean
+    data: UnreadNotificationResponse
+  }>(NOTIFICATION_ENDPOINTS.UNREAD_LIST(page, size))
+  return response.data.data
+}
+
+// 안읽음 푸시 일괄/전체 읽음 처리
+export const markNotificationsAsRead = async (ids?: number[] | null) => {
+  const response = await api.post(NOTIFICATION_ENDPOINTS.MARK_READ_BULK, {
+    ids,
+  })
   return response.data
 }
 
-// 테스트 푸시 발송
-export const sendTestPush = async (data: PushNotificationRequest) => {
-  const response = await api.post(NOTIFICATION_ENDPOINTS.TEST_PUSH, data)
-  return response.data
-}
-
-// 테스트 채팅방 딥링크 푸시 발송
-export const sendTestChatroomPush = async (data: TestChatroomPushRequest) => {
-  const response = await api.post(
-    NOTIFICATION_ENDPOINTS.TEST_CHATROOM_PUSH,
-    data
-  )
+// 안읽음 푸시 단건 읽음 처리
+export const markSingleNotificationAsRead = async (id: number) => {
+  const response = await api.post(NOTIFICATION_ENDPOINTS.MARK_READ_SINGLE(id))
   return response.data
 }

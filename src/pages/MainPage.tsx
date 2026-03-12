@@ -13,11 +13,10 @@ import Dashboard from '../components/main/Dashboard'
 import InstaContent from '../components/main/InstaContent'
 import { MANAGER_ROOM } from '../constants/mainData'
 import useUnreadStore from '../stores/useUnreadStore'
-import ReactGA from 'react-ga4'
-import { GA_ENABLED, IS_PROD } from '../constants/env'
 import type { ChatRoomWithMessage } from '../types/main'
 import { useDeepLinkChatRoom } from '../hooks/main/useDeepLinkChatRoom'
 import { useStartGreeting } from '../hooks/main/useStartGreeting'
+import { sendGAEvent } from '../utils/ga'
 
 const MainPage = () => {
   const navigate = useNavigate()
@@ -40,11 +39,11 @@ const MainPage = () => {
   const { userId } = useFetchUser()
   const { chatMsg, isLoading } = useFetchChatRooms(userId)
 
-  // view_main GA
+  // GA_view_main
   useEffect(() => {
-    if (IS_PROD && GA_ENABLED && userId) {
+    if (userId) {
       const entryTimestamp = Math.floor(Date.now() / 1000)
-      ReactGA.event('view_main', {
+      sendGAEvent('view_main', {
         entry_timestamp: entryTimestamp,
       })
     }
@@ -98,14 +97,12 @@ const MainPage = () => {
       return
     }
 
-    // enter_chatroom GA
-    if (IS_PROD && GA_ENABLED) {
-      const entryTimestamp = Math.floor(Date.now() / 1000)
-      ReactGA.event('enter_chatroom', {
-        concept: roomName,
-        entry_timestamp: entryTimestamp,
-      })
-    }
+    // GA_enter_chatroom
+    const entryTimestamp = Math.floor(Date.now() / 1000)
+    sendGAEvent('enter_chatroom', {
+      concept: roomName,
+      entry_timestamp: entryTimestamp,
+    })
 
     const room = chatMsg.find((r: ChatRoomWithMessage) => r.roomRouteId === id)
     if (room?.chatroomId) setUnread(room.chatroomId, false)
@@ -188,7 +185,7 @@ const MainPage = () => {
 
       <div className="px-5 relative z-20">
         {/* 카드의 정중앙이 캐러셀 밑변 */}
-        <div className="-mt-[33px]">
+        <div className="-mt-8.25">
           <Dashboard />
         </div>
       </div>
@@ -203,7 +200,7 @@ const MainPage = () => {
         />
       </div>
 
-      <section className="max-w-app md:max-w-tablet lg:max-w-desktop mx-auto ml-5 mb-[77px]">
+      <section className="max-w-app md:max-w-tablet lg:max-w-desktop mx-auto ml-5 mb-19.25">
         <div className="text-title mb-3 mr-5 text-[18px]">
           Koach Pick K - contents
         </div>

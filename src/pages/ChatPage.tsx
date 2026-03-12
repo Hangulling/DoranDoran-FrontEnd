@@ -30,6 +30,7 @@ import { useChatSettingStore } from '../stores/useChatSetting'
 import ReportSheet from '../components/chat/ReportSheet'
 import { createSupport } from '../api/support'
 import showToast from '../components/common/CommonToast'
+import { sendGAEvent } from '../utils/ga'
 
 const INACTIVITY_DURATION_MS = 300000
 
@@ -275,14 +276,12 @@ const ChatPage: React.FC = () => {
       // 'loading' 상태는 isNewChat == true일 때만 설정됨
       if (greetingState !== 'loading') return // 중복 실행 방지
 
-      // send_greeting_message GA
-      if (IS_PROD && GA_ENABLED && chatroomId) {
-        ReactGA.event('send_greeting_message', {
-          chatroom_id: chatroomId,
-          bot_message: botMsg,
-          guide_message: guideMsg ?? '',
-        })
-      }
+      // GA_send_greeting_message
+      sendGAEvent('send_greeting_message', {
+        chatroom_id: chatroomId,
+        bot_message: botMsg,
+        guide_message: guideMsg ?? '',
+      })
       setGreetingState('complete')
     }
 
@@ -404,7 +403,7 @@ const ChatPage: React.FC = () => {
           title="Auto-open messages"
           description="Turn this on to view messages instantly."
         >
-          <div className="flex flex-col gap-5 mt-[14px] mb-[30px]">
+          <div className="flex flex-col gap-5 mt-3.5 mb-7.5">
             <div className="flex justify-between items-center">
               <span className="text-[16px]">Vocabulary</span>
               <ToggleSwitch

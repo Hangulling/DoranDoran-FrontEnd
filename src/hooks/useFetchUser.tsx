@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useUserStore } from '../stores/useUserStore'
 import { getCurrentUser, getUserStats } from '../api'
 import { countBookmarks } from '../api/archive'
+import { setGAUserContext } from '../utils/ga'
 
 export const useFetchUser = () => {
   const navigate = useNavigate()
@@ -39,6 +40,7 @@ export const useFetchUser = () => {
   useEffect(() => {
     if (data) {
       const { profile, bookmarkCount, stats } = data
+      setGAUserContext(profile.email) // 내부 사용자 판별
       setStoreName(profile.name)
       setStoreId(profile.id)
       setStoreEmail(profile.email)

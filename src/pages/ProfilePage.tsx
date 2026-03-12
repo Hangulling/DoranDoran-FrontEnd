@@ -5,6 +5,7 @@ import CommonModal from '../components/common/CommonModal'
 import { useNavigate } from 'react-router-dom'
 import { useUserStore } from '../stores/useUserStore'
 import type { User } from '../types/user'
+import { setGAUserContext } from '../utils/ga'
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null)
@@ -20,6 +21,7 @@ export default function ProfilePage() {
     try {
       await logout()
       reset() // 유저 스토어 초기화
+      setGAUserContext() // 내부 유저 해제
 
       navigate('/login', { replace: true })
       setOpenLogout(false)
@@ -32,6 +34,7 @@ export default function ProfilePage() {
     try {
       await deleteUser(userId)
       reset()
+      setGAUserContext()
       navigate('/login', { replace: true })
       setOpenDelete(false)
     } catch (error) {
