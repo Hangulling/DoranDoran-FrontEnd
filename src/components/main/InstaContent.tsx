@@ -8,20 +8,12 @@ interface InstaContentProps {
 
 // 스켈레톤 카드
 const SkeletonCard = () => (
-  <div
-    className="
-				flex-shrink-0 
-        relative
-        h-[226px] w-[180px] 
-        rounded-[12px] overflow-hidden
-				bg-primary-30 animate-pulse
-      "
-  />
+  <div className="shrink-0 relative h-56.5 w-45 rounded-xl overflow-hidden bg-primary-30 animate-pulse" />
 )
 
 const InstaContent = ({ onCardClick }: InstaContentProps) => {
   const [isLoading, setIsLoading] = useState(true)
-  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({})
+  const [loadedMedia, setLoadedMedia] = useState<Record<string, boolean>>({})
   const { homePosts, setHomePosts } = useHomeStore()
 
   useEffect(() => {
@@ -43,7 +35,11 @@ const InstaContent = ({ onCardClick }: InstaContentProps) => {
     }
   }, [setHomePosts, homePosts.length])
 
-  // 로딩 중일 때 스켈레톤 표시
+  // 로딩 중 스켈레톤 표시
+  const handleMediaLoad = (id: string) => {
+    setLoadedMedia(prev => ({ ...prev, [id]: true }))
+  }
+
   if (isLoading) {
     return (
       <div className="no-scrollbar flex w-full gap-x-2 overflow-x-auto">
@@ -60,41 +56,47 @@ const InstaContent = ({ onCardClick }: InstaContentProps) => {
     <div className="w-full">
       <div className="no-scrollbar flex w-full gap-x-2 overflow-x-auto">
         {homePosts.map(post => {
-          const isImageLoaded = loadedImages[post.externalId]
+          const isLoaded = loadedMedia[post.externalId]
+          const mediaUrl = post.coverImageUrl || post.imageUrl || ''
+          const isVideo =
+            post.mediaType === 'VIDEO' || mediaUrl.includes('.mp4')
 
           return (
             <button
               key={post.externalId}
               onClick={() => onCardClick && onCardClick(post.externalId)}
-              className="
-              flex-shrink-0 
-              relative 
-              h-[226px] w-[180px] 
-              items-center justify-center 
-              rounded-[12px] overflow-hidden
-              transition-transform
-            "
+              className="shrink-0 relative h-56.5 w-45 rounded-xl overflow-hidden transition-transform"
             >
-              {!isImageLoaded && (
+              {!isLoaded && (
                 <div className="absolute inset-0 z-10">
                   <SkeletonCard />
                 </div>
               )}
 
               <div className="h-full w-full overflow-hidden">
-                <img
-                  src={post.coverImageUrl || post.imageUrl || ''}
-                  alt={post.title || ''}
-                  onLoad={() =>
-                    setLoadedImages(prev => ({
-                      ...prev,
-                      [post.externalId]: true,
-                    }))
-                  }
-                  className={`w-full h-full object-cover transition-opacity duration-300 ${
-                    isImageLoaded ? 'opacity-100' : 'opacity-0'
-                  }`}
-                />
+                {isVideo ? (
+                  /* 비디오인 경우 */
+                  <video
+                    src={mediaUrl}
+                    className={`w-full h-full object-cover transition-opacity duration-300 ${
+                      isLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    muted
+                    playsInline
+                    preload="metadata"
+                    onLoadedData={() => handleMediaLoad(post.externalId)}
+                  />
+                ) : (
+                  /* 이미지인 경우 */
+                  <img
+                    src={mediaUrl}
+                    alt={post.title || ''}
+                    onLoad={() => handleMediaLoad(post.externalId)}
+                    className={`w-full h-full object-cover transition-opacity duration-300 ${
+                      isLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  />
+                )}
               </div>
             </button>
           )
