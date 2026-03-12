@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.15.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.14.0...v3.15.0) (2026-03-12)
+
+
+### Features
+
+* 기존 GA 태그 추가 ([#409](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/409)) ([a0d6413](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/a0d6413327a0a9e6b5babbdbe76a90c4629c4cc5))
+* 기존 ga 태그 추가 ([#413](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/413)) ([020bf9b](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/020bf9b05fdbb5cc85ffb6e7183397ac63720972)), closes [#409](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/409) [#410](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/410) [#411](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/411) [#412](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/412)
+* 푸시 읽음 처리 api 추가 ([#411](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/411)) ([d2b175e](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/d2b175e5f26c62370db01c185d73cf016e2def8d))
+
 ## [3.14.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.13.12...v3.14.0) (2026-03-07)
 
 ### [3.13.12](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.13.11...v3.13.12) (2026-03-06)
