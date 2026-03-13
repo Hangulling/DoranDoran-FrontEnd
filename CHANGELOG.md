@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.16.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.15.0...v3.16.0) (2026-03-13)
+
+
+### Features
+
+* 로그아웃 탈퇴 ga 추가 ([#414](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/414)) ([3546ab9](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/3546ab9af5ea82bd28e3ea7c5d392a2309548e7b))
+
+
+### Bug Fixes
+
+* ios 애플 로그인 오류 수정 ([#415](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/415)) ([a925801](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/a925801ddc764ff8a303ace03deade71d695552e))
+
 ## [3.15.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.14.0...v3.15.0) (2026-03-12)
 
 
