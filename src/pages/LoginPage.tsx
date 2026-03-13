@@ -17,6 +17,7 @@ import AppleLoginIcon from '../assets/auth/appleLogin.png'
 import type { User } from '../types/user'
 import type { OAuthLoginResponse } from '../types/auth'
 import { tokenService } from '../api/tokenService'
+import { Capacitor } from '@capacitor/core'
 
 type ErrorKind = 'wrong_email' | 'wrong_password' | 'both' | 'general' | null
 type Provider = 'google' | 'email' | 'apple'
@@ -33,6 +34,8 @@ export default function LoginPage() {
 
   const googleLoginContainerRef = useRef<HTMLDivElement | null>(null)
   const isNative = isNativeApp()
+
+  const isIOS = isNative && Capacitor.getPlatform() === 'ios'
 
   useEffect(() => {
     if (IS_PROD && GA_ENABLED) {
@@ -187,7 +190,7 @@ export default function LoginPage() {
   }
 
   const handleAppleLogin = async () => {
-    if (!isNativeApp()) return
+    if (!isNativeApp() || Capacitor.getPlatform() !== 'ios') return
 
     try {
       const r = (await SocialLogin.login({
@@ -438,18 +441,24 @@ export default function LoginPage() {
             {lastLogin === 'google' && <LastLoginBubble provider="google" />}
           </div>
 
-          <div className="my-4">
-            <Button
-              size="xl"
-              className="bg-primary-900"
-              onClick={handleAppleLogin}
-            >
-              <img src={AppleLoginIcon} alt="apple" className="w-7 h-7 mr-4" />
-              <span className="text-subtitle text-base text-white">
-                Continue with Apple
-              </span>
-            </Button>
-          </div>
+          {isIOS && (
+            <div className="my-4">
+              <Button
+                size="xl"
+                className="bg-primary-900"
+                onClick={handleAppleLogin}
+              >
+                <img
+                  src={AppleLoginIcon}
+                  alt="apple"
+                  className="w-7 h-7 mr-4"
+                />
+                <span className="text-subtitle text-base text-white">
+                  Continue with Apple
+                </span>
+              </Button>
+            </div>
+          )}
 
           <div className="mt-6 flex justify-center items-center gap-2 text-sm">
             <span className="text-gray-700">New to Koach?</span>

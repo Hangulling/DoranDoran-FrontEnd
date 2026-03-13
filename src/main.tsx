@@ -15,6 +15,7 @@ import {
 } from './constants/env'
 import { tokenService } from './api/tokenService.ts'
 import { initGA } from './utils/ga.ts'
+import { Capacitor } from '@capacitor/core'
 
 const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
 
@@ -39,8 +40,11 @@ const initSocialLogin = async () => {
   if (!isNative) return
 
   try {
+    const platform = Capacitor.getPlatform()
+
     if (shouldVerboseLog) {
       logWarn('SocialLogin env', {
+        platform,
         apple: APPLE_CLIENT_ID,
         googleWeb: GOOGLE_WEB_CLIENT_ID,
         googleIos: GOOGLE_IOS_CLIENT_ID,
@@ -48,12 +52,12 @@ const initSocialLogin = async () => {
     }
 
     await SocialLogin.initialize({
-      apple: APPLE_CLIENT_ID
+      ...(platform === 'ios' && APPLE_CLIENT_ID
         ? {
             clientId: APPLE_CLIENT_ID,
-            redirectUrl: 'https://api.doran-chat.com/api/auth/oauth/callback', // AOS
+            redirectUrl: 'https://api.doran-chat.com/api/auth/oauth/callback',
           }
-        : {},
+        : {}),
       ...(GOOGLE_WEB_CLIENT_ID && GOOGLE_IOS_CLIENT_ID
         ? {
             google: {

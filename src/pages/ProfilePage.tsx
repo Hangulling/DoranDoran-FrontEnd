@@ -5,7 +5,7 @@ import CommonModal from '../components/common/CommonModal'
 import { useNavigate } from 'react-router-dom'
 import { useUserStore } from '../stores/useUserStore'
 import type { User } from '../types/user'
-import { setGAUserContext } from '../utils/ga'
+import { sendGAEvent, setGAUserContext } from '../utils/ga'
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null)
@@ -19,6 +19,8 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     try {
+      // GA_click_logout
+      sendGAEvent('click_logout', {})
       await logout()
       reset() // 유저 스토어 초기화
       setGAUserContext() // 내부 유저 해제
@@ -32,6 +34,8 @@ export default function ProfilePage() {
 
   const handleDelete = async () => {
     try {
+      // GA_click_delete_account
+      sendGAEvent('click_delete_account', {})
       await deleteUser(userId)
       reset()
       setGAUserContext()
