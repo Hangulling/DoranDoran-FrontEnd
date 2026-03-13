@@ -60,6 +60,7 @@ const InstaContent = ({ onCardClick }: InstaContentProps) => {
           const mediaUrl = post.coverImageUrl || post.imageUrl || ''
           const isVideo =
             post.mediaType === 'VIDEO' || mediaUrl.includes('.mp4')
+          const videoSrc = isVideo ? `${mediaUrl}#t=0.001` : mediaUrl
 
           return (
             <button
@@ -77,7 +78,7 @@ const InstaContent = ({ onCardClick }: InstaContentProps) => {
                 {isVideo ? (
                   /* 비디오인 경우 */
                   <video
-                    src={mediaUrl}
+                    src={videoSrc}
                     className={`w-full h-full object-cover transition-opacity duration-300 ${
                       isLoaded ? 'opacity-100' : 'opacity-0'
                     }`}
