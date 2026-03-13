@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.17.1](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.17.0...v3.17.1) (2026-03-13)
+
+
+### Bug Fixes
+
+* 메인페이지 인스타 카드 오류 수정 ([34a82d5](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/34a82d5565f5b38300d4fae69407e48370c3d426))
+
 ## [3.17.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.16.0...v3.17.0) (2026-03-13)
 
 ## [3.16.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.15.0...v3.16.0) (2026-03-13)
