@@ -58,9 +58,7 @@ const InstaContent = ({ onCardClick }: InstaContentProps) => {
         {homePosts.map(post => {
           const isLoaded = loadedMedia[post.externalId]
           const mediaUrl = post.coverImageUrl || post.imageUrl || ''
-          const isVideo =
-            post.mediaType === 'VIDEO' || mediaUrl.includes('.mp4')
-          const videoSrc = isVideo ? `${mediaUrl}#t=0.001` : mediaUrl
+          const isVideo = post.mediaType === 'VIDEO'
 
           return (
             <button
@@ -77,15 +75,14 @@ const InstaContent = ({ onCardClick }: InstaContentProps) => {
               <div className="h-full w-full overflow-hidden">
                 {isVideo ? (
                   /* 비디오인 경우 */
-                  <video
-                    src={videoSrc}
+                  <img
+                    src={mediaUrl}
+                    alt={post.title || ''}
                     className={`w-full h-full object-cover transition-opacity duration-300 ${
                       isLoaded ? 'opacity-100' : 'opacity-0'
                     }`}
-                    muted
-                    playsInline
-                    preload="metadata"
-                    onLoadedData={() => handleMediaLoad(post.externalId)}
+                    onLoad={() => handleMediaLoad(post.externalId)}
+                    onError={() => handleMediaLoad(post.externalId)}
                   />
                 ) : (
                   /* 이미지인 경우 */
@@ -93,6 +90,7 @@ const InstaContent = ({ onCardClick }: InstaContentProps) => {
                     src={mediaUrl}
                     alt={post.title || ''}
                     onLoad={() => handleMediaLoad(post.externalId)}
+                    onError={() => handleMediaLoad(post.externalId)}
                     className={`w-full h-full object-cover transition-opacity duration-300 ${
                       isLoaded ? 'opacity-100' : 'opacity-0'
                     }`}
