@@ -9,10 +9,7 @@ import type {
 import { Capacitor } from '@capacitor/core'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import {
-  markSingleNotificationAsRead,
-  registerFcmToken,
-} from '../api/notification'
+import { markNotificationsAsRead, registerFcmToken } from '../api/notification'
 import useUnreadStore from '../stores/useUnreadStore'
 import { useUserStore } from '../stores/useUserStore'
 
@@ -89,15 +86,14 @@ const usePushNotification = () => {
         console.log('Push Payload:', JSON.stringify(data, null, 2))
 
         // 읽음 처리
-        if (data?.id) {
-          try {
-            await markSingleNotificationAsRead(Number(data.id))
-          } catch (error) {
-            console.error('푸시 읽음 처리 실패:', error)
-          }
+        try {
+          await markNotificationsAsRead
+          console.log('읽음 처리 성공')
+        } catch (error) {
+          console.error('푸시 읽음 처리 실패:', error)
         }
 
-        if (data.chatbotId && data.topic) {
+        if (data.topic) {
           navigate('/', {
             state: {
               fromPush: true,
