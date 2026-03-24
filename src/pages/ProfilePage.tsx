@@ -71,8 +71,8 @@ export default function ProfilePage() {
         <div className="text-title text-lg text-gray-800">{user.name}</div>
         <div className="text-xs text-gray-400 mt-1 flex items-center gap-3">
           <span>{user.email}</span>
-          <span className="h-2.5 w-px bg-gray-300" />
-          <span>{user.birthDate}</span>
+          {/* <span className="h-2.5 w-px bg-gray-300" />
+          <span>{user.birthDate}</span> */}
         </div>
       </div>
 
