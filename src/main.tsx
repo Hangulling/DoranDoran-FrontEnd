@@ -16,8 +16,7 @@ import {
 import { tokenService } from './api/tokenService.ts'
 import { initGA } from './utils/ga.ts'
 import { Capacitor } from '@capacitor/core'
-
-const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
+import { checkMaintenanceMode } from './utils/firebase.ts'
 
 const isDev = import.meta.env.DEV
 const shouldVerboseLog = isDev
@@ -98,15 +97,18 @@ prepare()
     initGA()
     await tokenService.hydrate()
     await initSocialLogin()
+    // 점검 모드 확인
+    const isMaintenance = await checkMaintenanceMode()
+    return isMaintenance
   })
-  .then(() => {
+  .then(isMaintenance => {
     const container = document.getElementById('root')!
     const root = ReactDOM.createRoot(container)
 
     root.render(
       <React.StrictMode>
         <Router>
-          {IS_MAINTENANCE_MODE ? (
+          {isMaintenance ? (
             <Routes>
               <Route path="*" element={<MaintenancePage />} />
             </Routes>
