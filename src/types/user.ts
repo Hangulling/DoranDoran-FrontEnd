@@ -41,7 +41,7 @@ export interface OnboardingPayload {
   referralSource?: string
   referralOther?: string
   koreanLevel?: number
-  purposeKey?: string
+  purposeKeys?: string[]
   purposeOther?: string
 }
 

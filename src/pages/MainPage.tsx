@@ -16,7 +16,7 @@ import useUnreadStore from '../stores/useUnreadStore'
 import type { ChatRoomWithMessage } from '../types/main'
 import { useDeepLinkChatRoom } from '../hooks/main/useDeepLinkChatRoom'
 import { useStartGreeting } from '../hooks/main/useStartGreeting'
-import { sendGAEvent } from '../utils/ga'
+import { getTodayDate, getUnixTime, sendGAEvent } from '../utils/ga'
 
 const MainPage = () => {
   const navigate = useNavigate()
@@ -42,9 +42,9 @@ const MainPage = () => {
   // GA_view_main
   useEffect(() => {
     if (userId) {
-      const entryTimestamp = Math.floor(Date.now() / 1000)
       sendGAEvent('view_main', {
-        entry_timestamp: entryTimestamp,
+        time: getUnixTime(),
+        date: getTodayDate(),
       })
     }
   }, [userId])
@@ -86,8 +86,13 @@ const MainPage = () => {
     }
   }, [location.state])
 
-  const handleCardClick = (externalId: string) =>
+  const handleCardClick = (externalId: string) => {
+    sendGAEvent('view_content_detail', {
+      time: getUnixTime(),
+      content_id: externalId,
+    })
     navigate(`/insta/${externalId}`)
+  }
 
   const handleRoomClick = (id: number | string, roomName: string) => {
     if (id === MANAGER_ROOM.roomRouteId) {
@@ -98,10 +103,9 @@ const MainPage = () => {
     }
 
     // GA_enter_chatroom
-    const entryTimestamp = Math.floor(Date.now() / 1000)
     sendGAEvent('enter_chatroom', {
       concept: roomName,
-      entry_timestamp: entryTimestamp,
+      entry_timestamp: getUnixTime(),
     })
 
     const room = chatMsg.find((r: ChatRoomWithMessage) => r.roomRouteId === id)
@@ -129,6 +133,13 @@ const MainPage = () => {
       }
 
       if (targetId) {
+        // ga_enter_chatroom_push
+        sendGAEvent('enter_chatroom_push', {
+          notification_type: 'push',
+          chatroom_id: targetId,
+          enter_timestamp: Math.floor(Date.now() / 1000),
+        })
+
         setUnread(targetId, false)
         mutateGreeting({
           chatroomId: targetId,

@@ -10,15 +10,15 @@ const ChatRoomItem = ({ room, onClick, isLoading }: ChatRoomItemProps) => {
   if (!targetData) return null
 
   const Skeleton = () => (
-    <div className="h-[18px] w-[210px] bg-primary-30 rounded-[4px] animate-pulse" />
+    <div className="h-4.5 w-52.5 bg-primary-30 rounded-sm animate-pulse" />
   )
 
   return (
     <button
       onClick={() => onClick(targetData.roomRouteId, targetData.roomName)}
-      className="flex items-center gap-x-3 w-full h-[57px] bg-gray-0 py-[6px]"
+      className="flex items-center gap-x-3 w-full h-14.25 bg-gray-0 py-1.5"
     >
-      <div className="w-10 h-10 rounded-[12px] flex items-center justify-center overflow-hidden">
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden">
         <img
           src={targetData.avatar}
           alt={targetData.roomName}

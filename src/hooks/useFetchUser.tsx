@@ -40,7 +40,7 @@ export const useFetchUser = () => {
   useEffect(() => {
     if (data) {
       const { profile, bookmarkCount, stats } = data
-      setGAUserContext(profile.email) // 내부 사용자 판별
+      setGAUserContext(profile.id, profile.email) // 내부 사용자 판별
       setStoreName(profile.name)
       setStoreId(profile.id)
       setStoreEmail(profile.email)
