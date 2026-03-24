@@ -39,6 +39,6 @@ export interface ErrorPageProps {
   errorCode?: number
 }
 
-export interface ClientErrorViewProps {
+export interface ErrorViewProps {
   onClickBack: () => void
 }
