@@ -42,7 +42,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
       { value: 'instagram_contents', label: 'Instagram contents' },
       { value: 'instagram_reels', label: 'Instagram reels' },
       { value: 'facebook_contents', label: 'Facebook contents' },
-      { value: 'friend', label: 'Recommended by a friend' },
+      { value: 'recommend', label: 'Recommended by a friend' },
     ],
   },
   {
@@ -108,7 +108,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
     hasEtc: true,
     options: [
       {
-        value: 'casual_chats',
+        value: 'friends',
         label: 'Casual chats with Korean friends',
         image: Card1,
       },
@@ -138,7 +138,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
     hasEtc: false,
     options: [
       {
-        value: 'entertainment',
+        value: 'enter',
         label: 'Entertainment',
         subLabel: 'game, movie, music, drama etc.',
         image: Entertainment,

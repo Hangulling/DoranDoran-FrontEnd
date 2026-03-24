@@ -10,6 +10,7 @@ import LeftArrowIcon from '../assets/icon/leftArrow.svg?react'
 import type { OnboardingPayload } from '../types/user'
 import { useCompleteOnboarding } from '../hooks/useCompleteOnboarding'
 import { useIOSKeyboard } from '../hooks/useIOSKeyboard'
+import { getTodayDate, getUnixTime, sendGAEvent } from '../utils/ga'
 
 const ETC_VALUE = 'Other'
 
@@ -76,11 +77,13 @@ export default function OnboardingPage() {
 
     // Purpose
     if (selections[2]?.length) {
-      payload.purposeKey = selections[2].includes(ETC_VALUE)
-        ? 'other'
-        : selections[2][0]
-      if (payload.purposeKey === 'other')
+      payload.purposeKeys = selections[2].map(option =>
+        option === ETC_VALUE ? 'other' : option
+      )
+
+      if (selections[2].includes(ETC_VALUE)) {
         payload.purposeOther = etcValues[2] || ''
+      }
     }
 
     // Topic Keys
@@ -92,7 +95,51 @@ export default function OnboardingPage() {
     return payload
   }
 
+  const trackOnboardingStep = (isLast: boolean) => {
+    const commonParams = {
+      time: getUnixTime(),
+      date: getTodayDate(),
+    }
+
+    if (isLast) {
+      // ga_On_complete
+      sendGAEvent('On_complete', commonParams)
+    } else {
+      const eventNames = [
+        'On_marketing',
+        'On_level',
+        'On_purpose',
+        'On_topic',
+        'On_noti',
+      ]
+      const eventName = eventNames[page]
+
+      // 각 단계별 type 값 설정
+      let typeValue = ''
+      // Level
+      if (page === 1) {
+        typeValue = `lv.${currentSelections[0]}`
+        // 다중 선택
+      } else if (currentStepData.type === 'multiple') {
+        typeValue = currentSelections
+          .map(val => (val === ETC_VALUE ? 'other' : val))
+          .join(', ')
+      } else {
+        // 그 외
+        typeValue =
+          currentSelections[0] === ETC_VALUE ? 'other' : currentSelections[0]
+      }
+
+      sendGAEvent(eventName, {
+        ...commonParams,
+        type: typeValue,
+      })
+    }
+  }
+
   const handleAction = (isCompleting: boolean) => {
+    trackOnboardingStep(isCompleting)
+
     if (isCompleting) {
       completeOnboarding(createPayload(), false)
     } else {
