@@ -21,7 +21,8 @@ platform :ios do
       readonly: true,
       api_key: api_key,
       team_id: "8UY99NV2AM",
-      app_identifier: ["com.koach.app"]
+      app_identifier: ["com.koach.app"],
+      git_basic_authorization: ENV["MATCH_GIT_BASIC_AUTHORIZATION"]
     )
 		if options[:build_number]
       increment_build_number(
@@ -83,7 +84,8 @@ platform :ios do
       app_identifier: ["com.koach.app"],
       force: true,
       team_id: "8UY99NV2AM",
-      skip_certificate_matching: true
+      skip_certificate_matching: true,
+      git_basic_authorization: ENV["MATCH_GIT_BASIC_AUTHORIZATION"] 
     )
   end
 end
