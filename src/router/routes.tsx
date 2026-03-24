@@ -12,9 +12,9 @@ import SignupEmail from '../pages/signup/steps/SignupEmail'
 import SignupPassword from '../pages/signup/steps/SignupPassword'
 import SignupName from '../pages/signup/steps/SignupName'
 import SignupQuestion from '../pages/signup/steps/SignupQuestion'
-import SignupBirthDate from '../pages/signup/steps/SignupBirthDate'
+// import SignupBirthDate from '../pages/signup/steps/SignupBirthDate'
 import FindEmailName from '../pages/find-email/steps/FindEmailName'
-import FindEmailBirthDate from '../pages/find-email/steps/FindEmailBirthDate'
+// import FindEmailBirthDate from '../pages/find-email/steps/FindEmailBirthDate'
 import FindEmailQuestion from '../pages/find-email/steps/FindEmailQuestion'
 import LoginEmailPage from '../pages/LoginEmailPage'
 import ProfilePage from '../pages/ProfilePage'
@@ -47,7 +47,7 @@ export function Routes() {
           <Route index element={<Navigate to="term" replace />} />
           <Route path="term" element={<SignupTerm />} />
           <Route path="name" element={<SignupName />} />
-          <Route path="birthdate" element={<SignupBirthDate />} />
+          {/* <Route path="birthdate" element={<SignupBirthDate />} /> */}
           <Route path="email" element={<SignupEmail />} />
           <Route path="password" element={<SignupPassword />} />
           <Route path="question" element={<SignupQuestion />} />
@@ -127,7 +127,7 @@ export function Routes() {
         <Route path="/find-email" element={<FindEmailPage />}>
           <Route index element={<Navigate to="name" replace />} />
           <Route path="name" element={<FindEmailName />} />
-          <Route path="birthdate" element={<FindEmailBirthDate />} />
+          {/* <Route path="birthdate" element={<FindEmailBirthDate />} /> */}
           <Route path="question" element={<FindEmailQuestion />} />
           <Route path="not-found" element={<FindEmailNotFound />} />
           <Route path="success" element={<FindEmailSuccess />} />

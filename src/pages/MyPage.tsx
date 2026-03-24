@@ -55,9 +55,8 @@ export default function MyPage() {
       if (!id) return
       try {
         const interestRes = await getUserInterests(id)
-
         const keys = (interestRes.topics ?? []).map(
-          (t: { key: string }) => t.key
+          (t: { topicKey: string }) => t.topicKey
         )
         setInterests(keys)
       } catch (e) {
