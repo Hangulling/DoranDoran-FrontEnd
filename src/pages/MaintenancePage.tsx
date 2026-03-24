@@ -1,13 +1,13 @@
 import { useEffect } from 'react'
 import maintenance from '/public/maintenance.svg'
-import { getTodayDate, getUnixTime, sendGAEvent } from '../utils/ga'
+import { sendGAEvent } from '../utils/ga'
 
 const MaintenancePage = () => {
-  // ga_view_maintenance_page
+  // ga_view_error_page
   useEffect(() => {
-    sendGAEvent('view_maintenance_page', {
-      time: getUnixTime(),
-      date: getTodayDate(),
+    sendGAEvent('view_error_page', {
+      error_type: 'maintenance',
+      error_path: window.location.pathname + window.location.search,
     })
   }, [])
 
