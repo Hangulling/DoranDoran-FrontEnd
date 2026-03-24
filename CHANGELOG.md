@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.18.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.17.1...v3.18.0) (2026-03-24)
+
+
+### Features
+
+* 전체 읽음 처리 추가 ([#420](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/420)) ([43001f7](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/43001f79937c469ee67f26194282ed1d3a69acf5))
+
+
+### Bug Fixes
+
+* 인스타 비디오 썸네일 수정 ([#419](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/419)) ([7814b5c](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/7814b5c06a2eeb085d2e922dbffcc1e966ad5f0f))
+
 ### [3.17.1](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.17.0...v3.17.1) (2026-03-13)
 
 
