@@ -18,10 +18,10 @@ export default function FindEmailPage() {
   const step: Record<string, number> = {
     '/find-email/form': 1,
     '/find-email/name': 1,
-    '/find-email/birthdate': 2,
-    '/find-email/question': 3,
-    '/find-email/success': 4,
-    '/find-email/not-found': 4,
+    // '/find-email/birthdate': 2,
+    '/find-email/question': 2,
+    '/find-email/success': 3,
+    '/find-email/not-found': 3,
   }
   const isResultPage =
     path === '/find-email/not-found' || path === '/find-email/success'
@@ -32,14 +32,17 @@ export default function FindEmailPage() {
     if (path === '/find-email/name') {
       submit?.()
       if (canSubmit) {
-        navigate('/find-email/birthdate')
-      }
-    } else if (path === '/find-email/birthdate') {
-      submit?.()
-      if (canSubmit) {
+        // navigate('/find-email/birthdate')
         navigate('/find-email/question')
       }
-    } else if (path === '/find-email/question') {
+    }
+    //  else if (path === '/find-email/birthdate') {
+    //   submit?.()
+    //   if (canSubmit) {
+    //     navigate('/find-email/question')
+    //   }
+    // }
+    else if (path === '/find-email/question') {
       submit?.()
     } else {
       navigate('/login')
@@ -67,7 +70,7 @@ export default function FindEmailPage() {
 
   return (
     <div className="flex flex-col items-center min-h-screen">
-      <ProgressBar currentStep={currentStep} totalSteps={4} />
+      <ProgressBar currentStep={currentStep} totalSteps={3} />
 
       <Outlet context={{ setSubmit, setCanSubmit }} />
       <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center">

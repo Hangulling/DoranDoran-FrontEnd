@@ -19,8 +19,8 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     try {
-      // GA_click_logout
-      sendGAEvent('click_logout', {})
+      // GA_confirm_logout
+      sendGAEvent('confirm_logout', {})
       await logout()
       reset() // 유저 스토어 초기화
       setGAUserContext() // 내부 유저 해제
@@ -34,8 +34,8 @@ export default function ProfilePage() {
 
   const handleDelete = async () => {
     try {
-      // GA_click_delete_account
-      sendGAEvent('click_delete_account', {})
+      // GA_confirm_delete_account
+      sendGAEvent('confirm_delete_account', {})
       await deleteUser(userId)
       reset()
       setGAUserContext()
@@ -71,15 +71,27 @@ export default function ProfilePage() {
         <div className="text-title text-lg text-gray-800">{user.name}</div>
         <div className="text-xs text-gray-400 mt-1 flex items-center gap-3">
           <span>{user.email}</span>
-          <span className="h-2.5 w-px bg-gray-300" />
-          <span>{user.birthDate}</span>
+          {/* <span className="h-2.5 w-px bg-gray-300" />
+          <span>{user.birthDate}</span> */}
         </div>
       </div>
 
       <div className="bg-gray-50 h-2 w-full my-4" />
       <div className="w-full max-w-app md:max-w-tablet lg:max-w-desktop">
-        <MenuRow label="Log out" onClick={() => setOpenLogout(true)} />
-        <MenuRow label="Delete account" onClick={() => setOpenDelete(true)} />
+        <MenuRow
+          label="Log out"
+          onClick={() => {
+            sendGAEvent('click_logout', {}) // ga_click_logout
+            setOpenLogout(true)
+          }}
+        />
+        <MenuRow
+          label="Delete account"
+          onClick={() => {
+            sendGAEvent('click_delete_account', {}) // ga_click_delete_account
+            setOpenDelete(true)
+          }}
+        />
       </div>
       {openLogout && (
         <CommonModal
