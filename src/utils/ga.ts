@@ -12,12 +12,25 @@ const INTERNAL_EMAIL_LIST = GA_INTERNAL_EMAILS
   : []
 
 let isInternalUser = false
+let currentUserId: string | null = null // 현재 사용자 Id 저장
 
-export const setGAUserContext = (email?: string) => {
+// 유닉스 타임스탬프 반환
+export const getUnixTime = () => Math.floor(Date.now() / 1000)
+
+// 날짜 문자열 반환
+export const getTodayDate = () => new Date().toISOString().split('T')[0]
+
+export const setGAUserContext = (userId?: string, email?: string) => {
   if (email && INTERNAL_EMAIL_LIST.includes(email)) {
     isInternalUser = true
   } else {
     isInternalUser = false
+  }
+
+  currentUserId = userId || null
+
+  if (IS_PROD && GA_ENABLED && userId && !isInternalUser) {
+    ReactGA.set({ user_id: userId }) // GA4 시스템 식별용 전역 설정
   }
 }
 
@@ -39,6 +52,11 @@ export const sendGAEvent = (
   params?: Record<string, string | number | boolean | undefined | null>
 ) => {
   if (IS_PROD && GA_ENABLED && !isInternalUser) {
-    ReactGA.event(eventName, params)
+    const eventParams = {
+      user_id: currentUserId,
+      ...params,
+    }
+
+    ReactGA.event(eventName, eventParams)
   }
 }
