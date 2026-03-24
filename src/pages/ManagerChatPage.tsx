@@ -11,6 +11,7 @@ import showToast from '../components/common/CommonToast'
 import Restart from '../assets/icon/restart.svg?react'
 import CommonModal from '../components/common/CommonModal'
 import { useBackButton } from '../hooks/useBackButton'
+import { sendGAEvent } from '../utils/ga'
 
 interface ManagerMessage {
   id: string
@@ -108,6 +109,11 @@ const ManagerChatPage: React.FC = () => {
     optionLabel: string,
     nextStepId: ManagerStepId
   ) => {
+    // ga_select_inquiry_type
+    sendGAEvent('select_inquiry_type', {
+      inquiry_type: optionLabel,
+    })
+
     setHasProgress(true)
     setMessages(prev => [
       ...prev,

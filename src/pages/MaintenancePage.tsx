@@ -1,6 +1,16 @@
+import { useEffect } from 'react'
 import maintenance from '/public/maintenance.svg'
+import { getTodayDate, getUnixTime, sendGAEvent } from '../utils/ga'
 
 const MaintenancePage = () => {
+  // ga_view_maintenance_page
+  useEffect(() => {
+    sendGAEvent('view_maintenance_page', {
+      time: getUnixTime(),
+      date: getTodayDate(),
+    })
+  }, [])
+
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <h2 className="text-[22px] text-title text-gray-400 mb-6 text-center">
