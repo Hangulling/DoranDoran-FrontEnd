@@ -21,10 +21,10 @@ export default function SignupPage() {
 
   const stepMap: Record<string, number> = {
     '/signup/name': 1,
-    '/signup/birthdate': 2,
-    '/signup/email': 3,
-    '/signup/password': 4,
-    '/signup/question': 5,
+    // '/signup/birthdate': 2,
+    '/signup/email': 2,
+    '/signup/password': 3,
+    '/signup/question': 4,
   }
 
   const currentStep = stepMap[path]
@@ -35,17 +35,21 @@ export default function SignupPage() {
     if (fromOAuth) {
       if (path === '/signup/term') {
         submit?.()
-        navigate('/signup/birthdate', {
-          replace: true,
-          state: location.state,
-        })
+        // navigate('/signup/birthdate', {
+        //   replace: true,
+        //   state: location.state,
+        // })
+        // navigate('/signup/birthdate', {
+        //   replace: true,
+        //   state: location.state,
+        // })
         return
       }
 
-      if (path === '/signup/birthdate') {
-        submit?.()
-        return
-      }
+      // if (path === '/signup/birthdate') {
+      //   submit?.()
+      //   return
+      // }
 
       return
     }
@@ -54,11 +58,14 @@ export default function SignupPage() {
       navigate('/signup/name')
     } else if (path === '/signup/name') {
       submit?.()
-      navigate('/signup/birthdate')
-    } else if (path === '/signup/birthdate') {
-      submit?.()
+      // navigate('/signup/birthdate')
       navigate('/signup/email')
-    } else if (path === '/signup/email') {
+    }
+    // else if (path === '/signup/birthdate') {
+    //   submit?.()
+    //   navigate('/signup/email')
+    // }
+    else if (path === '/signup/email') {
       submit?.()
       navigate('/signup/password')
     } else if (path === '/signup/password') {
@@ -85,7 +92,12 @@ export default function SignupPage() {
 
   useEffect(() => {
     if (fromOAuth) {
-      if (path === '/signup/birthdate') {
+      // if (path === '/signup/birthdate') {
+      //   setLabel('Complete')
+      // } else {
+      //   setLabel('Next')
+      // }
+      if (path === '/signup/question') {
         setLabel('Complete')
       } else {
         setLabel('Next')
@@ -102,7 +114,7 @@ export default function SignupPage() {
   return (
     <div className="flex h-full min-h-0 w-full flex-col">
       {!fromOAuth && path !== '/signup/term' && (
-        <ProgressBar currentStep={currentStep} totalSteps={5} />
+        <ProgressBar currentStep={currentStep} totalSteps={4} />
       )}
 
       <div className="flex-1 flex justify-center min-h-0 w-full">
