@@ -3,7 +3,6 @@ import { create } from 'zustand'
 interface FindEmailState {
   firstName: string
   lastName: string
-  birthDate: string
   identityQuestion: string
   answer: string
   setMany: (v: Partial<FindEmailState>) => void
@@ -13,7 +12,6 @@ interface FindEmailState {
 const initialState = {
   firstName: '',
   lastName: '',
-  birthDate: '',
   identityQuestion: '',
   answer: '',
 }

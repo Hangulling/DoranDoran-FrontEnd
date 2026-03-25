@@ -3,7 +3,6 @@ export interface CreatePayload {
   email: string // 이메일 형식
   firstName: string // 1-50자
   lastName: string // 1-50자
-  birthDate: string // yyyy-MM-dd
   signupQuestion: string
   signupAnswer: string // 최대 30자
   name: string // 미제공 시 `firstName + lastName` 사용
@@ -20,7 +19,6 @@ export interface User {
   firstName: string
   lastName: string
   name: string
-  birthDate: string
   passwordHash: string
   picture: string
   info: string
@@ -74,7 +72,6 @@ export type UserRole = 'ROLE_USER' | 'ROLE_ADMIN'
 export interface EmailPayload {
   firstName: string
   lastName: string
-  birthDate: string
   signupQuestion: string
   signupAnswer: string
 }

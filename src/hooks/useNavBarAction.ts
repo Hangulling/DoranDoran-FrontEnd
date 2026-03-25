@@ -9,7 +9,6 @@ export function useNavBar() {
   const instaMatch = useMatch('/insta/:externalId')
   const policyMatch = useMatch('/policy/:id')
 
-  const signupBirthdateMatch = useMatch('/signup/birthdate')
   const signupTermMatch = useMatch('/signup/term')
 
   const isChatPage = Boolean(chatMatch)
@@ -20,14 +19,6 @@ export function useNavBar() {
   const goBack = () => {
     if (instaMatch) {
       navigate('/')
-      return
-    }
-
-    if (signupBirthdateMatch && location.state?.fromOAuth) {
-      navigate('/signup/term', {
-        replace: true,
-        state: location.state,
-      })
       return
     }
 
