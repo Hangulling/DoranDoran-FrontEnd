@@ -84,24 +84,40 @@ const initSocialLogin = async () => {
 const USE_MSW = import.meta.env.VITE_USE_MSW === 'true'
 
 const prepare = async () => {
-  if (isDev && USE_MSW) {
-    const { worker } = await import('./mocks/browser')
-    await worker.start()
+  try {
+    if (isDev && USE_MSW) {
+      const { worker } = await import('./mocks/browser')
+      await worker.start()
+    }
+  } catch (e) {
+    logError('MSW preparation failed', e)
   }
 }
 
 const queryClient = new QueryClient()
 
-prepare()
-  .then(async () => {
+const startApp = async () => {
+  let isMaintenance = false
+
+  try {
+    await prepare()
+
+    // 초기 서비스 실행
     initGA()
     await tokenService.hydrate()
     await initSocialLogin()
+
     // 점검 모드 확인
-    const isMaintenance = await checkMaintenanceMode()
-    return isMaintenance
-  })
-  .then(isMaintenance => {
+    try {
+      isMaintenance = await checkMaintenanceMode()
+    } catch (firebaseErr) {
+      logError('Firebase maintenance check failed', firebaseErr)
+      isMaintenance = false
+    }
+  } catch (globalErr) {
+    logError('Global initialization failed', globalErr)
+  } finally {
+    // 렌더링은 반드시 실행
     const container = document.getElementById('root')!
     const root = ReactDOM.createRoot(container)
 
@@ -126,4 +142,7 @@ prepare()
         </Router>
       </React.StrictMode>
     )
-  })
+  }
+}
+
+startApp()
