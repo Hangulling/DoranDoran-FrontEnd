@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { ErrorPageProps, FromPage } from '../types/common'
+import { sendGAEvent } from '../utils/ga'
 
 export function useErrorPage({ errorCode }: ErrorPageProps) {
   const navigate = useNavigate()
@@ -28,6 +29,8 @@ export function useErrorPage({ errorCode }: ErrorPageProps) {
   const backTarget = from === 'signup' ? '/signup' : '/'
 
   const handleClickBack = () => {
+    // ga_click_error_action
+    sendGAEvent('click_error_action')
     navigate(backTarget, { replace: true })
   }
 

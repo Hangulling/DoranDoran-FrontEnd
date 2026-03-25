@@ -16,8 +16,7 @@ import {
 import { tokenService } from './api/tokenService.ts'
 import { initGA } from './utils/ga.ts'
 import { Capacitor } from '@capacitor/core'
-
-const IS_MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
+import { checkMaintenanceMode } from './utils/firebase.ts'
 
 const isDev = import.meta.env.DEV
 const shouldVerboseLog = isDev
@@ -33,15 +32,13 @@ const logWarn = (title: string, extra?: unknown) => {
 }
 
 const isNative = isNativeApp()
-
 const Router = isNative ? HashRouter : BrowserRouter
+const queryClient = new QueryClient()
 
 const initSocialLogin = async () => {
   if (!isNative) return
-
   try {
     const platform = Capacitor.getPlatform()
-
     if (shouldVerboseLog) {
       logWarn('SocialLogin env', {
         platform,
@@ -50,7 +47,6 @@ const initSocialLogin = async () => {
         googleIos: GOOGLE_IOS_CLIENT_ID,
       })
     }
-
     await SocialLogin.initialize({
       ...(platform === 'ios' && APPLE_CLIENT_ID
         ? {
@@ -68,60 +64,40 @@ const initSocialLogin = async () => {
           }
         : {}),
     })
-
-    if (!GOOGLE_WEB_CLIENT_ID || !GOOGLE_IOS_CLIENT_ID) {
-      logWarn(
-        'Google Client ID missing',
-        shouldVerboseLog
-          ? { web: GOOGLE_WEB_CLIENT_ID, ios: GOOGLE_IOS_CLIENT_ID }
-          : undefined
-      )
-    }
   } catch (e: unknown) {
     logError('SocialLogin init failed', e)
   }
 }
 
-const USE_MSW = import.meta.env.VITE_USE_MSW === 'true'
+// 앱 초기화 및 렌더링 로직
+const startApp = async () => {
+  initGA()
+  await tokenService.hydrate()
+  await initSocialLogin()
 
-const prepare = async () => {
-  if (isDev && USE_MSW) {
-    const { worker } = await import('./mocks/browser')
-    await worker.start()
-  }
-}
+  // 점검 모드 확인
+  const isMaintenance = await checkMaintenanceMode()
 
-const queryClient = new QueryClient()
+  const container = document.getElementById('root')!
+  const root = ReactDOM.createRoot(container)
 
-prepare()
-  .then(async () => {
-    initGA()
-    await tokenService.hydrate()
-    await initSocialLogin()
-  })
-  .then(() => {
-    const container = document.getElementById('root')!
-    const root = ReactDOM.createRoot(container)
-
-    root.render(
-      <React.StrictMode>
-        <Router>
-          {IS_MAINTENANCE_MODE ? (
-            <Routes>
-              <Route path="*" element={<MaintenancePage />} />
-            </Routes>
-          ) : isNative ? (
+  root.render(
+    <React.StrictMode>
+      <Router>
+        {isMaintenance ? (
+          <Routes>
+            <Route path="*" element={<MaintenancePage />} />
+          </Routes>
+        ) : (
+          <GoogleOAuthProvider clientId={GOOGLE_WEB_CLIENT_ID}>
             <QueryClientProvider client={queryClient}>
               <App />
             </QueryClientProvider>
-          ) : (
-            <GoogleOAuthProvider clientId={GOOGLE_WEB_CLIENT_ID}>
-              <QueryClientProvider client={queryClient}>
-                <App />
-              </QueryClientProvider>
-            </GoogleOAuthProvider>
-          )}
-        </Router>
-      </React.StrictMode>
-    )
-  })
+          </GoogleOAuthProvider>
+        )}
+      </Router>
+    </React.StrictMode>
+  )
+}
+
+startApp()

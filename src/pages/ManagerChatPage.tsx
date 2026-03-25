@@ -11,6 +11,7 @@ import showToast from '../components/common/CommonToast'
 import Restart from '../assets/icon/restart.svg?react'
 import CommonModal from '../components/common/CommonModal'
 import { useBackButton } from '../hooks/useBackButton'
+import { sendGAEvent } from '../utils/ga'
 
 interface ManagerMessage {
   id: string
@@ -108,6 +109,11 @@ const ManagerChatPage: React.FC = () => {
     optionLabel: string,
     nextStepId: ManagerStepId
   ) => {
+    // ga_select_inquiry_type
+    sendGAEvent('select_inquiry_type', {
+      inquiry_type: optionLabel,
+    })
+
     setHasProgress(true)
     setMessages(prev => [
       ...prev,
@@ -246,7 +252,7 @@ const ManagerChatPage: React.FC = () => {
 
       <div
         ref={chatMainRef}
-        className={`flex-grow overflow-y-auto px-5 pt-6 ${
+        className={`grow overflow-y-auto px-5 pt-6 ${
           isCompleted ? 'pb-[calc(92px+env(safe-area-inset-bottom))]' : 'pb-6'
         }`}
       >
@@ -257,7 +263,7 @@ const ManagerChatPage: React.FC = () => {
               const next = messages[idx + 1]
               if (next?.group === 'completed') {
                 return (
-                  <div key={message.id} className="flex flex-col gap-[10px]">
+                  <div key={message.id} className="flex flex-col gap-2.5">
                     <ChatBubble
                       message={
                         <div className="flex flex-col">
@@ -325,14 +331,14 @@ const ManagerChatPage: React.FC = () => {
         {showOptions && currentStepId === 'intro' && (
           <>
             <div className="my-5 w-full border-t border-dashed border-gray-100" />
-            <div className="flex flex-col gap-[10px]">
+            <div className="flex flex-col gap-2.5">
               {introOptions.map((option, idx) => (
                 <button
                   key={idx}
                   onClick={() =>
                     handleOptionClick(option.label, option.nextStepId!)
                   }
-                  className="h-[49px] px-5 py-[14px] bg-gray-0 border border-gray-100 rounded-[12px] text-left active:bg-primary-10 active:border-primary-200 focus:bg-primary-10 focus:border-primary-200 transition-colors text-[14px]"
+                  className="h-12.25 px-5 py-3.5 bg-gray-0 border border-gray-100 rounded-xl text-left active:bg-primary-10 active:border-primary-200 focus:bg-primary-10 focus:border-primary-200 transition-colors text-[14px]"
                 >
                   {option.label}
                 </button>
@@ -344,7 +350,7 @@ const ManagerChatPage: React.FC = () => {
 
       {/* 고정 버튼 */}
       {isCompleted && (
-        <div className="flex flex-row gap-[10px] pt-[10px] pb-[calc(10px+env(safe-area-inset-bottom))] px-5 bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] border-t border-gray-100 fixed bottom-0 left-0 right-0 z-10 max-w-app mx-auto">
+        <div className="flex flex-row gap-2.5 pt-2.5 pb-[calc(10px+env(safe-area-inset-bottom))] px-5 bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] border-t border-gray-100 fixed bottom-0 left-0 right-0 z-10 max-w-app mx-auto">
           <button
             onClick={() => {
               setCurrentStepId('intro')
@@ -359,13 +365,13 @@ const ManagerChatPage: React.FC = () => {
               setShowOptions(true)
               setHasProgress(false)
             }}
-            className="flex w-[56px] items-center justify-center bg-gray-50 border border-gray-100 rounded-[12px]"
+            className="flex w-14 items-center justify-center bg-gray-50 border border-gray-100 rounded-xl"
           >
             <Restart />
           </button>
           <button
             onClick={() => requestLeave('home')}
-            className="flex-1 h-[52px] bg-primary-10 text-primary-300 border border-primary-300 rounded-[12px] text-[16px] text-subtitle"
+            className="flex-1 h-13 bg-primary-10 text-primary-300 border border-primary-300 rounded-xl text-[16px] text-subtitle"
           >
             Go Home
           </button>

@@ -21,5 +21,38 @@ export default defineConfig({
   },
    build: {
     outDir: 'dist',
+    // iOS 웹뷰 호환성 및 최신 문법 지원
+    target: 'es2020',
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        // manualChunks를 통한 라이브러리 분리
+        manualChunks: id => {
+          if (id.includes('node_modules')) {
+            // React 관련 패키지
+            if (
+              id.includes('react') ||
+              id.includes('react-dom') ||
+              id.includes('react-router-dom')
+            ) {
+              return 'vendor-react'
+            }
+            // Firebase 관련 패키지
+            if (id.includes('firebase')) {
+              return 'vendor-firebase'
+            }
+            return 'vendor-libs'
+          }
+        },
+        // 빌드 파일 이름 구조화
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+      },
+    },
+  },
+  // 배포 시 불필요한 로그 제거
+  esbuild: {
+    drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
   },
 })

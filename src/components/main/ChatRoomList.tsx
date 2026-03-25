@@ -29,7 +29,7 @@ const ChatRoomList = ({
           />
 
           {index < displayData.length - 1 && (
-            <div className="my-[6px] h-[1px] w-full bg-gray-80" />
+            <div className="my-1.5 h-px w-full bg-gray-80" />
           )}
         </React.Fragment>
       ))}

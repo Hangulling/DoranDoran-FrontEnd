@@ -7,16 +7,17 @@ import { useHomeStore } from '../stores/useHomeStore'
 import type { HomePost } from '../types/home'
 import LeftArrow from '../assets/icon/leftArrow.svg?react'
 import { AnimatePresence, motion, wrap } from 'framer-motion'
+import { sendGAEvent } from '../utils/ga'
 
 const ImageSkeleton = () => (
-  <div className="w-full aspect-[4/5] bg-primary-30 animate-pulse" />
+  <div className="w-full aspect-4/5 bg-primary-30 animate-pulse" />
 )
 
 const TextSkeleton = () => (
   <div className="space-y-1 w-full animate-pulse">
-    <div className="h-[18px] w-full bg-primary-30 rounded-[4px]" />
-    <div className="h-[18px] w-full bg-primary-30 rounded-[4px]" />
-    <div className="h-[18px] w-[60%] bg-primary-30 rounded-[4px]" />
+    <div className="h-4.5 w-full bg-primary-30 rounded-sm" />
+    <div className="h-4.5 w-full bg-primary-30 rounded-sm" />
+    <div className="h-4.5 w-[60%] bg-primary-30 rounded-sm" />
   </div>
 )
 
@@ -83,12 +84,18 @@ const InstaPage = () => {
 
   const handlePrev = () => {
     if (hasPrev) {
+      sendGAEvent('click_content_navigation', {
+        nav_direction: 'prev',
+      })
       navigate(`/insta/${homePosts[currentIndex - 1].externalId}`)
     }
   }
 
   const handleNext = () => {
     if (hasNext) {
+      sendGAEvent('click_content_navigation', {
+        nav_direction: 'next',
+      })
       navigate(`/insta/${homePosts[currentIndex + 1].externalId}`)
     }
   }
@@ -98,12 +105,16 @@ const InstaPage = () => {
       console.warn('Permalink is not available')
       return
     }
+    sendGAEvent('click_external_link', {
+      link_type: 'instagram',
+      content_id: externalId,
+    })
     window.open(post.permalink, '_blank', 'noopener,noreferrer')
   }
 
   if (loading) {
     return (
-      <div className="flex min-h-full flex-col bg-gray-0 pb-[calc(50px_+_env(safe-area-inset-bottom))]">
+      <div className="flex min-h-full flex-col bg-gray-0 pb-[calc(50px+env(safe-area-inset-bottom))]">
         <ImageSkeleton />
         <div className="mt-4">
           <TextSkeleton />
@@ -115,9 +126,9 @@ const InstaPage = () => {
   if (!post) return null
 
   return (
-    <div className="flex min-h-full flex-col bg-gray-0 pb-[calc(80px_+_env(safe-area-inset-bottom))]">
+    <div className="flex min-h-full flex-col bg-gray-0 pb-[calc(80px+env(safe-area-inset-bottom))]">
       <div className="w-full mb-1.5">
-        <div className="relative w-full aspect-[4/5] overflow-hidden bg-gray-0">
+        <div className="relative w-full aspect-4/5 overflow-hidden bg-gray-0">
           <AnimatePresence initial={false} custom={direction}>
             {assets.length > 0 ? (
               <motion.div
@@ -195,22 +206,18 @@ const InstaPage = () => {
         </div>
 
         <Button variant="visit" size="visit" onClick={handleVisitInstagram}>
-          <img
-            src={instagram}
-            alt="instagram"
-            className="w-[18px] h-[18px] mr-[6px]"
-          />
+          <img src={instagram} alt="instagram" className="w-4.5 h-4.5 mr-1.5" />
           Visit Instagram
         </Button>
       </div>
 
       {totalCount > 0 && (
-        <footer className="z-50 max-w-app md:max-w-tablet lg:max-w-desktop fixed bottom-0 left-0 right-0 bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] border-t border-gray-100 grid grid-cols-3 items-center px-5 pt-[14px] pb-[calc(14px_+_env(safe-area-inset-bottom))] mx-auto text-[14px]">
+        <footer className="z-50 max-w-app md:max-w-tablet lg:max-w-desktop fixed bottom-0 left-0 right-0 bg-gray-0 shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] border-t border-gray-100 grid grid-cols-3 items-center px-5 pt-3.5 pb-[calc(14px+env(safe-area-inset-bottom))] mx-auto text-[14px]">
           <div className="flex justify-start">
             <button
               onClick={handlePrev}
               disabled={!hasPrev}
-              className="flex items-center gap-x-[2px] whitespace-nowrap"
+              className="flex items-center gap-x-0.5 whitespace-nowrap"
             >
               <LeftArrow
                 className={`w-5 h-5 ${!hasPrev ? 'text-gray-400' : 'text-gray-800'}`}
@@ -231,7 +238,7 @@ const InstaPage = () => {
             <button
               onClick={handleNext}
               disabled={!hasNext}
-              className="flex items-center gap-x-[2px] whitespace-nowrap"
+              className="flex items-center gap-x-0.5 whitespace-nowrap"
             >
               <span className={hasNext ? 'text-gray-800' : 'text-gray-400'}>
                 Next Post

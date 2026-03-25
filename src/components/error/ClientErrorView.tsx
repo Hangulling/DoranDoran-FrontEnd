@@ -1,9 +1,9 @@
 import ClientError from '/public/clientError.svg'
 import Arrow from '../../assets/icon/leftArrow.svg?react'
 import Button from '../common/Button'
-import type { ClientErrorViewProps } from '../../types/common'
+import type { ErrorViewProps } from '../../types/common'
 
-const ClientErrorView = ({ onClickBack }: ClientErrorViewProps) => {
+const ClientErrorView = ({ onClickBack }: ErrorViewProps) => {
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <img src={ClientError} alt="Client Error" />
@@ -12,14 +12,14 @@ const ClientErrorView = ({ onClickBack }: ClientErrorViewProps) => {
         <br />
         Looks like this page got lost.
       </h2>
-      <p className="text-gray-300 text-[14px] mb-[30px] text-center leading-relaxed">
+      <p className="text-gray-300 text-[14px] mb-7.5 text-center leading-relaxed">
         The path you’re trying to
         <br />
         reach isn’t here right now.
         <br />
         Please head back to the homepage.
       </p>
-      <div className="text-title text-gray-300 text-[14px] text-center mb-[30px]">
+      <div className="text-title text-gray-300 text-[14px] text-center mb-7.5">
         Error Code : <span className="text-body">400</span>
       </div>
       <Button variant="home" className="py-2 px-3" onClick={onClickBack}>
