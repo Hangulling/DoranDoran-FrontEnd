@@ -14,7 +14,7 @@ type OutletContext = {
 }
 
 export default function FindEmailQuestion() {
-  const { firstName, lastName, birthDate, identityQuestion, answer, setMany } =
+  const { firstName, lastName, identityQuestion, answer, setMany } =
     useFindEmailStore()
   const [answerError, setAnswerError] = useState<string | null>(null)
   const { setSubmit, setCanSubmit } = useOutletContext<OutletContext>()
@@ -44,7 +44,7 @@ export default function FindEmailQuestion() {
       const payload = {
         firstName,
         lastName,
-        birthDate: birthDate.replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3'),
+        // birthDate: birthDate.replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3'),
         signupQuestion: identityQuestion,
         signupAnswer: answer,
       }
@@ -57,7 +57,7 @@ export default function FindEmailQuestion() {
       console.log('error', error)
       navigate('/find-email/not-found')
     }
-  }, [firstName, lastName, birthDate, identityQuestion, answer, navigate])
+  }, [firstName, lastName, identityQuestion, answer, navigate])
 
   const isFormValid = identityQuestion !== '' && ANSWER_REGEX.test(answer)
 
