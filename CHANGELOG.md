@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.20.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.19.8...v3.20.0) (2026-03-31)
+
+
+### Bug Fixes
+
+* **deps:** resolve security vulnerabilities ([#440](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/440)) ([167b2c8](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/167b2c8ade7011d9ac9dc533690d0ff75a0e99a8))
+
 ### [3.19.8](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.19.7...v3.19.8) (2026-03-25)
 
 ### [3.19.7](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.19.6...v3.19.7) (2026-03-25)
