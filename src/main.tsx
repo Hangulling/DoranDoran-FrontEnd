@@ -33,18 +33,6 @@ const logWarn = (title: string, extra?: unknown) => {
 
 const isNative = isNativeApp()
 
-if (isNative) {
-  CapApp.addListener('appUrlOpen', data => {
-    console.log('deeplink appUrlOpen:', data.url)
-
-    if (data.url.includes('email-verified')) {
-      console.log('✅ email-verified 감지')
-    } else {
-      console.log('ℹ️ email-verified 아님')
-    }
-  })
-}
-
 const Router = isNative ? HashRouter : BrowserRouter
 
 const initSocialLogin = async () => {
