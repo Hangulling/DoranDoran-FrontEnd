@@ -29,13 +29,16 @@ export default function SignupQuestion() {
     setMany,
     reset: resetForm,
   } = useSignupFormStore()
+
   const agreements = useAgreementStore(s => s.value)
-  const [answerError, setAnswerError] = useState<string | null>(null)
-  const [openModal, setOpenModal] = useState(false)
-  const { setSubmit, setCanSubmit } = useOutletContext<OutletContext>()
-  const [, setSubmitError] = useState<string | null>(null)
-  const navigate = useNavigate()
   const resetAgreements = useAgreementStore(s => s.reset)
+
+  const [answerError, setAnswerError] = useState<string | null>(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [openModal, setOpenModal] = useState(false)
+
+  const { setSubmit, setCanSubmit } = useOutletContext<OutletContext>()
+  const navigate = useNavigate()
 
   const handleAnswerChange = (v: string) => {
     if (v.length > 30) {
@@ -57,7 +60,7 @@ export default function SignupQuestion() {
   }
 
   const handleConfirmModal = async () => {
-    setOpenModal(false)
+    alert('1. Start clicked')
     setSubmitError(null)
 
     try {
@@ -72,7 +75,22 @@ export default function SignupQuestion() {
         marketingOption: agreements.marketing,
       }
 
+      alert(
+        `2. payload ready
+email: ${email}
+firstName: ${firstName}
+lastName: ${lastName}
+question: ${identityQuestion}
+answer: ${answer}
+password: ${password ? 'exists' : 'empty'}
+marketingOption: ${String(agreements.marketing)}`
+      )
+
       await createUser(payload)
+
+      alert('3. createUser success')
+
+      setOpenModal(false)
 
       if (IS_PROD && GA_ENABLED) {
         ReactGA.event('sign_up', {
@@ -80,7 +98,9 @@ export default function SignupQuestion() {
         })
       }
 
+      alert('4. navigate to login')
       navigate('/login', { replace: true })
+
       setTimeout(() => {
         resetForm()
         resetAgreements()
@@ -88,15 +108,33 @@ export default function SignupQuestion() {
     } catch (e: unknown) {
       const isAxios = axios.isAxiosError(e)
       const status = isAxios ? e.response?.status : undefined
+      const data = isAxios ? e.response?.data : undefined
+      const message =
+        typeof data === 'string'
+          ? data
+          : data?.message || data?.error || 'unknown error'
+
+      alert(
+        `signup failed
+status: ${status ?? 'no status'}
+message: ${message}
+data: ${JSON.stringify(data)}`
+      )
+
       const errorCode = status ?? 503
 
       if (status && status >= 400 && status < 500) {
+        setSubmitError(
+          typeof message === 'string'
+            ? message
+            : 'Sign up failed. Please check your input.'
+        )
         return
       }
 
       navigate('/error', {
         replace: true,
-        state: { errorCode: errorCode, from: 'signup' },
+        state: { errorCode, from: 'signup' },
       })
     }
   }
@@ -113,6 +151,7 @@ export default function SignupQuestion() {
 
   const handleOpenModal = useCallback(() => {
     if (!isFormValid) return
+    setSubmitError(null)
     setOpenModal(true)
   }, [isFormValid])
 
@@ -125,12 +164,13 @@ export default function SignupQuestion() {
       <FormIntro>
         <p>Choose a recovery question</p>
       </FormIntro>
+
       <div>
         <Dropdown
           label="Identity Verification Question"
           placeholder="Please select a question"
           options={Identity_Questions}
-          variant={answerError ? 'error' : 'primary'}
+          variant={answerError || submitError ? 'error' : 'primary'}
           value={
             identityQuestion
               ? (Identity_Questions.find(q => q.value === identityQuestion) ??
@@ -139,15 +179,21 @@ export default function SignupQuestion() {
           }
           onChange={q => setMany({ identityQuestion: q.value })}
         />
+
         <Input
-          variant={answerError ? 'error' : 'primary'}
+          variant={answerError || submitError ? 'error' : 'primary'}
           type="text"
           placeholder="Please enter your answer"
           onChange={e => handleAnswerChange(e.target.value)}
           value={answer}
         />
+
         {answerError && (
           <span className="text-xs text-system-red">{answerError}</span>
+        )}
+
+        {submitError && (
+          <span className="text-xs text-system-red">{submitError}</span>
         )}
       </div>
 
