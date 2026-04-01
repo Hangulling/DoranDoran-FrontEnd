@@ -60,7 +60,6 @@ export default function SignupQuestion() {
   }
 
   const handleConfirmModal = async () => {
-    alert('1. Start clicked')
     setSubmitError(null)
 
     try {
@@ -75,20 +74,7 @@ export default function SignupQuestion() {
         marketingOption: agreements.marketing,
       }
 
-      alert(
-        `2. payload ready
-email: ${email}
-firstName: ${firstName}
-lastName: ${lastName}
-question: ${identityQuestion}
-answer: ${answer}
-password: ${password ? 'exists' : 'empty'}
-marketingOption: ${String(agreements.marketing)}`
-      )
-
       await createUser(payload)
-
-      alert('3. createUser success')
 
       setOpenModal(false)
 
@@ -98,7 +84,6 @@ marketingOption: ${String(agreements.marketing)}`
         })
       }
 
-      alert('4. navigate to login')
       navigate('/login', { replace: true })
 
       setTimeout(() => {
@@ -114,16 +99,10 @@ marketingOption: ${String(agreements.marketing)}`
           ? data
           : data?.message || data?.error || 'unknown error'
 
-      alert(
-        `signup failed
-status: ${status ?? 'no status'}
-message: ${message}
-data: ${JSON.stringify(data)}`
-      )
-
       const errorCode = status ?? 503
 
       if (status && status >= 400 && status < 500) {
+        setOpenModal(false)
         setSubmitError(
           typeof message === 'string'
             ? message
