@@ -35,7 +35,7 @@ const isNative = isNativeApp()
 
 if (isNative) {
   CapApp.addListener('appUrlOpen', data => {
-    console.log('🔥 appUrlOpen:', data.url)
+    console.log('deeplink appUrlOpen:', data.url)
 
     if (data.url.includes('email-verified')) {
       console.log('✅ email-verified 감지')
