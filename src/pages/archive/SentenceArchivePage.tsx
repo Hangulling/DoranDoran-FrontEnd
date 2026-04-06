@@ -96,7 +96,7 @@ export default function SentenceArchivePage() {
     setOpenId(prev => (prev === bookmarkId ? null : bookmarkId))
 
     if (nextOpen && IS_PROD && GA_ENABLED) {
-      ReactGA.event('ment_explanation_saved_click', {
+      ReactGA.event('sentence_explanation_saved_click', {
         bookmark_id: bookmarkId,
       })
     }

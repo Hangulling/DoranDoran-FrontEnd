@@ -9,6 +9,8 @@ import { useUserStore } from '../../../stores/useUserStore'
 import { tokenService } from '../../../api/tokenService'
 import type { OAuthLoginResponse } from '../../../types/auth'
 import type { User } from '../../../types/user'
+import { GA_ENABLED, IS_PROD } from '../../../constants/env'
+import ReactGA from 'react-ga4'
 
 type Provider = 'google' | 'apple'
 
@@ -74,6 +76,12 @@ export default function SignupTerm() {
 
           const user = res.data?.user as User | undefined
           if (!user) return
+
+          if (IS_PROD && GA_ENABLED) {
+            ReactGA.event('sign_up', {
+              method: provider,
+            })
+          }
 
           setStoreId(user.id)
           setStoreName(user.name)
