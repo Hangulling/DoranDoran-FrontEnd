@@ -5,15 +5,19 @@ interface UserState {
   id: string
   name: string
   email: string
+  isOnboard: boolean
   savedCount: number | null
   streakCount: number | null
   perfectCount: number | null
+  isLoaded: boolean // 데이터 로드 완료 여부
   setId: (id: string) => void
   setName: (name: string) => void
   setEmail: (email: string) => void
   setSavedCount: (count: number) => void
   setStreakCount: (count: number) => void
   setPerfectCount: (count: number) => void
+  setIsOnboard: (isOnboard: boolean) => void
+  setIsLoaded: (isLoaded: boolean) => void
   reset: () => void
 }
 
@@ -26,12 +30,16 @@ export const useUserStore = create<UserState>()(
       savedCount: null,
       streakCount: null,
       perfectCount: null,
+      isOnboard: false,
+      isLoaded: false,
       setId: id => set({ id }),
       setName: name => set({ name }),
       setEmail: email => set({ email }),
       setSavedCount: count => set({ savedCount: count }),
       setStreakCount: count => set({ streakCount: count }),
       setPerfectCount: count => set({ perfectCount: count }),
+      setIsOnboard: isOnboard => set({ isOnboard }),
+      setIsLoaded: isLoaded => set({ isLoaded }),
       reset: () => {
         set({
           id: '',
@@ -40,6 +48,8 @@ export const useUserStore = create<UserState>()(
           savedCount: undefined,
           streakCount: undefined,
           perfectCount: undefined,
+          isOnboard: false,
+          isLoaded: false,
         })
       },
     }),
@@ -50,6 +60,7 @@ export const useUserStore = create<UserState>()(
         id: state.id,
         name: state.name,
         email: state.email,
+        isOnboard: state.isOnboard,
       }),
     }
   )

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import ChatRoomList from '../components/main/ChatRoomList'
 import ClosenessSheet from '../components/chat/ClosenessSheet'
 import CommonModal from '../components/common/CommonModal'
-import { useFetchUser } from '../hooks/useFetchUser'
 import { useFetchChatRooms } from '../hooks/main/useFetchChatRooms'
 import { useCreateChatRoom } from '../hooks/main/useCreateChatRoom'
 import { getChatBotIdByConcept } from '../utils/chatbotMap'
@@ -17,6 +16,7 @@ import type { ChatRoomWithMessage } from '../types/main'
 import { useDeepLinkChatRoom } from '../hooks/main/useDeepLinkChatRoom'
 import { useStartGreeting } from '../hooks/main/useStartGreeting'
 import { getTodayDate, getUnixTime, sendGAEvent } from '../utils/ga'
+import { useUserStore } from '../stores/useUserStore'
 
 const MainPage = () => {
   const navigate = useNavigate()
@@ -36,7 +36,7 @@ const MainPage = () => {
     targetTopic?: string
   } | null>(null)
 
-  const { userId } = useFetchUser()
+  const userId = useUserStore(state => state.id)
   const { chatMsg, isLoading } = useFetchChatRooms(userId)
 
   // GA_view_main

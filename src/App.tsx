@@ -5,10 +5,13 @@ import AppLayout from './layouts/AppLayout'
 import { Toaster } from 'react-hot-toast'
 import usePushNotification from './hooks/usePushNotification'
 import { useEmailVerifiedDeepLink } from './hooks/useEmailVerifiedDeepLink'
+import { useFetchUser } from './hooks/useFetchUser'
 
 function App() {
   usePushNotification()
   useEmailVerifiedDeepLink()
+
+  useFetchUser()
 
   return (
     <div
