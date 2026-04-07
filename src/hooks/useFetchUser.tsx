@@ -10,19 +10,13 @@ import { tokenService } from '../api/tokenService'
 export const useFetchUser = () => {
   const navigate = useNavigate()
 
-  const setStoreName = useUserStore(state => state.setName)
-  const setStoreId = useUserStore(state => state.setId)
-  const setStoreEmail = useUserStore(state => state.setEmail)
-  const setSavedCount = useUserStore(state => state.setSavedCount)
-  const setStreakCount = useUserStore(state => state.setStreakCount)
-  const setPerfectCount = useUserStore(state => state.setPerfectCount)
-  const setIsOnboard = useUserStore(state => state.setIsOnboard)
+  const setUserData = useUserStore(state => state.setUserData)
   const setIsLoaded = useUserStore(state => state.setIsLoaded)
 
   const hasToken = !!tokenService.access || !!tokenService.refresh
 
   // 데이터 fetching 및 캐싱
-  const { data, isError } = useQuery({
+  const { data, isError, isLoading } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
       // 사용자 정보 조회
@@ -46,32 +40,21 @@ export const useFetchUser = () => {
   useEffect(() => {
     if (!hasToken) {
       setIsLoaded(true)
+      return
     }
 
+    if (hasToken && isLoading) {
+      setIsLoaded(false)
+      return
+    }
+
+    // 데이트 오면 일괄 업데이트
     if (data) {
       const { profile, bookmarkCount, stats } = data
-      setGAUserContext(profile.id, profile.email) // 내부 사용자 판별
-      setStoreName(profile.name)
-      setStoreId(profile.id)
-      setStoreEmail(profile.email)
-      setSavedCount(bookmarkCount)
-      setStreakCount(stats.streakCount)
-      setPerfectCount(stats.perfectCount)
-      setIsOnboard(profile.isOnboard)
-      setIsLoaded(true) // 데이터 로드 완료
+      setGAUserContext(profile.id, profile.email)
+      setUserData({ profile, bookmarkCount, stats })
     }
-  }, [
-    data,
-    setStoreName,
-    setStoreId,
-    setStoreEmail,
-    setSavedCount,
-    setStreakCount,
-    setPerfectCount,
-    setIsOnboard,
-    setIsLoaded,
-    hasToken,
-  ])
+  }, [data, hasToken, isLoading, setUserData, setIsLoaded])
 
   // 에러 처리
   useEffect(() => {
