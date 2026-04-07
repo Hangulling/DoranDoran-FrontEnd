@@ -16,7 +16,7 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
 				SplashScreen.installSplashScreen(this);
-        androidx.activity.EdgeToEdge.enable(this);
+        //androidx.activity.EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
     }
 
