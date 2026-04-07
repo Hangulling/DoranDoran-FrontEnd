@@ -116,6 +116,7 @@ export default function SentenceArchivePage() {
       showToast({
         message: `Selected ${ids.length > 1 ? 'sentences' : 'sentence'} deleted.`,
         iconType: 'checkRound',
+        size: 'archive',
       })
       exitSelectionMode()
     } catch (error) {

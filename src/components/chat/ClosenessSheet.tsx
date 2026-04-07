@@ -64,7 +64,7 @@ const ClosenessSheet = ({
         </p>
       }
     >
-      <div className="flex flex-col items-center w-full mt-[14px]">
+      <div className="flex flex-col items-center w-full mt-3.5">
         <div className="flex justify-center gap-3 w-full">
           {/* 친밀도 1 */}
           <button
@@ -106,7 +106,7 @@ const ClosenessSheet = ({
         </div>
 
         {/* 시작 버튼 */}
-        <div className="w-full mt-[30px]">
+        <div className="w-full mt-7.5 mb-2.5">
           <Button
             variant="primary"
             size="confirm"

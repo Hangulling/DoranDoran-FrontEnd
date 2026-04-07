@@ -181,6 +181,7 @@ const ChatPage: React.FC = () => {
       showToast({
         message: 'Thanks for letting us know!',
         iconType: 'checkRound',
+        size: 'long',
       })
       console.log('신고 완료 처리:', messageId, reason)
 
@@ -190,6 +191,11 @@ const ChatPage: React.FC = () => {
         )
       )
     } catch (error) {
+      showToast({
+        message: 'Failed to submit',
+        iconType: 'error',
+        size: 'long',
+      })
       console.error('신고 요청 실패:', error)
     } finally {
       handleCloseReport()
