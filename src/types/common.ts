@@ -25,7 +25,7 @@ export interface CommonModalProps {
 export interface ToastProps {
   message: string
   iconType?: IconType
-  size?: 'default' | 'sheet' | 'manager'
+  size?: 'default' | 'sheet' | 'manager' | 'long' | 'archive'
 }
 
 // 로딩 스피너
