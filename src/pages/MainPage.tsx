@@ -17,6 +17,7 @@ import { useDeepLinkChatRoom } from '../hooks/main/useDeepLinkChatRoom'
 import { useStartGreeting } from '../hooks/main/useStartGreeting'
 import { getTodayDate, getUnixTime, sendGAEvent } from '../utils/ga'
 import { useUserStore } from '../stores/useUserStore'
+//import { getUnreadNotifications } from '../api/notification'
 
 const MainPage = () => {
   const navigate = useNavigate()
@@ -38,6 +39,18 @@ const MainPage = () => {
 
   const userId = useUserStore(state => state.id)
   const { chatMsg, isLoading } = useFetchChatRooms(userId)
+
+  // useEffect(() => {
+  //   if (userId) {
+  //     getUnreadNotifications()
+  //       .then(res => {
+  //         console.log('[DEBUG] Unread Notifications:', res)
+  //       })
+  //       .catch(err => {
+  //         console.error('[DEBUG] Failed to fetch notifications:', err)
+  //       })
+  //   }
+  // }, [userId])
 
   // GA_view_main
   useEffect(() => {

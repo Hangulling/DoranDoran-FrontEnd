@@ -48,7 +48,7 @@ export const useFetchUser = () => {
       return
     }
 
-    // 데이트 오면 일괄 업데이트
+    // 데이터 오면 일괄 업데이트
     if (data) {
       const { profile, bookmarkCount, stats } = data
       setGAUserContext(profile.id, profile.email)
