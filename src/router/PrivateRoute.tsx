@@ -2,7 +2,6 @@ import type { JSX } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { tokenService } from '../api/tokenService'
 import { useUserStore } from '../stores/useUserStore'
-import LoadingSpinner from '../components/common/LoadingSpinner'
 
 interface PrivateRouteProps {
   children: JSX.Element
@@ -22,11 +21,7 @@ export default function PrivateRoute({ children }: PrivateRouteProps) {
   }
 
   if (!isLoaded) {
-    return (
-      <div className="flex items-center justify-center h-full w-full">
-        <LoadingSpinner />
-      </div>
-    )
+    return <div className="h-screen w-screen bg-white" />
   }
 
   // 온보딩 미완료시 온보딩 페이지
