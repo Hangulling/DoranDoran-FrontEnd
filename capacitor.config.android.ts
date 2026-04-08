@@ -21,6 +21,12 @@ const config: CapacitorConfig = {
       resize: KeyboardResize.Native,
       resizeOnFullScreen: false,
     },
+    SplashScreen: {
+      launchAutoHide: false, // 자동 숨김 방지
+      launchShowDuration: 30000,
+      backgroundColor: '#ffffffff',
+      showSpinner: false,
+    },
   },
 }
 

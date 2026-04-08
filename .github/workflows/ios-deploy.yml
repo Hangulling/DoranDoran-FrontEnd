@@ -22,7 +22,7 @@ jobs:
   build-ios:
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: List Xcode versions
         run: ls -1 /Applications | grep Xcode
@@ -34,7 +34,7 @@ jobs:
         run: xcodebuild -version
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22.x
 
