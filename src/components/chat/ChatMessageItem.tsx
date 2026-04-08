@@ -16,6 +16,7 @@ interface ChatMessageItemProps {
   isVocabularyEnabled: boolean
   isCorrectionEnabled: boolean
   isTranslationEnabled: boolean
+  isAiResponding: boolean
   onChatBubbleBookmark: (
     messageId: string,
     content: string,
@@ -40,6 +41,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
     isVocabularyEnabled,
     isCorrectionEnabled,
     isTranslationEnabled,
+    isAiResponding,
     onChatBubbleBookmark,
     onCorrectionBubbleBookmark,
     onReport,
@@ -102,7 +104,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
       return (
         <button
           onClick={toggleFeedback}
-          className={`flex items-center justify-center w-7 h-7 rounded-full transition-colors duration-200 mr-[6px] ${
+          className={`flex items-center justify-center w-7 h-7 rounded-full transition-colors duration-200 mr-1.5 ${
             showFeedback
               ? 'bg-purple-10 text-primary-300'
               : 'bg-gradient-1 text-gray-0'
@@ -137,12 +139,15 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = React.memo(
             isReported={msg.isReported}
           />
 
-          {/* 응답 중지 */}
+          {/* 응답 중지 후 다시 보내기 */}
           {!msg.isSender && msg.isCancelled && (
             <button
-              className="ml-[6px] flex items-center justify-center"
+              disabled={isAiResponding}
+              className={`ml-1.5 flex items-center justify-center ${
+                isAiResponding ? 'cursor-not-allowed' : ''
+              }`}
               onClick={() => {
-                if (onResend && msg.targetUserMsgId) {
+                if (!isAiResponding && onResend && msg.targetUserMsgId) {
                   onResend(msg.id, msg.targetUserMsgId)
                 }
               }}

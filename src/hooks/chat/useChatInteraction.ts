@@ -61,10 +61,15 @@ export const useChatInteraction = ({
     setRetryCount(prev => prev + 1)
   }, [resetInactivityTimer])
 
+  // 중지 후 재전송 핸들러
   const handleResend = async (
     cancelledMsgId: string,
     targetUserMsgId: string
   ) => {
+    if (isAiResponding) return
+
+    setIsAiResponding(true)
+
     try {
       const originMessage = await getMessage(targetUserMsgId)
       const content = originMessage.content
@@ -79,6 +84,7 @@ export const useChatInteraction = ({
       await handleSendMessage(content)
     } catch (error) {
       console.error('Failed to resend message:', error)
+      setIsAiResponding(false)
     }
   }
 
@@ -129,6 +135,8 @@ export const useChatInteraction = ({
 
   // 메시지 전송
   const handleSendMessage = async (text: string) => {
+    if (isAiResponding || !text.trim()) return
+
     resetInactivityTimer() // 타이머 리셋
     setSendError(null)
     setSseError(null)
