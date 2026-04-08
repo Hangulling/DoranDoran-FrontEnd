@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.22.0...v4.0.0) (2026-04-08)
+
+
+### Bug Fixes
+
+* 온보딩 오류 수정 ([#457](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/457)) ([61a36fb](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/61a36fb536596f445188b58e560fb69af5659305))
+* 채팅페이지 수정 ([#456](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/456)) ([63653b5](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/63653b5f634a67a114da734050fed077b8cb2ad8))
+* 토스트 위치, 온보딩 접근 제어 추가, capacitor 다운그레이드 ([#455](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/455)) ([4d18aee](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/4d18aee400fdb560d32a724c575bff52d851fa84))
+
 ## [3.22.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v3.21.0...v3.22.0) (2026-04-06)
 
 
