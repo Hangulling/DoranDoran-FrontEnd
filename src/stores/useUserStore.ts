@@ -21,11 +21,6 @@ interface UserState {
     stats: { streakCount: number; perfectCount: number }
   }) => void
   reset: () => void
-  setUserData: (data: {
-    profile: { id: string; name: string; email: string; isOnboard: boolean }
-    bookmarkCount: number
-    stats: { streakCount: number; perfectCount: number }
-  }) => void
 }
 
 export const useUserStore = create<UserState>()(
@@ -46,7 +41,6 @@ export const useUserStore = create<UserState>()(
       setIsOnboard: isOnboard => set({ isOnboard }),
       setIsLoaded: isLoaded => set({ isLoaded }),
 
-      // 일괄 업데이트
       setUserData: ({ profile, bookmarkCount, stats }) =>
         set({
           id: profile.id,
@@ -71,17 +65,6 @@ export const useUserStore = create<UserState>()(
           isLoaded: false,
         })
       },
-      setUserData: ({ profile, bookmarkCount, stats }) =>
-        set({
-          id: profile.id,
-          name: profile.name,
-          email: profile.email,
-          isOnboard: profile.isOnboard,
-          savedCount: bookmarkCount,
-          streakCount: stats.streakCount,
-          perfectCount: stats.perfectCount,
-          isLoaded: true,
-        }),
     }),
     {
       name: 'user-storage',
