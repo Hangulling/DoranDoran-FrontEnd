@@ -108,7 +108,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
     hasEtc: true,
     options: [
       {
-        value: 'friends',
+        value: 'casual_chats',
         label: 'Casual chats with Korean friends',
         image: Card1,
       },
@@ -138,7 +138,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
     hasEtc: false,
     options: [
       {
-        value: 'enter',
+        value: 'entertainment',
         label: 'Entertainment',
         subLabel: 'game, movie, music, drama etc.',
         image: Entertainment,
@@ -156,7 +156,7 @@ export const ONBOARDING_STEPS: OnboardingStepData[] = [
         image: Daily,
       },
       {
-        value: 'fb',
+        value: 'f&b',
         label: 'F&B',
         subLabel: 'fashion, beauty',
         image: Fb,

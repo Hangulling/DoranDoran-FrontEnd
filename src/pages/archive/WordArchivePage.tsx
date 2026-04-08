@@ -125,6 +125,7 @@ export default function WordArchivePage() {
       showToast({
         message: `Selected ${ids.length > 1 ? 'words' : 'word'} deleted.`,
         iconType: 'checkRound',
+        size: 'archive',
       })
       exitSelectionMode()
     } catch (error) {

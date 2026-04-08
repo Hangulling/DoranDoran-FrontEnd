@@ -32,12 +32,23 @@
   "tailwindCSS.includeLanguages": {
     "typescriptreact": "typescriptreact"
   },
-  "tailwindCSS.experimental.classRegex": ["clsx\\(([^)]*)\\)", "className={`([^`}]+)"],
+  "tailwindCSS.experimental.classRegex": [
+    "clsx\\(([^)]*)\\)",
+    "className={`([^`}]+)"
+  ],
 
   // === Prettier 보조 설정
   "prettier.requireConfig": true,
   "prettier.useEditorConfig": true,
 
   // === javascript 내장포맷터 차단 (Prettier 우선)
-  "javascript.format.enable": false
+  "javascript.format.enable": false,
+
+  // === Java Language Support 설정 ===
+  "java.import.exclusions": [
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/dist/**",
+    "**/build/**"
+  ]
 }

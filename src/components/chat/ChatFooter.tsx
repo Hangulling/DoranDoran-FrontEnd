@@ -53,8 +53,8 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
   const [toast, setToast] = useState<ToastMessageProps | null>(null)
   const [isToastVisible, setIsToastVisible] = useState(false)
 
-  const toastTimerRef = useRef<NodeJS.Timeout | null>(null)
-const { isIOSApp, keyboardHeight } = useIOSKeyboard()
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const { isIOSApp, keyboardHeight } = useIOSKeyboard()
 
   useEffect(() => {
     return () => {
@@ -127,7 +127,7 @@ const { isIOSApp, keyboardHeight } = useIOSKeyboard()
         className={`w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-gray-0 shadow-[0_-1px_4px_rgba(0,0,0,0.06)]`}
       >
         {/* 토스트 */}
-        <div className="absolute bottom-full w-full left-0 flex justify-center pointer-events-none">
+        <div className="absolute bottom-full inset-x-0 pointer-events-none">
           {toast && (
             <div
               className={`mx-5 ${isToastVisible ? 'toast-slide-fade-in' : 'toast-slide-fade-out'}`}

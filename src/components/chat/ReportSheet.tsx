@@ -39,6 +39,7 @@ const ReportSheet = ({
 
   return (
     <BottomSheet
+      className="mb-2.5"
       isOpen={isOpen}
       onClose={handleClose}
       title="Report a Reply Issue"
@@ -53,13 +54,13 @@ const ReportSheet = ({
         </Button>
       }
     >
-      <div className="flex flex-col items-center w-full mt-1 gap-[10px] mb-5">
+      <div className="flex flex-col items-center w-full mt-1 gap-2.5 mb-5">
         {REPORT_REASONS.map(reason => {
           const isSelected = selectedReason === reason
           return (
             <button
               key={reason}
-              className={`w-full py-[14px] px-5 text-left text-[16px] border rounded-[12px] transition-colors ${
+              className={`w-full py-3.5 px-5 text-left text-[16px] border rounded-xl transition-colors ${
                 isSelected
                   ? 'border-primary-200 bg-primary-10'
                   : 'bg-gray-0 border-gray-100'

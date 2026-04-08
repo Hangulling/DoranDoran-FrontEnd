@@ -51,12 +51,14 @@ export default function InterestSection({
       showToast({
         message: 'Your changes have been saved',
         iconType: 'checkRound',
+        size: 'long',
       })
     } catch (error) {
       console.log(error)
       showToast({
         message: 'Failed to save changes',
         iconType: 'error',
+        size: 'long',
       })
     }
   }

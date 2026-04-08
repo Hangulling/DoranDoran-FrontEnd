@@ -1,14 +1,23 @@
-import { Suspense } from 'react'
+import { Suspense, useMemo } from 'react' // useMemo 추가
 import { Routes } from './router/routes'
 import LoadingSpinner from './components/common/LoadingSpinner'
 import AppLayout from './layouts/AppLayout'
 import { Toaster } from 'react-hot-toast'
 import usePushNotification from './hooks/usePushNotification'
 import { useEmailVerifiedDeepLink } from './hooks/useEmailVerifiedDeepLink'
+import { useFetchUser } from './hooks/useFetchUser'
+import { Capacitor } from '@capacitor/core'
+import { isNativeApp } from './utils/isNativeApp'
 
 function App() {
   usePushNotification()
   useEmailVerifiedDeepLink()
+  useFetchUser()
+
+  const isIOSApp = useMemo(
+    () => isNativeApp() && Capacitor.getPlatform() === 'ios',
+    []
+  )
 
   return (
     <div
@@ -17,16 +26,14 @@ function App() {
     >
       <Toaster
         containerStyle={{
-          bottom: 'env(safe-area-inset-bottom)',
+          bottom: isIOSApp ? '0px' : 'env(safe-area-inset-bottom)',
         }}
       />
-      {
-        <AppLayout>
-          <Suspense fallback={<LoadingSpinner />}>
-            <Routes />
-          </Suspense>
-        </AppLayout>
-      }
+      <AppLayout>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes />
+        </Suspense>
+      </AppLayout>
     </div>
   )
 }
