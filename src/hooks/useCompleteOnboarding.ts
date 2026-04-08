@@ -3,9 +3,13 @@ import { Capacitor } from '@capacitor/core'
 import { PushNotifications } from '@capacitor/push-notifications'
 import { updateOnboarding } from '../api'
 import type { OnboardingPayload } from '../types/user'
+import { useUserStore } from '../stores/useUserStore'
+import { useQueryClient } from '@tanstack/react-query'
 
 export const useCompleteOnboarding = (userId: string | null) => {
   const navigate = useNavigate()
+  const setIsOnboard = useUserStore(state => state.setIsOnboard)
+  const queryClient = useQueryClient()
 
   const registerPush = async () => {
     if (!Capacitor.isNativePlatform()) return
@@ -38,7 +42,12 @@ export const useCompleteOnboarding = (userId: string | null) => {
         finalPayload.pushEnabled = false
       }
 
+      // 서버 업데이트
       await updateOnboarding(userId, finalPayload)
+      // 로컬 상태 업데이트
+      setIsOnboard(true)
+      // 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] })
 
       if (finalPayload.pushEnabled) {
         await registerPush()
