@@ -31,6 +31,12 @@ platform :ios do
       )
     end
 
+		# ios 빌드 버전
+		increment_version_number(
+  	version_number: "1.0.1", # 원하는 버전 명시
+  	xcodeproj: "App/App.xcodeproj"
+			)
+
 		# Xcode의 자동 서명을 끄고 수동 서명으로 변경
 		update_code_signing_settings(
       use_automatic_signing: false,
