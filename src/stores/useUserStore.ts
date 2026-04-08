@@ -19,6 +19,11 @@ interface UserState {
   setIsOnboard: (isOnboard: boolean) => void
   setIsLoaded: (isLoaded: boolean) => void
   reset: () => void
+  setUserData: (data: {
+    profile: { id: string; name: string; email: string; isOnboard: boolean }
+    bookmarkCount: number
+    stats: { streakCount: number; perfectCount: number }
+  }) => void
 }
 
 export const useUserStore = create<UserState>()(
@@ -52,6 +57,17 @@ export const useUserStore = create<UserState>()(
           isLoaded: false,
         })
       },
+      setUserData: ({ profile, bookmarkCount, stats }) =>
+        set({
+          id: profile.id,
+          name: profile.name,
+          email: profile.email,
+          isOnboard: profile.isOnboard,
+          savedCount: bookmarkCount,
+          streakCount: stats.streakCount,
+          perfectCount: stats.perfectCount,
+          isLoaded: true,
+        }),
     }),
     {
       name: 'user-storage',

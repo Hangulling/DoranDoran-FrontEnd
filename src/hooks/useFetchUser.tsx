@@ -10,70 +10,61 @@ import { tokenService } from '../api/tokenService'
 export const useFetchUser = () => {
   const navigate = useNavigate()
 
-  const setStoreName = useUserStore(state => state.setName)
-  const setStoreId = useUserStore(state => state.setId)
-  const setStoreEmail = useUserStore(state => state.setEmail)
-  const setSavedCount = useUserStore(state => state.setSavedCount)
-  const setStreakCount = useUserStore(state => state.setStreakCount)
-  const setPerfectCount = useUserStore(state => state.setPerfectCount)
-  const setIsOnboard = useUserStore(state => state.setIsOnboard)
+  const setUserData = useUserStore(state => state.setUserData)
   const setIsLoaded = useUserStore(state => state.setIsLoaded)
 
   const hasToken = !!tokenService.access || !!tokenService.refresh
 
   // 데이터 fetching 및 캐싱
-  const { data, isError } = useQuery({
+  const { data, isError, isLoading } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
-      // 사용자 정보 조회
       const userResponse = await getCurrentUser()
       const profile = userResponse.data
 
-      // 병렬 조회
       const [bookmarkCount, stats] = await Promise.all([
-        countBookmarks(),
-        getUserStats(profile.id),
+        countBookmarks().catch(() => 0),
+        getUserStats(profile.id).catch(() => ({
+          streakCount: 0,
+          perfectCount: 0,
+        })),
       ])
 
       return { profile, bookmarkCount, stats }
     },
-    enabled: hasToken, // 토큰 있을 때만 호출
-    staleTime: 0, // 매번 데이터 호출
-    gcTime: 1000 * 60 * 30, // 30분간 캐시 유지
+    enabled: hasToken,
+    staleTime: 0,
+    gcTime: 1000 * 60 * 30,
     retry: 1,
   })
 
   useEffect(() => {
     if (!hasToken) {
       setIsLoaded(true)
+      return
     }
 
+    // 데이터를 가져오는 중에는 로딩 상태 유지
+    if (isLoading) {
+      setIsLoaded(false)
+      return
+    }
+
+    // 데이터 로드 성공 시 스토어 업데이트
     if (data) {
       const { profile, bookmarkCount, stats } = data
-      setGAUserContext(profile.id, profile.email) // 내부 사용자 판별
-      setStoreName(profile.name)
-      setStoreId(profile.id)
-      setStoreEmail(profile.email)
-      setSavedCount(bookmarkCount)
-      setStreakCount(stats.streakCount)
-      setPerfectCount(stats.perfectCount)
-      setIsOnboard(profile.isOnboard)
-      setIsLoaded(true) // 데이터 로드 완료
-    }
-  }, [
-    data,
-    setStoreName,
-    setStoreId,
-    setStoreEmail,
-    setSavedCount,
-    setStreakCount,
-    setPerfectCount,
-    setIsOnboard,
-    setIsLoaded,
-    hasToken,
-  ])
+      setGAUserContext(profile.id, profile.email)
 
-  // 에러 처리
+      // 한 번에 업데이트
+      setUserData({
+        profile,
+        bookmarkCount,
+        stats,
+      })
+    }
+  }, [data, hasToken, isLoading, setUserData, setIsLoaded])
+
+  // 에러 발생 시 처리
   useEffect(() => {
     if (isError) {
       console.error('사용자 정보 로드 실패')
