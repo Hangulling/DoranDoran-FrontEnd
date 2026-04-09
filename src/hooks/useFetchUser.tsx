@@ -1,74 +1,84 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useUserStore } from '../stores/useUserStore'
 import { getCurrentUser, getUserStats } from '../api'
 import { countBookmarks } from '../api/archive'
-import { setGAUserContext } from '../utils/ga'
+import { tokenService } from '../api/tokenService'
+import { SplashScreen } from '@capacitor/splash-screen'
 
 export const useFetchUser = () => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const setUserData = useUserStore(state => state.setUserData)
+  const setIsLoaded = useUserStore(state => state.setIsLoaded)
+  const isLoaded = useUserStore(state => state.isLoaded)
 
-  const setStoreName = useUserStore(state => state.setName)
-  const setStoreId = useUserStore(state => state.setId)
-  const setStoreEmail = useUserStore(state => state.setEmail)
-  const setSavedCount = useUserStore(state => state.setSavedCount)
-  const setStreakCount = useUserStore(state => state.setStreakCount)
-  const setPerfectCount = useUserStore(state => state.setPerfectCount)
+  const access = tokenService.access
+  const refresh = tokenService.refresh
+  const hasToken = !!access || !!refresh
 
-  // 데이터 fetching 및 캐싱
-  const { data, isError } = useQuery({
-    queryKey: ['userProfile'],
+  const { data, isError, isLoading, error } = useQuery({
+    queryKey: ['userProfile', access],
     queryFn: async () => {
-      // 사용자 정보 조회
       const userResponse = await getCurrentUser()
       const profile = userResponse.data
 
-      // 병렬 조회
       const [bookmarkCount, stats] = await Promise.all([
-        countBookmarks(),
-        getUserStats(profile.id),
+        countBookmarks().catch(() => 0),
+        getUserStats(profile.id).catch(() => ({
+          streakCount: 0,
+          perfectCount: 0,
+        })),
       ])
 
       return { profile, bookmarkCount, stats }
     },
-    staleTime: 0, // 매번 데이터 호출
-    gcTime: 1000 * 60 * 30, // 30분간 캐시 유지
-    retry: 1,
+    enabled: hasToken,
+    staleTime: 0,
+    retry: 0,
   })
 
   useEffect(() => {
-    if (data) {
-      const { profile, bookmarkCount, stats } = data
-      setGAUserContext(profile.id, profile.email) // 내부 사용자 판별
-      setStoreName(profile.name)
-      setStoreId(profile.id)
-      setStoreEmail(profile.email)
-      setSavedCount(bookmarkCount)
-      setStreakCount(stats.streakCount)
-      setPerfectCount(stats.perfectCount)
+    if (!hasToken) {
+      setIsLoaded(true)
+      return
     }
-  }, [
-    data,
-    setStoreName,
-    setStoreId,
-    setStoreEmail,
-    setSavedCount,
-    setStreakCount,
-    setPerfectCount,
-  ])
 
-  // 에러 처리
+    if (isLoading) {
+      setIsLoaded(false)
+      return
+    }
+
+    if (data) {
+      setUserData(data)
+    }
+  }, [data, hasToken, isLoading, setUserData, setIsLoaded])
+
+  // 로드 완료시 스플래시 숨김
+  useEffect(() => {
+    if (isLoaded) {
+      SplashScreen.hide().catch(() => {
+        // 웹 브라우저 환경 등에서 실행될 때 발생하는 에러 무시
+      })
+    }
+  }, [isLoaded])
+
   useEffect(() => {
     if (isError) {
-      console.error('사용자 정보 로드 실패')
-      navigate('/error', { state: { from: '/main' } })
+      console.error('사용자 정보 로드 실패:', error)
+      tokenService.clearTokens()
+      useUserStore.getState().reset()
+      queryClient.clear()
+      setIsLoaded(true)
+      navigate('/login', { replace: true })
     }
-  }, [isError, navigate])
+  }, [isError, navigate, setIsLoaded, error, queryClient])
 
   return {
     userName: data?.profile.name || '',
     userId: data?.profile.id || '',
     userEmail: data?.profile.email || '',
+    isOnboard: data?.profile.isOnboard || false,
   }
 }

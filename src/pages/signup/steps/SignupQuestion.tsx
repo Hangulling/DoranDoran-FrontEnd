@@ -7,11 +7,12 @@ import { useSignupFormStore } from '../../../stores/useSignupStore'
 import { ANSWER_REGEX } from '../../../utils/validations'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import CommonModal from '../../../components/common/CommonModal'
-import { createUser } from '../../../api'
+import { createUser, login } from '../../../api'
 import axios from 'axios'
 import { useAgreementStore } from '../../../stores/useAgreementStore'
 import { GA_ENABLED, IS_PROD } from '../../../constants/env'
 import ReactGA from 'react-ga4'
+import { tokenService } from '../../../api/tokenService'
 
 type OutletContext = {
   setSubmit: (fn: () => void) => void
@@ -84,7 +85,21 @@ export default function SignupQuestion() {
         })
       }
 
-      navigate('/login', { replace: true })
+      const loginRes = await login({ email, password })
+
+      if (!loginRes?.success) {
+        navigate('/login', { replace: true })
+        return
+      }
+
+      await tokenService.setLastLogin('email')
+      const user = loginRes?.data?.user
+
+      if (user?.isOnboard) {
+        navigate('/')
+      } else {
+        navigate('/onboarding')
+      }
 
       setTimeout(() => {
         resetForm()
