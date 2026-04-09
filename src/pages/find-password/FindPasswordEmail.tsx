@@ -106,15 +106,17 @@ export default function FindPasswordEmail() {
             </div>
           }
         />
-        {emailError ? (
-          <div className="mt-1 text-body text-xs text-system-red whitespace-pre-line">
-            {emailError}
-          </div>
-        ) : emailSuccess ? (
-          <span className="mt-1 text-body text-xs text-system-blue">
-            {emailSuccess}
-          </span>
-        ) : null}
+        <div className="w-80 mt-1">
+          {emailError ? (
+            <div className="text-body text-xs text-system-red whitespace-pre-line">
+              {emailError}
+            </div>
+          ) : emailSuccess ? (
+            <span className="text-body text-xs text-system-blue">
+              {emailSuccess}
+            </span>
+          ) : null}
+        </div>
       </div>
       <div className="flex flex-col gap-1 mt-8">
         <div className="text-sm text-body text-gray-500">

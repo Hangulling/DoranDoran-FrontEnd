@@ -113,9 +113,11 @@ export default function SignupPage() {
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col">
-      {!fromOAuth && path !== '/signup/term' && (
-        <ProgressBar currentStep={currentStep} totalSteps={4} />
-      )}
+      <div className="w-full px-5">
+        {!fromOAuth && path !== '/signup/term' && (
+          <ProgressBar currentStep={currentStep} totalSteps={4} />
+        )}
+      </div>
 
       <div className="flex-1 flex justify-center min-h-0 w-full">
         <Outlet context={{ setSubmit, setCanSubmit }} />
