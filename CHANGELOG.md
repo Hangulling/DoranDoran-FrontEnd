@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.1.0...v4.2.0) (2026-04-09)
+
+
+### Bug Fixes
+
+* 회원가입페이지 수정 ([#462](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/462)) ([415839d](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/415839de43ba68858c315ed831adb4ff5ccd1506))
+* 회원가입페이지 수정 ([#462](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/462)) ([#463](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/463)) ([dd29807](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/dd29807b678993965a40249aeb2e611e4b22275f))
+
 ## [4.1.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.0.0...v4.1.0) (2026-04-08)
 
 
