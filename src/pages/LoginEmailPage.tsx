@@ -10,7 +10,7 @@ import { useUserStore } from '../stores/useUserStore'
 
 import showToast from '../components/common/CommonToast'
 import { tokenService } from '../api/tokenService'
-// import { useIOSKeyboard } from '../hooks/useIOSKeyboard'
+import { useIOSKeyboard } from '../hooks/useIOSKeyboard'
 import { GA_ENABLED, IS_PROD } from '../constants/env'
 
 type ErrorKind = 'wrong_email' | 'wrong_password' | 'both' | 'general' | null
@@ -22,7 +22,7 @@ export default function LoginEmailPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const navigate = useNavigate()
   const location = useLocation()
-  // const { isIOSApp, keyboardHeight } = useIOSKeyboard()
+  const { isIOSApp, keyboardHeight } = useIOSKeyboard()
 
   const canSubmit = useMemo(() => {
     return email.trim().length > 0 && password.trim().length > 0
@@ -280,11 +280,11 @@ export default function LoginEmailPage() {
           <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center">
             <div
               className="w-full max-w-md bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)]"
-              /* style={
+              style={
                 isIOSApp
                   ? { transform: `translateY(-${keyboardHeight}px)` }
                   : undefined
-              } */
+              }
             >
               <Button
                 onClick={handleLogin}

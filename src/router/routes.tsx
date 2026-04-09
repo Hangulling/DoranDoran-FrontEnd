@@ -18,7 +18,6 @@ import FindEmailName from '../pages/find-email/steps/FindEmailName'
 import FindEmailQuestion from '../pages/find-email/steps/FindEmailQuestion'
 import LoginEmailPage from '../pages/LoginEmailPage'
 import ProfilePage from '../pages/ProfilePage'
-import { useFetchUser } from '../hooks/useFetchUser'
 
 const MainPage = lazy(() => import('../pages/MainPage'))
 const InstaPage = lazy(() => import('../pages/InstaPage'))
@@ -41,8 +40,6 @@ const FindPasswordPage = lazy(
 )
 
 export function Routes() {
-  useFetchUser()
-
   return (
     <ErrorBoundary fallback={<ErrorPage errorCode={500} />}>
       <RouterRoutes>

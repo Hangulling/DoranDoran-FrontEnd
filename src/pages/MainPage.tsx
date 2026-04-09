@@ -16,7 +16,7 @@ import type { ChatRoomWithMessage } from '../types/main'
 import { useDeepLinkChatRoom } from '../hooks/main/useDeepLinkChatRoom'
 import { useStartGreeting } from '../hooks/main/useStartGreeting'
 import { getTodayDate, getUnixTime, sendGAEvent } from '../utils/ga'
-import { useUserStore } from '../stores/useUserStore'
+import { useFetchUser } from '../hooks/useFetchUser'
 //import { getUnreadNotifications } from '../api/notification'
 
 const MainPage = () => {
@@ -37,7 +37,7 @@ const MainPage = () => {
     targetTopic?: string
   } | null>(null)
 
-  const userId = useUserStore(state => state.id)
+  const { userId } = useFetchUser()
   const { chatMsg, isLoading } = useFetchChatRooms(userId)
 
   // useEffect(() => {
