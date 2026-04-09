@@ -70,7 +70,9 @@ export default function FindEmailPage() {
 
   return (
     <div className="flex flex-col items-center min-h-screen">
-      <ProgressBar currentStep={currentStep} totalSteps={3} />
+      <div className="w-full px-5">
+        <ProgressBar currentStep={currentStep} totalSteps={3} />
+      </div>
 
       <Outlet context={{ setSubmit, setCanSubmit }} />
       <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center">
