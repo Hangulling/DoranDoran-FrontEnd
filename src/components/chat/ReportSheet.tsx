@@ -60,7 +60,7 @@ const ReportSheet = ({
           return (
             <button
               key={reason}
-              className={`w-full py-3.5 px-5 text-left text-[16px] border rounded-xl transition-colors ${
+              className={`w-full mb-2.5 py-3.5 px-5 text-left text-[16px] border rounded-xl transition-colors ${
                 isSelected
                   ? 'border-primary-200 bg-primary-10'
                   : 'bg-gray-0 border-gray-100'
