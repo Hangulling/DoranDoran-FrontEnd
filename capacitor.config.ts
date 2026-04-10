@@ -18,8 +18,13 @@ const config: CapacitorConfig = {
       },
     },
     Keyboard: {
-      resize: KeyboardResize.None,
-      resizeOnFullScreen: true,
+      resize: KeyboardResize.Native,
+      resizeOnFullScreen: false,
+    },
+    SplashScreen: {
+      launchAutoHide: false, // 자동 숨김 방지
+      backgroundColor: '#ffffffff',
+      showSpinner: false,
     },
   },
 }
