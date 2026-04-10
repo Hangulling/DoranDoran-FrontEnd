@@ -17,6 +17,7 @@ import { useUserStore } from '../stores/useUserStore'
 import axios from 'axios'
 import { Capacitor } from '@capacitor/core'
 import { PushNotifications } from '@capacitor/push-notifications'
+import showToast from '../components/common/CommonToast'
 
 const items = [
   { label: 'Terms of Service', to: '/policy/service' },
@@ -106,6 +107,20 @@ export default function MyPage() {
       const res = await updateNotificationSetting(user.id, isAlert)
       setIsAlert(res.pushEnabled)
       setOpenAlert(false)
+
+      if (isAlert) {
+        showToast({
+          message: 'Notifications enabled.',
+          iconType: 'checkRound',
+          size: 'long',
+        })
+      } else {
+        showToast({
+          message: 'Notifications disabled.',
+          iconType: 'checkRound',
+          size: 'long',
+        })
+      }
 
       if (isAlert) {
         // 알림 켰을 때 권한 요청
