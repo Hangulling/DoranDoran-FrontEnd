@@ -3,6 +3,7 @@ import { useLocation, useMatch } from 'react-router-dom'
 import NavBar from '../components/common/NavBar'
 import useArchiveStore from '../stores/useArchiveStore'
 import { useBackButton } from '../hooks/useBackButton'
+import { useIOSKeyboard } from '../hooks/useIOSKeyboard'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -33,6 +34,7 @@ const showBookmarkPaths = ['/']
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation()
   const pathname = location.pathname
+  const { isIOSApp } = useIOSKeyboard()
 
   // 전역 뒤로가기
   useBackButton([])
@@ -147,8 +149,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       {/* 하단 네비게이션 바 */}
       {!hideNavBar && !isTopNav && (
         <footer
-          className={
-            'sticky bottom-0 shrink-0 z-40 bg-white pb-[env(safe-area-inset-bottom)]'
+          className="sticky bottom-0 shrink-0 z-40 bg-white"
+          style={
+            isIOSApp
+              ? { paddingBottom: 0 }
+              : { paddingBottom: 'env(safe-area-inset-bottom)' }
           }
         >
           <NavBar

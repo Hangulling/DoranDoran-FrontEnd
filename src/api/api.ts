@@ -22,6 +22,22 @@ export const publicApi = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+function redirectToLogin() {
+  if (typeof window === 'undefined') return
+
+  const current = `${window.location.pathname}${window.location.hash}`
+  if (current.includes('/login')) return
+
+  const isHashRouter = window.location.hash.startsWith('#/')
+
+  if (isHashRouter) {
+    window.location.hash = '#/login'
+    return
+  }
+
+  window.location.assign('/login')
+}
+
 function emitAuthEvent(
   type: 'auth:expired' | 'auth:logout' | 'auth:inactive',
   detail?: unknown
@@ -114,6 +130,7 @@ async function refreshAccessToken(): Promise<string | null> {
     if (import.meta.env.DEV) console.error('❌ 토큰 재발급 실패:', e)
     await tokenService.clearTokens()
     emitAuthEvent('auth:expired', { reason: 'refresh_failed' })
+    redirectToLogin()
     return null
   }
 }
@@ -177,18 +194,21 @@ function installResponseInterceptor(instance: AxiosInstance) {
         }
 
         emitAuthEvent('auth:expired', { reason: 'refresh_failed_401' })
+        redirectToLogin()
         return Promise.reject(error)
       }
 
       if (status === 401 && originalRequest?._retry && !isAuthEndpoint) {
         await tokenService.clearTokens()
         emitAuthEvent('auth:expired', { reason: 'final_401_after_retry', url })
+        redirectToLogin()
         return Promise.reject(error)
       }
 
       if (status === 401 && !tokenService.refresh && !isAuthEndpoint) {
         await tokenService.clearTokens()
         emitAuthEvent('auth:expired', { reason: 'no_refresh_token', url })
+        redirectToLogin()
         return Promise.reject(error)
       }
 
