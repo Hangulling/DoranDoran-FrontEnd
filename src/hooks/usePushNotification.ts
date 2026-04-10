@@ -87,10 +87,13 @@ const usePushNotification = () => {
 
         // 읽음 처리
         try {
-          await markNotificationsAsRead
+          const notificationId = data?.id ? [Number(data.id)] : null
+
+          await markNotificationsAsRead(notificationId)
+
           console.log('읽음 처리 성공')
         } catch (error) {
-          console.error('푸시 읽음 처리 실패:', error)
+          console.error('푸시 읽음 처리 실패 (서버 에러):', error)
         }
 
         if (data.topic) {
