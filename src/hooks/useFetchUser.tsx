@@ -5,6 +5,8 @@ import { useUserStore } from '../stores/useUserStore'
 import { getCurrentUser, getUserStats } from '../api'
 import { countBookmarks } from '../api/archive'
 import { setGAUserContext } from '../utils/ga'
+import { tokenService } from '../api/tokenService'
+import type { AxiosError } from 'axios'
 
 export const useFetchUser = () => {
   const navigate = useNavigate()
@@ -17,14 +19,12 @@ export const useFetchUser = () => {
   const setPerfectCount = useUserStore(state => state.setPerfectCount)
 
   // 데이터 fetching 및 캐싱
-  const { data, isError } = useQuery({
+  const { data, isError, error, isFetching } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
-      // 사용자 정보 조회
       const userResponse = await getCurrentUser()
       const profile = userResponse.data
 
-      // 병렬 조회
       const [bookmarkCount, stats] = await Promise.all([
         countBookmarks(),
         getUserStats(profile.id),
@@ -60,11 +60,23 @@ export const useFetchUser = () => {
 
   // 에러 처리
   useEffect(() => {
-    if (isError) {
-      console.error('사용자 정보 로드 실패')
-      navigate('/error', { state: { from: '/main' } })
+    // 재발급 중일 때는 에러 처리 유예
+    if (isError && !isFetching) {
+      const axiosError = error as AxiosError
+      const status = axiosError?.response?.status
+
+      if (!tokenService.access && !tokenService.refresh) {
+        navigate('/login')
+        return
+      }
+
+      // 재발급 실패 후 최종 에러일 때만 이동
+      if (status !== 401) {
+        console.error('사용자 정보 로드 실패:', axiosError)
+        navigate('/error', { state: { from: '/' } })
+      }
     }
-  }, [isError, navigate])
+  }, [isError, isFetching, error, navigate])
 
   return {
     userName: data?.profile.name || '',

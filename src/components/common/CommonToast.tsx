@@ -16,11 +16,11 @@ const iconMap: Record<IconType, JSX.Element> = {
 }
 
 const sizeStyles: Record<ToastSize, string> = {
-  default: 'mx-5 mb-[82px]',
-  long: 'mx-1 mb-[82px]', // mx-4 인 페이지에서 사용
-  sheet: 'mx-1 mb-18',
-  manager: 'mx-1 mb-23',
-  archive: 'mx-1 mb-5',
+  default: 'mx-5 -translate-y-[82px]',
+  long: 'mx-1 -translate-y-[82px]', // mx-4 인 페이지에서 사용
+  sheet: 'mx-1 -translate-y-18',
+  manager: 'mx-1 -translate-y-23',
+  archive: 'mx-1 -translate-y-5',
 }
 
 let toastActive = false
@@ -32,11 +32,11 @@ const showToast = ({ message, iconType, size = 'default' }: ToastProps) => {
 
   toast.custom(
     t => (
-      <div className="w-full max-w-app md:max-w-tablet lg:max-w-desktop">
+      <div className="w-full max-w-app md:max-w-tablet lg:max-w-desktop pointer-events-none">
         <div
           className={`flex items-start bg-[rgba(44,42,44,0.85)] px-4 py-3.5 rounded-xl gap-3
 					${sizeStyles[size]}
-          ${t.visible ? 'animate-fade-in-up' : 'toast-slide-fade-out'}
+          ${t.visible ? 'animate-fade-in-up' : 'toast-slide-fade-out'} pointer-events-none
         `}
         >
           {iconType && iconMap[iconType]}
