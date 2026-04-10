@@ -22,7 +22,7 @@ const config: CapacitorConfig = {
       resizeOnFullScreen: true,
     },
     SplashScreen: {
-      launchAutoHide: false,
+      launchAutoHide: true,
       backgroundColor: '#ffffffff',
       showSpinner: false,
     },

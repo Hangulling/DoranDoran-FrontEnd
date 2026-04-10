@@ -219,11 +219,16 @@ const ManagerChatPage: React.FC = () => {
           return base
         })
       }, 500)
-    } catch (error) {
-      console.error('지원 문의 실패:', error)
-    } finally {
       setIsContactSheetOpen(false)
       setSelectedOption('')
+    } catch (error) {
+      showToast({
+        message:
+          'An error occurred while sending your message. Please try again.',
+        iconType: 'error',
+        size: 'manager',
+      })
+      console.error('지원 문의 실패:', error)
     }
   }
 
