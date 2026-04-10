@@ -194,7 +194,8 @@ const ChatPage: React.FC = () => {
       )
     } catch (error) {
       showToast({
-        message: 'Failed to submit',
+        message:
+          'An error occurred while sending your message. Please try again.',
         iconType: 'error',
         size: 'long',
       })
@@ -340,7 +341,12 @@ const ChatPage: React.FC = () => {
   }, [messages])
 
   return (
-    <div className="flex flex-col h-full bg-gray-0 overflow-hidden">
+    <div
+      className="flex flex-col h-full bg-gray-0 overflow-hidden"
+      style={{
+        paddingBottom: isIOSApp ? `${keyboardHeight}px` : '0',
+      }}
+    >
       <ChatHeader
         title={room?.roomName || 'Chat'}
         avatar={room?.avatar}
@@ -352,9 +358,6 @@ const ChatPage: React.FC = () => {
       <div
         ref={chatMainRef}
         className="flex-1 w-full bg-gray-10 relative overflow-y-auto min-h-0"
-        style={{
-          paddingBottom: isIOSApp ? `${keyboardHeight}px` : '0',
-        }}
       >
         <div className="px-5 pt-6 pb-24">
           {/*여백 확인 필요*/}

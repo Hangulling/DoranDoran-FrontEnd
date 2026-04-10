@@ -21,6 +21,11 @@ const config: CapacitorConfig = {
       resize: KeyboardResize.None,
       resizeOnFullScreen: true,
     },
+    SplashScreen: {
+      launchAutoHide: true,
+      backgroundColor: '#ffffffff',
+      showSpinner: false,
+    },
   },
 }
 
