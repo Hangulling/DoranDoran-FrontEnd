@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.3.2](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.3.1...v4.3.2) (2026-04-10)
+
+
+### Bug Fixes
+
+* 토스트 아래 영역 터치 안되는 오류 수정 ([38386df](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/38386dff456fd777d6357d1fe51911d0dc711617))
+* 토스트 아래 영역 터치 안되는 오류 수정 ([#471](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/471)) ([581ff34](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/581ff34e4d392855cdcd5eb5a4d434202febed16))
+
 ### [4.3.1](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.3.0...v4.3.1) (2026-04-10)
 
 ## [4.3.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.2.2...v4.3.0) (2026-04-10)
