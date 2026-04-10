@@ -22,7 +22,7 @@ const config: CapacitorConfig = {
       resizeOnFullScreen: false,
     },
     SplashScreen: {
-      launchAutoHide: false, // 자동 숨김 방지
+      launchAutoHide: true, // 자동 숨김
       launchShowDuration: 30000,
       backgroundColor: '#ffffffff',
       showSpinner: false,
