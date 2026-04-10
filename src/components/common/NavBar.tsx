@@ -21,6 +21,10 @@ const NavBar: React.FC<NavBarProps & { position?: 'top' | 'bottom' }> = ({
   const location = useLocation()
   const { goBack, isChatPage } = useNavBar()
 
+  const isNoBorderPage = ['/signup', '/find-email', '/find-password'].some(
+    path => location.pathname.startsWith(path)
+  )
+
   const {
     items,
     activeRoom,
@@ -38,9 +42,12 @@ const NavBar: React.FC<NavBarProps & { position?: 'top' | 'bottom' }> = ({
 
   const positionStyle =
     position === 'top'
-      ? 'shadow-[0_1px_2px_rgba(0,0,0,0.08)] border-b border-gray-100 h-15 min-h-15' // 상단
+      ? `${
+          isNoBorderPage
+            ? ''
+            : 'shadow-[0_1px_2px_rgba(0,0,0,0.08)] border-b border-gray-100'
+        } h-15 min-h-15` // 상단
       : 'shadow-[0_-1px_4px_0_rgba(0,0,0,0.06)] border-t border-gray-100 h-[62px] min-h-[62px]' // 하단
-
   const iconColor = (path: string) => {
     const isActive =
       path === '/'
