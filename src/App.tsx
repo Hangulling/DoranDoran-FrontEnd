@@ -16,6 +16,7 @@ function App() {
       className="relative flex flex-col h-dvh mx-auto w-full max-w-app md:max-w-tablet lg:max-w-desktop bg-white"
     >
       <Toaster
+        containerClassName="pointer-events-none"
         containerStyle={{
           bottom: 'env(safe-area-inset-bottom)',
         }}

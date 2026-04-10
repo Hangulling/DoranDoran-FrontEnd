@@ -167,3 +167,13 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+/* 토스트 컨테이너와 내부의 모든 자동 생성 div가 터치를 무시 */
+.react-hot-toast-container,
+.react-hot-toast-container > div {
+  pointer-events: none !important;
+}
+
+.pointer-events-none {
+  pointer-events: none !important;
+}
