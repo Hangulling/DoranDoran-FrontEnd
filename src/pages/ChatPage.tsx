@@ -194,7 +194,8 @@ const ChatPage: React.FC = () => {
       )
     } catch (error) {
       showToast({
-        message: 'Failed to submit',
+        message:
+          'An error occurred while sending your message. Please try again.',
         iconType: 'error',
         size: 'long',
       })
