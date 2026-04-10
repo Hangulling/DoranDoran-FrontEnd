@@ -33,7 +33,7 @@ const ToastMessage = ({ message, iconType }: ToastMessageProps) => {
   }
 
   return (
-    <div className="flex items-start mb-5 bg-[rgba(15,16,16,0.8)] px-3.5 py-4 rounded-xl gap-2">
+    <div className="flex items-start mb-5 pointer-events-none bg-[rgba(15,16,16,0.8)] px-3.5 py-4 rounded-xl gap-2">
       {iconType && iconMap[iconType]}
       <span className="text-subtitle text-[14px] text-white">{message}</span>
     </div>
@@ -118,7 +118,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-50 flex justify-center"
+      className="fixed inset-x-0 bottom-0 z-50 flex justify-center "
       style={{
         transform: isIOSApp ? `translateY(-${keyboardHeight}px)` : 'none',
       }}
@@ -130,7 +130,9 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
         <div className="absolute bottom-full inset-x-0 pointer-events-none">
           {toast && (
             <div
-              className={`mx-5 ${isToastVisible ? 'toast-slide-fade-in' : 'toast-slide-fade-out'}`}
+              className={`mx-5 ${
+                isToastVisible ? 'toast-slide-fade-in' : 'toast-slide-fade-out'
+              } -translate-y-5 pointer-events-none`}
             >
               <ToastMessage message={toast.message} iconType={toast.iconType} />
             </div>
