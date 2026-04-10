@@ -316,6 +316,13 @@ const ChatPage: React.FC = () => {
     }
   }, [userId, greetingMsg1, greetingMsg2, greetingState, chatroomId])
 
+  // 스크롤 이동
+  useEffect(() => {
+    if (chatMainRef.current) {
+      chatMainRef.current.scrollTop = chatMainRef.current.scrollHeight
+    }
+  }, [messages, keyboardHeight])
+
   // 다시 보지 않기 설정을 스토어에 동기화
   useEffect(() => {
     const fetchUserExitSetting = async () => {
@@ -344,7 +351,8 @@ const ChatPage: React.FC = () => {
     <div
       className="flex flex-col h-full bg-gray-0 overflow-hidden"
       style={{
-        paddingBottom: isIOSApp ? `${keyboardHeight}px` : '0',
+        height: isIOSApp ? `calc(100% - ${keyboardHeight}px)` : '100%',
+        transition: 'height 0.2s ease-out',
       }}
     >
       <ChatHeader
@@ -359,7 +367,7 @@ const ChatPage: React.FC = () => {
         ref={chatMainRef}
         className="flex-1 w-full bg-gray-10 relative overflow-y-auto min-h-0"
       >
-        <div className="px-5 pt-6 pb-24">
+        <div className="px-5 pt-6 pb-5">
           {/*여백 확인 필요*/}
           <ChatBody
             isHistoryLoading={isHistoryLoading}
