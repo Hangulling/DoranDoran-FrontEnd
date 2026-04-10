@@ -75,6 +75,11 @@ function attachAuth(instance: AxiosInstance) {
     if (import.meta.env.DEV) {
       console.log('🟢 Authorization 적용:', String(token).slice(0, 32) + '...')
     }
+
+    console.log(
+      `🟢 [Request] ${cfg.method?.toUpperCase()} ${url} | Token: ${token ? 'Present' : 'None'}`
+    ) // 확인용 콘솔
+
     return cfg
   })
 }
@@ -90,6 +95,8 @@ publicApi.interceptors.request.use(cfg => {
       data: cfg.data,
     })
   }
+  console.log('🌐 [publicApi Request]', (cfg.baseURL || '') + (cfg.url || '')) // 확인 콘솔
+
   return cfg
 })
 
@@ -124,9 +131,11 @@ async function refreshAccessToken(): Promise<string | null> {
       refreshToken: newRefresh,
     })
 
+    console.log('♻️ [Refresh] AccessToken 재발급 완료') // 확인용 콘솔
     if (import.meta.env.DEV) console.log('♻️ AccessToken 재발급 완료')
     return newAccess
   } catch (e) {
+    console.error('❌ [Refresh] 토큰 재발급 실패:', e) // 확인용 콘솔
     if (import.meta.env.DEV) console.error('❌ 토큰 재발급 실패:', e)
     await tokenService.clearTokens()
     emitAuthEvent('auth:expired', { reason: 'refresh_failed' })
@@ -139,6 +148,14 @@ function installResponseInterceptor(instance: AxiosInstance) {
   instance.interceptors.response.use(
     res => res,
     async (error: AxiosError) => {
+      console.error('🔴 [Response Error] 상세 정보:', {
+        url: error.config?.url,
+        status: error.response?.status, // 0인 경우 undefined나 0으로 출력
+        code: error.code, //
+        message: error.message, //
+        headers: error.config?.headers,
+      }) // 확인용 콘솔
+
       if (!error.response) {
         if (tokenService.access) {
           emitAuthEvent('auth:inactive', { reason: 'network_or_cors' })
