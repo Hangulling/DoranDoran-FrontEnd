@@ -4,13 +4,14 @@ import { useUserStore } from '../stores/useUserStore'
 import OnboardingContent from '../components/onboarding/OnboardingContent'
 import ProgressBar from '../components/common/ProgressBar'
 import Button from '../components/common/Button'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ONBOARDING_STEPS } from '../constants/onboardingData'
 import LeftArrowIcon from '../assets/icon/leftArrow.svg?react'
 import type { OnboardingPayload } from '../types/user'
 import { useCompleteOnboarding } from '../hooks/useCompleteOnboarding'
 import { useIOSKeyboard } from '../hooks/useIOSKeyboard'
 import { getTodayDate, getUnixTime, sendGAEvent } from '../utils/ga'
+import { SplashScreen } from '@capacitor/splash-screen'
 
 const ETC_VALUE = 'Other'
 
@@ -160,6 +161,10 @@ export default function OnboardingPage() {
       navigate(-1)
     }
   }
+
+  useEffect(() => {
+    SplashScreen.hide()
+  }, [])
 
   return (
     <div className="flex flex-col min-h-full items-center bg-gray-0 relative px-5">
