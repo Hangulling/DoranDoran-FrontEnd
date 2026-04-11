@@ -17,9 +17,10 @@ export const useFetchUser = () => {
   const setSavedCount = useUserStore(state => state.setSavedCount)
   const setStreakCount = useUserStore(state => state.setStreakCount)
   const setPerfectCount = useUserStore(state => state.setPerfectCount)
+  const setIsOnboarded = useUserStore(state => state.setIsOnboarded)
 
   // 데이터 fetching 및 캐싱
-  const { data, isError, error, isFetching } = useQuery({
+  const { data, isError, error, isFetching, isLoading } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
       const userResponse = await getCurrentUser()
@@ -32,6 +33,7 @@ export const useFetchUser = () => {
 
       return { profile, bookmarkCount, stats }
     },
+    enabled: !!tokenService.access, // 토큰 있을때만 실행
     staleTime: 0, // 매번 데이터 호출
     gcTime: 1000 * 60 * 30, // 30분간 캐시 유지
     retry: 1,
@@ -44,6 +46,7 @@ export const useFetchUser = () => {
       setStoreName(profile.name)
       setStoreId(profile.id)
       setStoreEmail(profile.email)
+      setIsOnboarded(profile.isOnboard)
       setSavedCount(bookmarkCount)
       setStreakCount(stats.streakCount)
       setPerfectCount(stats.perfectCount)
@@ -56,6 +59,7 @@ export const useFetchUser = () => {
     setSavedCount,
     setStreakCount,
     setPerfectCount,
+    setIsOnboarded,
   ])
 
   // 에러 처리
@@ -82,5 +86,7 @@ export const useFetchUser = () => {
     userName: data?.profile.name || '',
     userId: data?.profile.id || '',
     userEmail: data?.profile.email || '',
+    isOnboarded: data?.profile.isOnboard,
+    isLoading,
   }
 }

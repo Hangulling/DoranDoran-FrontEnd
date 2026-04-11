@@ -8,12 +8,14 @@ interface UserState {
   savedCount: number | null
   streakCount: number | null
   perfectCount: number | null
+  isOnboarded: boolean
   setId: (id: string) => void
   setName: (name: string) => void
   setEmail: (email: string) => void
   setSavedCount: (count: number) => void
   setStreakCount: (count: number) => void
   setPerfectCount: (count: number) => void
+  setIsOnboarded: (val: boolean) => void
   reset: () => void
 }
 
@@ -26,6 +28,8 @@ export const useUserStore = create<UserState>()(
       savedCount: null,
       streakCount: null,
       perfectCount: null,
+      isOnboarded: false,
+      setIsOnboarded: val => set({ isOnboarded: val }),
       setId: id => set({ id }),
       setName: name => set({ name }),
       setEmail: email => set({ email }),
@@ -37,19 +41,21 @@ export const useUserStore = create<UserState>()(
           id: '',
           name: '',
           email: '',
-          savedCount: undefined,
-          streakCount: undefined,
-          perfectCount: undefined,
+          isOnboarded: false,
+          savedCount: null,
+          streakCount: null,
+          perfectCount: null,
         })
       },
     }),
     {
       name: 'user-storage',
-      storage: createJSONStorage(() => sessionStorage),
+      storage: createJSONStorage(() => localStorage),
       partialize: state => ({
         id: state.id,
         name: state.name,
         email: state.email,
+        isOnboarded: state.isOnboarded,
       }),
     }
   )
