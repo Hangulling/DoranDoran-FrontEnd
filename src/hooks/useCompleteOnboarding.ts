@@ -3,9 +3,11 @@ import { Capacitor } from '@capacitor/core'
 import { PushNotifications } from '@capacitor/push-notifications'
 import { updateOnboarding } from '../api'
 import type { OnboardingPayload } from '../types/user'
+import { useUserStore } from '../stores/useUserStore'
 
 export const useCompleteOnboarding = (userId: string | null) => {
   const navigate = useNavigate()
+  const setIsOnboarded = useUserStore(state => state.setIsOnboarded)
 
   const registerPush = async () => {
     if (!Capacitor.isNativePlatform()) return
@@ -39,6 +41,8 @@ export const useCompleteOnboarding = (userId: string | null) => {
       }
 
       await updateOnboarding(userId, finalPayload)
+
+      setIsOnboarded(true)
 
       if (finalPayload.pushEnabled) {
         await registerPush()

@@ -17,12 +17,25 @@ import { useDeepLinkChatRoom } from '../hooks/main/useDeepLinkChatRoom'
 import { useStartGreeting } from '../hooks/main/useStartGreeting'
 import { getTodayDate, getUnixTime, sendGAEvent } from '../utils/ga'
 import { useFetchUser } from '../hooks/useFetchUser'
+import { SplashScreen } from '@capacitor/splash-screen'
+import { useUserStore } from '../stores/useUserStore'
 //import { getUnreadNotifications } from '../api/notification'
 
 const MainPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { setUnread } = useUnreadStore()
+
+  const { isOnboarded: storedOnboarded } = useUserStore()
+  const {
+    userId,
+    isLoading: isUserLoading,
+    isOnboarded: fetchedOnboarded,
+  } = useFetchUser()
+
+  const { chatMsg, isLoading: isChatLoading } = useFetchChatRooms(userId)
+
+  const [isReady, setIsReady] = useState(false)
 
   const [showCompleteModal, setShowCompleteModal] = useState(false)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
@@ -37,9 +50,6 @@ const MainPage = () => {
     targetTopic?: string
   } | null>(null)
 
-  const { userId } = useFetchUser()
-  const { chatMsg, isLoading } = useFetchChatRooms(userId)
-
   // useEffect(() => {
   //   if (userId) {
   //     getUnreadNotifications()
@@ -52,15 +62,34 @@ const MainPage = () => {
   //   }
   // }, [userId])
 
+  // 스플래시, 온보딩 제어
+  useEffect(() => {
+    if (isUserLoading) return
+
+    const finalStatus = fetchedOnboarded ?? storedOnboarded
+
+    if (finalStatus === false) {
+      navigate('/onboarding', { replace: true })
+    } else if (finalStatus === true) {
+      setIsReady(true)
+      setTimeout(() => {
+        SplashScreen.hide()
+      }, 300)
+    } else {
+      setIsReady(true)
+      SplashScreen.hide()
+    }
+  }, [isUserLoading, fetchedOnboarded, storedOnboarded, navigate])
+
   // GA_view_main
   useEffect(() => {
-    if (userId) {
+    if (isReady && userId) {
       sendGAEvent('view_main', {
         time: getUnixTime(),
         date: getTodayDate(),
       })
     }
-  }, [userId])
+  }, [isReady, userId])
 
   // API 로직
   const { mutate: createRoom, isPending: isCreatingRoom } = useCreateChatRoom(
@@ -203,6 +232,8 @@ const MainPage = () => {
     }
   }
 
+  if (!isReady) return null
+
   return (
     <div>
       <Carousel />
@@ -218,7 +249,7 @@ const MainPage = () => {
         <div className="text-title mb-2 text-[18px]">Chatting Room</div>
 
         <ChatRoomList
-          isLoading={isLoading}
+          isLoading={isChatLoading}
           chatMsg={chatMsg}
           onRoomClick={handleRoomClick}
         />

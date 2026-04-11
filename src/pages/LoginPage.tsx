@@ -18,6 +18,7 @@ import type { User } from '../types/user'
 import type { OAuthLoginResponse } from '../types/auth'
 import { tokenService } from '../api/tokenService'
 import { Capacitor } from '@capacitor/core'
+import { SplashScreen } from '@capacitor/splash-screen'
 
 type ErrorKind = 'wrong_email' | 'wrong_password' | 'both' | 'general' | null
 type Provider = 'google' | 'email' | 'apple'
@@ -36,6 +37,10 @@ export default function LoginPage() {
   const isNative = isNativeApp()
 
   const isIOS = isNative && Capacitor.getPlatform() === 'ios'
+
+  useEffect(() => {
+    SplashScreen.hide()
+  }, [])
 
   useEffect(() => {
     if (IS_PROD && GA_ENABLED) {
