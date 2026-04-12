@@ -367,7 +367,7 @@ const ChatPage: React.FC = () => {
         ref={chatMainRef}
         className="flex-1 w-full bg-gray-10 relative overflow-y-auto min-h-0"
       >
-        <div className="px-5 pt-6 pb-6">
+        <div className="px-5 pt-6 pb-24">
           {/*여백 확인 필요*/}
           <ChatBody
             isHistoryLoading={isHistoryLoading}
