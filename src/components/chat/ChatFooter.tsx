@@ -144,7 +144,9 @@ const ChatFooter: React.FC<ChatFooterProps> = ({
           className="w-full px-5 pt-2.5"
           style={
             isIOSApp
-              ? { paddingBottom: '10px' }
+              ? keyboardHeight > 0
+                ? { paddingBottom: '10px' }
+                : { paddingBottom: 'calc(10px + env(safe-area-inset-bottom))' }
               : { paddingBottom: 'calc(10px + env(safe-area-inset-bottom))' }
           }
         >
