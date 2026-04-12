@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Ignore missing Facebook classes from the social login plugin
+-dontwarn com.facebook.**
+-keep class com.facebook.** { *; }
