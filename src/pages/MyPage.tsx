@@ -82,21 +82,28 @@ export default function MyPage() {
   }, [id])
 
   // 알림 권한 요청
-  const registerPush = async () => {
-    if (!Capacitor.isNativePlatform()) return
+  const registerPush = async (): Promise<'granted' | 'denied'> => {
+    if (!Capacitor.isNativePlatform()) return 'granted'
 
     try {
-      let permStatus = await PushNotifications.checkPermissions()
+      const status = await PushNotifications.checkPermissions()
 
-      if (permStatus.receive === 'prompt') {
-        permStatus = await PushNotifications.requestPermissions()
+      if (status.receive === 'denied') {
+        return 'denied'
       }
 
-      if (permStatus.receive === 'granted') {
-        await PushNotifications.register()
+      if (status.receive === 'prompt') {
+        const requestStatus = await PushNotifications.requestPermissions()
+        if (requestStatus.receive !== 'granted') {
+          return 'denied'
+        }
       }
+
+      await PushNotifications.register()
+      return 'granted'
     } catch (e) {
-      console.error('Push registration failed in MyPage', e)
+      console.error('Push registration failed', e)
+      return 'denied'
     }
   }
 
@@ -104,30 +111,36 @@ export default function MyPage() {
     if (!user?.id) return
 
     try {
+      // 권한 확인
+      if (isAlert) {
+        const isPermissionGranted = await registerPush()
+
+        // 이전에 거절했거나 거절하거나
+        if (isPermissionGranted === 'denied') {
+          showToast({
+            message: 'Please enable notifications in your device settings.',
+            iconType: 'error',
+            size: 'long',
+          })
+          setIsAlert(false)
+          setOpenAlert(false)
+          return
+        }
+      }
+
       const res = await updateNotificationSetting(user.id, isAlert)
       setIsAlert(res.pushEnabled)
       setOpenAlert(false)
 
-      if (isAlert) {
-        showToast({
-          message: 'Notifications enabled.',
-          iconType: 'checkRound',
-          size: 'long',
-        })
-      } else {
-        showToast({
-          message: 'Notifications disabled.',
-          iconType: 'checkRound',
-          size: 'long',
-        })
-      }
-
-      if (isAlert) {
-        // 알림 켰을 때 권한 요청
-        await registerPush()
-      }
+      showToast({
+        message: isAlert ? 'Notifications enabled.' : 'Notifications disabled.',
+        iconType: 'checkRound',
+        size: 'long',
+      })
     } catch (error) {
-      console.log(error)
+      console.error('Failed to update notification setting', error)
+      setIsAlert(!isAlert)
+      showToast({ message: 'Update failed. Please try again.' })
     }
   }
 
