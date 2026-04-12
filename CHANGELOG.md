@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.3.7](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.3.6...v4.3.7) (2026-04-12)
+
+
+### Bug Fixes
+
+* ios 여백 수정 ([#479](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/479)) ([bbb7366](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/bbb7366c7765092e23d82996ff00994f4f800a39))
+
 ### [4.3.6](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.3.5...v4.3.6) (2026-04-12)
 
 ### [4.3.5](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.3.4...v4.3.5) (2026-04-11)
