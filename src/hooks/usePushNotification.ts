@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { PushNotifications } from '@capacitor/push-notifications'
-import { FCM } from '@capacitor-community/fcm'
 import type {
   Token,
   ActionPerformed,
@@ -38,13 +37,13 @@ const usePushNotification = () => {
       'registration',
       async (token: Token) => {
         try {
-          let fcmToken = token.value
+          const fcmToken = token.value
 
-          if (Capacitor.getPlatform() === 'ios') {
-            // iOS일 경우 APNs 토큰을 FCM 토큰으로 교체
-            const res = await FCM.getToken()
-            fcmToken = res.token
-          }
+          // if (Capacitor.getPlatform() === 'ios') {
+          //   // iOS일 경우 APNs 토큰을 FCM 토큰으로 교체
+          //   const res = await FCM.getToken()
+          //   fcmToken = res.token
+          // }
 
           const platform = Capacitor.getPlatform() === 'ios' ? 'ios' : 'android'
           await registerFcmToken(fcmToken, platform)
