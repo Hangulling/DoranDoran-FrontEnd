@@ -58,7 +58,11 @@ export default function OnboardingContent({
 
       <div
         className="flex-1 overflow-y-auto pb-18 scrollbar-hide"
-        style={isIOSApp ? { paddingBottom: `${keyboardHeight}px` } : undefined}
+        style={
+          isIOSApp && keyboardHeight > 0
+            ? { paddingBottom: `${keyboardHeight}px` }
+            : undefined
+        }
       >
         {/* 옵션 목록 */}
         <div
