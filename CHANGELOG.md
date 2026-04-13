@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.3.10](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.3.9...v4.3.10) (2026-04-13)
+
+
+### Bug Fixes
+
+* firebase에 fcm 토큰 등록 ([4ae2762](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/4ae2762cfcf4fdfbd45b2e8836dcfda2c13d8932))
+* firebase에 fcm 토큰 등록 ([#483](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/483)) ([b035e91](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/b035e918a82bc11b3b408c153631612536312ab6))
+
 ### [4.3.9](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.3.8...v4.3.9) (2026-04-13)
 
 
