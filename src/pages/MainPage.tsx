@@ -11,7 +11,7 @@ import Carousel from '../components/main/Carousel'
 import Dashboard from '../components/main/Dashboard'
 import InstaContent from '../components/main/InstaContent'
 import { MANAGER_ROOM } from '../constants/mainData'
-import useUnreadStore from '../stores/useUnreadStore'
+import useUnreadStore, { DAILY_UNREAD_KEY } from '../stores/useUnreadStore'
 import type { ChatRoomWithMessage } from '../types/main'
 import { useDeepLinkChatRoom } from '../hooks/main/useDeepLinkChatRoom'
 import { useStartGreeting } from '../hooks/main/useStartGreeting'
@@ -19,12 +19,15 @@ import { getTodayDate, getUnixTime, sendGAEvent } from '../utils/ga'
 import { useFetchUser } from '../hooks/useFetchUser'
 import { SplashScreen } from '@capacitor/splash-screen'
 import { useUserStore } from '../stores/useUserStore'
-//import { getUnreadNotifications } from '../api/notification'
+import {
+  getUnreadNotifications,
+  markNotificationsAsRead,
+} from '../api/notification'
 
 const MainPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { setUnread } = useUnreadStore()
+  const { unreadMap, setUnread } = useUnreadStore()
 
   const { isOnboarded: storedOnboarded } = useUserStore()
   const {
@@ -50,17 +53,28 @@ const MainPage = () => {
     targetTopic?: string
   } | null>(null)
 
-  // useEffect(() => {
-  //   if (userId) {
-  //     getUnreadNotifications()
-  //       .then(res => {
-  //         console.log('[DEBUG] Unread Notifications:', res)
-  //       })
-  //       .catch(err => {
-  //         console.error('[DEBUG] Failed to fetch notifications:', err)
-  //       })
-  //   }
-  // }, [userId])
+  // 안읽음 확인, 저장
+  useEffect(() => {
+    if (userId) {
+      getUnreadNotifications()
+        .then(res => {
+          if (res.content && res.content.length > 0) {
+            const latest = res.content[0] // 여러 개라면 최신 알림만 저장
+            setUnread(
+              DAILY_UNREAD_KEY,
+              true,
+              latest.startMessage,
+              latest.concept ?? undefined,
+              latest.chatbotId ?? undefined,
+              latest.topic ?? undefined
+            )
+          }
+        })
+        .catch(err => {
+          console.error('Failed to fetch notifications:', err)
+        })
+    }
+  }, [userId, setUnread])
 
   // 스플래시, 온보딩 제어
   useEffect(() => {
@@ -128,6 +142,7 @@ const MainPage = () => {
     }
   }, [location.state])
 
+  // 인스타 카드 선택
   const handleCardClick = (externalId: string) => {
     sendGAEvent('view_content_detail', {
       time: getUnixTime(),
@@ -136,6 +151,7 @@ const MainPage = () => {
     navigate(`/insta/${externalId}`)
   }
 
+  // 채팅 컨셉 선택
   const handleRoomClick = (id: number | string, roomName: string) => {
     if (id === MANAGER_ROOM.roomRouteId) {
       navigate(`/manager`, {
@@ -144,17 +160,35 @@ const MainPage = () => {
       return
     }
 
+    // 알림 데이터 확인
+    const dailyGreeting = unreadMap[DAILY_UNREAD_KEY]
+    const isDailyUnread =
+      dailyGreeting?.hasUnread &&
+      dailyGreeting.concept?.toLowerCase() === roomName.toLowerCase()
+
     // GA_enter_chatroom
     sendGAEvent('enter_chatroom', {
       concept: roomName,
       entry_timestamp: getUnixTime(),
     })
-
-    const room = chatMsg.find((r: ChatRoomWithMessage) => r.roomRouteId === id)
-    if (room?.chatroomId) setUnread(room.chatroomId, false)
-
     setSelectedRoom({ id, name: roomName })
-    setPushData(null)
+
+    if (isDailyUnread) {
+      // 알림 있는 경우 딥링크 채팅 생성 로직
+      setPushData({
+        startMessage: dailyGreeting.message,
+        targetChatbotId: dailyGreeting.chatbotId,
+        targetTopic: dailyGreeting.topic,
+      })
+    } else {
+      // 기존 로직
+      const room = chatMsg.find(
+        (r: ChatRoomWithMessage) => r.roomRouteId === id
+      )
+      if (room?.chatroomId) setUnread(room.chatroomId, false)
+      setPushData(null)
+    }
+
     setIsSheetOpen(true)
   }
 
@@ -226,6 +260,13 @@ const MainPage = () => {
   const handleStartChat = async (closeness: number) => {
     if (!selectedRoom || !userId) return
     if (pushData) {
+      try {
+        setUnread(DAILY_UNREAD_KEY, false)
+        await markNotificationsAsRead(null) // 서버 전체 읽음 처리
+      } catch (e) {
+        console.error('읽음 처리 실패:', e)
+      }
+
       await handlePushRoomStart(closeness)
     } else {
       handleNormalRoomStart(closeness)
