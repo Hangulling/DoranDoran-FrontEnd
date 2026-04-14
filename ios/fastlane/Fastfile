@@ -33,7 +33,7 @@ platform :ios do
 
 		# ios 빌드 버전
 		increment_version_number(
-  	version_number: "1.1.1", # 원하는 버전 명시
+  	version_number: "1.1.2", # 원하는 버전 명시
   	xcodeproj: "App/App.xcodeproj"
 			)
 
