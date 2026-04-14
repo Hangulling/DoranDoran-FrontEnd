@@ -39,6 +39,8 @@ const usePushNotification = () => {
         try {
           const fcmToken = token.value
 
+          console.log('fcm 토큰:', fcmToken)
+
           // if (Capacitor.getPlatform() === 'ios') {
           //   // iOS일 경우 APNs 토큰을 FCM 토큰으로 교체
           //   const res = await FCM.getToken()
