@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.3.14](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.3.13...v4.3.14) (2026-04-14)
+
+
+### Bug Fixes
+
+* ios fcm 수정 ([96c8002](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/96c80026b764762c9ba47ff49bce18a0b42e829e))
+* ios fcm 수정 ([#489](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/489)) ([1e1aff9](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/1e1aff916fd99a8f38810157204dddac40c95771))
+
 ### [4.3.13](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.3.12...v4.3.13) (2026-04-14)
 
 ### [4.3.12](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.3.11...v4.3.12) (2026-04-14)
