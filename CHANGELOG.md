@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.4.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.3.14...v4.4.0) (2026-04-15)
+
+
+### Features
+
+* 안읽은 알림 메인페이지 표시 ([#490](https://github.com/Hangulling/DoranDoran-FrontEnd/issues/490)) ([c0b1893](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/c0b1893c8fe91841b629033f1419c80ac1239aa9))
+
+
+### Bug Fixes
+
+* vconsole 삭제 ([dc2be4d](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/dc2be4d5bf82dc55296265d661dd4dda30704ec4))
+
 ### [4.3.14](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.3.13...v4.3.14) (2026-04-14)
 
 
