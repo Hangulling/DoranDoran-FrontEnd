@@ -5,8 +5,6 @@
 > 언어와 문화, 관계의 친밀도에 맞게 학습할 수 있는 ‘AI 한국어 챗봇 메이트’  
 > [도란도란] https://doran-chat.com
 
-<img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white"> <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=black"> <img src="https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=black"> <img src="https://img.shields.io/badge/TypeScript.js-3178C6?style=for-the-badge&logo=TypeScript&logoColor=black"> <img src="https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=blue"> <img src="https://img.shields.io/badge/Zustand-00BFFF?style=for-the-badge&logo=vite&logoColor=brown"> <img src="https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=blue"> <img src="https://img.shields.io/badge/DaisyUi-1AD1A5?style=for-the-badge&logo=daisyui&logoColor=green">
-
 ## 🎯 프로젝트 개요
 
 What if AI could understand your level of closeness?

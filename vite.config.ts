@@ -20,7 +20,7 @@ export default defineConfig({
   server: {
     port: 3000, // 3000번 포트 고정
   },
-  build: {
+   build: {
     outDir: 'dist',
   },
 })
