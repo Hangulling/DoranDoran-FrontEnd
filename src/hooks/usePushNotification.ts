@@ -10,13 +10,13 @@ import { Capacitor } from '@capacitor/core'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { markNotificationsAsRead, registerFcmToken } from '../api/notification'
-import useUnreadStore from '../stores/useUnreadStore'
+import useUnreadStore, { DAILY_UNREAD_KEY } from '../stores/useUnreadStore'
 import { useUserStore } from '../stores/useUserStore'
 
 const usePushNotification = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { setUnread } = useUnreadStore() // 확인 유무
+  const { setUnread, clearAllUnread } = useUnreadStore() // 확인 유무
   const { id: userId } = useUserStore()
 
   useEffect(() => {
@@ -68,9 +68,9 @@ const usePushNotification = () => {
       (notification: PushNotificationSchema) => {
         const data = notification.data
         console.log('Foreground Push received:', JSON.stringify(data, null, 2))
-        if (data?.chatroomId) {
-          // 안 읽음 상태
-          setUnread(data.chatroomId, true)
+
+        if (data?.topic || data?.concept) {
+          setUnread(DAILY_UNREAD_KEY, true, data.startMessage, data.concept)
         }
 
         // 메시지 내용 업데이트
@@ -85,12 +85,11 @@ const usePushNotification = () => {
         const data = notification.notification.data
         console.log('Push Payload:', JSON.stringify(data, null, 2))
 
+        clearAllUnread()
+
         // 읽음 처리
         try {
-          const notificationId = data?.id ? [Number(data.id)] : null
-
-          await markNotificationsAsRead(notificationId)
-
+          await markNotificationsAsRead(null)
           console.log('읽음 처리 성공')
         } catch (error) {
           console.error('푸시 읽음 처리 실패 (서버 에러):', error)
@@ -116,7 +115,7 @@ const usePushNotification = () => {
       receivedListener.then(l => l.remove())
       actionPerformedListener.then(l => l.remove())
     }
-  }, [navigate, queryClient, setUnread, userId])
+  }, [clearAllUnread, navigate, queryClient, setUnread, userId])
 }
 
 export default usePushNotification
