@@ -1,13 +1,26 @@
 import type { ChatRoomItemProps } from '../../types/main'
 import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter'
 import { MAIN_DATA, MANAGER_ROOM } from '../../constants/mainData'
+import useUnreadStore, { DAILY_UNREAD_KEY } from '../../stores/useUnreadStore'
 
 const ChatRoomItem = ({ room, onClick, isLoading }: ChatRoomItemProps) => {
+  const { unreadMap } = useUnreadStore()
   const targetData =
     MAIN_DATA.find(data => data.roomName === room.roomName) ||
     (room.roomName === MANAGER_ROOM.roomName ? MANAGER_ROOM : null)
 
   if (!targetData) return null
+
+  const dailyGreeting = unreadMap[DAILY_UNREAD_KEY]
+
+  const isTargetOfDailyPush =
+    dailyGreeting?.hasUnread &&
+    dailyGreeting.concept?.toLowerCase() === room.roomName.toLowerCase()
+
+  const displayMessage = isTargetOfDailyPush
+    ? dailyGreeting.message
+    : room.message
+  const showUnreadDot = isTargetOfDailyPush || room.hasNewMessage
 
   const Skeleton = () => (
     <div className="h-4.5 w-52.5 bg-primary-30 rounded-sm animate-pulse" />
@@ -33,7 +46,7 @@ const ChatRoomItem = ({ room, onClick, isLoading }: ChatRoomItemProps) => {
           </span>
 
           {/* 보라색 점 표시 */}
-          {room.hasNewMessage && (
+          {showUnreadDot && (
             <div className="w-2 h-2 rounded-full bg-purple-300 mr-2" />
           )}
         </div>
@@ -42,10 +55,10 @@ const ChatRoomItem = ({ room, onClick, isLoading }: ChatRoomItemProps) => {
         ) : (
           <span
             className={`text-[14px] truncate w-full text-left ${
-              room.hasNewMessage ? 'text-gray-800' : 'text-gray-500'
+              showUnreadDot ? 'text-gray-800' : 'text-gray-500'
             }`}
           >
-            {room.message}
+            {displayMessage}
           </span>
         )}
       </div>
