@@ -10,9 +10,8 @@ import CommonModal from '../../../components/common/CommonModal'
 import { createUser, login } from '../../../api'
 import axios from 'axios'
 import { useAgreementStore } from '../../../stores/useAgreementStore'
-import { GA_ENABLED, IS_PROD } from '../../../constants/env'
-import ReactGA from 'react-ga4'
 import { tokenService } from '../../../api/tokenService'
+import { sendGAEvent } from '../../../utils/ga'
 
 type OutletContext = {
   setSubmit: (fn: () => void) => void
@@ -79,11 +78,9 @@ export default function SignupQuestion() {
 
       setOpenModal(false)
 
-      if (IS_PROD && GA_ENABLED) {
-        ReactGA.event('sign_up', {
-          method: 'email',
-        })
-      }
+      sendGAEvent('sign_up', {
+        method: 'email',
+      })
 
       const loginRes = await login({ email, password })
 
