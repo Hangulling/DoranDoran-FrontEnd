@@ -21,11 +21,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         Messaging.messaging().delegate = self
         print("[iOS FCM] [STEP1] Messaging.delegate 설정 완료")
 
-				//didFinishLaunchingWithOptions 내에서 호출하여 SDK를 활성화
+				// Meta(Facebook) SDK 설정 추가
         ApplicationDelegate.shared.application(
             application,
             didFinishLaunchingWithOptions: launchOptions
         )
+				Settings.shared.isAutoLogAppEventsEnabled = true
+    		Settings.shared.isAdvertiserIDCollectionEnabled = true
 
         return true
     }
