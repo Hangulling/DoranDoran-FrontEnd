@@ -4,4 +4,7 @@
     <string name="title_activity_main">K-oach</string>
     <string name="package_name">com.koach.app</string>
     <string name="custom_url_scheme">com.koach.app</string>
+		<string name="facebook_app_id">2822743828076251</string>
+    <string name="facebook_client_token">02fd34801dbb3e5344d7b0b3a41131a3</string>
+		<string name="facebook_login_protocol_scheme">fb2822743828076251</string>
 </resources>

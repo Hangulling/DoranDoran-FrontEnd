@@ -14,9 +14,16 @@ declare module '@capgo/capacitor-social-login' {
     name?: string
   }
 
+  export interface FacebookLoginResult {
+    accessToken?: string
+    userId?: string
+    email?: string
+    name?: string
+  }
+
   export interface SocialLoginResponse {
     provider: string
-    result: GoogleLoginResult | AppleLoginResult
+    result: GoogleLoginResult | AppleLoginResult | FacebookLoginResult
   }
 
   export const SocialLogin: {
@@ -30,10 +37,14 @@ declare module '@capgo/capacitor-social-login' {
         clientId?: string
         redirectUrl?: string
       }
+      facebook?: {
+        appId?: string
+        clientToken?: string
+      }
     }): Promise<void>
 
     login(options: {
-      provider: 'google' | 'apple'
+      provider: 'google' | 'apple' | 'facebook'
       options?: {
         scopes?: string[]
       }
