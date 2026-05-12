@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import ReactGA from 'react-ga4'
-import { GA_ENABLED, IS_PROD } from '../../constants/env'
 import ArchiveTabs from '../../components/archive/ArchiveTabs'
 import ClosenessSelect from '../../components/archive/ClosenessSelect'
 import SentenceCard from '../../components/archive/SentenceCard'
@@ -13,6 +11,7 @@ import Button from '../../components/common/Button'
 import CommonModal from '../../components/common/CommonModal'
 import showToast from '../../components/common/CommonToast'
 import EmptyCard from '../../components/archive/EmptyCard'
+import { sendGAEvent } from '../../utils/ga'
 
 export default function SentenceArchivePage() {
   const [lang, setLang] = useState<Lang>('KOR')
@@ -95,8 +94,8 @@ export default function SentenceArchivePage() {
 
     setOpenId(prev => (prev === bookmarkId ? null : bookmarkId))
 
-    if (nextOpen && IS_PROD && GA_ENABLED) {
-      ReactGA.event('sentence_explanation_saved_click', {
+    if (nextOpen) {
+      sendGAEvent('sentence_explanation_saved_click', {
         bookmark_id: bookmarkId,
       })
     }

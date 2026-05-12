@@ -14,8 +14,6 @@ import type {
 import { getUserById } from '../api'
 import useClosenessStore from '../stores/useClosenessStore'
 import { getClosenessAsText } from '../utils/conceptMap'
-import ReactGA from 'react-ga4'
-import { GA_ENABLED, IS_PROD } from '../constants/env'
 import { useBookmarkManager } from '../hooks/chat/useBookmarkManager'
 import { useChatExit } from '../hooks/chat/useChatExit'
 import { useInactivityTimer } from '../hooks/chat/useInactivityTimer'
@@ -30,7 +28,7 @@ import { useChatSettingStore } from '../stores/useChatSetting'
 import ReportSheet from '../components/chat/ReportSheet'
 import { createSupport } from '../api/support'
 import showToast from '../components/common/CommonToast'
-import { sendGAEvent } from '../utils/ga'
+import { getTodayDate, sendGAEvent } from '../utils/ga'
 import { useIOSKeyboard } from '../hooks/useIOSKeyboard'
 
 const INACTIVITY_DURATION_MS = 300000
@@ -262,17 +260,17 @@ const ChatPage: React.FC = () => {
 
   // view_chatroom GA
   useEffect(() => {
-    if (IS_PROD && GA_ENABLED && chatroomId && userId) {
+    if (chatroomId && userId) {
       const sessionKey = `viewed_chatroom_${chatroomId}`
       const alreadyViewed = sessionStorage.getItem(sessionKey)
 
       // alreadyViewed가 'true'가 아닐 때만 이벤트 전송
       if (alreadyViewed !== 'true') {
-        const yyyyMmDd = new Date().toISOString().slice(0, 10)
-        ReactGA.event('view_chatroom', {
+        sendGAEvent('view_chatroom', {
           chatroom_id: chatroomId,
-          date: yyyyMmDd,
+          date: getTodayDate(),
         })
+
         // 이벤트 전송 후 sessionStorage에 플래그 설정
         sessionStorage.setItem(sessionKey, 'true')
       }

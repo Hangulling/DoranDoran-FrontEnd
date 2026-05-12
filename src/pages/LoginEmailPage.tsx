@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
-import ReactGA from 'react-ga4'
 
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
@@ -11,7 +10,7 @@ import { useUserStore } from '../stores/useUserStore'
 import showToast from '../components/common/CommonToast'
 import { tokenService } from '../api/tokenService'
 import { useIOSKeyboard } from '../hooks/useIOSKeyboard'
-import { GA_ENABLED, IS_PROD } from '../constants/env'
+import { sendGAEvent } from '../utils/ga'
 
 type ErrorKind = 'wrong_email' | 'wrong_password' | 'both' | 'general' | null
 
@@ -32,11 +31,9 @@ export default function LoginEmailPage() {
   const setStoreName = useUserStore(s => s.setName)
 
   useEffect(() => {
-    if (IS_PROD && GA_ENABLED) {
-      ReactGA.event('page_view', {
-        page: 'login_email',
-      })
-    }
+    sendGAEvent('page_view', {
+      page: 'login_email',
+    })
   }, [])
 
   const mapAuthError = ({
@@ -116,23 +113,19 @@ export default function LoginEmailPage() {
         setError(mapped.type)
         setErrorMsg(mapped.msg ?? '')
 
-        if (IS_PROD && GA_ENABLED) {
-          ReactGA.event('fail_login', {
-            error_type: mapped.type ?? 'unknown_login_error',
-            method: 'email',
-          })
-        }
+        sendGAEvent('fail_login', {
+          error_type: mapped.type ?? 'unknown_login_error',
+          method: 'email',
+        })
 
         return
       }
 
       const user = res?.data?.user
       if (user) {
-        if (IS_PROD && GA_ENABLED) {
-          ReactGA.event('login', {
-            method: 'email',
-          })
-        }
+        sendGAEvent('login', {
+          method: 'email',
+        })
 
         setStoreId(user.id)
         setStoreName(user.name)
@@ -155,12 +148,10 @@ export default function LoginEmailPage() {
         }
 
         if (!status || status >= 500) {
-          if (IS_PROD && GA_ENABLED) {
-            ReactGA.event('fail_login', {
-              error_type: `status_${status ?? 503}`,
-              method: 'email',
-            })
-          }
+          sendGAEvent('fail_login', {
+            error_type: `status_${status ?? 503}`,
+            method: 'email',
+          })
 
           navigate('/error', {
             replace: true,
@@ -179,19 +170,15 @@ export default function LoginEmailPage() {
         setErrorMsg(mapped.msg ?? '')
         console.error('🚨 로그인 에러:', err.response?.data || err)
 
-        if (IS_PROD && GA_ENABLED) {
-          ReactGA.event('fail_login', {
-            error_type: mapped.type ?? 'unknown_login_catch_error',
-            method: 'email',
-          })
-        }
+        sendGAEvent('fail_login', {
+          error_type: mapped.type ?? 'unknown_login_catch_error',
+          method: 'email',
+        })
       } else {
-        if (IS_PROD && GA_ENABLED) {
-          ReactGA.event('fail_login', {
-            error_type: 'unknown_email_login_error',
-            method: 'email',
-          })
-        }
+        sendGAEvent('fail_login', {
+          error_type: 'unknown_email_login_error',
+          method: 'email',
+        })
 
         navigate('/error', {
           replace: true,
