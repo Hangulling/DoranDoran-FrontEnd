@@ -69,7 +69,9 @@ export const useFetchChatRooms = (userId: string) => {
     const data = rawChatMsg || []
     return data.map(room => ({
       ...room,
-      hasNewMessage: room.chatroomId ? !!unreadMap[room.chatroomId] : false,
+      hasNewMessage: room.chatroomId
+        ? !!unreadMap[room.chatroomId]?.hasUnread
+        : false,
     }))
   }, [rawChatMsg, unreadMap])
 
