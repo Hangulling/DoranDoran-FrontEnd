@@ -1,14 +1,11 @@
 import { useEffect } from 'react'
-import ReactGA from 'react-ga4'
 import ArchiveLogoImg from '../../assets/archive/archive.svg'
 import ArchiveEntryCard from '../../components/archive/ArchiveEntryCard'
-import { GA_ENABLED, IS_PROD } from '../../constants/env'
+import { sendGAEvent } from '../../utils/ga'
 
 export default function ArchivePage() {
   useEffect(() => {
-    if (IS_PROD && GA_ENABLED) {
-      ReactGA.event('store_enter')
-    }
+    sendGAEvent('store_enter')
   }, [])
 
   return (
