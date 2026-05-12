@@ -32,6 +32,11 @@
                 <string>dorandoran</string>
             </array>
         </dict>
+				<dict>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>fb2822743828076251</string> </array>
+        </dict>
     </array>
     <key>ITSAppUsesNonExemptEncryption</key>
     <false/>
@@ -115,5 +120,22 @@
         <key>HTTPMaximumConnectionsPerHost</key>
         <integer>10</integer>
     </dict>
+
+		<key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>fbapi</string>
+        <string>fb-messenger-api</string>
+        <string>fbauth2</string>
+        <string>fbshareextension</string>
+    </array>
+    <key>FacebookAppID</key>
+    <string>2822743828076251</string> <key>FacebookClientToken</key>
+    <string>02fd34801dbb3e5344d7b0b3a41131a3</string> <key>FacebookDisplayName</key>
+    <string>K-oach</string>
+
+    <key>FacebookAutoLogAppEventsEnabled</key>
+    <true/>
+    <key>FacebookAdvertiserIDCollectionEnabled</key>
+    <true/>
 </dict>
 </plist>

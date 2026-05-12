@@ -3,6 +3,7 @@ import Capacitor
 import FirebaseCore
 import GoogleSignIn
 import FirebaseMessaging
+import FBSDKCoreKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
@@ -19,6 +20,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         // MessagingDelegate 등록 (토큰 갱신 감지)
         Messaging.messaging().delegate = self
         print("[iOS FCM] [STEP1] Messaging.delegate 설정 완료")
+
+				//didFinishLaunchingWithOptions 내에서 호출하여 SDK를 활성화
+        ApplicationDelegate.shared.application(
+            application,
+            didFinishLaunchingWithOptions: launchOptions
+        )
 
         return true
     }
@@ -66,6 +73,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     func application(_ app: UIApplication,
                      open url: URL,
                      options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+
+				if ApplicationDelegate.shared.application(app, open: url, options: options) {
+            return true
+        }
 
         if GIDSignIn.sharedInstance.handle(url) {
             return true
