@@ -29,6 +29,9 @@ target 'App' do
   pod 'FirebaseAuth'
   pod 'GoogleSignIn'
   pod 'Alamofire'
+	pod 'FBSDKCoreKit', '~> 17.0'
+  pod 'FBSDKLoginKit', '~> 17.0'
+  pod 'FBSDKShareKit', '~> 17.0'
 end
 
 post_install do |installer|
