@@ -4,6 +4,8 @@ import FirebaseCore
 import GoogleSignIn
 import FirebaseMessaging
 import FBSDKCoreKit
+import AppTrackingTransparency
+import AdSupport
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
@@ -26,10 +28,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
             application,
             didFinishLaunchingWithOptions: launchOptions
         )
-				Settings.shared.isAutoLogAppEventsEnabled = true
-    		Settings.shared.isAdvertiserIDCollectionEnabled = true
+
+				// 앱 실행 1초 후 추적 권한 팝업 요청
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.requestTrackingPermission()
+        }
 
         return true
+    }
+
+		// 추적 권한 요청
+    func requestTrackingPermission() {
+        if #available(iOS 14, *) {
+            ATTrackingManager.requestTrackingAuthorization { status in
+                switch status {
+                case .authorized:
+                    print("사용자가 추적을 허용")
+                    // 허용 시 Meta SDK 활성화
+                    Settings.shared.isAutoLogAppEventsEnabled = true
+                    Settings.shared.isAdvertiserIDCollectionEnabled = true
+                case .denied, .restricted, .notDetermined:
+                    print("사용자가 추적을 거부")
+                    // 거부 시 광고 식별자 수집 비활성화
+                    Settings.shared.isAdvertiserIDCollectionEnabled = false
+                @unknown default:
+                    break
+                }
+            }
+        }
     }
 
     // APNs 디바이스 토큰 수신
