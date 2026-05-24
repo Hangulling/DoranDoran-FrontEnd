@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.9.1](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.9.0...v4.9.1) (2026-05-24)
+
+
+### Bug Fixes
+
+* 설치 추적 추가 ([7ad8a63](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/7ad8a6350fdce116116bd8c13cf27fe83b76099f))
+
 ## [4.9.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.8.0...v4.9.0) (2026-05-13)
 
 ## [4.8.0](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.7.2...v4.8.0) (2026-05-12)
