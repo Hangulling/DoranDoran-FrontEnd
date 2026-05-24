@@ -47,10 +47,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
                     // 허용 시 Meta SDK 활성화
                     Settings.shared.isAutoLogAppEventsEnabled = true
                     Settings.shared.isAdvertiserIDCollectionEnabled = true
+										Settings.shared.isAdvertiserTrackingEnabled = true
                 case .denied, .restricted, .notDetermined:
                     print("사용자가 추적을 거부")
                     // 거부 시 광고 식별자 수집 비활성화
                     Settings.shared.isAdvertiserIDCollectionEnabled = false
+										Settings.shared.isAdvertiserTrackingEnabled = false
                 @unknown default:
                     break
                 }
