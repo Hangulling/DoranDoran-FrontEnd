@@ -12,7 +12,7 @@ const config: CapacitorConfig = {
     SocialLogin: {
       providers: {
         google: true,
-        facebook: false,
+        facebook: true,
         apple: true,
         twitter: false,
       },
