@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.9.2](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.9.1...v4.9.2) (2026-05-26)
+
+
+### Bug Fixes
+
+* facebook 세팅 수정 ([5c975c6](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/5c975c671d34ccc4b5b9064c67458fd8d6a48063))
+* facebook 세팅 수정 ([aa818e3](https://github.com/Hangulling/DoranDoran-FrontEnd/commit/aa818e35579b99be9f5101da8bc981494ccbfb84))
+
 ### [4.9.1](https://github.com/Hangulling/DoranDoran-FrontEnd/compare/v4.9.0...v4.9.1) (2026-05-24)
 
 
